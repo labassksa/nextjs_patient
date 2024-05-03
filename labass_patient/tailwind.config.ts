@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/globals.css",
   ],
   theme: {
     extend: {
@@ -18,7 +19,7 @@ const config: Config = {
         "custom-green": "#4DA514",
       },
       fontFamily: {
-        sans: ["Cairo", "sans-serif"], // Cairo will be the default sans font
+        cairo: ["Cairo", "sans-serif"], // Ensures the font is easily referenced
       },
     },
   },

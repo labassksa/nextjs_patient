@@ -2,13 +2,14 @@
 // src/app/Home.tsx
 import { usePathname } from "next/navigation";
 import BottomNavBar from "../components/BottomNavBar";
-import TopBanner from "../components/TopHomePageBanner";
-import BottomBanner from "../components/BottomHomePageBanner";
-import ConsultationButton from "../components/ConsultationButtonHomePage";
-import HorizontalItemList from "../components/symptomsList";
+import TopBanner from "../components/homePage/TopHomePageBanner";
+import BottomBanner from "../components/homePage/BottomHomePageBanner";
+import ConsultationButton from "../components/homePage/ConsultationButtonHomePage";
+import HorizontalItemList from "../components/homePage/symptomsList";
 import React from "react";
 import "./globals.css";
-import LinkInsuranceButton from "../components/LinkInsuranceButton";
+import LinkInsuranceButton from "../components/homePage/LinkInsuranceButton";
+import LinkInsurance from "../components/homePage/LinkInsuranceButton";
 
 const items = [
   {
@@ -42,15 +43,13 @@ const Home: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <div className="bg-custom-background min-h-screen flex flex-col font-sans ">
+    <div className="bg-custom-background min-h-screen flex-col">
       <TopBanner />
-      <div>
-        <BottomBanner />
-      </div>
+      <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">
         <ConsultationButton />
         <HorizontalItemList items={items} />
-        <LinkInsuranceButton />
+        <LinkInsurance />
       </div>
       <BottomNavBar currentPath={pathname} />
     </div>

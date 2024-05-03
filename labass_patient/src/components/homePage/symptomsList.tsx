@@ -1,7 +1,7 @@
 // src/components/HorizontalItemList.tsx
 import React from "react";
 import ListItem from "./symptomsListItem";
-import { Item } from "../app/types"; // Assuming you have defined types separately
+import { Item } from "../../app/types"; // Assuming you have defined types separately
 
 interface Props {
   items: Item[];

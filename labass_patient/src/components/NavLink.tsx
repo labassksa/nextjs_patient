@@ -1,7 +1,13 @@
-// components/NavLink.tsx
 "use client";
-// components/NavLink.tsx
 import Link from "next/link";
+import React from "react";
+
+interface NavLinkProps {
+  href: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  active: boolean;
+}
 
 interface NavLinkProps {
   href: string;
@@ -19,14 +25,15 @@ const NavLink: React.FC<NavLinkProps> = ({
   return (
     <Link
       href={href}
-      className="flex flex-col items-center space-y-1 text-center"
+      className="flex flex-col items-center text-center"
+      passHref
     >
       <Icon
-        className={`h-5 w-5 ${active ? "text-green-700" : "text-gray-400"}`}
+        className={`h-5 w-20 ${active ? "text-green-700" : "text-gray-400"}`}
       />
       <span
-        className={` ${
-          active ? "text-green-700 text-sm"  : "text-gray-400 text-xs"
+        className={`${
+          active ? "text-green-700 text-sm" : "text-gray-400 text-xs"
         } hover:text-green-700`}
       >
         {label}
