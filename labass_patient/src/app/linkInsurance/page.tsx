@@ -8,19 +8,27 @@ import LinkInsuranceButton from "../../components/linkInsurance/buttonLinkInsura
 
 const LinkInsurancePage: React.FC = () => {
   return (
-    <div className="bg-custom-background min-h-screen flex-col">
-      <InsuranceHeader />
-      <UserDetails
-        name="John Doe"
-        nationality="Saudi"
-        nationalId="10876321"
-        dateOfBirth="9-6-1998"
-      />
-      <InsuranceDropdown
-        onChange={(value) => console.log("Selected Insurance:", value)}
-      />
-      {/* Other components will follow */}
-      <LinkInsuranceButton />
+    <div className="bg-custom-background min-h-screen flex flex-col justify-between">
+      <div>
+        <InsuranceHeader />
+        <div className="px-4 mt-4 text-red-600 font-normal text-sm" dir="rtl">
+          ربط التأمين غير متاح حاليا
+          <UserDetails
+            name="John Doe"
+            nationalId="10876321"
+            dateOfBirth="9-6-1998"
+            nationality="Saudi"
+          />
+          <div className="mt-6">
+            <InsuranceDropdown
+              onChange={(value) => console.log("Selected Insurance:", value)}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="mx-4 my-6">
+        <LinkInsuranceButton />
+      </div>
     </div>
   );
 };
