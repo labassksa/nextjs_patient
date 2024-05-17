@@ -9,7 +9,7 @@ interface Props {
 
 const HorizontalItemList: React.FC<Props> = ({ items }) => {
   return (
-    <div className="flex flex-nowrap overflow-x-auto  gap-4 p-2 w-full">
+    <div className=" flex flex-nowrap overflow-x-auto  gap-4 p-2 w-full">
       {items.map((item) => (
         <div className="w-1/2 shrink-0 md:w-1/3" key={item.id}> {/* Added wrapper with w-1/2 and shrink-0 */}
         <ListItem

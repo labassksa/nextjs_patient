@@ -51,10 +51,12 @@
   font-style: normal;
 }
 
-html,
-body {
+html {
+  line-height: 1.5;
   font-family: "Cairo", sans-serif; /* Include a generic sans-serif as a fallback */
-  color: "text-black";
+  -webkit-text-size-adjust: 100%; /* Ensure consistent text size on iOS */
+  -moz-text-size-adjust: 100%; /* Ensure consistent text size on Firefox */
+  text-size-adjust: 100%; /* Standard syntax for other browsers */
 }
 
 :root {
@@ -83,6 +85,7 @@ body {
 
 @layer utilities {
   .text-balance {
-    text-wrap: balance;
+    text-align: justify;
+    hyphens: auto; /* Helps break words more evenly across lines */
   }
 }

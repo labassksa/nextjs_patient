@@ -49,7 +49,7 @@ const Home: React.FC = () => {
   const pathname = usePathname();
 
   return (
-    <div className="bg-custom-background min-h-screen  justify-center items-center">
+    <div className=" bg-custom-background min-h-screen  justify-center items-center ">
       <TopBanner />
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">

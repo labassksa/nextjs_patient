@@ -5,7 +5,7 @@ import Image from "next/image";
 const BottomBanner: React.FC = () => {
   return (
     <div
-      className="fixed top-[11vh] bg-white rounded-lg shadow-lg p-4 px-4 z-20 mx-4  inset-x-0
+      className="md:w-1/3 fixed top-[11vh] bg-white rounded-lg shadow-lg p-4 px-4 z-20 mx-4  inset-x-0
     "
     >
       <div dir="rtl" className="flex  items-center ">

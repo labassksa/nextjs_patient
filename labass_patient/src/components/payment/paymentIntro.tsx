@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 const PaymentIntro: React.FC = () => {
   return (
@@ -6,10 +7,15 @@ const PaymentIntro: React.FC = () => {
       <p>سيتم تحويلك الى طبيب عام خلال ثلاثة دقائق</p>
       <h2 className="text-lg font-semibold mt-4">طرق الدفع المتوفرة</h2>
       <div className="flex justify-around mt-4">
-        <img src="/icons/visa.svg" alt="Visa" />
-        <img src="/icons/mada.svg" alt="Maestro" />
-        <img src="/icons/mc.svg" alt="Mastercard" />
-        <img src="/icons/apple_pay.svg" alt="Apple Pay" />
+        <Image src="/icons/visa.svg" alt="Visa" width={64} height={40} />
+        <Image src="/icons/mada.svg" alt="Maestro" width={64} height={40} />
+        <Image src="/icons/mc.svg" alt="Mastercard" width={64} height={40} />
+        <Image
+          src="/icons/apple_pay.svg"
+          alt="Apple Pay"
+          width={64}
+          height={40}
+        />
       </div>
     </div>
   );

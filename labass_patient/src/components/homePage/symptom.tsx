@@ -22,16 +22,15 @@ const ListItem: React.FC<ListItemProps> = ({
             src={imageUrl}
             alt={title}
             layout="responsive"
-            width={1} // Since aspect ratio is 1:1, width and height are the same
-            height={1}
-            objectFit="contain"
+            width={24} // Since aspect ratio is 1:1, width and height are the same
+            height={24}
             className="rounded-lg"
           />
         </div>
       </div>
       <div className="">
         <h3
-          className="text-lg md:text-lg lg:text-xl font-bold text-black"
+          className="text-md md:text-lg lg:text-xl font-bold text-black"
           dir="rtl"
         >
           {title}

@@ -4,13 +4,17 @@ import Image from "next/image";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation"; // Correct import should be 'next/router', not 'next/navigation'
+import { isAuthenticated } from "../../utils/auth";
 
 const ConsultationButton: React.FC = () => {
   const router = useRouter();
 
   const navigateToPayment = () => {
-    router.push("/payment"); // Ensure this matches your actual route
-  };
+    if (isAuthenticated()) {
+      router.push("/payment"); // Navigate to payment if authenticated
+    } else {
+      router.push("/login"); // Redirect to login if not authenticated
+    }  };
 
   return (
     <div
@@ -23,8 +27,8 @@ const ConsultationButton: React.FC = () => {
           <div className="flex justify-between gap-2">
             <div className="flex bg-custom-background rounded-2xl px-1 py-1 ">
               <div>
-                <p className=" text-sm font-bold text-black " dir="rtl">
-                  خلال ثلاث دقائق
+                <p className=" text-sm font-semibold text-black " dir="rtl">
+                    أقل من دقيقة
                 </p>
               </div>
               <ClockIcon className="h-6 w-6 text-black" aria-hidden="true" />

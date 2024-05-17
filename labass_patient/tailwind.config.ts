@@ -21,6 +21,9 @@ const config: Config = {
       fontFamily: {
         cairo: ["Cairo", "sans-serif"], // Ensures the font is easily referenced
       },
+      textColor: {
+        DEFAULT: "#000000", // Default text color set to black
+      },
     },
   },
   plugins: [],

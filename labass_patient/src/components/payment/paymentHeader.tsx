@@ -7,13 +7,13 @@ const PaymentHeader: React.FC = () => {
 
   return (
     <div className="fixed top-0 w-full bg-white p-4 flex items-center justify-between">
-      <h1 className="text-lg text-black font-normal flex-grow text-center ">
+      <h1 className="text-lg text-gray-500  font-normal flex-grow text-center ">
         الدفع{" "}
       </h1>
       <button onClick={() => router.back()} className="ml-2">
         {" "}
         {/* Adjusted for RTL layout */}
-        <ArrowRightIcon className="h-5 w-5 text-black" aria-hidden="true" />
+        <ArrowRightIcon className="h-5 w-5 text-gray-500 " aria-hidden="true" />
       </button>
     </div>
   );
