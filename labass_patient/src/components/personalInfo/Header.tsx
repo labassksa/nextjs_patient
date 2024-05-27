@@ -1,0 +1,22 @@
+// src/components/personalInfo/PersonalInfoHeader.tsx
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/solid";
+
+const PersonalInfoHeader: React.FC = () => {
+  const router = useRouter();
+
+  return (
+    <div className="fixed top-0 w-full bg-white p-4 flex items-center justify-between">
+      <h1 className="text-lg text-black font-normal flex-grow text-center">
+        معلوماتك الشخصية
+      </h1>
+      <button onClick={() => router.back()} className="mr-2">
+        <ArrowRightIcon className="h-5 w-5 text-black" aria-hidden="true" />
+      </button>
+    </div>
+  );
+};
+
+export default PersonalInfoHeader;

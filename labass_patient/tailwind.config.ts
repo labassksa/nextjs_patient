@@ -9,6 +9,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      ringColor: {
+        "custom-green": "#4DA514", // Define your custom color
+      },
+      ringWidth: {
+        3: "3px", // Optional: Define custom ring width if needed
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
