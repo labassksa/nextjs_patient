@@ -1,5 +1,5 @@
 import React from "react";
-import { PaymentMethodEnum } from "../../app/types/paymentMethods";
+import { PaymentMethodEnum } from "../../app/profile/types/paymentMethods";
 
 interface PaymentMethodProps {
   method: string;
@@ -9,7 +9,9 @@ interface PaymentMethodProps {
 const PaymentMethod: React.FC<PaymentMethodProps> = ({ method, setMethod }) => {
   return (
     <div className="bg-white pt-4 pb-4 mx-4 mt-2 rounded-lg" dir="rtl">
-      <h2 className="text-lg font-semibold text-black pr-2">اختر طريقة الدفع</h2>
+      <h2 className="text-lg font-semibold text-black pr-2">
+        اختر طريقة الدفع
+      </h2>
       <div className="flex flex-col items-start justify-between mt-4 space-y-2">
         <button
           onClick={() => setMethod(PaymentMethodEnum.ApplePay)}
@@ -24,7 +26,8 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ method, setMethod }) => {
           />
           ابل باي
         </button>
-        <div className="w-full border-t border-gray-200"></div> {/* Divider line */}
+        <div className="w-full border-t border-gray-200"></div>{" "}
+        {/* Divider line */}
         <button
           onClick={() => setMethod(PaymentMethodEnum.Card)}
           className={"flex items-center p-2 w-full text-black"}

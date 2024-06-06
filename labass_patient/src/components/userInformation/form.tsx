@@ -11,7 +11,9 @@ const PersonalInfoForm = () => {
     dateOfBirth: "",
     gender: "",
   });
-
+  const navigateToPaymentConfirmation = () => {
+    router.push("/waitingDoctor");
+  };
   // Add state for error handling and feedback
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -125,6 +127,7 @@ const PersonalInfoForm = () => {
         <button
           type="submit"
           className="w-full font-bold bg-custom-green text-white py-4 px-4 rounded-3xl"
+          onClick={navigateToPaymentConfirmation}
         >
           إرسال
         </button>

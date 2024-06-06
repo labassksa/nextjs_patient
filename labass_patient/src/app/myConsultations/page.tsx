@@ -37,7 +37,7 @@ const MyConsultationsPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <MyConsultationHeader />
-      <div className="pt-16">
+      {/* <div className="pt-16">
         {isLoading ? (
           <p className="text-center">Loading...</p>
         ) : error ? (
@@ -54,7 +54,7 @@ const MyConsultationsPage = () => {
             />
           ))
         )}
-      </div>
+      </div> */}
       <BottomNavBar currentPath={pathname} />
     </div>
   );

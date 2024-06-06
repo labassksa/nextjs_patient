@@ -8,12 +8,14 @@ import { PlusIcon } from "@heroicons/react/24/solid"; // Ensure the icon is impo
 
 const PatientSelection: React.FC = () => {
   const router = useRouter();
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
+    null
+  );
 
   const patients: User[] = [
-    new User("أنا", "", "123456789", "1990-01-01", "male"),
-    new User("محمد", "سمير", "987654321", "1992-07-15", "male"),
-    new User("أماني", "مرتضى", "192837465", "1993-05-20", "female"),
+    new User(0, "أنا", "", "123456789", "1990-01-01", "male"),
+    new User(1, "محمد", "سمير", "987654321", "1992-07-15", "male"),
+    new User(2, "أماني", "مرتضى", "192837465", "1993-05-20", "female"),
   ];
 
   const handleSelectPatient = (nationalId: string) => {
@@ -30,7 +32,8 @@ const PatientSelection: React.FC = () => {
               className="self-start w-24 h-28 text-sm py-2 px-4 bg-gray-100 rounded-lg text-black flex flex-col items-center justify-center"
               onClick={() => router.push("/path/to/add/patient")}
             >
-              <PlusIcon className="h-6 w-6 mb-2" /> {/* Adjusted icon size and margin */}
+              <PlusIcon className="h-6 w-6 mb-2" />{" "}
+              {/* Adjusted icon size and margin */}
               إضافة مريض
             </button>
             {patients.map((patient) => (

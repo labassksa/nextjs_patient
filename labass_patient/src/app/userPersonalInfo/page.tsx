@@ -1,6 +1,7 @@
 import React from "react";
 import PersonalInfoHeader from "../../components/userInformation/header"; // Adjust the path as necessary
 import PersonalInfoForm from "../../components/userInformation/form";
+import { usePathname } from "next/navigation";
 
 const PersonalInfo = () => {
   return (

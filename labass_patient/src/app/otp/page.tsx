@@ -1,4 +1,3 @@
-// pages/otp.tsx
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -10,70 +9,64 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([
-    null,
-    null,
-    null,
-    null,
-  ]);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([null, null, null, null]);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const router = useRouter();
 
-  const searchParams = useSearchParams();
-  const phoneNumber = searchParams.get("phoneNumber"); // Extract phoneNumber from query parameters
-  const router = useRouter(); // Use useRouter for navigation
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const phoneNumber = searchParams.get("phoneNumber");
+    setPhoneNumber(phoneNumber);
+  }, []);
 
   useEffect(() => {
     if (otp.every((val) => val.length === 1)) {
-      handleSubmitOTP();
+      // handleSubmitOTP();
     }
-  }, [otp.join("")]); // Trigger only when combined OTP changes
+  }, [otp.join("")]);
 
   const updateOTP = (value: string, index: number) => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
     if (value && index < 3) {
-      inputRefs.current[index + 1]?.focus(); // Focus next field
+      inputRefs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
-      inputRefs.current[index - 1]?.focus(); // Focus previous field
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handleSubmitOTP = async () => {
-    if (!phoneNumber) {
-      console.error("Phone number is missing in the OTP page.");
-      return;
-    }
+  // const handleSubmitOTP = async () => {
+  //   if (!phoneNumber) {
+  //     console.error("Phone number is missing in the OTP page.");
+  //     return;
+  //   }
 
-    const otpCode = otp.join("");
-    const data = {
-      role: "patient",
-      phoneNumber, // Use phoneNumber from query parameters
-      otpcode: otpCode,
-    };
+  //   const otpCode = otp.join("");
+  //   const data = {
+  //     role: "patient",
+  //     phoneNumber,
+  //     otpcode: otpCode,
+  //   };
 
-    try {
-      const response = await axios.post(
-        "http://localhost:4000/api_labass/auth",
-        data
-      );
-      // Extract the JWT token from response and store it in local storage
-      const { token } = response.data;
-      localStorage.setItem("jwtToken", token); // Store the token in local storage
+  //   try {
+  //     const response = await axios.post("http://localhost:4000/api_labass/auth", data);
+  //     const { token } = response.data;
+  //     localStorage.setItem("jwtToken", token);
 
-      console.log("OTP Verified:", response.data);
+  //     console.log("OTP Verified:", response.data);
 
-      // Navigate to the home page after successful login
-      router.push("/");
-    } catch (error) {
-      console.error("Failed to verify OTP:", error);
-    }
-  };
+  //     router.push("/");
+  //   } catch (error) {
+  //     console.error("Failed to verify OTP:", error);
+  //   }
+  // };
 
   return (
     <div className="bg-white min-h-screen">
       <div className="flex flex-col justify-between">
         <OTPHeader />
-        <OTPTopText phoneNumber={phoneNumber} />
+        {phoneNumber ? <OTPTopText phoneNumber={phoneNumber} /> : null}
         <div className="flex mt-10 justify-center">
           {otp.map((value, index) => (
             <OTPInput

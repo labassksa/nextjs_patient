@@ -53,7 +53,7 @@ const Home: React.FC = () => {
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">
         <ConsultationButton />
-        <HorizontalItemList items={items} />
+        {/* <HorizontalItemList items={items} /> */}
         <LinkInsurance />
       </div>
       <BottomNavBar currentPath={pathname} />

@@ -9,9 +9,9 @@ const AddressAndWhatsAppSection: React.FC = () => {
       <div className="flex flex-row justify-end items-center mb-2">
         <div className="text-right">
           <p className="text-sm font-semibold"> العنوان</p>
-          <p className="text-gray-500 text-sm">
-            الرياض، طريق الأمير بندر بن عبدالعزيز{" "}
-            <LocationOn className="inline-block" />
+          <p className="text-gray-500 text-sm" dir="rtl">
+            <LocationOn className="inline-block text-gray-400" />
+            الرياض طريق الأمير بندر بن عبدالعزيز مبنى رقم 3486 {" "}
           </p>
         </div>
       </div>

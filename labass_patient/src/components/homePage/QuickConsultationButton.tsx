@@ -10,11 +10,12 @@ const ConsultationButton: React.FC = () => {
   const router = useRouter();
 
   const navigateToPayment = () => {
-    if (isAuthenticated()) {
-      router.push("/payment"); // Navigate to payment if authenticated
-    } else {
-      router.push("/login"); // Redirect to login if not authenticated
-    }
+    router.push("/payment"); // Navigate to payment if authenticated
+    // if (isAuthenticated()) {
+    //   router.push("/payment"); // Navigate to payment if authenticated
+    // } else {
+    //   router.push("/login"); // Redirect to login if not authenticated
+    // }
   };
 
   return (

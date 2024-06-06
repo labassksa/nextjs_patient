@@ -20,7 +20,10 @@ const CardForm: React.FC<CardFormProps> = ({ sessionId, countryCode }) => {
 
     function initializeMyFatoorah() {
       if (window.myFatoorah) {
-        console.log("Initializing MyFatoorah with:", { countryCode, sessionId });
+        console.log("Initializing MyFatoorah with:", {
+          countryCode,
+          sessionId,
+        });
         window.myFatoorah.init({
           countryCode,
           sessionId,
@@ -39,10 +42,10 @@ const CardForm: React.FC<CardFormProps> = ({ sessionId, countryCode }) => {
   }, [sessionId, countryCode]);
 
   return (
-    <form id="payment-form">
-      <h2>Enter Card Details</h2>
-      <div id="card-element"></div> {/* MyFatoorah will render the card form here */}
-    </form>
+    <div>
+      <div id="card-element"></div>{" "}
+      {/* MyFatoorah will render the card form here */}
+    </div>
   );
 };
 

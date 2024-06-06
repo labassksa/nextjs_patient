@@ -65,7 +65,7 @@ const CardDetailsPage: React.FC = () => {
       <h1>A</h1>
       {sessionId && (
         <CardForm
-          sessionId="4ee5dfac-fd66-4aef-a8fe-7aa77a6241aa"
+          sessionId="b10917e5-f859-4c01-83ee-b3fa7634fecc"
           countryCode="KWT"
         />
       )}

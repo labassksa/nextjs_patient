@@ -1,7 +1,6 @@
-
 import React from "react";
 import AppleIcon from "@mui/icons-material/Apple";
-import { PaymentMethodEnum } from "../../app/types/paymentMethods";
+import { PaymentMethodEnum } from "../../app/profile/types/paymentMethods";
 import { useRouter } from "next/navigation";
 
 interface PaymentButtonProps {
@@ -13,7 +12,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
 
   const handlePaymentClick = () => {
     if (method === PaymentMethodEnum.Card) {
-      router.push("/payment/cardDetails"); // Navigate to the Card Details page
+      router.push("/cardDetails"); // Navigate to the Card Details page
+    } else {
+      router.push("/userPersonalInfo"); // Navigate to the Card Details page
     }
   };
 

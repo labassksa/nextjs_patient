@@ -1,8 +1,19 @@
-const DoctorInfoCard = () => {
+import React from "react";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
+import { Person2Rounded } from "@mui/icons-material";
+import DoctorsHeader from "./_components/header";
+
+const DoctorsPage = () => {
   return (
-    <div className="flex flex-row justify-end bg-white p-2  shadow rounded-lg">
-      <div className="flex flex-col justify-start">
-      <div className="flex flex-row items-center" dir="rtl">
+    <div className="min-h-screen bg-white">
+      <DoctorsHeader />
+      <div className="p-4 pt-28 text-right leading-relaxed text-gray-800">
+        {/* Placeholder for policy text */}
+
+        <div className="flex p-2 m-2 rounded-lg border shadow border-gray-300 bg-white">
+          <div className="w-full flex flex-col justify-between" dir="rtl">
+            <div className="flex flex-row justify-between mb-2">
+              <div className="flex flex-row items-center">
                 <img
                   src="/images/dr_mohammed.jpg"
                   alt="د. محمد"
@@ -31,10 +42,13 @@ const DoctorInfoCard = () => {
                     الخبرة: سنتين{" "}
                   </h3>
                 </div>
-              </div>        
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
     </div>
   );
 };
-export default DoctorInfoCard
+
+export default DoctorsPage;
