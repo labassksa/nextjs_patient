@@ -7,7 +7,7 @@ const CardDetailsPage: React.FC = () => {
   const [sessionId, setSessionId] = useState<string>("");
   const [countryCode, setCountryCode] = useState<string>("");
 
-  useEffect(() => {
+   useEffect(() => {
     const fetchSessionData = async () => {
       try {
         const response = await axios.get("/api/initiate-session");
