@@ -8,7 +8,6 @@ import ConsultationButton from "../components/homePage/QuickConsultationButton";
 import HorizontalItemList from "../components/homePage/symptoms";
 import React from "react";
 import "./globals.css";
-import LinkInsuranceButton from "../components/homePage/LinkInsuranceButton";
 import LinkInsurance from "../components/homePage/LinkInsuranceButton";
 
 const items = [

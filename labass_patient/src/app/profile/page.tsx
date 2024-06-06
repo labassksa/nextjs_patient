@@ -1,20 +1,14 @@
-"use client";
 import React from "react";
-import BottomNavBar from "../../components/BottomNavBar";
-import { usePathname } from "next/navigation";
+import Header from "../../components/profile/header";
+import Menu from "../../components/profile/menu";
+import AddressAndWhatsAppSection from "../../components/profile/addresandCustomerSupport";
 
 const ProfilePage: React.FC = () => {
-  const pathname = usePathname();
   return (
-    <div>
-      <div className="bg-custom-background min-h-screen flex-col text-blue-600">
-        <div className="pt-[28vh] overflow-auto px-4 flex-grow">
-          <h1>Profile Page</h1>
-          <h1>Profile Page</h1>
-          <p>Welcome to your profile.</p>
-        </div>
-        <BottomNavBar currentPath={pathname} />
-      </div>
+    <div className="profile-page bg-gray-100 min-h-screen p-4 text-black">
+      <Header />
+      <Menu />
+      <AddressAndWhatsAppSection/>
     </div>
   );
 };

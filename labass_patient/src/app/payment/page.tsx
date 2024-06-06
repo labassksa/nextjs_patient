@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import PaymentIntro from "../../components/payment/paymentIntro";
 import PaymentMethod from "../../components/payment/paymentMethod";

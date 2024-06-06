@@ -108,7 +108,7 @@ const PersonalInfoForm = () => {
           onChange={handleChange}
           required
           autoComplete="off"
-          className="px-4 py-2 border border-gray-300 w-full text-black text-right focus:border-custom-green  placeholder:text-right  rtl"
+          className="px-4 py-2 border focus:outline-none  border-gray-300 w-full text-black text-right focus:border-custom-green  placeholder:text-right  rtl"
         >
           <option value="" dir="rtl">
             اختر الجنس

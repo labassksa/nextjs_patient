@@ -14,7 +14,8 @@ const ConsultationButton: React.FC = () => {
       router.push("/payment"); // Navigate to payment if authenticated
     } else {
       router.push("/login"); // Redirect to login if not authenticated
-    }  };
+    }
+  };
 
   return (
     <div
@@ -26,9 +27,9 @@ const ConsultationButton: React.FC = () => {
         <div>
           <div className="flex justify-between gap-2">
             <div className="flex bg-custom-background rounded-2xl px-1 py-1 ">
-              <div>
-                <p className=" text-sm font-semibold text-black " dir="rtl">
-                    أقل من دقيقة
+              <div className="flex flex-row justify-center">
+                <p className=" text-xs font-semibold text-black " dir="rtl">
+                  أقل من دقيقة
                 </p>
               </div>
               <ClockIcon className="h-6 w-6 text-black" aria-hidden="true" />
