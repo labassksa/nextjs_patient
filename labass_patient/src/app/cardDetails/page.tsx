@@ -7,21 +7,21 @@ const CardDetailsPage: React.FC = () => {
   const [sessionId, setSessionId] = useState<string>("");
   const [countryCode, setCountryCode] = useState<string>("");
 
-   useEffect(() => {
-    const fetchSessionData = async () => {
-      try {
-        const response = await axios.get("/api/initiate-session");
-        if (response.data.IsSuccess) {
-          setSessionId(response.data.Data.SessionId);
-          setCountryCode(response.data.Data.CountryCode);
-        }
-      } catch (error) {
-        console.error("Error fetching session data:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchSessionData = async () => {
+  //     try {
+  //       const response = await axios.get("/api/initiate-session");
+  //       if (response.data.IsSuccess) {
+  //         setSessionId(response.data.Data.SessionId);
+  //         setCountryCode(response.data.Data.CountryCode);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching session data:", error);
+  //     }
+  //   };
 
-    fetchSessionData();
-  }, []);
+  //   fetchSessionData();
+  // }, []);
 
   const handlePaymentSubmit = async () => {
     try {
@@ -62,13 +62,13 @@ const CardDetailsPage: React.FC = () => {
 
   return (
     <div>
-      <h1>A</h1>
-      {sessionId && (
+      <h1>Card Details</h1>
+      {
         <CardForm
-          sessionId="b10917e5-f859-4c01-83ee-b3fa7634fecc"
+          sessionId="387220c2-6e74-4bfb-a1e8-5e8ce76ef5b5"
           countryCode="KWT"
         />
-      )}
+      }
       <button onClick={handlePaymentSubmit}>Submit Payment</button>
     </div>
   );

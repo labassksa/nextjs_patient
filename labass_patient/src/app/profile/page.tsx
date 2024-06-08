@@ -5,7 +5,7 @@ import Menu from "../../components/profile/menu";
 import AddressAndWhatsAppSection from "../../components/profile/addresandCustomerSupport";
 import BottomNavBar from "../../components/BottomNavBar";
 import { usePathname } from "next/navigation";
-
+import ComplaintsSection from "../../components/profile/complaints";
 
 const ProfilePage: React.FC = () => {
   const pathname = usePathname();
@@ -14,6 +14,7 @@ const ProfilePage: React.FC = () => {
       <Header />
       <Menu />
       <AddressAndWhatsAppSection />
+      <ComplaintsSection />
       <BottomNavBar currentPath={pathname} />
     </div>
   );

@@ -6,7 +6,7 @@ import PaymentSummary from "../../components/payment/paymentSummary";
 import PaymentButton from "../../components/payment/paymentButton";
 import PaymentHeader from "../../components/payment/paymentHeader";
 import PromoCode from "../../components/payment/promoCodeInput"; // Ensure correct path
-import { PaymentMethodEnum } from "../profile/types/paymentMethods";
+import { PaymentMethodEnum } from "../../types/paymentMethods";
 
 const PaymentPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState(

@@ -1,6 +1,6 @@
 import React from "react";
 import AppleIcon from "@mui/icons-material/Apple";
-import { PaymentMethodEnum } from "../../app/profile/types/paymentMethods";
+import { PaymentMethodEnum } from "../../types/paymentMethods";
 import { useRouter } from "next/navigation";
 
 interface PaymentButtonProps {

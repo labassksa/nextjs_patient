@@ -1,5 +1,5 @@
 import React from "react";
-import { PaymentMethodEnum } from "../../app/profile/types/paymentMethods";
+import { PaymentMethodEnum } from "../../types/paymentMethods";
 
 interface PaymentMethodProps {
   method: string;

@@ -7,8 +7,8 @@ const menuItems = [
   { title: "الأطباء", href: "/doctors" },
   { title: "الشروط والأحكام", href: "/termsandConditions" },
   { title: "سياسة الخصوصية", href: "/privacyPolicy" },
-//   { title: "تواصل معنا", href: "/profile/contact" },
-  { title: "تعديل على المعلومات الشخصيه", href: "/userPersonalInfo" },
+  //   { title: "تواصل معنا", href: "/profile/contact" },
+  { title: "قائمة الأسعار", href: "/pricingList" },
   { title: "ربط التأمين", href: "/linkInsurance" },
 ];
 
