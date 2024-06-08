@@ -27,7 +27,7 @@ const PricingPage = () => {
                     السعر: SAR 89
                   </h3>
                   <h3 className="font-normal text-sm text-black" dir="rtl">
-                    طبيب عام{" "}
+                    شامل الضريبة{" "}
                   </h3>
                   <h3
                     className="font-normal text-sm text-custom-green mt-2"
