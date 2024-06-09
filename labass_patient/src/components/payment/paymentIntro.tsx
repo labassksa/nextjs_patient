@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const PaymentIntro: React.FC = () => {
   return (
-    <div className="bg-custom-background text-black p-4 mt-2" dir="rtl">
+    <div className="bg-gray-100 text-black p-4 mt-2" dir="rtl">
       <p>سيتم تحويلك الى طبيب عام خلال ثلاثة دقائق</p>
       <h2 className="text-lg font-semibold mt-4">طرق الدفع المتوفرة</h2>
       <div className="flex justify-around mt-4">

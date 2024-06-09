@@ -8,7 +8,7 @@ interface CardFormProps {
 const CardForm: React.FC<CardFormProps> = ({ sessionId, countryCode }) => {
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://portal.myfatoorah.com/cardview/v2/session.js"; // Adjust URL based on environment
+    script.src = "https://demo.myfatoorah.com/cardview/v2/session.js"; // Adjust URL based on environment
     script.onload = () => {
       console.log("MyFatoorah script loaded.");
       initializeMyFatoorah();

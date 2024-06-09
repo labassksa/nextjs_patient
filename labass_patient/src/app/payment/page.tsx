@@ -14,7 +14,7 @@ const PaymentPage: React.FC = () => {
   );
 
   return (
-    <div className="bg-custom-background min-h-screen flex flex-col">
+    <div className="bg-gray-100 min-h-screen flex flex-col">
       <PaymentHeader />
       <div className="pt-16 flex-grow overflow-auto">
         <PaymentIntro />
