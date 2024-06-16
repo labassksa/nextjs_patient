@@ -91,7 +91,7 @@ const CardDetails: React.FC = () => {
           );
 
           // try {
-          //   const executePaymentResponse = await axios.post(
+          //   const executePaymentResponse = await axios.po st(
           //     "http://localhost:4000/api_labass/execute-payment",
           //     {
           //       sessionId: response.data.sessionId,
