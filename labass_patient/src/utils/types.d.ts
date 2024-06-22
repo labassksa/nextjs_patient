@@ -5,21 +5,27 @@ interface MyFatoorahInitConfig {
   supportedNetworks: string;
 }
 
-
-
 interface MyFatoorahResponse {
-  isSuccess: boolean;
-  message: string | null;
-  validationErrors: string | null;
+  IsSuccess: boolean;
+  Message: string | null;
+  ValidationErrors: string | null;
+  Data: {
+    SessionId: string;
+    CardBrand: string;
+    CardIdentifier: string;
+    CardToken: string | null;
+  };
+}
+
+interface MyFatoorahSubmitResponse {
   sessionId: string;
   cardBrand: string;
   cardIdentifier: string;
-  cardToken: string | null;
 }
 
 interface Window {
   myFatoorah: {
     init: (config: MyFatoorahInitConfig) => void;
-    submit: () => Promise<MyFatoorahResponse>;
+    submit: () => Promise<MyFatoorahSubmitResponse>;
   };
 }
