@@ -1,63 +1,26 @@
 "use client";
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
-const CardDetailsContent: React.FC = () => {
+declare global {
+  interface Window {
+    myFatoorah: any;
+  }
+}
+
+const CardDetails: React.FC = () => {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get("sessionId");
-  const countryCode = searchParams.get("countryCode");
+  const sessionId = searchParams.get("sessionId") || "";
+  const countryCode = searchParams.get("countryCode") || "";
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null);
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  const [formRendered, setFormRendered] = useState(false);
   const myFatoorahInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (!sessionId || !countryCode) return;
-
-    const scriptId = "myFatoorahScript";
-
-    const loadScript = () => {
-      return new Promise<void>((resolve, reject) => {
-        const existingScript = document.getElementById(scriptId);
-        if (existingScript) {
-          console.log("Script already exists, resolving...");
-          setIsScriptLoaded(true);
-          resolve();
-          return;
-        }
-
-        const script = document.createElement("script");
-        script.id = scriptId;
-        script.src = "https://demo.myfatoorah.com/cardview/v2/session.js";
-        script.onload = () => {
-          console.log("MyFatoorah script loaded successfully.");
-          setIsScriptLoaded(true);
-          resolve();
-        };
-        script.onerror = (error) => {
-          console.error("Failed to load MyFatoorah script.", error);
-          reject(error);
-        };
-        document.body.appendChild(script);
-        console.log("Script element added to the document.");
-      });
-    };
+    if (typeof window === "undefined" || !sessionId || !countryCode) return;
 
     const initializeMyFatoorah = () => {
-      if (
-        typeof window !== "undefined" &&
-        window.myFatoorah &&
-        !myFatoorahInitializedRef.current
-      ) {
-        const cardElement = document.getElementById("card-element");
-        if (!cardElement) {
-          console.error("Card element not found.");
-          return;
-        }
-        console.log(
-          `myFatoorahInitialized: ${myFatoorahInitializedRef.current}`
-        );
+      if (window.myFatoorah && !myFatoorahInitializedRef.current) {
         console.log("Initializing MyFatoorah with:", {
           countryCode,
           sessionId,
@@ -68,7 +31,7 @@ const CardDetailsContent: React.FC = () => {
           cardViewId: "card-element",
           supportedNetworks: "v,m,md,ae",
         });
-        console.log("MyFatoorah initialized successfully.");
+        console.log("MyFatoorah initialized.");
         myFatoorahInitializedRef.current = true;
       } else if (myFatoorahInitializedRef.current) {
         console.log("MyFatoorah is already initialized.");
@@ -77,25 +40,17 @@ const CardDetailsContent: React.FC = () => {
       }
     };
 
-    loadScript()
-      .then(() => {
-        const cardElementInterval = setInterval(() => {
-          if (document.getElementById("card-element")) {
-            clearInterval(cardElementInterval);
-            initializeMyFatoorah();
-          }
-        }, 100);
-      })
-      .catch(console.error);
+    const scriptCheckInterval = setInterval(() => {
+      if (window.myFatoorah) {
+        clearInterval(scriptCheckInterval);
+        initializeMyFatoorah();
+      }
+    }, 100);
+
+    return () => clearInterval(scriptCheckInterval);
   }, [sessionId, countryCode]);
 
-  useEffect(() => {
-    if (sessionId && countryCode && isScriptLoaded && !formRendered) {
-      setFormRendered(true);
-    }
-  }, [sessionId, countryCode, isScriptLoaded]);
-
-  const handlePaymentSubmit = () => {
+  const handlePaymentSubmit = async () => {
     console.log("Submitting payment...");
 
     if (
@@ -110,15 +65,57 @@ const CardDetailsContent: React.FC = () => {
     try {
       console.log("Before submitting to MyFatoorah");
 
-      window.myFatoorah.submit().then(function (response) {
-        console.log("Submit response received:", response);
-        // In case of success
-        // Here you need to pass session id to you backend here
-        var sessionId = response.sessionId;
-        var cardBrand = response.cardBrand; //cardBrand will be one of the following values: Master, Visa, Mada, Amex
-        var cardIdentifier = response.cardIdentifier;
-        console.log("session", sessionId);
-      });
+      const response = await window.myFatoorah.submit();
+      console.log("Submit response received:", response);
+
+      const sessionId = response.sessionId;
+      const cardBrand = response.cardBrand; // cardBrand will be one of the following values: Master, Visa, Mada, Amex
+      const cardIdentifier = response.cardIdentifier;
+      const issuccess = response.IsSuccess;
+      console.log("isSucess", issuccess)
+      console.log("session", sessionId);
+
+      // Call your execute payment endpoint here
+      const executePaymentResponse = await axios.post(
+        "http://localhost:4000/api_labass/execute-payment",
+        {
+          sessionId: response.sessionId,
+          invoiceValue: 100, // Example value
+          customerName: "John Doe", // Example value
+          displayCurrencyIso: "KWD", // Example value
+          mobileCountryCode: "+965", // Example value
+          customerMobile: "12345678", // Example value
+          customerEmail: "john.doe@example.com", // Example value
+          callbackUrl: "https://yoursite.com/success", // Your success callback URL
+          errorUrl: "https://yoursite.com/error", // Your error callback URL
+          customerReference: "ref123", // Example value
+          customerAddress: {
+            Block: "1",
+            Street: "Main Street",
+            HouseBuildingNo: "10",
+            AddressInstructions: "Near the park",
+          },
+          invoiceItems: [
+            {
+              ItemName: "Product 1",
+              Quantity: 1,
+              UnitPrice: 100,
+            },
+          ],
+        }
+      );
+
+      if (executePaymentResponse.data.IsSuccess) {
+        console.log(
+          `Payment URL: ${executePaymentResponse.data.Data.PaymentURL}`
+        );
+        handle3DSecure(executePaymentResponse.data.Data.PaymentURL);
+      } else {
+        console.error(
+          "Execute payment failed:",
+          executePaymentResponse.data.Message
+        );
+      }
     } catch (error) {
       console.error("Payment error:", error);
     }
@@ -189,13 +186,9 @@ const CardDetailsContent: React.FC = () => {
           أدخل معلومات البطاقة
         </h1>
         <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-          {formRendered ? (
-            <div className="bg-white">
-              <div id="card-element"></div>
-            </div>
-          ) : (
-            <p>Loading...</p>
-          )}
+          <div className="bg-white">
+            <div id="card-element"></div>
+          </div>
         </div>
       </div>
       <div className="flex justify-between">
@@ -216,14 +209,6 @@ const CardDetailsContent: React.FC = () => {
         )}
       </div>
     </div>
-  );
-};
-
-const CardDetails: React.FC = () => {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CardDetailsContent />
-    </Suspense>
   );
 };
 
