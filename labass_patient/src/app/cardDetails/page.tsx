@@ -95,7 +95,7 @@ const CardDetailsContent: React.FC = () => {
     }
   }, [sessionId, countryCode, isScriptLoaded]);
 
-  const handlePaymentSubmit = async () => {
+  const handlePaymentSubmit = () => {
     console.log("Submitting payment...");
 
     if (
@@ -110,7 +110,7 @@ const CardDetailsContent: React.FC = () => {
     try {
       console.log("Before submitting to MyFatoorah");
 
-      window.myFatoorah.submit().then((response) => {
+      window.myFatoorah.submit().then(function (response) {
         console.log("Submit response received:", response);
         // In case of success
         // Here you need to pass session id to you backend here
@@ -200,7 +200,7 @@ const CardDetailsContent: React.FC = () => {
       </div>
       <div className="flex justify-between">
         <button
-          className="bg-custom-green w-1/2 text-white py-2 px-4 rounded mt-4"
+          className="bg-custom-green w-full text-white py-2 px-4 rounded mt-4"
           onClick={handlePaymentSubmit}
           disabled={!myFatoorahInitializedRef.current}
         >

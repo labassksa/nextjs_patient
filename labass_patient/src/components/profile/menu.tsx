@@ -17,8 +17,8 @@ const Menu: React.FC = () => {
     <div className="menu">
       {menuItems.slice(0, 4).map((item, index) => (
         <Link href={item.href} key={index}>
-          <div className="menu-item flex justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-sm cursor-pointer">
-            <ArrowBackIos className="text-gray-500" />
+          <div className="menu-item flex justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-xs cursor-pointer">
+            <ArrowBackIos className="text-gray-600" />
             <span>{item.title}</span>
           </div>
         </Link>
@@ -26,7 +26,7 @@ const Menu: React.FC = () => {
       <div className="mt-4">
         {menuItems.slice(4).map((item, index) => (
           <Link href={item.href} key={index}>
-            <div className="menu-item flex justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-sm cursor-pointer">
+            <div className="menu-item flex justify-between items-center bg-white p-4 mb-8 rounded-lg shadow-sm cursor-pointer">
               <ArrowBackIos className="text-gray-500" />
               <span>{item.title}</span>
             </div>

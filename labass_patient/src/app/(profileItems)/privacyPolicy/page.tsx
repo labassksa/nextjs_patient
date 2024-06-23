@@ -1,10 +1,10 @@
 import React from "react";
-import PrivacyPolicyHeader from "../../../components/privacePolicy/header";
+import Header from "../../../components/common/header";
 
 const PrivacyPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      <PrivacyPolicyHeader />
+      <Header title="سياسة الخصوصية" showBackButton />
       <div className="p-4 pt-28 text-right leading-relaxed text-gray-800">
         {/* Placeholder for policy text */}
         <p dir="rtl">

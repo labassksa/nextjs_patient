@@ -1,12 +1,12 @@
+"use client"
 import React from "react";
-import PersonalInfoHeader from "../../components/userInformation/header"; // Adjust the path as necessary
+import Header from "../../components/common/header";
 import PersonalInfoForm from "../../components/userInformation/form";
-import { usePathname } from "next/navigation";
 
 const PersonalInfo = () => {
   return (
-    <div className="flex flex-col bg-custom-background min-h-screen">
-      <PersonalInfoHeader />
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Header title="أدخل المعلومات الشخصية" showBackButton />
       <div className="pt-16 w-full"> {/* Adjust this padding to match your header height */}
         <PersonalInfoForm />
       </div>

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import User from "../../models/user";
 import PatientCard from "../../components/patientSelection/patientCard";
-import PatientSelectionHeader from "../../components/patientSelection/header";
+import Header from "../../components/common/header";
 import { PlusIcon } from "@heroicons/react/24/solid"; // Ensure the icon is imported correctly
 
 const PatientSelection: React.FC = () => {
@@ -24,7 +24,7 @@ const PatientSelection: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex">
-      <PatientSelectionHeader />
+      <Header title="أدخل المعلومات الشخصية" showBackButton />
       <div className="flex flex-col justify-between m-2 w-full">
         <div className="pt-16 px-2" dir="rtl">
           <div className="flex flex-row gap-2 flex-wrap">

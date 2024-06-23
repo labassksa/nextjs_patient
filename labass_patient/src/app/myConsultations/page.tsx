@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import ConsultationCard from "../../components/myConsultation/card";
 import BottomNavBar from "../../components/BottomNavBar";
-import MyConsultationHeader from "../../components/myConsultation/header";
+import Header from "../../components/common/header";
 import { usePathname } from "next/navigation";
 import { fetchConsultations } from "../../controllers/consultation.controller"; // adjust the path as necessary
 import { mockConsultations } from "../../utils/mockedConsultation";
@@ -36,7 +36,7 @@ const MyConsultationsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <MyConsultationHeader />
+      <Header title='استشاراتي' />
       {/* <div className="pt-16">
         {isLoading ? (
           <p className="text-center">Loading...</p>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import OTPInput from "../../components/otp/otpInput";
-import OTPHeader from "../../components/otp/header";
+import Header from "../../components/common/header";
 import OTPTopText from "../../components/otp/otpTopText";
 import OTPBottomText from "../../components/otp/otpBottomText";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -65,7 +65,7 @@ const OTPPage = () => {
   return (
     <div className="bg-white min-h-screen">
       <div className="flex flex-col justify-between">
-        <OTPHeader />
+      <Header title="التحقق" showBackButton />
         {phoneNumber ? <OTPTopText phoneNumber={phoneNumber} /> : null}
         <div className="flex mt-10 justify-center">
           {otp.map((value, index) => (
