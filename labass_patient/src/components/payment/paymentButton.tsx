@@ -16,7 +16,11 @@ interface ApplePayConfig {
   currencyCode: string;
   amount: string;
   cardViewId: string;
-  callback: (response: { sessionId: string; cardBrand: string; cardIdentifier: string }) => void;
+  callback: (response: {
+    sessionId: string;
+    cardBrand: string;
+    cardIdentifier: string;
+  }) => void;
   sessionStarted: () => void;
   sessionCanceled: () => void;
 }
@@ -54,14 +58,19 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     if (method === PaymentMethodEnum.Card) {
       setLoading(true);
       try {
-        const response = await axios.post("http://localhost:4000/api_labass/initiate-session", {
-          InvoiceAmount: 100, // Use actual amount
-          CurrencyIso: "KWD", // Use actual currency
-        });
+        const response = await axios.post(
+          "http://localhost:4000/api_labass/initiate-session",
+          {
+            InvoiceAmount: 100, // Use actual amount
+            CurrencyIso: "KWD", // Use actual currency
+          }
+        );
 
         if (response.data.IsSuccess) {
           const { SessionId, CountryCode } = response.data.Data;
-          router.push(`/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`);
+          router.push(
+            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
+          );
         } else {
           console.error("Failed to initiate session:", response.data.Message);
         }
@@ -73,10 +82,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     } else if (method === PaymentMethodEnum.ApplePay) {
       setLoading(true);
       try {
-        const response = await axios.post("http://localhost:4000/api_labass/initiate-session", {
-          InvoiceAmount: 100, // Use actual amount
-          CurrencyIso: "KWD", // Use actual currency
-        });
+        const response = await axios.post(
+          "http://localhost:4000/api_labass/initiate-session",
+          {
+            InvoiceAmount: 100, // Use actual amount
+            CurrencyIso: "KWD", // Use actual currency
+          }
+        );
 
         if (response.data.IsSuccess) {
           const { SessionId } = response.data.Data;
@@ -114,9 +126,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
 
   const executePayment = async (sessionId: any) => {
     try {
-      const response = await axios.post("http://localhost:4000/api_labass/execute-payment", {
-        SessionId: sessionId,
-      });
+      const response = await axios.post(
+        "http://localhost:4000/api_labass/execute-payment",
+        {
+          SessionId: sessionId,
+        }
+      );
 
       if (response.data.IsSuccess) {
         console.log("Payment successful:", response.data);
@@ -128,7 +143,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     }
   };
 
-  const payment = (response: { sessionId: string; cardBrand: string; cardIdentifier: string }) => {
+  const payment = (response: {
+    sessionId: string;
+    cardBrand: string;
+    cardIdentifier: string;
+  }) => {
     const { sessionId } = response;
     executePayment(sessionId);
   };
@@ -145,7 +164,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     return (
       <div>
         <div id="card-element" style={{ display: "none" }}></div>
-        {/* <button
+        <button
           className="sticky bottom-0 pb-4 w-full font-bold bg-black text-white py-4 px-4 rounded-3xl flex justify-center items-center"
           dir="rtl"
           onClick={handlePaymentClick}
@@ -153,7 +172,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         >
           <AppleIcon className="ml-2" />
           {loading ? "Processing..." : "Apple Pay"}
-        </button> */}
+        </button>
       </div>
     );
   } else if (method === PaymentMethodEnum.Card) {
