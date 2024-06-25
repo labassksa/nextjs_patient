@@ -14,21 +14,6 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ method, setMethod }) => {
       </h2>
       <div className="flex flex-col items-start justify-between mt-4 space-y-2">
         <button
-          onClick={() => setMethod(PaymentMethodEnum.ApplePay)}
-          className={"flex items-center p-2 w-full text-black"}
-        >
-          <div
-            className={`w-4 h-4 rounded-full  ml-2 ${
-              method === PaymentMethodEnum.ApplePay
-                ? "bg-custom-green"
-                : "bg-gray-400"
-            }`}
-          />
-          ابل باي
-        </button>
-        <div className="w-full border-t border-gray-200"></div>{" "}
-        {/* Divider line */}
-        <button
           onClick={() => setMethod(PaymentMethodEnum.Card)}
           className={"flex items-center p-2 w-full text-black"}
         >
@@ -40,6 +25,21 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({ method, setMethod }) => {
             }`}
           />
           البطاقة الاتمانية
+        </button>
+        <div className="w-full border-t border-gray-200"></div>{" "}
+        {/* Divider line */}
+        <button
+          onClick={() => setMethod(PaymentMethodEnum.ApplePay)}
+          className={"flex items-center p-2 w-full text-black"}
+        >
+          <div
+            className={`w-4 h-4 rounded-full  ml-2 ${
+              method === PaymentMethodEnum.ApplePay
+                ? "bg-custom-green"
+                : "bg-gray-400"
+            }`}
+          />
+          ابل باي
         </button>
       </div>
     </div>

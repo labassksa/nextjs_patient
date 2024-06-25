@@ -9,9 +9,7 @@ import { PaymentMethodEnum } from "../../types/paymentMethods";
 import Header from "../../components/common/header";
 
 const PaymentPage: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState(
-    PaymentMethodEnum.ApplePay
-  );
+  const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.Card);
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import AppleIcon from "@mui/icons-material/Apple";
 import { PaymentMethodEnum } from "../../types/paymentMethods";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -29,9 +28,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
+  const scriptLoadedRef = useRef(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (method === PaymentMethodEnum.ApplePay) {
+    const loadApplePayScript = () => {
       const script = document.createElement("script");
       script.src = "https://demo.myfatoorah.com/applepay/v3/applepay.js";
       script.async = true;
@@ -39,8 +40,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
 
       script.onload = () => {
         console.log("Apple Pay script loaded successfully.");
-        if (applePayConfigRef.current) {
-          window.myFatoorahAP.init(applePayConfigRef.current);
+        scriptLoadedRef.current = true;
+        if (applePayConfigRef.current ) {
+          (window as any).myFatoorahAP.init(applePayConfigRef.current);
+          setIsInitialized(true);
         }
       };
 
@@ -51,80 +54,60 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       return () => {
         document.body.removeChild(script);
       };
+    };
+
+    if (method === PaymentMethodEnum.ApplePay && !scriptLoadedRef.current ) {
+      loadApplePayScript();
+    } else if (method !== PaymentMethodEnum.ApplePay) {
+      const container = document.getElementById("apple-pay-container");
+      if (container) {
+        container.innerHTML = ""; // remove the apple pay button
+        setIsInitialized(false); // Reset isInitialized when switching to another method
+      }
     }
   }, [method]);
 
   const handlePaymentClick = async () => {
-    if (method === PaymentMethodEnum.Card) {
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          "http://localhost:4000/api_labass/initiate-session",
-          {
-            InvoiceAmount: 100, // Use actual amount
-            CurrencyIso: "KWD", // Use actual currency
-          }
-        );
-
-        if (response.data.IsSuccess) {
-          const { SessionId, CountryCode } = response.data.Data;
-          router.push(
-            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
-          );
-        } else {
-          console.error("Failed to initiate session:", response.data.Message);
+    if (loading) return; // Prevent multiple initiations
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api_labass/initiate-session",
+        {
+          InvoiceAmount: 100, // Use actual amount
+          CurrencyIso: "KWD", // Use actual currency
         }
-      } catch (error) {
-        console.error("Error initiating session:", error);
-      } finally {
-        setLoading(false);
-      }
-    } else if (method === PaymentMethodEnum.ApplePay) {
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          "http://localhost:4000/api_labass/initiate-session",
-          {
-            InvoiceAmount: 100, // Use actual amount
-            CurrencyIso: "KWD", // Use actual currency
-          }
-        );
+      );
 
-        if (response.data.IsSuccess) {
-          const { SessionId } = response.data.Data;
+      if (response.data.IsSuccess) {
+        const { SessionId } = response.data.Data;
 
-          applePayConfigRef.current = {
-            sessionId: SessionId,
-            countryCode: "KWT", // Use actual country code
-            currencyCode: "KWD", // Use actual currency code
-            amount: "100", // Use actual amount
-            cardViewId: "card-element",
-            callback: payment,
-            sessionStarted: sessionStarted,
-            sessionCanceled: sessionCanceled,
-          };
+        applePayConfigRef.current = {
+          sessionId: SessionId,
+          countryCode: "KWT", // Use actual country code
+          currencyCode: "KWD", // Use actual currency code
+          amount: "100", // Use actual amount
+          cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
+          callback: payment,
+          sessionStarted: sessionStarted,
+          sessionCanceled: sessionCanceled,
+        };
 
-          if (window.myFatoorahAP) {
-            console.log("window.myFatoorahAP is available");
-            window.myFatoorahAP.init(applePayConfigRef.current);
-            console.log("Initialization completed");
-          } else {
-            console.error("window.myFatoorahAP is not available");
-          }
-        } else {
-          console.error("Failed to initiate session:", response.data.Message);
+        if (scriptLoadedRef.current) {
+          (window as any).myFatoorahAP.init(applePayConfigRef.current);
+          setIsInitialized(true);
         }
-      } catch (error) {
-        console.error("Error initiating session:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        console.error("Failed to initiate session:", response.data.Message);
       }
-    } else {
-      router.push("/userPersonalInfo");
+    } catch (error) {
+      console.error("Error initiating session:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const executePayment = async (sessionId: any) => {
+  const executePayment = async (sessionId: string) => {
     try {
       const response = await axios.post(
         "http://localhost:4000/api_labass/execute-payment",
@@ -148,7 +131,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     cardBrand: string;
     cardIdentifier: string;
   }) => {
-    const { sessionId } = response;
+    const sessionId = response.sessionId;
     executePayment(sessionId);
   };
 
@@ -160,35 +143,35 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     console.log("Session canceled");
   };
 
-  if (method === PaymentMethodEnum.ApplePay) {
-    return (
-      <div>
-        <div id="card-element" style={{ display: "none" }}></div>
+  useEffect(() => {
+    if (method === PaymentMethodEnum.ApplePay) {
+      handlePaymentClick();
+      const container = document.getElementById("apple-pay-container");
+      if (container) {
+        container.style.display = "block"; // Show the Apple Pay button
+      }
+    }
+  }, [method]);
+
+  return (
+    <div>
+      <div
+        id="apple-pay-container"
+        className="my-4"
+        style={{ display: "none" }}
+      ></div>
+      {method === PaymentMethodEnum.Card && (
         <button
-          className="sticky bottom-0 pb-4 w-full font-bold bg-black text-white py-4 px-4 rounded-3xl flex justify-center items-center"
+          className="sticky bottom-0 pb-4 w-full font-bold bg-custom-green text-white py-4 px-4 rounded-3xl"
           dir="rtl"
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          <AppleIcon className="ml-2" />
-          {loading ? "Processing..." : "Apple Pay"}
+          {loading ? "Processing..." : "الدفع"}
         </button>
-      </div>
-    );
-  } else if (method === PaymentMethodEnum.Card) {
-    return (
-      <button
-        className="sticky bottom-0 pb-4 w-full font-bold bg-custom-green text-white py-4 px-4 rounded-3xl"
-        dir="rtl"
-        onClick={handlePaymentClick}
-        disabled={loading}
-      >
-        {loading ? "Processing..." : "الدفع"}
-      </button>
-    );
-  }
-
-  return null;
+      )}
+    </div>
+  );
 };
 
 export default PaymentButton;
