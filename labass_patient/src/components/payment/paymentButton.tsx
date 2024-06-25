@@ -72,16 +72,16 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     setLoading(true);
     try {
       //Initiate session
-      const response = await axios.post(
-        "http://localhost:4000/api_labass/initiate-session",
-        {
-          InvoiceAmount: 100, // Use actual amount
-          CurrencyIso: "KWD", // Use actual currency
-        }
-      );
+      // const response = await axios.post(
+      //   "http://localhost:4000/api_labass/initiate-session",
+      //   {
+      //     InvoiceAmount: 100, // Use actual amount
+      //     CurrencyIso: "KWD", // Use actual currency
+      //   }
+      // );
 
-      if (response.data.IsSuccess) {
-        const { SessionId } = response.data.Data;
+      if (true) {
+        // const { SessionId } = response.data.Data;
 
         applePayConfigRef.current = {
           sessionId: "1ce4b21d-26b6-46b5-a665-78c5442e5802",
@@ -98,9 +98,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
           (window as any).myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
         }
-      } else {
-        console.error("Failed to initiate session:", response.data.Message);
       }
+      //  else {
+      //   console.error("Failed to initiate session:", response.data.Message);
+      // }
     } catch (error) {
       console.error("Error initiating session:", error);
     } finally {
