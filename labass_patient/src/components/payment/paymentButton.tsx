@@ -41,7 +41,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       script.onload = () => {
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
-        if (applePayConfigRef.current ) {
+        if (applePayConfigRef.current) {
           (window as any).myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
         }
@@ -56,7 +56,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       };
     };
 
-    if (method === PaymentMethodEnum.ApplePay && !scriptLoadedRef.current ) {
+    if (method === PaymentMethodEnum.ApplePay && !scriptLoadedRef.current) {
       loadApplePayScript();
     } else if (method !== PaymentMethodEnum.ApplePay) {
       const container = document.getElementById("apple-pay-container");
@@ -71,6 +71,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
+      //Initiate session
       const response = await axios.post(
         "http://localhost:4000/api_labass/initiate-session",
         {
@@ -83,7 +84,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         const { SessionId } = response.data.Data;
 
         applePayConfigRef.current = {
-          sessionId: SessionId,
+          sessionId: "1ce4b21d-26b6-46b5-a665-78c5442e5802",
           countryCode: "KWT", // Use actual country code
           currencyCode: "KWD", // Use actual currency code
           amount: "100", // Use actual amount
@@ -155,11 +156,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
 
   return (
     <div>
-      <div
-        id="apple-pay-container"
-        className="my-4"
-     
-      ></div>
+      <div id="apple-pay-container"></div>
       {method === PaymentMethodEnum.Card && (
         <button
           className="sticky bottom-0 pb-4 w-full font-bold bg-custom-green text-white py-4 px-4 rounded-3xl"
