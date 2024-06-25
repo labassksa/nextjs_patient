@@ -158,7 +158,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       <div
         id="apple-pay-container"
         className="my-4"
-        style={{ display: "none" }}
+     
       ></div>
       {method === PaymentMethodEnum.Card && (
         <button
