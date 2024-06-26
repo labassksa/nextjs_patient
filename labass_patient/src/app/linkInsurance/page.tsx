@@ -8,7 +8,7 @@ import LinkInsuranceButton from "../../components/linkInsurance/buttonLinkInsura
 
 const LinkInsurancePage: React.FC = () => {
   return (
-    <div className="bg-custom-background min-h-screen flex flex-col justify-between">
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
       <div>
       <Header title="ربط التأمين" showBackButton />
         <div className="px-4 mt-4 text-red-600 font-normal text-sm" dir="rtl">

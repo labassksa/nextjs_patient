@@ -71,37 +71,41 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
-      //Initiate session
-      // const response = await axios.post(
-      //   "http://localhost:4000/api_labass/initiate-session",
-      //   {
-      //     InvoiceAmount: 100, // Use actual amount
-      //     CurrencyIso: "KWD", // Use actual currency
-      //   }
-      // );
-
-      if (true) {
-        // const { SessionId } = response.data.Data;
-
-        applePayConfigRef.current = {
-          sessionId: "1ce4b21d-26b6-46b5-a665-78c5442e5802",
-          countryCode: "KWT", // Use actual country code
-          currencyCode: "KWD", // Use actual currency code
-          amount: "100", // Use actual amount
-          cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
-          callback: payment,
-          sessionStarted: sessionStarted,
-          sessionCanceled: sessionCanceled,
-        };
-
-        if (scriptLoadedRef.current) {
-          (window as any).myFatoorahAP.init(applePayConfigRef.current);
-          setIsInitialized(true);
+      const response = await axios.post(
+        "http://localhost:4000/api_labass/initiate-session",
+        {
+          InvoiceAmount: 100, // Use actual amount
+          CurrencyIso: "KWD", // Use actual currency
         }
+      );
+
+      if (response.data.IsSuccess) {
+        const { SessionId, CountryCode } = response.data.Data;
+
+        if (method === PaymentMethodEnum.Card) {
+          router.push(
+            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
+          );
+        } else if (method === PaymentMethodEnum.ApplePay) {
+          applePayConfigRef.current = {
+            sessionId: SessionId,
+            countryCode: "KWT", // Use actual country code
+            currencyCode: "KWD", // Use actual currency code
+            amount: "100", // Use actual amount
+            cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
+            callback: payment,
+            sessionStarted: sessionStarted,
+            sessionCanceled: sessionCanceled,
+          };
+
+          if (scriptLoadedRef.current) {
+            (window as any).myFatoorahAP.init(applePayConfigRef.current);
+            setIsInitialized(true);
+          }
+        }
+      } else {
+        console.error("Failed to initiate session:", response.data.Message);
       }
-      //  else {
-      //   console.error("Failed to initiate session:", response.data.Message);
-      // }
     } catch (error) {
       console.error("Error initiating session:", error);
     } finally {
