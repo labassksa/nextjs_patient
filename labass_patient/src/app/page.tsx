@@ -1,6 +1,3 @@
-"use client";
-// src/app/Home.tsx
-import { usePathname } from "next/navigation";
 import BottomNavBar from "../components/BottomNavBar";
 import TopBanner from "../components/homePage/TopHomePageBanner";
 import BottomBanner from "../components/homePage/BottomHomePageBanner";
@@ -43,13 +40,12 @@ const items = [
   },
   // Add other items
 ];
+
 interface HomeProps {
   pathname: string;
 }
 
-const Home: React.FC<HomeProps> = ({ pathname }) => {
-  // const pathname = usePathname();
-
+const Home: React.FC = () => {
   return (
     <div className=" bg-custom-background min-h-screen  justify-center items-center ">
       <TopBanner />
@@ -59,7 +55,7 @@ const Home: React.FC<HomeProps> = ({ pathname }) => {
         {/* <HorizontalItemList items={items} /> */}
         <LinkInsurance />
       </div>
-      <BottomNavBar currentPath={pathname} />
+      <BottomNavBar currentPath="/" />
     </div>
   );
 };
