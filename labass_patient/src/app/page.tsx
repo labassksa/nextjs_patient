@@ -43,9 +43,12 @@ const items = [
   },
   // Add other items
 ];
+interface HomeProps {
+  pathname: string;
+}
 
-const Home: React.FC = () => {
-  const pathname = usePathname();
+const Home: React.FC<HomeProps> = ({ pathname }) => {
+  // const pathname = usePathname();
 
   return (
     <div className=" bg-custom-background min-h-screen  justify-center items-center ">
