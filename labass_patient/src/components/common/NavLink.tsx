@@ -2,10 +2,9 @@
 import Link from "next/link";
 import React from "react";
 
-
 interface NavLinkProps {
   href: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon: React.ElementType; // Updated to use React.ElementType for Material Icons
   label: string;
   active: boolean;
 }

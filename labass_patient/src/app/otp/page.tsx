@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import OTPInput from "../../components/otp/otpInput";
+import OTPInput from "./_components/otp/otpInput";
 import Header from "../../components/common/header";
-import OTPTopText from "../../components/otp/otpTopText";
-import OTPBottomText from "../../components/otp/otpBottomText";
+import OTPTopText from "./_components/otp/otpTopText";
+import OTPBottomText from "./_components/otp/otpBottomText";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const OTPPage = () => {

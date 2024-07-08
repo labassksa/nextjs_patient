@@ -16,7 +16,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   dateOfBirth,
 }) => {
   return (
-    <div className="bg-gray-200  p-4 my-2 mx-4 rounded-lg">
+    <div className="bg-gray-200  p-4 rounded-lg mt-4">
       <div className="flex justify-between items-center ">
         <div>
           <p className="text-sm text-gray-600 ">الاسم</p>

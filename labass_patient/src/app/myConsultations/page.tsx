@@ -1,11 +1,11 @@
 // MyConsultationsPage.js
 "use client";
 import React, { useState, useEffect } from "react";
-import ConsultationCard from "../../components/myConsultation/card";
-import BottomNavBar from "../../components/BottomNavBar";
+import ConsultationCard from "./_components/myConsultation/card";
+import BottomNavBar from "../../components/common/BottomNavBar";
 import Header from "../../components/common/header";
 import { usePathname } from "next/navigation";
-import { fetchConsultations } from "../../controllers/consultation.controller"; // adjust the path as necessary
+// import { fetchConsultations } from "../../controllers/consultation.controller"; // adjust the path as necessary
 import { mockConsultations } from "../../utils/mockedConsultation";
 import { Consultation } from "../../models/consultation";
 
@@ -18,26 +18,28 @@ const MyConsultationsPage = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      const result = await fetchConsultations();
-      if (result) {
-        if (result.success) {
-          setConsultations(result.data);
-        } else {
-          setError(result.message || "maybe no consultations ");
-        }
-      } else {
-        setError("Failed to fetch data.");
-      }
-    };
+    //Use this to fetch consultations 
 
-    loadData();
+    // const loadData = async () => {
+    //   const result = await fetchConsultations();
+    //   if (result) {
+    //     if (result.success) {
+    //       setConsultations(result.data);
+    //     } else {
+    //       setError(result.message || "maybe no consultations ");
+    //     }
+    //   } else {
+    //     setError("Failed to fetch data.");
+    //   }
+    // };
+
+    // loadData();
   }, []);
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header title='استشاراتي' />
-      {/* <div className="pt-16">
+      <Header title="استشاراتي" />
+      <div className="pt-16">
         {isLoading ? (
           <p className="text-center">Loading...</p>
         ) : error ? (
@@ -54,7 +56,7 @@ const MyConsultationsPage = () => {
             />
           ))
         )}
-      </div> */}
+      </div>
       <BottomNavBar currentPath={pathname} />
     </div>
   );

@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import Header from "../../components/common/header";
-import DoctorInfoCard from "../../components/waitingDoctor/doctorCard";
-import StatusSection from "../../components/waitingDoctor/checkMark";
-import Button from "../../components/waitingDoctor/button";
+import DoctorInfoCard from "./_components/waitingDoctor/doctorCard";
+import StatusSection from "./_components/waitingDoctor/checkMark";
+import Button from "./_components/waitingDoctor/button";
 
 const WaitingForConsultation = () => {
   return (

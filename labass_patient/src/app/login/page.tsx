@@ -1,6 +1,6 @@
 // src/pages/CardDetailsPage.tsx
 import React from "react";
-import SimpleLoginForm from "../../components/login/form";
+import SimpleLoginForm from "./_components/login/form";
 
 const LoginPage: React.FC = () => {
   return (

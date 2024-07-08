@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import PaymentIntro from "../../components/payment/paymentIntro";
-import PaymentMethod from "../../components/payment/paymentMethod";
-import PaymentSummary from "../../components/payment/paymentSummary";
-import PaymentButton from "../../components/payment/paymentButton";
-import PromoCode from "../../components/payment/promoCodeInput"; // Ensure correct path
+import PaymentIntro from "./_components/payment/paymentIntro";
+import PaymentMethod from "./_components/payment/paymentMethod";
+import PaymentSummary from "./_components/payment/paymentSummary";
+import PaymentButton from "./_components/payment/paymentButton";
+import PromoCode from "./_components/payment/promoCodeInput"; // Ensure correct path
 import { PaymentMethodEnum } from "../../types/paymentMethods";
 import Header from "../../components/common/header";
 

@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import Header from "../../components/common/header";
-import PersonalInfoForm from "../../components/userInformation/form";
+import PersonalInfoForm from "./_components/userInformation/form";
 
 const PersonalInfo = () => {
   return (

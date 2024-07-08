@@ -1,12 +1,10 @@
-// components/BottomNav.tsx
-
 "use client";
 import {
-  HomeIcon,
-  UserIcon,
-  ChatBubbleBottomCenterIcon,
-} from "@heroicons/react/24/solid";
-// components/BottomNavBar.tsx
+  Home as HomeIcon,
+  AccountCircle as UserIcon,
+  ChatBubble as ChatBubbleIcon,
+} from "@mui/icons-material";
+
 import NavLink from "./NavLink";
 
 interface BottomNavBarProps {
@@ -17,7 +15,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentPath }) => {
   const isActive = (href: string) => currentPath === href;
 
   return (
-    <nav className="flex fixed inset-x-0 bottom-0 bg-white shadow-md px-4 py-2  justify-around items-center text-sm text-gray-800 border-t">
+    <nav className="flex fixed inset-x-0 bottom-0 bg-white shadow-md px-4 py-2 justify-around items-center text-sm text-gray-800 border-t">
       <NavLink
         href="/profile"
         icon={UserIcon}
@@ -26,7 +24,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentPath }) => {
       />
       <NavLink
         href="/myConsultations"
-        icon={ChatBubbleBottomCenterIcon}
+        icon={ChatBubbleIcon}
         label="استشاراتي"
         active={isActive("/myConsultations")}
       />

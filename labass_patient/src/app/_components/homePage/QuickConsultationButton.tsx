@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation"; // Correct import should be 'next/router', not 'next/navigation'
-import { isAuthenticated } from "../../utils/auth";
+import { isAuthenticated } from "../../../utils/auth";
 
 const ConsultationButton: React.FC = () => {
   const router = useRouter();

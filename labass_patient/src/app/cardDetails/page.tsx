@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import axios from "axios";
+import Header from "../../components/common/header";
 
 declare global {
   interface Window {
     myFatoorah: any;
-    myFatoorahAP:any
+    myFatoorahAP: any;
   }
 }
 
@@ -134,16 +135,16 @@ const CardDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col justify-between p-4">
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between ">
       <script
         src="https://demo.myfatoorah.com/cardview/v2/session.js"
         defer
         onLoad={initializeMyFatoorah}
       />
-
+      <Header title="ادفع" showBackButton />
       <div>
         <h1
-          className="flex flex-row text-black text-lg font-bold mb-4"
+          className="flex flex-row text-black text-lg font-bold mb-4 mt-16"
           dir="rtl"
         >
           أدخل معلومات البطاقة

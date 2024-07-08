@@ -1,7 +1,7 @@
 import React from "react";
-import { PaymentMethodEnum } from "../../types/paymentMethods";
-import CardIcon from "../../../public/icons/card.svg"; // Import the SVG icons
-import ApplePayIcon from "../../../public/icons/apple_pay.svg";
+import { PaymentMethodEnum } from "../../../../types/paymentMethods";
+import CardIcon from "../../_icons/card.svg"; // Import the SVG icons
+import ApplePayIcon from "../../_icons/apple_pay.svg";
 
 interface PaymentMethodProps {
   method: string;

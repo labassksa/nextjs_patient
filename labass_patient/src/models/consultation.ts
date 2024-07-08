@@ -17,6 +17,10 @@ export class Consultation {
   constructor(
     public id: number,
     public createdAt: Date,
+    public patientJoinedAT: Date,
+    public doctorJoinedAT: Date,
+    public paidAT: Date,
+    public closedAt: Date,
     public status: ConsultationStatus,
     public type: ConsultationType,
     public patient: PatientProfile,

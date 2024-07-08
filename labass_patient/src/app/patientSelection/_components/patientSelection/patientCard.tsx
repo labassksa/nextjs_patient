@@ -1,6 +1,6 @@
 // components/PatientCard.tsx
 import React from "react";
-import User from "../../models/user";
+import User from "../../../../models/user";
 import { Person, Person2Rounded } from "@mui/icons-material";
 
 interface PatientCardProps {

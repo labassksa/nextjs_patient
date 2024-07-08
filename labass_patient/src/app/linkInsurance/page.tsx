@@ -2,16 +2,16 @@
 "use client";
 import React from "react";
 import Header from "../../components/common/header";
-import UserDetails from "../../components/linkInsurance/userDetails";
-import InsuranceDropdown from "../../components/linkInsurance/dropdown";
-import LinkInsuranceButton from "../../components/linkInsurance/buttonLinkInsurance";
+import UserDetails from "./_components/linkInsurance/userDetails";
+import InsuranceDropdown from "./_components/linkInsurance/dropdown";
+import LinkInsuranceButton from "./_components/linkInsurance/buttonLinkInsurance";
 
 const LinkInsurancePage: React.FC = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
       <div>
       <Header title="ربط التأمين" showBackButton />
-        <div className="px-4 mt-4 text-red-600 font-normal text-sm" dir="rtl">
+        <div className="px-4 text-red-600 font-normal text-sm mt-16" dir="rtl">
           ربط التأمين غير متاح حاليا
           <UserDetails
             name="John Doe"

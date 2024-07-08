@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { PaymentMethodEnum } from "../../types/paymentMethods";
+import { PaymentMethodEnum } from "../../../../types/paymentMethods";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 

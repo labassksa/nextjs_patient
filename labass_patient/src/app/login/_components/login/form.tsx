@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "../../controllers/login.Controller";
-import { convertArabicToEnglishNumbers } from "../../utils/arabicToenglish";
+import { login } from "../../../../controllers/login.Controller";
+import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish";
 
 const SimpleLoginForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -26,7 +26,9 @@ const SimpleLoginForm = () => {
       return;
     }
 
-    const cleanedPhoneNumber = phoneNumber.startsWith("0") ? phoneNumber.slice(1) : phoneNumber;
+    const cleanedPhoneNumber = phoneNumber.startsWith("0")
+      ? phoneNumber.slice(1)
+      : phoneNumber;
     const result = await login(cleanedPhoneNumber);
 
     setIsLoading(false); // Stop loading after API response
@@ -69,11 +71,7 @@ const SimpleLoginForm = () => {
           className="mt-2 px-6 py-4 w-full bg-custom-green text-white font-bold text-sm rounded-md focus:outline-none flex justify-center items-center"
           disabled={isLoading}
         >
-          {isLoading ? (
-            <div className="spinner"></div>
-          ) : (
-            "تسجيل الدخول"
-          )}
+          {isLoading ? <div className="spinner"></div> : "تسجيل الدخول"}
         </button>
       </div>
     </div>

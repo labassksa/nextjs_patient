@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import Header from "../../components/profile/header";
-import Menu from "../../components/profile/menu";
-import AddressAndWhatsAppSection from "../../components/profile/addresandCustomerSupport";
-import BottomNavBar from "../../components/BottomNavBar";
+import Header from "./_components/profile/header";
+import Menu from "./_components/profile/menu";
+import AddressAndWhatsAppSection from "./_components/profile/addresandCustomerSupport";
+import BottomNavBar from "../../components/common/BottomNavBar";
 import { usePathname } from "next/navigation";
-import ComplaintsSection from "../../components/profile/complaints";
+import ComplaintsSection from "./_components/profile/complaints";
 
 const ProfilePage: React.FC = () => {
   const pathname = usePathname();

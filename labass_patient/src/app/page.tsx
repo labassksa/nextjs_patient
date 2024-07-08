@@ -1,11 +1,11 @@
-import BottomNavBar from "../components/BottomNavBar";
-import TopBanner from "../components/homePage/TopHomePageBanner";
-import BottomBanner from "../components/homePage/BottomHomePageBanner";
-import ConsultationButton from "../components/homePage/QuickConsultationButton";
-import HorizontalItemList from "../components/homePage/symptoms";
+import BottomNavBar from "../components/common/BottomNavBar";
+import TopBanner from "./_components/homePage/TopHomePageBanner";
+import BottomBanner from "./_components/homePage/BottomHomePageBanner";
+import ConsultationButton from "./_components/homePage/QuickConsultationButton";
+import HorizontalItemList from "./_components/homePage/symptoms";
 import React from "react";
 import "./globals.css";
-import LinkInsurance from "../components/homePage/LinkInsuranceButton";
+import LinkInsurance from "./_components/homePage/LinkInsuranceButton";
 
 const items = [
   {

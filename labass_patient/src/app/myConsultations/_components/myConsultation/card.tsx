@@ -1,5 +1,5 @@
 import React from "react";
-import { Consultation } from "../../models/consultation";
+import { Consultation } from "../../../../models/consultation";
 import { Person2Outlined, Person2Rounded, NewspaperSharp, ChatBubble } from "@mui/icons-material";
 import { ChatBubbleLeftEllipsisIcon, ChatBubbleLeftRightIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import User from "../../models/user";
-import PatientCard from "../../components/patientSelection/patientCard";
+import PatientCard from "./_components/patientSelection/patientCard";
 import Header from "../../components/common/header";
 import { PlusIcon } from "@heroicons/react/24/solid"; // Ensure the icon is imported correctly
 
