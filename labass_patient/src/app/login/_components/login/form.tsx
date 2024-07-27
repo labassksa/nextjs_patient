@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "../../../../controllers/login.Controller";
+import { loginPatient } from "../../_controllers/sendOTP.Controller";
 import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish";
 
 const SimpleLoginForm = () => {
@@ -29,10 +29,11 @@ const SimpleLoginForm = () => {
     const cleanedPhoneNumber = phoneNumber.startsWith("0")
       ? phoneNumber.slice(1)
       : phoneNumber;
-    const result = await login(cleanedPhoneNumber);
+    const result = await loginPatient(cleanedPhoneNumber);
 
     setIsLoading(false); // Stop loading after API response
     if (result.success) {
+      console.log(`the result from login is ${result}`);
       router.push(`/otp?phoneNumber=%2B966${cleanedPhoneNumber}`);
     } else {
       setErrorMessage(result.message);

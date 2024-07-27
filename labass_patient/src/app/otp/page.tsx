@@ -1,16 +1,23 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import OTPInput from "./_components/otp/otpInput";
 import Header from "../../components/common/header";
 import OTPTopText from "./_components/otp/otpTopText";
 import OTPBottomText from "./_components/otp/otpBottomText";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { verifyOTPandLogin } from "./_controllers/verifyOTPandLogin"; // Adjust the import path as necessary
+import { loginPatient } from "../login/_controllers/sendOTP.Controller"; // Adjust the import path as necessary
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([null, null, null, null]);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,7 +28,7 @@ const OTPPage = () => {
 
   useEffect(() => {
     if (otp.every((val) => val.length === 1)) {
-      // handleSubmitOTP();
+      handleVerifyOTP();
     }
   }, [otp.join("")]);
 
@@ -36,36 +43,61 @@ const OTPPage = () => {
     }
   };
 
-  // const handleSubmitOTP = async () => {
-  //   if (!phoneNumber) {
-  //     console.error("Phone number is missing in the OTP page.");
-  //     return;
-  //   }
+  const handleVerifyOTP = async () => {
+    if (!phoneNumber) {
+      console.error("Phone number is missing in the OTP page.");
+      return;
+    }
 
-  //   const otpCode = otp.join("");
-  //   const data = {
-  //     role: "patient",
-  //     phoneNumber,
-  //     otpcode: otpCode,
-  //   };
+    const otpCode = otp.join("");
+    try {
+      const result = await verifyOTPandLogin("patient", phoneNumber, otpCode);
 
-  //   try {
-  //     const response = await axios.post("http://localhost:4000/api_labass/auth", data);
-  //     const { token } = response.data;
-  //     localStorage.setItem("jwtToken", token);
+      if (result && result.success) {
+        console.log("OTP Verified:", result);
+        router.push("/");
+      } else if (result) {
+        setErrorMessage(result.message);
+        console.error("Failed to verify OTP:", result.message);
+      } else {
+        setErrorMessage("حدث خطأ ، حاول مرة أخرى");
+        console.error("Failed to verify OTP: Result is undefined");
+      }
+    } catch (error) {
+      setErrorMessage("حدث خطأ ، حاول مرة أخرى");
+      console.error("Failed to verify OTP:", error);
+    }
+  };
 
-  //     console.log("OTP Verified:", response.data);
+  const handleResendOTP = async () => {
+    if (!phoneNumber) {
+      console.error("Phone number is missing in the OTP page.");
+      return;
+    }
 
-  //     router.push("/");
-  //   } catch (error) {
-  //     console.error("Failed to verify OTP:", error);
-  //   }
-  // };
+    try {
+      const result = await loginPatient(phoneNumber);
+      if (result && result.success) {
+        setOtp(["", "", "", ""]); // Clear the OTP input fields
+        inputRefs.current[0]?.focus(); // Focus on the first input field
+        setErrorMessage(null);
+      } else if (result) {
+        setErrorMessage(result.message);
+        console.error("Failed to resend OTP:", result.message);
+      } else {
+        setErrorMessage("حدث خطأ ، حاول مرة أخرى");
+        console.error("Failed to resend OTP: Result is undefined");
+      }
+    } catch (error) {
+      setErrorMessage("حدث خطأ ، حاول مرة أخرى");
+      console.error("Failed to resend OTP:", error);
+    }
+  };
 
   return (
     <div className="bg-white min-h-screen">
       <div className="flex flex-col justify-between">
-      <Header title="التحقق" showBackButton />
+        <Header title="التحقق" showBackButton />
         {phoneNumber ? <OTPTopText phoneNumber={phoneNumber} /> : null}
         <div className="flex mt-10 justify-center">
           {otp.map((value, index) => (
@@ -79,7 +111,12 @@ const OTPPage = () => {
             />
           ))}
         </div>
-        <OTPBottomText />
+        {errorMessage && (
+          <div className="text-red-500 text-sm m-2 text-center">
+            {errorMessage}
+          </div>
+        )}
+        <OTPBottomText onResend={handleResendOTP} />
       </div>
     </div>
   );
