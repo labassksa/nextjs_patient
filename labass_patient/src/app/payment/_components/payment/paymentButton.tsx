@@ -72,7 +72,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:4000/api_labass/initiate-session",
+        "http://34.170.14.141:4000/api_labass/initiate-session",
         {
           InvoiceAmount: 100, // Use actual amount
           CurrencyIso: "KWD", // Use actual currency
@@ -116,9 +116,18 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
   const executePayment = async (sessionId: string) => {
     try {
       const response = await axios.post(
-        "http://localhost:4000/api_labass/execute-payment",
+        "http://34.170.14.141/api_labass/execute-payment",
         {
           SessionId: sessionId,
+          DisplayCurrencyIso: "KWD",
+          InvoiceValue: 120,
+          CallBackUrl: "https://yoursite.com/success",
+          ErrorUrl: "https://yoursite.com/error",
+        },
+        {
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InBhdGllbnQiLCJwYXRpZW50UHJvZmlsZSI6eyJ1c2VyIjp7ImNyZWF0ZWRBdCI6IjIwMjQtMDgtMjlUMTk6MjE6MDguNjYzWiIsImlkIjoxLCJwaG9uZU51bWJlciI6Iis5NjY1OTE3MTcwMjQiLCJmaXJzdE5hbWUiOm51bGwsImxhc3ROYW1lIjpudWxsLCJlbWFpbCI6bnVsbCwiZ2VuZGVyIjpudWxsLCJuYXRpb25hbElkIjpudWxsLCJkYXRlT2ZCaXJ0aCI6bnVsbCwicmVnaXN0cmF0aW9uVG9rZW4iOm51bGwsInJvbGUiOiJwYXRpZW50In0sImlkIjoxfSwiaWF0IjoxNzI0OTU5MjY4fQ.YcDn0Fs8Dg9fLF_4LyYfb7z7OAwegHQLuf4AfHOBFGo`, // Add the Bearer token here
+          },
         }
       );
 

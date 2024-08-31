@@ -16,8 +16,13 @@ export const verifyOTPandLogin = async (
     const response = await axios.post(`${apiUrl}/verifyOTPandLogin`, data);
 
     if (response.status === 200) {
-      const { token } = response.data;
+      // Extract the token from the response
+      const token = response.data.tokens.token;
+      console.log(`the token inside verify otp method ${token}`);
+
+      // Store the token in localStorage
       localStorage.setItem("labass_token", token);
+
       return { success: true, token };
     } else {
       return { success: false, message: "Unexpected response status code" };

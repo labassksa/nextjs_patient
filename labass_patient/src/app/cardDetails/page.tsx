@@ -72,34 +72,29 @@ const CardDetails: React.FC = () => {
       console.log("Submit response received:", response);
 
       if (response) {
+        // Get the token from localStorage
+        const token = localStorage.getItem("labass_token");
+
+        if (!token) {
+          console.error("Token not found in localStorage.");
+          return;
+        }
+
         try {
           const executePaymentResponse =
             await axios.post<ExecutePaymentResponse>(
-              "http://localhost:4000/api_labass/execute-payment",
+              "http://34.170.14.141:4000/api_labass/execute-payment",
               {
-                sessionId: response.sessionId,
-                invoiceValue: 100, // Example value
-                customerName: "John Doe", // Example value
-                displayCurrencyIso: "KWD", // Example value
-                mobileCountryCode: "+965", // Example value
-                customerMobile: "12345678", // Example value
-                customerEmail: "john.doe@example.com", // Example value
-                callbackUrl: "https://yoursite.com/success", // Your success callback URL
-                errorUrl: "https://yoursite.com/error", // Your error callback URL
-                customerReference: "ref123", // Example value
-                customerAddress: {
-                  Block: "1",
-                  Street: "Main Street",
-                  HouseBuildingNo: "10",
-                  AddressInstructions: "Near the park",
+                SessionId: response.sessionId,
+                DisplayCurrencyIso: "KWD",
+                InvoiceValue: 200,
+                CallBackUrl: "https://yoursite.com/success",
+                ErrorUrl: "https://yoursite.com/error",
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`, // Use the token from localStorage
                 },
-                invoiceItems: [
-                  {
-                    ItemName: "Product 1",
-                    Quantity: 1,
-                    UnitPrice: 100,
-                  },
-                ],
               }
             );
 
@@ -127,10 +122,22 @@ const CardDetails: React.FC = () => {
 
   const handle3DSecure = (paymentUrl: string) => {
     const iframeUrl = `${paymentUrl}&iframeEnabled=true`;
+
+    // Clear existing content
+    document.body.innerHTML = "";
+
+    // Create and style the iframe
     const iframe = document.createElement("iframe");
     iframe.src = iframeUrl;
-    iframe.width = "100%";
-    iframe.height = "500";
+    iframe.style.position = "fixed";
+    iframe.style.top = "0";
+    iframe.style.left = "0";
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
+    iframe.style.zIndex = "9999"; // Ensure it appears on top of everything
+
+    // Append the iframe to the body
     document.body.appendChild(iframe);
   };
 
