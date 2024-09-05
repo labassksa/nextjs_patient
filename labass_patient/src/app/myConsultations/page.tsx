@@ -1,39 +1,34 @@
-// MyConsultationsPage.js
+// MyConsultationsPage.tsx
 "use client";
 import React, { useState, useEffect } from "react";
-import ConsultationCard from "./_components/myConsultation/card";
+import ConsultationCard from "./_components/myConsultation/card"; // Adjust the import path based on your structure
 import BottomNavBar from "../../components/common/BottomNavBar";
 import Header from "../../components/common/header";
 import { usePathname } from "next/navigation";
-// import { fetchConsultations } from "../../controllers/consultation.controller"; // adjust the path as necessary
-import { mockConsultations } from "../../utils/mockedConsultation";
+import { fetchConsultations } from "./_controllers/myConsultations"; // Adjust the path as necessary
 import { Consultation } from "../../models/consultation";
 
 const MyConsultationsPage = () => {
   const pathname = usePathname();
-  // Initialize the state with an empty array of Consultation type
   const [consultations, setConsultations] = useState<Consultation[]>([]);
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    //Use this to fetch consultations 
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const result = await fetchConsultations();
+        setConsultations(result);
+      } catch (error) {
+        console.log(`${error}`);
+        setError("Failed to fetch data. ");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    // const loadData = async () => {
-    //   const result = await fetchConsultations();
-    //   if (result) {
-    //     if (result.success) {
-    //       setConsultations(result.data);
-    //     } else {
-    //       setError(result.message || "maybe no consultations ");
-    //     }
-    //   } else {
-    //     setError("Failed to fetch data.");
-    //   }
-    // };
-
-    // loadData();
+    loadData();
   }, []);
 
   return (
@@ -49,10 +44,10 @@ const MyConsultationsPage = () => {
             <ConsultationCard
               key={consultation.id}
               consultation={consultation}
-              onSelect={(id) => console.log("Selected consultation ID:", id)}
-              onChatClick={function (id: number): void {
-                throw new Error("Function not implemented.");
-              }}
+              onSelect={(id: any) =>
+                console.log("Selected consultation ID:", id)
+              }
+              onChatClick={(id: any) => console.log("Chat clicked for ID:", id)}
             />
           ))
         )}

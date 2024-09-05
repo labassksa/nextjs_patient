@@ -87,7 +87,7 @@ const CardDetails: React.FC = () => {
               {
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "KWD",
-                InvoiceValue: 200,
+                InvoiceValue: 101,
                 CallBackUrl: "https://yoursite.com/success",
                 ErrorUrl: "https://yoursite.com/error",
               },
