@@ -91,7 +91,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
             sessionId: SessionId,
             countryCode: "KWT", // Use actual country code
             currencyCode: "KWD", // Use actual currency code
-            amount: "100", // Use actual amount
+            amount: "1", // Use actual amount
             cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
             callback: payment,
             sessionStarted: sessionStarted,
@@ -147,6 +147,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     cardIdentifier: string;
   }) => {
     const sessionId = response.sessionId;
+    console.log(`Payment ${sessionId}`);
+
     executePayment(sessionId);
   };
 
