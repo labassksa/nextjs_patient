@@ -14,8 +14,8 @@ const useSocket = (url: string) => {
   useEffect(() => {
     const initializeSocket = () => {
       socketRef.current = io(url, {
-        reconnectionAttempts: 5,   // Maximum number of reconnection attempts
-        reconnectionDelay: 1000,   // Delay between reconnection attempts in milliseconds
+        reconnectionAttempts: 5, // Maximum number of reconnection attempts
+        reconnectionDelay: 1000, // Delay between reconnection attempts in milliseconds
       });
 
       socketRef.current.on("connect", () => {
@@ -58,7 +58,12 @@ const useSocket = (url: string) => {
     }
   };
 
-  return { socket: socketRef.current, isConnected, attemptingReconnection, emitEvent };
+  return {
+    socket: socketRef.current,
+    isConnected,
+    attemptingReconnection,
+    emitEvent,
+  };
 };
 
 export default useSocket;
