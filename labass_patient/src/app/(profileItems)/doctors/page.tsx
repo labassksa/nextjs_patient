@@ -1,12 +1,13 @@
+"use client";
+import Header from "../../../components/common/header";
 import React from "react";
-import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
-import { Person2Rounded } from "@mui/icons-material";
-import DoctorsHeader from "./_components/header";
 
 const DoctorsPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      <DoctorsHeader />
+      {/* <DoctorsHeader /> */}
+      <Header title="الأطباء" showBackButton />
+
       <div className="p-4 pt-28 text-right leading-relaxed text-gray-800">
         {/* Placeholder for policy text */}
 

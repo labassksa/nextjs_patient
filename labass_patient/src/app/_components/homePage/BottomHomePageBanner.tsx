@@ -13,7 +13,7 @@ const BottomBanner: React.FC = () => {
           <Image
             src="/icons/MOHLogo.svg"
             alt="Ministry of Health Logo"
-            layout="fill"
+            fill
             objectFit="contain"
             className="rounded-lg"
           />

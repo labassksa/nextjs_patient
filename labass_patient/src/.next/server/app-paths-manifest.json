@@ -1,0 +1,22 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(profileItems)/doctors/page": "app/(profileItems)/doctors/page.js",
+  "/(profileItems)/pricingList/page": "app/(profileItems)/pricingList/page.js",
+  "/(profileItems)/termsandConditions/page": "app/(profileItems)/termsandConditions/page.js",
+  "/(profileItems)/privacyPolicy/page": "app/(profileItems)/privacyPolicy/page.js",
+  "/chat/page": "app/chat/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/fillpersonalInfo/page": "app/fillpersonalInfo/page.js",
+  "/linkInsurance/page": "app/linkInsurance/page.js",
+  "/login/page": "app/login/page.js",
+  "/myConsultations/page": "app/myConsultations/page.js",
+  "/otp/page": "app/otp/page.js",
+  "/page": "app/page.js",
+  "/patientSelection/page": "app/patientSelection/page.js",
+  "/payment/cardDetails/page": "app/payment/cardDetails/page.js",
+  "/payment/page": "app/payment/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/userPersonalInfo/page": "app/userPersonalInfo/page.js",
+  "/waitingDoctor/page": "app/waitingDoctor/page.js",
+  "/cardDetails/page": "app/cardDetails/page.js"
+}
