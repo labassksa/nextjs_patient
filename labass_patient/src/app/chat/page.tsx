@@ -15,6 +15,7 @@ interface Message {
 
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  //TODO, change the socket url
   const { socket, isConnected } = useSocket("http://localhost:4000");
 
   const consultationId = 3; // Fixed consultationId for simplicity and testing
@@ -39,7 +40,9 @@ const ChatPage: React.FC = () => {
           );
         } else {
           // Add the new message to the state if it was not sent by the current user and does not already exist
-          const existingMessageIndex = prevMessages.findIndex((msg) => msg.id === newMessage.id);
+          const existingMessageIndex = prevMessages.findIndex(
+            (msg) => msg.id === newMessage.id
+          );
           if (existingMessageIndex === -1) {
             return [...prevMessages, newMessage];
           } else {
@@ -113,7 +116,9 @@ const ChatPage: React.FC = () => {
       (response: { messageId: number }) => {
         setMessages((prevMessages) =>
           prevMessages.map((msg) =>
-            msg.id === newMessage.id ? { ...msg, id: response.messageId, isSent: true } : msg
+            msg.id === newMessage.id
+              ? { ...msg, id: response.messageId, isSent: true }
+              : msg
           )
         );
       }
