@@ -81,9 +81,11 @@ const CardDetails: React.FC = () => {
         }
 
         try {
+          // Use environment variable for the backend URL
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
           const executePaymentResponse =
             await axios.post<ExecutePaymentResponse>(
-              "http://34.170.14.141:4000/api_labass/execute-payment",
+              `${apiUrl}/execute-payment`,
               {
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "KWD",

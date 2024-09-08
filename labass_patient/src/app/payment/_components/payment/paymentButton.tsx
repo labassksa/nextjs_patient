@@ -23,6 +23,8 @@ interface ApplePayConfig {
   sessionStarted: () => void;
   sessionCanceled: () => void;
 }
+// Use environment variable for the backend URL
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
   const router = useRouter();
@@ -71,13 +73,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://34.170.14.141:4000/api_labass/initiate-session",
-        {
-          InvoiceAmount: 100, // Use actual amount
-          CurrencyIso: "KWD", // Use actual currency
-        }
-      );
+      // Use environment variable for the backend URL
+      const response = await axios.post(`${apiUrl}/initiate-session`, {
+        InvoiceAmount: 100, // Use actual amount
+        CurrencyIso: "KWD", // Use actual currency
+      });
 
       if (response.data.IsSuccess) {
         const { SessionId, CountryCode } = response.data.Data;
@@ -116,7 +116,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
   const executePayment = async (sessionId: string) => {
     try {
       const response = await axios.post(
-        "http://34.170.14.141/api_labass/execute-payment",
+        `${apiUrl}/execute-payment`,
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "KWD",
