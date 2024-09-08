@@ -75,7 +75,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     try {
       // Use environment variable for the backend URL
       const response = await axios.post(`${apiUrl}/initiate-session`, {
-        InvoiceAmount: 100, // Use actual amount
+        InvoiceAmount: 1, // Use actual amount
         CurrencyIso: "KWD", // Use actual currency
       });
 
