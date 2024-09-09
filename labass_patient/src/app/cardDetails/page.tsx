@@ -42,6 +42,13 @@ const CardDetails: React.FC = () => {
     ) {
       initializeMyFatoorah();
     }
+
+    // Event listener for 3DS redirection URL
+    window.addEventListener("message", handle3DSRedirection, false);
+
+    return () => {
+      window.removeEventListener("message", handle3DSRedirection, false);
+    };
   }, [sessionId, countryCode]);
 
   const initializeMyFatoorah = () => {
@@ -72,7 +79,6 @@ const CardDetails: React.FC = () => {
       console.log("Submit response received:", response);
 
       if (response) {
-        // Get the token from localStorage
         const token = localStorage.getItem("labass_token");
 
         if (!token) {
@@ -81,7 +87,6 @@ const CardDetails: React.FC = () => {
         }
 
         try {
-          // Use environment variable for the backend URL
           const apiUrl = process.env.NEXT_PUBLIC_API_URL;
           const executePaymentResponse =
             await axios.post<ExecutePaymentResponse>(
@@ -90,20 +95,17 @@ const CardDetails: React.FC = () => {
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "KWD",
                 InvoiceValue: 101,
-                CallBackUrl: "https://yoursite.com/success",
-                ErrorUrl: "https://yoursite.com/error",
+                CallBackUrl: "https://labass.sa/cardDetails/success",
+                ErrorUrl: "https://labass.sa/cardDetails/error",
               },
               {
                 headers: {
-                  Authorization: `Bearer ${token}`, // Use the token from localStorage
+                  Authorization: `Bearer ${token}`,
                 },
               }
             );
 
           if (executePaymentResponse.data.IsSuccess) {
-            console.log(
-              `Payment URL: ${executePaymentResponse.data.Data.PaymentURL}`
-            );
             handle3DSecure(executePaymentResponse.data.Data.PaymentURL);
           } else {
             console.error(
@@ -137,14 +139,32 @@ const CardDetails: React.FC = () => {
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
-    iframe.style.zIndex = "9999"; // Ensure it appears on top of everything
+    iframe.style.zIndex = "9999";
 
-    // Append the iframe to the body
     document.body.appendChild(iframe);
   };
 
+  const handle3DSRedirection = (event: MessageEvent) => {
+    if (!event.data) return;
+
+    try {
+      const message = JSON.parse(event.data);
+
+      if (message.sender === "MF-3DSecure") {
+        const redirectionUrl = message.url;
+        if (redirectionUrl.includes("error")) {
+          window.location.href = "https://labass.sa/cardDetails/error";
+        } else {
+          window.location.href = "https://labass.sa/cardDetails/success";
+        }
+      }
+    } catch (error) {
+      console.error("Error handling 3DS redirection:", error);
+    }
+  };
+
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col justify-between ">
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
       <script
         src="https://demo.myfatoorah.com/cardview/v2/session.js"
         defer
