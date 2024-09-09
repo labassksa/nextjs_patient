@@ -1,6 +1,6 @@
 "use client";
 
-export default function ErrorPage() {
+export default function SuccessPage() {
   return (
     <div>
       <h1>Payment Success</h1>
