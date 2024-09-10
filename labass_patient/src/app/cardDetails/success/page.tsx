@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import StatusSection from "../../waitingDoctor/_components/waitingDoctor/checkMark";
+import StatusSection from "./_components/paymentSuccessButton";
 import Button from "../../waitingDoctor/_components/waitingDoctor/button";
 
 const WaitingForConsultation = () => {
