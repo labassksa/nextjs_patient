@@ -115,6 +115,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
 
   const executePayment = async (sessionId: string) => {
     try {
+      const token = localStorage.getItem("labass_token");
+
+      if (!token) {
+        console.error("Token not found in localStorage.");
+        return;
+      }
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
         {
@@ -126,7 +132,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         },
         {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InBhdGllbnQiLCJwYXRpZW50UHJvZmlsZSI6eyJ1c2VyIjp7ImNyZWF0ZWRBdCI6IjIwMjQtMDgtMjlUMTk6MjE6MDguNjYzWiIsImlkIjoxLCJwaG9uZU51bWJlciI6Iis5NjY1OTE3MTcwMjQiLCJmaXJzdE5hbWUiOm51bGwsImxhc3ROYW1lIjpudWxsLCJlbWFpbCI6bnVsbCwiZ2VuZGVyIjpudWxsLCJuYXRpb25hbElkIjpudWxsLCJkYXRlT2ZCaXJ0aCI6bnVsbCwicmVnaXN0cmF0aW9uVG9rZW4iOm51bGwsInJvbGUiOiJwYXRpZW50In0sImlkIjoxfSwiaWF0IjoxNzI0OTU5MjY4fQ.YcDn0Fs8Dg9fLF_4LyYfb7z7OAwegHQLuf4AfHOBFGo`, // Add the Bearer token here
+            Authorization: `Bearer ${token}`, // Add the Bearer token here
           },
         }
       );
