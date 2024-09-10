@@ -66,77 +66,77 @@ const CardDetails: React.FC = () => {
     }
   };
 
-const handlePaymentSubmit = async () => {
-  console.log("Submitting payment...");
+  const handlePaymentSubmit = async () => {
+    console.log("Submitting payment...");
 
-  // Check if MyFatoorah is initialized and the submit function is available
-  if (!window.myFatoorah || typeof window.myFatoorah.submit !== "function") {
-    console.error("window.myFatoorah.submit is not available.");
-    return;
-  }
-
-  // Check if sessionId is available
-  if (!sessionId) {
-    console.error("Session ID is missing. Unable to proceed with payment.");
-    return;
-  }
-
-  try {
-    // Log before submission to see if sessionId and session data is correctly passed
-    console.log("Submitting payment with sessionId:", sessionId);
-
-    // Submit the payment
-    const response = await window.myFatoorah.submit();
-    console.log("Submit response received:", response);
-
-    if (response) {
-      const token = localStorage.getItem("labass_token");
-
-      if (!token) {
-        console.error("Token not found in localStorage.");
-        return;
-      }
-
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        const executePaymentResponse = await axios.post<ExecutePaymentResponse>(
-          `${apiUrl}/execute-payment`,
-          {
-            SessionId: response.sessionId,
-            DisplayCurrencyIso: "KWD",
-            InvoiceValue: 101,
-            CallBackUrl: "https://labass.sa/cardDetails/success",
-            ErrorUrl: "https://labass.sa/cardDetails/error",
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (executePaymentResponse.data.IsSuccess) {
-          console.log(
-            `Payment URL: ${executePaymentResponse.data.Data.PaymentURL}`
-          );
-          handle3DSecure(executePaymentResponse.data.Data.PaymentURL);
-        } else {
-          console.error(
-            "Execute payment failed:",
-            executePaymentResponse.data.Message
-          );
-        }
-      } catch (error) {
-        console.error("Error executing payment:", error);
-      }
-    } else {
-      console.error("Payment submission failed:", response);
+    // Check if MyFatoorah is initialized and the submit function is available
+    if (!window.myFatoorah || typeof window.myFatoorah.submit !== "function") {
+      console.error("window.myFatoorah.submit is not available.");
+      return;
     }
-  } catch (error) {
-    console.error("Payment error:", error);
-  }
-};
 
+    // Check if sessionId is available
+    if (!sessionId) {
+      console.error("Session ID is missing. Unable to proceed with payment.");
+      return;
+    }
+
+    try {
+      // Log before submission to see if sessionId and session data is correctly passed
+      console.log("Submitting payment with sessionId:", sessionId);
+
+      // Submit the payment
+      const response = await window.myFatoorah.submit();
+      console.log("Submit response received:", response);
+
+      if (response) {
+        const token = localStorage.getItem("labass_token");
+
+        if (!token) {
+          console.error("Token not found in localStorage.");
+          return;
+        }
+
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          const executePaymentResponse =
+            await axios.post<ExecutePaymentResponse>(
+              `${apiUrl}/execute-payment`,
+              {
+                SessionId: response.sessionId,
+                DisplayCurrencyIso: "KWD",
+                InvoiceValue: 101,
+                CallBackUrl: "https://labass.sa/cardDetails/success",
+                ErrorUrl: "https://labass.sa/cardDetails/error",
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+
+          if (executePaymentResponse.data.IsSuccess) {
+            console.log(
+              `Payment URL: ${executePaymentResponse.data.Data.PaymentURL}`
+            );
+            handle3DSecure(executePaymentResponse.data.Data.PaymentURL);
+          } else {
+            console.error(
+              "Execute payment failed:",
+              executePaymentResponse.data.Message
+            );
+          }
+        } catch (error) {
+          console.error("Error executing payment:", error);
+        }
+      } else {
+        console.error("Payment submission failed:", response);
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+    }
+  };
 
   const handle3DSecure = (paymentUrl: string) => {
     const iframeUrl = `${paymentUrl}&iframeEnabled=true`;
