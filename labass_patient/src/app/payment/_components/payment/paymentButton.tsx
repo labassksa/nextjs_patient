@@ -132,9 +132,19 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       );
 
       if (response.data.IsSuccess) {
-        console.log("Payment successful:", response.data);
+        const paymentUrl = response.data.Data.PaymentURL;
+
+        // Make a GET request to the PaymentURL silently
+        const paymentResponse = await axios.get(paymentUrl);
+
+        if (paymentResponse.status === 200) {
+          console.log("Payment completed successfully:", paymentResponse.data);
+          // Optionally redirect or update UI based on payment success
+        } else {
+          console.error("Failed to complete payment:", paymentResponse.data);
+        }
       } else {
-        console.error("Payment failed:", response.data.Message);
+        console.error("Payment execution failed:", response.data.Message);
       }
     } catch (error) {
       console.error("Error executing payment:", error);
