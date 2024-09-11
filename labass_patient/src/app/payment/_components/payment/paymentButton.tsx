@@ -191,7 +191,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       <div id="apple-pay-container"></div>
       {method === PaymentMethodEnum.Card && (
         <button
-          className="sticky bottom-0 pb-4 w-full font-bold bg-custom-green text-white py-4 px-4 rounded-3xl"
+          className="sticky bottom-0 p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
           dir="rtl"
           onClick={handlePaymentClick}
           disabled={loading}

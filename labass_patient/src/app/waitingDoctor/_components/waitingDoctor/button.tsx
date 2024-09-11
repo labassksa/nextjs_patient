@@ -1,6 +1,6 @@
 const Button = () => {
   return (
-    <button className="w-full bg-custom-green rounded-3xl text-white py-3 sticky bottom-0 mb-16">
+    <button className="sticky bottom-0 p-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl">
       بدء الاستشارة
     </button>
   );

@@ -1,11 +1,18 @@
 "use client";
+import React from "react";
+import ErrorSection from "./_components/paymentError";
+import Button from "../../waitingDoctor/_components/waitingDoctor/button";
 
-export default function ErrorPage() {
+const WaitingForConsultation = () => {
   return (
-    <div>
-      <h1>Payment Failed</h1>
-      <p>Unfortunately, there was an error processing your payment.</p>
-      <p>Please try again or contact support if the issue persists.</p>
+    <div className="flex flex-col min-h-screen w-full bg-gray-100">
+      <div className="flex-grow pt-16 flex flex-col justify-between">
+        <div className="p-4">
+          <ErrorSection />
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default WaitingForConsultation;

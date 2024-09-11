@@ -178,7 +178,7 @@ const CardDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between p-4">
       <script
         src="https://demo.myfatoorah.com/cardview/v2/session.js"
         defer
@@ -200,7 +200,7 @@ const CardDetails: React.FC = () => {
       </div>
       <div>
         <button
-          className="bg-custom-green w-full text-white py-2 px-4 rounded mt-4"
+          className="sticky bottom-0 p-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
           onClick={handlePaymentSubmit}
           disabled={!isInitialized}
         >
