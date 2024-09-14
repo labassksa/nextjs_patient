@@ -1,5 +1,5 @@
 // models/Prescription.ts
-import { Consultation } from './consultation';
+import { Consultation } from "./consultation";
 
 export class Prescription {
   constructor(
@@ -20,5 +20,6 @@ export class Prescription {
     public indications?: string,
     public doseUnit?: string,
     public activeIngredient?: string,
+    public pdfURL?: string // Added pdfURL field
   ) {}
 }

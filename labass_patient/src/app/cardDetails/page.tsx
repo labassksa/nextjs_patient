@@ -103,9 +103,10 @@ const CardDetails: React.FC = () => {
             await axios.post<ExecutePaymentResponse>(
               `${apiUrl}/execute-payment`,
               {
+                PromoCode: "6B8A174",
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "KWD",
-                InvoiceValue: 101,
+                InvoiceValue: 50,
                 CallBackUrl: "https://labass.sa/cardDetails/success",
                 ErrorUrl: "https://labass.sa/cardDetails/error",
               },

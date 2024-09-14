@@ -1,30 +1,28 @@
 import React from "react";
-import { Consultation } from "../../../../models/consultation";
+import { useRouter } from "next/navigation"; // Import useRouter
+import {
+  Consultation,
+  ConsultationStatus,
+} from "../../../../models/consultation";
 import {
   Person2Outlined,
   Person2Rounded,
   NewspaperSharp,
-  ChatBubble,
 } from "@mui/icons-material";
-import {
-  ChatBubbleLeftEllipsisIcon,
-  ChatBubbleLeftRightIcon,
-  ChatBubbleOvalLeftIcon,
-} from "@heroicons/react/24/solid";
+import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 
 interface ConsultationCardProps {
   consultation: Consultation;
   onSelect: (id: number) => void;
-  onChatClick: (id: number) => void;
 }
 
 const ConsultationCard: React.FC<ConsultationCardProps> = ({
   consultation,
   onSelect,
-  onChatClick,
 }) => {
+  const router = useRouter(); // Initialize useRouter
+
   const handleSelect = () => onSelect(consultation.id);
-  const handleChatClick = () => onChatClick(consultation.id);
 
   // Parse and format the createdAt date and time
   const formattedDateTime = new Date(consultation.createdAt).toLocaleString(
@@ -38,6 +36,70 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
       hour12: true, // Use 12-hour clock (AM/PM)
     }
   );
+  const translateGender = (gender: string) => {
+    switch (gender) {
+      case "male":
+        return "ذكر";
+      case "female":
+        return "أنثى";
+      default:
+        return gender; // Return as is if no match found
+    }
+  };
+  // Determine the button label, class, and icon based on consultation status
+  let buttonLabel = "";
+  let buttonClass = "";
+  let icon = null;
+  let redirectUrl = "";
+
+  if (
+    consultation.status === ConsultationStatus.Paid &&
+    consultation.patient.user.firstName
+  ) {
+    buttonLabel = "مراسلة";
+    buttonClass = "bg-custom-green text-xs ";
+    icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
+    redirectUrl = "/chat"; // URL for the chat page
+  } else if (consultation.status === ConsultationStatus.Paid) {
+    buttonLabel = "أكمل معلوماتك";
+    buttonClass = "bg-custom-green text-xs"; // Add a new class for the "أكمل معلوماتك" button if needed
+    redirectUrl = "/fillpersonalInfo"; // URL for the fillPersonalInfo page
+  } else {
+    switch (consultation.status) {
+      case ConsultationStatus.Open:
+        buttonLabel = "مراسلة";
+        buttonClass = "bg-custom-green text-xs";
+        icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
+        redirectUrl = "/chat";
+        break;
+      case ConsultationStatus.Closed:
+        buttonLabel = "Completed";
+        buttonClass = "bg-blue-500";
+        icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
+        break;
+      case ConsultationStatus.Failed:
+        buttonLabel = "Cancelled";
+        buttonClass = "bg-red-500";
+        icon = <ChatBubbleOvalLeftIcon className="text-white w-6" />;
+        break;
+      default:
+        buttonLabel = "";
+        buttonClass = "";
+        icon = null;
+    }
+  }
+
+  const handleButtonClick = () => {
+    if (redirectUrl) {
+      router.push(redirectUrl); // Navigate to the appropriate page
+    }
+  };
+
+  const handlePrescriptionClick = () => {
+    if (consultation.prescription?.pdfURL) {
+      window.open(consultation.prescription.pdfURL, "_blank"); // Open the prescription PDF in a new tab
+    }
+  };
 
   return (
     <div
@@ -48,80 +110,51 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
         <div className="flex flex-row justify-between mb-2">
           <div className="flex flex-row">
             <Person2Rounded className="text-gray-400" />
-            <h3 className="font-bold text-md text-black" dir="rtl">
-              {`د. ${consultation.patient.user.firstName || ""} ${
-                consultation.id
-              }`}
+            <h3 className="font-bold text-sm text-black" dir="rtl">
+              {consultation.doctor && (
+                <p>{`د: ${consultation.doctor.user.firstName} ${consultation.doctor.user.lastName}`}</p>
+              )}
             </h3>
           </div>
-          <p className="bg-orange-100 p-2 text-black rounded-3xl text-xs font-medium">
-            Status: {consultation.status}
+          <p className="bg-green-100 p-2 text-black rounded-3xl text-xs font-medium">
+            {consultation.status}
           </p>
         </div>
-        {consultation.doctor && (
-          <p>{`Doctor: ${consultation.doctor.user.firstName} ${consultation.doctor.user.lastName}`}</p>
+        {consultation.patient && (
+          <p>{`المريض: ${consultation.patient.user.firstName} ${consultation.patient.user.lastName}`}</p>
         )}
+        {consultation.patient && (
+          <div className="text-gray-500 text-sm flex flex-col">
+            <p>{consultation.patient.user.dateOfBirth}</p>
+            <p>{translateGender(consultation.patient.user.gender)}</p>
+          </div>
+        )}
+
         <div className="flex">
-          <p className="text-gray-500 text-sm">Date: {formattedDateTime}</p>
+          <p className="text-gray-500 text-xs">Date: {formattedDateTime}</p>
         </div>
         <div className="flex flex-col items-center justify-center mt-4 space-y-2">
-          {consultation.status === "PendingPayment" && (
+          {/* Prescription button appears above other buttons */}
+          {consultation.prescription && (
             <button
-              className="flex items-center justify-center w-full p-2 bg-custom-green text-sm text-white font-bold rounded-lg"
-              onClick={handleChatClick}
+              className="flex items-center border border-gray-300 rounded-lg p-3 bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold text-sm transition duration-300 ease-in-out"
+              onClick={handlePrescriptionClick} // Open the prescription PDF
             >
-              <span className="ml-2">مراسله</span>
-              <ChatBubbleOvalLeftIcon className="text-white w-4" />
+              <NewspaperSharp className="text-blue-600 mr-2 text-base" />{" "}
+              {/* Adjusted size and color */}
+              <span className="text-gray-800 text-xs">الوصفة الطبية</span>{" "}
+              {/* Adjusted text color and size */}
             </button>
           )}
-          {consultation.status === "Completed" && (
+
+          {/* The button for other actions */}
+          {buttonLabel && (
             <button
-              className="flex items-center justify-center w-full p-2 bg-blue-500 text-sm text-white font-bold rounded-lg"
-              onClick={handleChatClick}
+              className={`flex items-center justify-center w-full p-2 ${buttonClass} text-sm text-white font-bold rounded-lg`}
+              onClick={handleButtonClick} // Use handleButtonClick for navigation
             >
-              <ChatBubbleOvalLeftIcon className="text-white w-4" />
-              <span className="ml-2">Completed</span>
-            </button>
-          )}
-          {consultation.status === "Cancelled" && (
-            <button
-              className="flex items-center justify-center w-full p-2 bg-red-500 text-sm text-white font-bold rounded-lg"
-              onClick={handleChatClick}
-            >
-              <ChatBubbleOvalLeftIcon className="text-white w-6" />
-              <span className="ml-2">Cancelled</span>
-            </button>
-          )}
-        </div>
-        <div
-          className="flex flex-row flex-wrap justify-start gap-2 mt-4 text-sm"
-          dir="rtl"
-        >
-          {consultation.hasPrescription && (
-            <button
-              className="flex items-center border border-gray-300 rounded-lg p-2"
-              onClick={() => onSelect(consultation.id)}
-            >
-              <NewspaperSharp className="text-gray-400 mr-2" />
-              <span className="text-gray-700">الوصفة الطبية</span>
-            </button>
-          )}
-          {consultation.hasSOAP && (
-            <button
-              className="flex items-center border border-gray-300 rounded-lg p-2"
-              onClick={() => onSelect(consultation.id)}
-            >
-              <Person2Outlined className="text-gray-400 mr-2" />
-              <span className="text-gray-700">SOAP Available</span>
-            </button>
-          )}
-          {consultation.hasSickLeave && (
-            <button
-              className="flex items-center border border-gray-300 rounded-lg p-2"
-              onClick={() => onSelect(consultation.id)}
-            >
-              <Person2Outlined className="text-gray-400 mr-2" />
-              <span className="text-gray-700">Sick Leave Available</span>
+              <span className="ml-2">{buttonLabel}</span>
+              {icon}
             </button>
           )}
         </div>

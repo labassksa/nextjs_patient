@@ -91,7 +91,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
             sessionId: SessionId,
             countryCode: "KWT", // Use actual country code
             currencyCode: "KWD", // Use actual currency code
-            amount: "1", // Use actual amount
+            amount: "100", // Use actual amount
             cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
             callback: payment,
             sessionStarted: sessionStarted,
@@ -126,7 +126,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "KWD",
-          InvoiceValue: 120,
+          InvoiceValue: 100,
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },

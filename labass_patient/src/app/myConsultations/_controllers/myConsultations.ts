@@ -16,7 +16,7 @@ export const fetchConsultations = async () => {
         },
       }
     );
-    return response.data.reverse();
+    return response.data;
   } catch (error) {
     console.error("Error fetching consultations:", error);
     return [];

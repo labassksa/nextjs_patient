@@ -1,6 +1,7 @@
 // models/Consultation.ts
 import { DoctorProfile } from "./doctorProfile";
 import { PatientProfile } from "./patientProfile";
+import { Prescription } from "./prescription"; // Import Prescription class
 
 export enum ConsultationType {
   Quick = "Quick",
@@ -8,9 +9,11 @@ export enum ConsultationType {
 }
 
 export enum ConsultationStatus {
+  Paid = "Paid",
+  Open = "Open",
+  Closed = "Closed",
   PendingPayment = "PendingPayment",
-  Completed = "Completed",
-  Cancelled = "Cancelled",
+  Failed = "Failed",
 }
 
 export class Consultation {
@@ -25,8 +28,6 @@ export class Consultation {
     public type: ConsultationType,
     public patient: PatientProfile,
     public doctor?: DoctorProfile | null, // Allowing null here
-    public hasPrescription: boolean = false,
-    public hasSOAP: boolean = false,
-    public hasSickLeave: boolean = false
+    public prescription?: Prescription // Added Prescription object
   ) {}
 }

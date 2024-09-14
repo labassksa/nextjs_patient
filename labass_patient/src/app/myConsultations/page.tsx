@@ -47,7 +47,7 @@ const MyConsultationsPage = () => {
               onSelect={(id: any) =>
                 console.log("Selected consultation ID:", id)
               }
-              onChatClick={(id: any) => console.log("Chat clicked for ID:", id)}
+              // onChatClick={(id: any) => console.log("Chat clicked for ID:", id)}
             />
           ))
         )}
