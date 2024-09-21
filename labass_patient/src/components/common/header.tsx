@@ -12,8 +12,8 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = false }) => {
   const router = useRouter();
 
   return (
-    <div className="fixed top-0 w-full bg-white p-4 flex items-center justify-between z-10">
-      <h1 className="text-lg text-gray-500 font-normal flex-grow text-center">
+    <div className="fixed top-0 w-full h-16 bg-white p-4 flex items-center justify-between z-10">
+      <h1 className="text-md text-gray-500 font-normal flex-grow text-center">
         {title}
       </h1>
       {showBackButton && (

@@ -32,6 +32,7 @@ const CardDetails: React.FC = () => {
   const countryCode = searchParams.get("countryCode");
   const myFatoorahInitializedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
 
   useEffect(() => {
     if (
@@ -43,7 +44,6 @@ const CardDetails: React.FC = () => {
       initializeMyFatoorah();
     }
 
-    // Event listener for 3DS redirection URL
     window.addEventListener("message", handle3DSRedirection, false);
 
     return () => {
@@ -67,25 +67,23 @@ const CardDetails: React.FC = () => {
   };
 
   const handlePaymentSubmit = async () => {
+    setLoading(true); // Set loading state to true
     console.log("Submitting payment...");
 
-    // Check if MyFatoorah is initialized and the submit function is available
     if (!window.myFatoorah || typeof window.myFatoorah.submit !== "function") {
       console.error("window.myFatoorah.submit is not available.");
+      setLoading(false); // Reset loading state
       return;
     }
 
-    // Check if sessionId is available
     if (!sessionId) {
       console.error("Session ID is missing. Unable to proceed with payment.");
+      setLoading(false); // Reset loading state
       return;
     }
 
     try {
-      // Log before submission to see if sessionId and session data is correctly passed
       console.log("Submitting payment with sessionId:", sessionId);
-
-      // Submit the payment
       const response = await window.myFatoorah.submit();
       console.log("Submit response received:", response);
 
@@ -94,6 +92,7 @@ const CardDetails: React.FC = () => {
 
         if (!token) {
           console.error("Token not found in localStorage.");
+          setLoading(false); // Reset loading state
           return;
         }
 
@@ -103,7 +102,6 @@ const CardDetails: React.FC = () => {
             await axios.post<ExecutePaymentResponse>(
               `${apiUrl}/execute-payment`,
               {
-                PromoCode: "6B8A174",
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "KWD",
                 InvoiceValue: 50,
@@ -127,25 +125,26 @@ const CardDetails: React.FC = () => {
               "Execute payment failed:",
               executePaymentResponse.data.Message
             );
+            setLoading(false); // Reset loading state
           }
         } catch (error) {
           console.error("Error executing payment:", error);
+          setLoading(false); // Reset loading state
         }
       } else {
         console.error("Payment submission failed:", response);
+        setLoading(false); // Reset loading state
       }
     } catch (error) {
       console.error("Payment error:", error);
+      setLoading(false); // Reset loading state
     }
   };
 
   const handle3DSecure = (paymentUrl: string) => {
     const iframeUrl = `${paymentUrl}&iframeEnabled=true`;
-
-    // Clear existing content
     document.body.innerHTML = "";
 
-    // Create and style the iframe
     const iframe = document.createElement("iframe");
     iframe.src = iframeUrl;
     iframe.style.position = "fixed";
@@ -203,11 +202,18 @@ const CardDetails: React.FC = () => {
         <button
           className="sticky bottom-0 p-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
           onClick={handlePaymentSubmit}
-          disabled={!isInitialized}
+          disabled={!isInitialized || loading} // Disable button when loading
         >
-          ادفع
+          {loading ? "Processing..." : "ادفع"}{" "}
+          {/* Show text based on loading state */}
         </button>
       </div>
+      {loading && (
+        <div className="text-center mt-4">
+          Processing payment, please wait...
+        </div>
+      )}{" "}
+      {/* Loading message */}
     </div>
   );
 };

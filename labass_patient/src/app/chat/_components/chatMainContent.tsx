@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import StickyMessageInput from "./chatInputarea";
 
 interface Message {
-  id: number;
   message: string;
   senderId: number;
   consultationId: number;
@@ -24,36 +23,38 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
   messages,
   handleSendMessage,
 }) => {
-  messages.forEach(
-    (message)=> {
-      console.log(`The isSent inside chatMainContents${message.isSent}`)
-    }
-  )
   useEffect(() => {
     console.log("Consultation ID:", consultationId);
-    // Fetch and load messages for the given consultationId here
   }, [consultationId]);
 
-  const userId = 2; // Example userId for doctor, adjust as needed
+  // Retrieve the current userId from localStorage
+  const userId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("labass_userId")
+      : null;
 
   return (
-    <div className="flex flex-col h-full text-black relative">
+    <div className="flex flex-col h-full bg-gray-100 text-black relative">
       <div
-        className="flex-grow overflow-y-auto p-4 bg-gray-100 text-sm mt-16"
+        className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0"
         dir="rtl"
       >
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message.id}
+            key={index} // Use index as key if no unique ID is provided
             dir="rtl"
-            className={`mb-4 p-3 rounded-lg max-w-xs ${
-              message.senderId === userId ? "bg-custom-background" : "bg-white"
+            className={`mb-2 p-2 rounded-lg max-w-xs ${
+              message.senderId === Number(userId)
+                ? "bg-custom-background"
+                : "bg-white"
             }`}
           >
             {message.message}
-            {message.senderId === userId && ( // Only show checkmarks for the sender
+
+            {/* Only show checkmarks for the sender */}
+            {message.senderId === Number(userId) && (
               <div className="text-right">
-                {message.isSent && ( // Show grey checkmark for sent messages
+                {message.isSent && (
                   <svg
                     className={`w-4 h-4 mt-1 ${
                       message.read ? "text-green-600" : "text-gray-500"
@@ -76,7 +77,7 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
           </div>
         ))}
       </div>
-      <StickyMessageInput onSendMessage={handleSendMessage} />
+      {showActions && <StickyMessageInput onSendMessage={handleSendMessage} />}
     </div>
   );
 };

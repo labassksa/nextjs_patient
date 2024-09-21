@@ -32,7 +32,7 @@ const MyConsultationsPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 mb-16">
       <Header title="استشاراتي" />
       <div className="pt-16">
         {isLoading ? (
