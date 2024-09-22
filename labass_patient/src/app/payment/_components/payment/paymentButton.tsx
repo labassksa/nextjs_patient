@@ -76,7 +76,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
       // Use environment variable for the backend URL
       const response = await axios.post(`${apiUrl}/initiate-session`, {
         InvoiceAmount: 1, // Use actual amount
-        CurrencyIso: "KWD", // Use actual currency
+        CurrencyIso: "SAR", // Use actual currency
       });
 
       if (response.data.IsSuccess) {
@@ -90,7 +90,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
           applePayConfigRef.current = {
             sessionId: SessionId,
             countryCode: "SAU", // Use actual country code
-            currencyCode: "KWD", // Use actual currency code
+            currencyCode: "SAR", // Use actual currency code
             amount: "100", // Use actual amount
             cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
             callback: payment,
