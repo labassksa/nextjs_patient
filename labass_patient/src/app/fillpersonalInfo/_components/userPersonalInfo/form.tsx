@@ -21,6 +21,8 @@ const PersonalInfoForm: React.FC = () => {
   const router = useRouter(); // Initialize useRouter for routing
   const searchParams = useSearchParams(); // Get search parameters
 
+  //In Next.js 13 and later, when using useSearchParams or useParams in a client component,
+  //you must wrap that component with <Suspense> to prevent hydration mismatches.
   // Retrieve consultationId from the query parameters
   const consultationId = searchParams?.get("consultationId");
 
