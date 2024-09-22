@@ -21,7 +21,7 @@ const BottomBanner: React.FC = () => {
         <div className=" text-black flex-col mx-2">
           <h1 className="text-sm font-bold">شركة معالم التطوير</h1>
           <div className="text-xs ml-4 flex-grow">
-            شركة مرخصة من وزارة الصحة وتحمل الترخيص رقم #####
+            شركة مرخصة من وزارة الصحة وتحمل الترخيص رقم 1400055938
           </div>
         </div>
       </div>

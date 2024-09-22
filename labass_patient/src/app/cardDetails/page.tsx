@@ -180,7 +180,7 @@ const CardDetails: React.FC = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col justify-between p-4">
       <script
-        src="https://demo.myfatoorah.com/cardview/v2/session.js"
+        src="https://sa.myfatoorah.com/cardview/v2/session.js"
         defer
         onLoad={initializeMyFatoorah}
       />
