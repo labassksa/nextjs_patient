@@ -89,7 +89,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         } else if (method === PaymentMethodEnum.ApplePay) {
           applePayConfigRef.current = {
             sessionId: SessionId,
-            countryCode: "KWT", // Use actual country code
+            countryCode: "SAU", // Use actual country code
             currencyCode: "KWD", // Use actual currency code
             amount: "100", // Use actual amount
             cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
