@@ -27,6 +27,7 @@ const ChatPage: React.FC = () => {
   // Use environment variable for the backend URL
   const websocketURL = process.env.NEXT_WEBSOCKET_URL || "";
   const consultationId = params.consultationId; // Retrieve consultationId from the URL
+  console.log("WebSocket URL:", websocketURL);
 
   // Retrieve JWT token and userId from localStorage
   const token =
