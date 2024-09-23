@@ -24,7 +24,8 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true); // Loading state for messages
   const router = useRouter(); // Initialize router for redirection
   const params = useParams(); // Extract dynamic params from the URL
-
+  // Use environment variable for the backend URL
+  const websocketURL = process.env.NEXT_WEBSOCKET_URL || "";
   const consultationId = params.consultationId; // Retrieve consultationId from the URL
 
   // Retrieve JWT token and userId from localStorage
@@ -81,10 +82,7 @@ const ChatPage: React.FC = () => {
   }, [token, userId, consultationId, router]);
 
   // Initialize socket if token and userId exist
-  const { socket, isConnected } = useSocket(
-    "http://localhost:4000",
-    token || ""
-  );
+  const { socket, isConnected } = useSocket(websocketURL, token || "");
 
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
