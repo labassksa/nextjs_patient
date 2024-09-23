@@ -25,7 +25,7 @@ const ChatPage: React.FC = () => {
   const router = useRouter(); // Initialize router for redirection
   const params = useParams(); // Extract dynamic params from the URL
   // Use environment variable for the backend URL
-  const websocketURL = process.env.NEXT_WEBSOCKET_URL || "";
+  const websocketURL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
   const consultationId = params.consultationId; // Retrieve consultationId from the URL
   console.log("WebSocket URL:", websocketURL);
 
