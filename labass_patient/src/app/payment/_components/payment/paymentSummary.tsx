@@ -16,7 +16,7 @@ const PaymentSummary: React.FC<{ discountedPrice: number }> = ({
         <span>{tax.toFixed(2)} SR</span>
         <span>الضريبة</span>
       </div>
-      <div className="flex justify-between font-bold">
+      <div className="flex justify-between font-bold mb-2">
         <span>{totalAmountIncludingVAT.toFixed(2)} SR</span>
         <span>المبلغ الاجمالي</span>
       </div>

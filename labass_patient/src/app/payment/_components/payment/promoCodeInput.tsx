@@ -96,7 +96,7 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
           value={promoCode}
           onChange={(e) => setPromoCode(e.target.value)}
           placeholder="أدخل الرمز الترويجي"
-          className="flex-grow p-2 text-black focus:outline-none rounded-r-md"
+          className="flex-grow p-2 text-black focus:outline-none text-xs rounded-r-md"
           dir="rtl"
           disabled={loading} // Disable input during loading
         />
