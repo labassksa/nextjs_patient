@@ -18,7 +18,7 @@ const Menu: React.FC = () => {
       {menuItems.slice(0, 4).map((item, index) => (
         <Link href={item.href} key={index}>
           <div className="menu-item flex justify-between items-center bg-white p-4 mb-2 rounded-lg shadow-xs cursor-pointer">
-            <ArrowBackIos className="text-gray-600" />
+            <ArrowBackIos className="text-gray-400" />
             <span>{item.title}</span>
           </div>
         </Link>
@@ -27,7 +27,7 @@ const Menu: React.FC = () => {
         {menuItems.slice(4).map((item, index) => (
           <Link href={item.href} key={index}>
             <div className="menu-item flex justify-between items-center bg-white p-4 mb-8 rounded-lg shadow-sm cursor-pointer">
-              <ArrowBackIos className="text-gray-500" />
+              <ArrowBackIos className="text-gray-400" />
               <span>{item.title}</span>
             </div>
           </Link>

@@ -59,10 +59,10 @@ const SimpleLoginForm = () => {
           onChange={handlePhoneNumberChange}
           placeholder="05xxxxxxx"
           required
-          className="w-full p-3 text-right text-lg border-2 border-gray-300 rounded-md focus:outline-none focus:border-custom-green direction-rtl"
+          className="w-full p-3 text-right text-lg border border-gray-200 rounded-md focus:outline-none focus:border-custom-green direction-rtl"
         />
         {errorMessage && (
-          <div className="text-red-500 text-sm m-2">{errorMessage}</div>
+          <div className="text-red-400 text-sm m-2">{errorMessage}</div>
         )}
       </form>
 
