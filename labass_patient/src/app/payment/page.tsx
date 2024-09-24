@@ -10,6 +10,7 @@ import Header from "../../components/common/header";
 
 const PaymentPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.Card);
+  const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -18,9 +19,9 @@ const PaymentPage: React.FC = () => {
         <PaymentIntro />
         <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
         <div className="my-4">
-          <PromoCode />
+          <PromoCode setDiscountedPrice={setDiscountedPrice} />
         </div>
-        <PaymentSummary />
+        <PaymentSummary discountedPrice={discountedPrice} />
       </div>
       <div className="m-2 pb-4 sticky bottom-0">
         <PaymentButton method={paymentMethod} />
