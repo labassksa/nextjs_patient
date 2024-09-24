@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginPatient } from "../../_controllers/sendOTP.Controller";
 import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish";
+import { ArrowBack } from "@mui/icons-material"; // Import the back arrow icon
 
 const SimpleLoginForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -40,8 +41,13 @@ const SimpleLoginForm = () => {
     }
   };
 
+  const handleBackClick = () => {
+    router.back(); // Navigate to the previous page
+  };
+
   return (
     <div className="flex flex-col h-screen justify-between">
+      {/* Login form */}
       <form onSubmit={handleSubmit} className="text-right m-2" id="loginForm">
         <label htmlFor="phoneNumber" className="block m-2">
           أدخل رقم الجوال
@@ -59,6 +65,8 @@ const SimpleLoginForm = () => {
           <div className="text-red-500 text-sm m-2">{errorMessage}</div>
         )}
       </form>
+
+      {/* Footer */}
       <div className="p-6 mb-60">
         <div className="text-xs text-right">
           مع الاستمرار بتسجيل الدخول، أنت توافق على{" "}
