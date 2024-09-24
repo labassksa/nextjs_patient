@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
@@ -35,13 +36,8 @@ const CardDetails: React.FC = () => {
   const [loading, setLoading] = useState(false); // Loading state
 
   useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.myFatoorah &&
-      sessionId &&
-      countryCode
-    ) {
-      initializeMyFatoorah();
+    if (sessionId && countryCode && typeof window !== "undefined") {
+      console.log("Waiting for MyFatoorah script to load...");
     }
 
     window.addEventListener("message", handle3DSRedirection, false);
@@ -52,7 +48,7 @@ const CardDetails: React.FC = () => {
   }, [sessionId, countryCode]);
 
   const initializeMyFatoorah = () => {
-    if (!myFatoorahInitializedRef.current) {
+    if (!myFatoorahInitializedRef.current && window.myFatoorah) {
       console.log("Initializing MyFatoorah with:", { countryCode, sessionId });
       window.myFatoorah.init({
         countryCode,
@@ -63,6 +59,8 @@ const CardDetails: React.FC = () => {
       console.log("MyFatoorah initialized successfully.");
       myFatoorahInitializedRef.current = true;
       setIsInitialized(true);
+    } else {
+      console.error("MyFatoorah script not available or already initialized.");
     }
   };
 
@@ -178,16 +176,17 @@ const CardDetails: React.FC = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col justify-between p-4">
-      <script
+    <div className="bg-gray-100 min-h-screen flex flex-col justify-between ">
+      <Script
         src="https://sa.myfatoorah.com/cardview/v2/session.js"
-        defer
+        strategy="lazyOnload"
         onLoad={initializeMyFatoorah}
+        onError={() => console.error("MyFatoorah script failed to load.")}
       />
       <Header title="ادفع" showBackButton />
       <div>
         <h1
-          className="flex flex-row text-black text-lg font-bold mb-4 mt-16"
+          className="flex flex-row text-black text-md font-bold mb-4 mt-16"
           dir="rtl"
         >
           أدخل معلومات البطاقة
@@ -202,18 +201,16 @@ const CardDetails: React.FC = () => {
         <button
           className="sticky bottom-0 p-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
           onClick={handlePaymentSubmit}
-          disabled={!isInitialized || loading} // Disable button when loading
+          disabled={!isInitialized || loading}
         >
           {loading ? "Processing..." : "ادفع"}{" "}
-          {/* Show text based on loading state */}
         </button>
       </div>
       {loading && (
         <div className="text-center mt-4">
           Processing payment, please wait...
         </div>
-      )}{" "}
-      {/* Loading message */}
+      )}
     </div>
   );
 };
