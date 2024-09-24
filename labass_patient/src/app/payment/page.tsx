@@ -19,12 +19,18 @@ const PaymentPage: React.FC = () => {
         <PaymentIntro />
         <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
         <div className="my-4">
+          {/* Pass setDiscountedPrice to PromoCode to allow updating the total */}
           <PromoCode setDiscountedPrice={setDiscountedPrice} />
         </div>
+        {/* Pass the updated discounted price to PaymentSummary */}
         <PaymentSummary discountedPrice={discountedPrice} />
       </div>
       <div className="m-2 pb-4 sticky bottom-0">
-        <PaymentButton method={paymentMethod} />
+        {/* Pass the updated discountedPrice to PaymentButton */}
+        <PaymentButton
+          method={paymentMethod}
+          discountedPrice={discountedPrice}
+        />
       </div>
     </div>
   );

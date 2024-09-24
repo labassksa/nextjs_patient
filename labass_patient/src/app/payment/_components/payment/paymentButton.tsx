@@ -7,6 +7,7 @@ import axios from "axios";
 
 interface PaymentButtonProps {
   method: string;
+  discountedPrice: number; // Add discountedPrice prop
 }
 
 interface ApplePayConfig {
@@ -23,10 +24,13 @@ interface ApplePayConfig {
   sessionStarted: () => void;
   sessionCanceled: () => void;
 }
-// Use environment variable for the backend URL
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
+const PaymentButton: React.FC<PaymentButtonProps> = ({
+  method,
+  discountedPrice,
+}) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
@@ -75,7 +79,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
     try {
       // Use environment variable for the backend URL
       const response = await axios.post(`${apiUrl}/initiate-session`, {
-        InvoiceAmount: 1, // Use actual amount
+        InvoiceAmount: discountedPrice, // Use actual discounted amount
         CurrencyIso: "SAR", // Use actual currency
       });
 
@@ -91,7 +95,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
             sessionId: SessionId,
             countryCode: "SAU", // Use actual country code
             currencyCode: "SAR", // Use actual currency code
-            amount: "20", // Use actual amount
+            amount: discountedPrice.toFixed(2), // Use actual amount
             cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
             callback: payment,
             sessionStarted: sessionStarted,
@@ -126,7 +130,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: 20,
+          InvoiceValue: discountedPrice, // Use the updated discounted price
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
@@ -196,7 +200,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ method }) => {
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : "الدفع"}
+          {loading ? "Processing..." : `الدفع ${discountedPrice} SR`}{" "}
+          {/* Show updated price */}
         </button>
       )}
     </div>
