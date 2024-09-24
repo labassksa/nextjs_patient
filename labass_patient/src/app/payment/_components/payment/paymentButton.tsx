@@ -73,6 +73,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, [method]);
 
+  // Update the displayed amount dynamically after Apple Pay is initialized
+  useEffect(() => {
+    if (isInitialized && method === PaymentMethodEnum.ApplePay) {
+      console.log("Updating Apple Pay amount to:", discountedPrice);
+      (window as any).myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+    }
+  }, [discountedPrice, isInitialized, method]);
+
   const handlePaymentClick = async () => {
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
