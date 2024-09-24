@@ -46,7 +46,9 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
       if (response.data.discountedPrice) {
         setDiscountedPrice(response.data.discountedPrice);
         setResponseMessage(
-          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice}`
+          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
+            2
+          )}`
         );
         setIsSuccess(true); // Mark as success
       } else if (response.data.message === "Promotional code not found") {
