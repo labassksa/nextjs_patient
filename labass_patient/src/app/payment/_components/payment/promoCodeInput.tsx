@@ -49,11 +49,13 @@ const PromoCode: React.FC<{
 
       if (response.data.discountedPrice) {
         setDiscountedPrice(response.data.discountedPrice); // Update discounted price
-        setPromoCode(promoCodeInput); // Freeze promo code by setting it in the parent
+        setPromoCode(promoCodeInput); // Set promo code in the parent state
         setResponseMessage(
-          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice}`
+          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
+            2
+          )}`
         );
-        setIsSuccess(true);
+        setIsSuccess(true); // Mark success
         setIsFieldFrozen(true); // Freeze the field after successful application
       } else if (response.data.message === "Promotional code not found") {
         setResponseMessage("الرمز الترويجي غير موجود");
@@ -81,7 +83,8 @@ const PromoCode: React.FC<{
       setPromoCode(""); // Reset promo code to empty string
       setDiscountedPrice(defaultPrice); // Reset to default price
       setIsFieldFrozen(false); // Make the field editable again
-      setResponseMessage(""); // Clear any success message
+      setResponseMessage(""); // Clear success message if the code is being changed
+      setIsSuccess(false); // Reset success status
     }
 
     setPromoCodeInput(newPromoCode); // Update input value
@@ -108,8 +111,8 @@ const PromoCode: React.FC<{
           value={promoCodeInput}
           onChange={handleInputChange}
           placeholder="أدخل الرمز الترويجي"
-          className={`flex-grow p-2 focus:outline-none rounded-r-md ${
-            isFieldFrozen ? "bg-gray-200 text-gray-500" : "" // Gray out the field if frozen
+          className={`flex-grow p-2 focus:outline-none rounded-r-md text-black ${
+            isFieldFrozen ? "bg-gray-200" : "" // Gray out the field if frozen
           }`}
           dir="rtl"
           disabled={loading || isFieldFrozen} // Disable input when frozen or loading
