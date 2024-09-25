@@ -7,8 +7,8 @@ import axios from "axios";
 
 interface PaymentButtonProps {
   method: string;
-  discountedPrice: number; // Add discountedPrice prop
-  promoCode: string; // Add promoCode prop
+  discountedPrice: number;
+  promoCode: string;
 }
 
 interface ApplePayConfig {
@@ -75,7 +75,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, [method]);
 
-  // Update the displayed amount dynamically after Apple Pay is initialized
   useEffect(() => {
     if (isInitialized && method === PaymentMethodEnum.ApplePay) {
       console.log("Updating Apple Pay amount to:", discountedPrice);
@@ -91,10 +90,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
-      // Use environment variable for the backend URL
       const response = await axios.post(`${apiUrl}/initiate-session`, {
-        InvoiceAmount: discountedPrice, // Use actual discounted amount
-        CurrencyIso: "SAR", // Use actual currency
+        InvoiceAmount: discountedPrice,
+        CurrencyIso: "SAR",
       });
 
       if (response.data.IsSuccess) {
@@ -107,17 +105,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         } else if (method === PaymentMethodEnum.ApplePay) {
           applePayConfigRef.current = {
             sessionId: SessionId,
-            countryCode: "SAU", // Use actual country code
-            currencyCode: "SAR", // Use actual currency code
-            amount: discountedPrice.toFixed(2), // Use actual amount
-            cardViewId: "apple-pay-container", // ID of the div where the Apple Pay button will be loaded
+            countryCode: "SAU",
+            currencyCode: "SAR",
+            amount: discountedPrice.toFixed(2),
+            cardViewId: "apple-pay-container",
             callback: payment,
             sessionStarted: sessionStarted,
             sessionCanceled: sessionCanceled,
           };
 
           if (scriptLoadedRef.current) {
-            (window as any).myFatoorahAP.init(applePayConfigRef.current);
+            window.myFatoorahAP.init(applePayConfigRef.current);
             setIsInitialized(true);
           }
         }
@@ -130,10 +128,18 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       setLoading(false);
     }
   };
+
   const testPromo = () => {
     console.log(`PromoCode ${promoCode}`);
     console.log(`Updated Amount ${discountedPrice}`);
+
+    // Mock sessionId for testing purposes
+    const mockSessionId = "test-session-id";
+
+    // Call the executePayment function with the mock sessionId
+    // executePayment(mockSessionId);
   };
+
   const executePayment = async (sessionId: string) => {
     try {
       const token = localStorage.getItem("labass_token");
@@ -142,19 +148,25 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.error("Token not found in localStorage.");
         return;
       }
+      window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+
+      console.log(
+        `Executing payment with amount: ${discountedPrice} and promoCode: ${promoCode}`
+      );
+
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2), // Use the updated discounted price
+          InvoiceValue: discountedPrice.toFixed(2), // Ensure this is the discounted price
           PromoCode: promoCode, // Include the applied promo code
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Add the Bearer token here
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -162,12 +174,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       if (response.data.IsSuccess) {
         const paymentUrl = response.data.Data.PaymentURL;
 
-        // Make a GET request to the PaymentURL silently
         const paymentResponse = await axios.get(paymentUrl);
 
         if (paymentResponse.status === 200) {
           console.log("Payment completed successfully:", paymentResponse.data);
-          // Optionally redirect or update UI based on payment success
         } else {
           console.error("Failed to complete payment:", paymentResponse.data);
         }
@@ -203,7 +213,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       handlePaymentClick();
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.style.display = "block"; // Show the Apple Pay button
+        container.style.display = "block";
       }
     }
   }, [method]);
@@ -212,11 +222,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     <div>
       <div id="apple-pay-container"></div>
       <button
-        className=" p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
+        className="p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
         dir="rtl"
         onClick={testPromo}
       >
-        test
+        Test Execute Payment
       </button>
       {method === PaymentMethodEnum.Card && (
         <button
