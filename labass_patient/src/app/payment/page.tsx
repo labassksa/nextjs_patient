@@ -9,7 +9,9 @@ import { PaymentMethodEnum } from "../../types/paymentMethods";
 import Header from "../../components/common/header";
 
 const PaymentPage: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.Card);
+  const [paymentMethod, setPaymentMethod] = useState(
+    PaymentMethodEnum.ApplePay
+  );
   const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
   const [promoCode, setPromoCode] = useState(""); // Track applied promo code
 
