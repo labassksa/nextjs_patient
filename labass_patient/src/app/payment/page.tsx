@@ -12,7 +12,7 @@ const PaymentPage: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState(
     PaymentMethodEnum.ApplePay
   );
-  const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
+  const [discountedPrice, setDiscountedPrice] = useState(2); // Default price
   const [promoCode, setPromoCode] = useState(""); // Track applied promo code
 
   return (
