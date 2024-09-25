@@ -126,7 +126,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       setLoading(false);
     }
   };
-
+  const testPromo = () => {
+    console.log(`PromoCode ${promoCode}`);
+    console.log(`Updated Amount ${discountedPrice}`);
+  };
   const executePayment = async (sessionId: string) => {
     try {
       const token = localStorage.getItem("labass_token");
@@ -204,6 +207,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   return (
     <div>
       <div id="apple-pay-container"></div>
+      <button
+        className=" p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
+        dir="rtl"
+        onClick={testPromo}
+      >
+        test
+      </button>
       {method === PaymentMethodEnum.Card && (
         <button
           className="sticky bottom-0 p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
