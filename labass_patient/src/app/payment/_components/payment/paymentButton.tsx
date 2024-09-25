@@ -37,7 +37,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [loading, setLoading] = useState(false);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true);
 
   useEffect(() => {
     const loadApplePayScript = () => {
@@ -147,7 +147,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice, // Use the updated discounted price
+          InvoiceValue: discountedPrice.toFixed(2), // Use the updated discounted price
           PromoCode: promoCode, // Include the applied promo code
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
@@ -225,8 +225,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : `الدفع ${discountedPrice.toFixed(2)} SR`}{" "}
-          {/* Show updated price */}
+          {loading ? "Processing..." : `الدفع`} {/* Show updated price */}
         </button>
       )}
     </div>

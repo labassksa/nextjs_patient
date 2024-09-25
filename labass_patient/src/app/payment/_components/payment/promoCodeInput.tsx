@@ -12,7 +12,7 @@ const PromoCode: React.FC<{
   const [isFieldFrozen, setIsFieldFrozen] = useState(false); // Track whether the field is frozen
   const [loading, setLoading] = useState(false); // Track loading state
 
-  const defaultPrice = 89; // Default price
+  const defaultPrice = 2; // Default price
 
   const handleApplyPromo = async () => {
     if (promoCodeInput.length !== 7) {
@@ -91,7 +91,7 @@ const PromoCode: React.FC<{
   };
 
   return (
-    <div className="relative flex flex-col border-2 border-gray-300 rounded-md bg-white mx-2 p-2">
+    <div className="relative flex flex-col border border-gray-200 rounded-md bg-white mx-2 p-2">
       <div className="flex justify-between items-center">
         <button
           onClick={handleApplyPromo}
@@ -101,7 +101,7 @@ const PromoCode: React.FC<{
           disabled={loading || isFieldFrozen} // Disable the button when loading or field is frozen
         >
           {loading ? (
-            <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 border-t-transparent rounded-full"></div>
+            <div className="spinner-border animate-spin inline-block w-4 h-4 border border-t-transparent rounded-full"></div>
           ) : (
             "استخدام"
           )}
@@ -111,7 +111,7 @@ const PromoCode: React.FC<{
           value={promoCodeInput}
           onChange={handleInputChange}
           placeholder="أدخل الرمز الترويجي"
-          className={`flex-grow p-2 focus:outline-none rounded-r-md text-black ${
+          className={`flex-grow p-2 focus:outline-none  rounded-r-md text-black ${
             isFieldFrozen ? "bg-gray-200" : "" // Gray out the field if frozen
           }`}
           dir="rtl"
