@@ -186,12 +186,12 @@ const CardDetails: React.FC = () => {
       <Header title="ادفع" showBackButton />
       <div>
         <h1
-          className="flex flex-row text-black text-md font-bold mb-4 mt-18"
+          className="flex flex-row text-black text-md font-bold mb-4 mt-20 mr-2"
           dir="rtl"
         >
           أدخل معلومات البطاقة
         </h1>
-        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md mt-10">
           <div className="bg-white">
             <div id="card-element"></div>
           </div>
@@ -199,7 +199,7 @@ const CardDetails: React.FC = () => {
       </div>
       <div>
         <button
-          className="sticky bottom-0 p-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
+          className="sticky bottom-0 p-2 my-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
           onClick={handlePaymentSubmit}
           disabled={!isInitialized || loading}
         >
