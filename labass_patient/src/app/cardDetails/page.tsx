@@ -186,7 +186,7 @@ const CardDetails: React.FC = () => {
       <Header title="ادفع" showBackButton />
       <div>
         <h1
-          className="flex flex-row text-black text-md font-bold mb-4 mt-16"
+          className="flex flex-row text-black text-md font-bold mb-4 mt-18"
           dir="rtl"
         >
           أدخل معلومات البطاقة

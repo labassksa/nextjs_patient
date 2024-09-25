@@ -8,6 +8,7 @@ import axios from "axios";
 interface PaymentButtonProps {
   method: string;
   discountedPrice: number; // Add discountedPrice prop
+  promoCode: string; // Add promoCode prop
 }
 
 interface ApplePayConfig {
@@ -30,6 +31,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   method,
   discountedPrice,
+  promoCode,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -139,6 +141,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
           InvoiceValue: discountedPrice, // Use the updated discounted price
+          PromoCode: promoCode, // Include the applied promo code
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
