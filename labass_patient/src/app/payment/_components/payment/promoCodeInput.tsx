@@ -6,10 +6,13 @@ const PromoCode: React.FC<{
   setDiscountedPrice: (price: number) => void;
   setPromoCode: (code: string) => void;
 }> = ({ setDiscountedPrice, setPromoCode }) => {
-  const [promoCodeInput, setPromoCodeInput] = useState("");
-  const [responseMessage, setResponseMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false); // Track if message is success or error
+  const [promoCodeInput, setPromoCodeInput] = useState(""); // Promo code value
+  const [responseMessage, setResponseMessage] = useState(""); // Feedback message (success or error)
+  const [isSuccess, setIsSuccess] = useState(false); // Track success state
+  const [isFieldFrozen, setIsFieldFrozen] = useState(false); // Track whether the field is frozen
   const [loading, setLoading] = useState(false); // Track loading state
+
+  const defaultPrice = 89; // Default price
 
   const handleApplyPromo = async () => {
     if (promoCodeInput.length !== 7) {
@@ -29,7 +32,7 @@ const PromoCode: React.FC<{
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     setLoading(true); // Start loading spinner
-    setResponseMessage(""); // Clear any previous messages
+    setResponseMessage(""); // Clear previous messages
 
     try {
       const response = await axios.post(
@@ -45,36 +48,43 @@ const PromoCode: React.FC<{
       );
 
       if (response.data.discountedPrice) {
-        setDiscountedPrice(response.data.discountedPrice);
-        setPromoCode(promoCodeInput); // Set the used promoCode to the parent state
+        setDiscountedPrice(response.data.discountedPrice); // Update discounted price
+        setPromoCode(promoCodeInput); // Freeze promo code by setting it in the parent
         setResponseMessage(
           `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice}`
         );
-        setIsSuccess(true); // Mark as success
+        setIsSuccess(true);
+        setIsFieldFrozen(true); // Freeze the field after successful application
       } else if (response.data.message === "Promotional code not found") {
         setResponseMessage("الرمز الترويجي غير موجود");
-        setIsSuccess(false); // Mark as error
+        setIsSuccess(false); // Handle invalid promo code
       } else if (response.data.message === "Promotional code is already used") {
         setResponseMessage("تم استخدام الرمز الترويجي بالفعل");
-        setIsSuccess(false); // Mark as error
+        setIsSuccess(false); // Handle already used promo code
       } else {
         setResponseMessage(response.data.message);
-        setIsSuccess(false); // Mark as error
+        setIsSuccess(false);
       }
     } catch (error: any) {
-      if (error.response) {
-        if (error.response.status === 500 && error.response.data.message) {
-          setResponseMessage(error.response.data.message);
-        } else {
-          setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
-        }
-      } else {
-        setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
-      }
-      setIsSuccess(false); // Mark as error
+      setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
+      setIsSuccess(false);
     } finally {
       setLoading(false); // Stop loading spinner
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPromoCode = e.target.value;
+
+    // If the user touches the field after it is frozen, reset the field
+    if (isFieldFrozen) {
+      setPromoCode(""); // Reset promo code to empty string
+      setDiscountedPrice(defaultPrice); // Reset to default price
+      setIsFieldFrozen(false); // Make the field editable again
+      setResponseMessage(""); // Clear any success message
+    }
+
+    setPromoCodeInput(newPromoCode); // Update input value
   };
 
   return (
@@ -82,8 +92,10 @@ const PromoCode: React.FC<{
       <div className="flex justify-between items-center">
         <button
           onClick={handleApplyPromo}
-          className="px-4 bg-custom-background text-custom-green rounded-l-md flex items-center"
-          disabled={loading} // Disable button during loading
+          className={`px-4 bg-custom-background text-custom-green rounded-l-md flex items-center ${
+            isFieldFrozen ? "cursor-not-allowed opacity-50" : "" // Disable button if field is frozen
+          }`}
+          disabled={loading || isFieldFrozen} // Disable the button when loading or field is frozen
         >
           {loading ? (
             <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 border-t-transparent rounded-full"></div>
@@ -94,11 +106,13 @@ const PromoCode: React.FC<{
         <input
           type="text"
           value={promoCodeInput}
-          onChange={(e) => setPromoCodeInput(e.target.value)}
+          onChange={handleInputChange}
           placeholder="أدخل الرمز الترويجي"
-          className="flex-grow p-2 focus:outline-none rounded-r-md"
+          className={`flex-grow p-2 focus:outline-none rounded-r-md ${
+            isFieldFrozen ? "bg-gray-200 text-gray-500" : "" // Gray out the field if frozen
+          }`}
           dir="rtl"
-          disabled={loading} // Disable input during loading
+          disabled={loading || isFieldFrozen} // Disable input when frozen or loading
         />
       </div>
 
