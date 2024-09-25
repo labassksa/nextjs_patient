@@ -37,7 +37,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [loading, setLoading] = useState(false);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
-  const [isInitialized, setIsInitialized] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const loadApplePayScript = () => {
@@ -50,7 +50,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
         if (applePayConfigRef.current) {
-          (window as any).myFatoorahAP.init(applePayConfigRef.current);
+          window.myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
         }
       };
@@ -79,7 +79,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   useEffect(() => {
     if (isInitialized && method === PaymentMethodEnum.ApplePay) {
       console.log("Updating Apple Pay amount to:", discountedPrice);
-      (window as any).myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+      window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
     }
   }, [discountedPrice, isInitialized, method]);
 
