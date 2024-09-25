@@ -51,6 +51,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         scriptLoadedRef.current = true;
         if (applePayConfigRef.current) {
           window.myFatoorahAP.init(applePayConfigRef.current);
+          window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           setIsInitialized(true);
         }
       };
@@ -116,6 +117,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
           if (scriptLoadedRef.current) {
             window.myFatoorahAP.init(applePayConfigRef.current);
+            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+
             setIsInitialized(true);
           }
         }

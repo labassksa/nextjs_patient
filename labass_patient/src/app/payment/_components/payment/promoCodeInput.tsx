@@ -91,11 +91,11 @@ const PromoCode: React.FC<{
   };
 
   return (
-    <div className="relative flex flex-col border border-gray-200 rounded-md bg-white mx-2 p-2">
+    <div className="relative flex flex-col border border-gray-200 rounded-lg bg-white mx-2 p-2">
       <div className="flex justify-between items-center">
         <button
           onClick={handleApplyPromo}
-          className={`px-4 bg-custom-background text-custom-green rounded-l-md flex items-center ${
+          className={`px-4 bg-custom-background text-custom-green rounded-lg flex items-center ${
             isFieldFrozen ? "cursor-not-allowed opacity-50" : "" // Disable button if field is frozen
           }`}
           disabled={loading || isFieldFrozen} // Disable the button when loading or field is frozen
