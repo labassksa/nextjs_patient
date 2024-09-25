@@ -9,10 +9,9 @@ import { PaymentMethodEnum } from "../../types/paymentMethods";
 import Header from "../../components/common/header";
 
 const PaymentPage: React.FC = () => {
-  const [paymentMethod, setPaymentMethod] = useState(
-    PaymentMethodEnum.ApplePay
-  );
+  const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.Card);
   const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
+  const [promoCode, setPromoCode] = useState(""); // Track applied promo code
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
@@ -21,17 +20,20 @@ const PaymentPage: React.FC = () => {
         <PaymentIntro />
         <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
         <div className="my-4">
-          {/* Pass setDiscountedPrice to PromoCode to allow updating the total */}
-          <PromoCode setDiscountedPrice={setDiscountedPrice} />
+          {/* Pass setDiscountedPrice and setPromoCode to PromoCode */}
+          <PromoCode
+            setDiscountedPrice={setDiscountedPrice}
+            setPromoCode={setPromoCode}
+          />
         </div>
-        {/* Pass the updated discounted price to PaymentSummary */}
         <PaymentSummary discountedPrice={discountedPrice} />
       </div>
       <div className="m-2 pb-4 sticky bottom-0">
-        {/* Pass the updated discountedPrice to PaymentButton */}
+        {/* Pass the updated discountedPrice and promoCode to PaymentButton */}
         <PaymentButton
           method={paymentMethod}
           discountedPrice={discountedPrice}
+          promoCode={promoCode}
         />
       </div>
     </div>

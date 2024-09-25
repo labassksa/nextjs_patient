@@ -1,17 +1,18 @@
-"use client"; // Ensure this is a client-side component
+"use client";
 import React, { useState } from "react";
 import axios from "axios";
 
-const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
-  setDiscountedPrice,
-}) => {
-  const [promoCode, setPromoCode] = useState("");
+const PromoCode: React.FC<{
+  setDiscountedPrice: (price: number) => void;
+  setPromoCode: (code: string) => void;
+}> = ({ setDiscountedPrice, setPromoCode }) => {
+  const [promoCodeInput, setPromoCodeInput] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false); // Track if message is success or error
   const [loading, setLoading] = useState(false); // Track loading state
 
   const handleApplyPromo = async () => {
-    if (promoCode.length !== 7) {
+    if (promoCodeInput.length !== 7) {
       setResponseMessage("الرمز الترويجي يجب أن يكون مكونًا من 7 أحرف");
       setIsSuccess(false);
       return;
@@ -34,7 +35,7 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
       const response = await axios.post(
         `${apiUrl}/use-promo`,
         {
-          promoCode: promoCode,
+          promoCode: promoCodeInput,
         },
         {
           headers: {
@@ -45,10 +46,9 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
 
       if (response.data.discountedPrice) {
         setDiscountedPrice(response.data.discountedPrice);
+        setPromoCode(promoCodeInput); // Set the used promoCode to the parent state
         setResponseMessage(
-          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
-            2
-          )}`
+          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice}`
         );
         setIsSuccess(true); // Mark as success
       } else if (response.data.message === "Promotional code not found") {
@@ -82,7 +82,7 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
       <div className="flex justify-between items-center">
         <button
           onClick={handleApplyPromo}
-          className=" bg-custom-background text-custom-green rounded-l-md flex items-center"
+          className="px-4 bg-custom-background text-custom-green rounded-l-md flex items-center"
           disabled={loading} // Disable button during loading
         >
           {loading ? (
@@ -93,10 +93,10 @@ const PromoCode: React.FC<{ setDiscountedPrice: (price: number) => void }> = ({
         </button>
         <input
           type="text"
-          value={promoCode}
-          onChange={(e) => setPromoCode(e.target.value)}
+          value={promoCodeInput}
+          onChange={(e) => setPromoCodeInput(e.target.value)}
           placeholder="أدخل الرمز الترويجي"
-          className="flex-grow p-2 text-black focus:outline-none text-xs rounded-r-md"
+          className="flex-grow p-2 focus:outline-none rounded-r-md"
           dir="rtl"
           disabled={loading} // Disable input during loading
         />
