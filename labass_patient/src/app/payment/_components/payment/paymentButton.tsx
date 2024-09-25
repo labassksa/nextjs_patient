@@ -39,6 +39,47 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // Function to initialize or reinitialize Apple Pay
+  const initializeApplePay = async () => {
+    if (method === PaymentMethodEnum.ApplePay) {
+      try {
+        const response = await axios.post(`${apiUrl}/initiate-session`, {
+          InvoiceAmount: discountedPrice,
+          CurrencyIso: "SAR",
+        });
+
+        if (response.data.IsSuccess) {
+          const { SessionId, CountryCode } = response.data.Data;
+
+          applePayConfigRef.current = {
+            sessionId: SessionId,
+            countryCode: "SAU",
+            currencyCode: "SAR",
+            amount: discountedPrice.toFixed(2),
+            cardViewId: "apple-pay-container",
+            callback: payment,
+            sessionStarted: sessionStarted,
+            sessionCanceled: sessionCanceled,
+          };
+
+          // Ensure the script is loaded and initialize Apple Pay
+          if (scriptLoadedRef.current) {
+            window.myFatoorahAP.init(applePayConfigRef.current);
+            setIsInitialized(true);
+
+            // After initializing, update the amount displayed in Apple Pay
+            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+          }
+        } else {
+          console.error("Failed to initiate session:", response.data.Message);
+        }
+      } catch (error) {
+        console.error("Error initiating session:", error);
+      }
+    }
+  };
+
+  // Load Apple Pay script
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
@@ -49,10 +90,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       script.onload = () => {
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
+
+        // Initialize Apple Pay when the script is loaded
         if (applePayConfigRef.current) {
           window.myFatoorahAP.init(applePayConfigRef.current);
-          window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           setIsInitialized(true);
+
+          // Update amount in Apple Pay after initialization
+          window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
         }
       };
 
@@ -65,23 +110,21 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       };
     };
 
-    if (method === PaymentMethodEnum.ApplePay && !scriptLoadedRef.current) {
+    if (!scriptLoadedRef.current) {
       loadApplePayScript();
-    } else if (method !== PaymentMethodEnum.ApplePay) {
+    }
+  }, []);
+
+  // Reinitialize Apple Pay when either the payment method or discounted price changes
+  useEffect(() => {
+    if (method === PaymentMethodEnum.ApplePay) {
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.innerHTML = ""; // remove the apple pay button
-        setIsInitialized(false); // Reset isInitialized when switching to another method
+        container.innerHTML = ""; // Clear the previous Apple Pay button
       }
+      initializeApplePay(); // Reinitialize with new values
     }
-  }, [method]);
-
-  useEffect(() => {
-    if (isInitialized && method === PaymentMethodEnum.ApplePay) {
-      console.log("Updating Apple Pay amount to:", discountedPrice);
-      window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
-    }
-  }, [discountedPrice, isInitialized, method]);
+  }, [discountedPrice, method]);
 
   const handlePaymentClick = async () => {
     const token = localStorage.getItem("labass_token");
@@ -117,9 +160,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
           if (scriptLoadedRef.current) {
             window.myFatoorahAP.init(applePayConfigRef.current);
-            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
-
             setIsInitialized(true);
+
+            // Update Apple Pay amount after re-initialization
+            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           }
         }
       } else {
@@ -132,15 +176,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
-  const testPromo = () => {
-    console.log(`PromoCode ${promoCode}`);
-    console.log(`Updated Amount ${discountedPrice}`);
+  const payment = (response: {
+    sessionId: string;
+    cardBrand: string;
+    cardIdentifier: string;
+  }) => {
+    const sessionId = response.sessionId;
+    console.log(`Payment ${sessionId}`);
 
-    // Mock sessionId for testing purposes
-    const mockSessionId = "test-session-id";
-
-    // Call the executePayment function with the mock sessionId
-    // executePayment(mockSessionId);
+    executePayment(sessionId);
   };
 
   const executePayment = async (sessionId: string) => {
@@ -151,7 +195,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.error("Token not found in localStorage.");
         return;
       }
-      window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
 
       console.log(
         `Executing payment with amount: ${discountedPrice} and promoCode: ${promoCode}`
@@ -192,17 +235,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
-  const payment = (response: {
-    sessionId: string;
-    cardBrand: string;
-    cardIdentifier: string;
-  }) => {
-    const sessionId = response.sessionId;
-    console.log(`Payment ${sessionId}`);
-
-    executePayment(sessionId);
-  };
-
   const sessionStarted = () => {
     console.log("Session started");
   };
@@ -211,26 +243,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     console.log("Session canceled");
   };
 
-  useEffect(() => {
-    if (method === PaymentMethodEnum.ApplePay) {
-      handlePaymentClick();
-      const container = document.getElementById("apple-pay-container");
-      if (container) {
-        container.style.display = "block";
-      }
-    }
-  }, [method]);
-
   return (
     <div>
       <div id="apple-pay-container"></div>
-      <button
-        className="p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
-        dir="rtl"
-        onClick={testPromo}
-      >
-        Test Execute Payment
-      </button>
       {method === PaymentMethodEnum.Card && (
         <button
           className="sticky bottom-0 p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
