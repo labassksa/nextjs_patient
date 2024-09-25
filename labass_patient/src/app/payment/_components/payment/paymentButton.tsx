@@ -84,6 +84,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   }, [discountedPrice, isInitialized, method]);
 
   const handlePaymentClick = async () => {
+    const token = localStorage.getItem("labass_token");
+    if (!token) {
+      router.push("/login"); // Navigate to login page
+    }
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
