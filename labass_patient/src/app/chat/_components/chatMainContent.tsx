@@ -3,18 +3,20 @@ import React, { useEffect } from "react";
 import StickyMessageInput from "./chatInputarea";
 
 interface Message {
-  message: string;
+  message?: string; // Text message (optional if an attachment exists)
   senderId: number;
   consultationId: number;
   isSent: boolean;
   read: boolean;
+  attachmentUrl?: string; // URL for the attachment (image or file)
+  attachmentType?: string; // Type of attachment (e.g., "images", "pdf", etc.)
 }
 
 interface ChatMainContentsProps {
   consultationId: number;
   showActions: boolean;
   messages: Message[];
-  handleSendMessage: (messageText: string) => void;
+  handleSendMessage: (messageText: string, fileMessage?: any) => void;
 }
 
 const ChatMainContents: React.FC<ChatMainContentsProps> = ({
@@ -49,7 +51,27 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
                 : "bg-white"
             }`}
           >
-            {message.message}
+            {/* Check if the message contains an attachment */}
+            {message.attachmentUrl ? (
+              message.attachmentType === "images" ? (
+                <img
+                  src={message.attachmentUrl}
+                  alt="attachment"
+                  className="w-full h-auto mb-2 rounded"
+                />
+              ) : (
+                <a
+                  href={message.attachmentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 underline"
+                >
+                  View Attachment
+                </a>
+              )
+            ) : (
+              <p>{message.message}</p> // If there's no attachment, show the text message
+            )}
 
             {/* Only show checkmarks for the sender */}
             {message.senderId === Number(userId) && (
