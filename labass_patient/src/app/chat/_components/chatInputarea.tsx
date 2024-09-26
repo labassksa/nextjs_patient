@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useRef } from "react";
-import axios from "axios";
 
 interface StickyMessageInputProps {
   onSendMessage: (messageText: string, file?: File) => void;
