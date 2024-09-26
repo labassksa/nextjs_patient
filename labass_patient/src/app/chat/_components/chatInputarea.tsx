@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useRef } from "react";
+import axios from "axios";
 
 interface StickyMessageInputProps {
-  onSendMessage: (messageText: string) => void;
+  onSendMessage: (messageText: string, file?: File) => void;
 }
 
 const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
@@ -10,6 +11,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [message, setMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined); // State for file input
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFocus = () => {
@@ -20,34 +22,60 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   };
 
   const handleSend = () => {
-    console.log("Message to send:", message); // Debugging
-    if (message.trim() !== "") {
-      onSendMessage(message);
+    if (message.trim() !== "" || selectedFile) {
+      // If a file is selected, the file will be sent instead of the message
+      onSendMessage(message, selectedFile);
       setMessage(""); // Clear the input field after sending the message
+      setSelectedFile(undefined); // Clear the file input after sending
     }
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setSelectedFile(file || undefined);
+
+    // Update the input field to show the file name
+    if (file) {
+      setMessage(file.name); // Show the file name in the input field
+    } else {
+      setMessage(""); // Clear the input field if no file is selected
+    }
+  };
+
+  const handleRemoveAttachment = () => {
+    setSelectedFile(undefined);
+    setMessage(""); // Clear the message input if attachment is removed
+  };
+
   return (
     <div className="sticky bottom-0 bg-white p-4 flex items-center border-t">
       {/* Plus Button */}
       <button className="p-2">
-        <svg
-          className="w-6 h-6 text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 4v16m8-8H4"
-          ></path>
-        </svg>
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="hidden"
+          id="file-input"
+        />
+        <label htmlFor="file-input">
+          <svg
+            className="w-6 h-6 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 4v16m8-8H4"
+            ></path>
+          </svg>
+        </label>
       </button>
 
       {/* Mic Button */}
@@ -66,7 +94,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         </svg>
       </button>
 
-      {/* Message Input */}
+      {/* Message or Attachment Display */}
       <input
         ref={inputRef}
         type="text"
@@ -77,7 +105,17 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         className="flex-grow p-2 border rounded-full outline-none text-sm"
         onFocus={handleFocus}
         onBlur={() => setInputFocused(false)}
+        readOnly={!!selectedFile} // Make input read-only if a file is selected
       />
+
+      {selectedFile && (
+        <button
+          className="ml-2 p-2 text-red-500"
+          onClick={handleRemoveAttachment}
+        >
+          Remove
+        </button>
+      )}
 
       {/* Send Button */}
       <button

@@ -31,7 +31,37 @@ export const loginPatient = async (phoneNumber: string) => {
       // Extract error message from backend response
       const backendMessage =
         error.response.data.error || "حدث خطأ ، حاول مرة أخرى";
-      return { success: false, message: backendMessage };
+
+      // Use regex to extract the role from the error message
+      const roleMatch = backendMessage.match(/role "(\w+)"/);
+      let translatedMessage = "حدث خطأ ، حاول مرة أخرى";
+
+      if (roleMatch) {
+        const role = roleMatch[1]; // Extract the role (e.g., patient, doctor, marketer, admin)
+
+        switch (role) {
+          case "doctor":
+            translatedMessage =
+              "المستخدم مسجل كطبيب و غير مصرح له بالدخول كمريض. يرجى الاتصال بدعم العملاء في لاباس";
+            break;
+          case "marketer":
+            translatedMessage =
+              "المستخدم مسجل كمسوق و غير مصرح له بالدخول كمريض. يرجى الاتصال بدعم العملاء في لاباس";
+            break;
+          case "admin":
+            translatedMessage =
+              "المستخدم مسجل كمسؤول و غير مصرح له بالدخول كمريض. يرجى الاتصال بدعم العملاء في لاباس";
+            break;
+          case "patient":
+            translatedMessage =
+              " المستخدم غير مصرح له بالدخول كمريض. يرجى الاتصال بدعم العملاء في";
+            break;
+          default:
+            translatedMessage = "حدث خطأ ، حاول مرة أخرى";
+        }
+      }
+
+      return { success: false, message: translatedMessage };
     } else {
       // Handle unexpected errors
       return {

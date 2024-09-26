@@ -6,14 +6,14 @@ import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish
 import { ArrowBack } from "@mui/icons-material"; // Import the back arrow icon
 
 const SimpleLoginForm = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string>(""); // Explicitly type as string
+  const [errorMessage, setErrorMessage] = useState<string>(""); // Explicitly type as string
   const [isLoading, setIsLoading] = useState(false); // State for loading indicator
   const router = useRouter();
 
   const handlePhoneNumberChange = (e: { target: { value: string } }) => {
-    const convertedNumber = convertArabicToEnglishNumbers(e.target.value);
-    setPhoneNumber(convertedNumber);
+    const convertedNumber = convertArabicToEnglishNumbers(e.target.value) || ""; // Default to an empty string if undefined
+    setPhoneNumber(convertedNumber); // Ensure setPhoneNumber always receives a string
     setErrorMessage("");
   };
 
@@ -30,14 +30,17 @@ const SimpleLoginForm = () => {
     const cleanedPhoneNumber = phoneNumber.startsWith("0")
       ? phoneNumber.slice(1)
       : phoneNumber;
+
+    // TypeScript now knows that result has success and message properties
     const result = await loginPatient(cleanedPhoneNumber);
 
     setIsLoading(false); // Stop loading after API response
+
     if (result.success) {
       console.log(`the result from login is ${result}`);
       router.push(`/otp?phoneNumber=%2B966${cleanedPhoneNumber}`);
     } else {
-      setErrorMessage(result.message);
+      setErrorMessage(result.message || "حدث خطأ غير معروف");
     }
   };
 

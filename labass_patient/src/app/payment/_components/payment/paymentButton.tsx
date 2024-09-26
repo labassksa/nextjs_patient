@@ -253,7 +253,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : `الدفع`} {/* Show updated price */}
+          {loading ? "Processing..." : `الدفع بالبطاقة`}{" "}
+          {/* Show updated price */}
         </button>
       )}
     </div>
