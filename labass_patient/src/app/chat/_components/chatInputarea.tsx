@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useRef } from "react";
+import axios from "axios";
 
 interface StickyMessageInputProps {
-  onSendMessage: (messageText: string, file?: File) => void;
+  onSendMessage: (messageText: string, fileMessage: any) => void; // Pass the file message back to parent
 }
 
 const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
@@ -10,7 +11,9 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined); // State for file input
+  const [selectedFile, setSelectedFile] = useState<File | null>(null); // State for file input
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to show or hide modal
+  const [isUploading, setIsUploading] = useState(false); // State to show spinner
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFocus = () => {
@@ -20,38 +23,64 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
-  const handleSend = () => {
-    if (message.trim() !== "" || selectedFile) {
-      // If a file is selected, the file will be sent instead of the message
-      onSendMessage(message, selectedFile);
-      setMessage(""); // Clear the input field after sending the message
-      setSelectedFile(undefined); // Clear the file input after sending
-    }
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    setSelectedFile(file || undefined);
-
-    // Update the input field to show the file name
     if (file) {
-      setMessage(file.name); // Show the file name in the input field
-    } else {
-      setMessage(""); // Clear the input field if no file is selected
+      setSelectedFile(file); // Store the selected file
+      setIsModalOpen(true); // Open the modal when a file is selected
     }
   };
 
-  const handleRemoveAttachment = () => {
-    setSelectedFile(undefined);
-    setMessage(""); // Clear the message input if attachment is removed
+  const handleSendFile = async () => {
+    if (selectedFile) {
+      setIsUploading(true); // Show spinner while uploading
+
+      // Handle file upload logic here
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      formData.append(
+        "senderId",
+        String(Number(localStorage.getItem("labass_userId")))
+      ); // Use localStorage for senderId
+      formData.append(
+        "consultationId",
+        String(Number(localStorage.getItem("labass_consultationId")))
+      ); // Use localStorage for consultationId
+
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attatchment`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("labass_token")}`, // JWT token
+            },
+          }
+        );
+
+        // Pass the response to the parent component to update chat
+        onSendMessage(message, response.data.chat);
+
+        // Clear file and close modal
+        setSelectedFile(null);
+        setIsModalOpen(false);
+        setIsUploading(false); // Hide spinner after upload
+      } catch (error) {
+        console.error("File upload failed:", error);
+        setIsUploading(false); // Hide spinner on error
+      }
+    }
+  };
+
+  const handleCancelFile = () => {
+    setSelectedFile(null); // Clear the selected file
+    setIsModalOpen(false); // Close the modal without sending
   };
 
   return (
     <div className="sticky bottom-0 bg-white p-4 flex items-center border-t">
-      {/* Plus Button */}
+      {/* Plus Button for File Upload */}
       <button className="p-2">
         <input
           type="file"
@@ -77,7 +106,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         </label>
       </button>
 
-      {/* Mic Button */}
+      {/* Mic Button for future voice note functionality */}
       <button className="p-2 mx-2">
         <svg
           className="w-6 h-6 text-gray-500"
@@ -93,7 +122,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         </svg>
       </button>
 
-      {/* Message or Attachment Display */}
+      {/* Message Input */}
       <input
         ref={inputRef}
         type="text"
@@ -104,22 +133,12 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         className="flex-grow p-2 border rounded-full outline-none text-sm"
         onFocus={handleFocus}
         onBlur={() => setInputFocused(false)}
-        readOnly={!!selectedFile} // Make input read-only if a file is selected
       />
 
-      {selectedFile && (
-        <button
-          className="ml-2 p-2 text-red-500"
-          onClick={handleRemoveAttachment}
-        >
-          Remove
-        </button>
-      )}
-
-      {/* Send Button */}
+      {/* Send Button for Text Messages */}
       <button
         className={`p-2 ${inputFocused ? "text-green-500" : "text-gray-500"}`}
-        onClick={handleSend}
+        onClick={() => onSendMessage(message, null)} // Only pass the message text
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path
@@ -131,6 +150,46 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
           />
         </svg>
       </button>
+
+      {/* Modal to display the selected attachment */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded-lg max-w-lg w-full">
+            <h2 className="text-lg font-bold mb-2">Review Attachment</h2>
+
+            {/* Preview the attachment */}
+            {selectedFile?.type.startsWith("image/") ? (
+              <img
+                src={URL.createObjectURL(selectedFile)}
+                alt="Selected Attachment"
+                className="w-full h-auto mb-4"
+              />
+            ) : (
+              <p className="text-sm mb-4">
+                Selected File: {selectedFile?.name}
+              </p>
+            )}
+
+            <div className="flex justify-end space-x-4">
+              {/* Cancel Button */}
+              <button
+                className="bg-red-500 text-white text-xs px-4 py-2 rounded"
+                onClick={handleCancelFile}
+              >
+                إلغاء
+              </button>
+
+              {/* Send Button */}
+              <button
+                className="bg-custom-green text-white text-xs px-4 py-2 rounded"
+                onClick={handleSendFile} // Trigger the file upload logic
+              >
+                {isUploading ? <div className="spinner"></div> : "إرسال"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

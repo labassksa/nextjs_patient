@@ -144,7 +144,7 @@ const ChatPage: React.FC = () => {
     };
   }, [socket, userId, consultationId]);
 
-  const handleSendMessage = async (messageText: string, file?: File) => {
+  const handleSendMessage = (messageText: string) => {
     if (!isConnected || !socket || !userId) {
       console.error(
         "Socket is not connected or userId is missing. Message cannot be sent."
@@ -152,73 +152,38 @@ const ChatPage: React.FC = () => {
       return;
     }
 
-    if (file) {
-      // If a file is selected, send the file via an Axios request
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("senderId", String(Number(userId))); // Ensure senderId is sent as a number
-      formData.append("consultationId", String(Number(consultationId))); // Ensure consultationId is sent as a number
+    // Prepare the message data to send without an ID
+    const newMessage: Message = {
+      message: messageText,
+      senderId: Number(userId), // Ensure senderId is a number
+      consultationId: Number(consultationId), // Ensure consultationId is a number
+      isSent: false,
+      read: false,
+    };
 
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attatchment`, // Your backend endpoint
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`, // Include JWT token
-            },
-          }
-        );
+    // Optimistically add the message locally
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
 
-        // Optimistically add the file message
-        const newMessage = {
-          message: response.data.chat.attachmentUrl,
-          senderId: Number(userId),
-          consultationId: Number(consultationId),
-          isSent: true,
-          read: false,
-          attachmentType: response.data.chat.attachmentType,
-        };
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      } catch (error) {
-        console.error("File upload failed:", error);
-      }
-    } else {
-      // Prepare the message data to send without an ID
-      const newMessage: Message = {
+    // Send the message via socket
+    socket.emit(
+      "sendMessage",
+      {
+        room: `${consultationId}`,
         message: messageText,
-        senderId: Number(userId), // Ensure senderId is a number
-        consultationId: Number(consultationId), // Ensure consultationId is a number
-        isSent: false,
-        read: false,
-      };
-
-      // Optimistically add the message locally
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-      // Send the message via socket
-      socket.emit(
-        "sendMessage",
-        {
-          room: `${consultationId}`,
-          message: messageText,
-          consultationId: Number(consultationId),
-          senderId: Number(userId),
-        },
-        (response: { messageId: string }) => {
-          // Update the message with the correct ID and mark as sent
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) =>
-              msg === newMessage
-                ? { ...msg, id: response.messageId, isSent: true }
-                : msg
-            )
-          );
-        }
-      );
-    }
+        consultationId: Number(consultationId),
+        senderId: Number(userId),
+      },
+      (response: { messageId: string }) => {
+        // Update the message with the correct ID and mark as sent
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg === newMessage
+              ? { ...msg, id: response.messageId, isSent: true }
+              : msg
+          )
+        );
+      }
+    );
   };
 
   // Loading spinner to display while messages are being loaded
