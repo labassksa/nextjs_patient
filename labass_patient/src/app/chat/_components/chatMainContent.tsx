@@ -99,7 +99,12 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
           </div>
         ))}
       </div>
-      {showActions && <StickyMessageInput onSendMessage={handleSendMessage} />}
+      {showActions && (
+        <StickyMessageInput
+          onSendMessage={handleSendMessage}
+          consultationId={consultationId}
+        />
+      )}
     </div>
   );
 };

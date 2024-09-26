@@ -144,47 +144,104 @@ const ChatPage: React.FC = () => {
     };
   }, [socket, userId, consultationId]);
 
-  const handleSendMessage = (messageText: string) => {
+  const handleSendMessage = (messageText: string, fileMessage?: any) => {
     if (!isConnected || !socket || !userId) {
       console.error(
         "Socket is not connected or userId is missing. Message cannot be sent."
       );
       return;
     }
-
-    // Prepare the message data to send without an ID
-    const newMessage: Message = {
-      message: messageText,
-      senderId: Number(userId), // Ensure senderId is a number
-      consultationId: Number(consultationId), // Ensure consultationId is a number
-      isSent: false,
-      read: false,
-    };
-
-    // Optimistically add the message locally
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-    // Send the message via socket
-    socket.emit(
-      "sendMessage",
-      {
-        room: `${consultationId}`,
-        message: messageText,
-        consultationId: Number(consultationId),
+    if (fileMessage) {
+      // This handles the file message after it's uploaded
+      const newFileMessage = {
+        message: "",
         senderId: Number(userId),
-      },
-      (response: { messageId: string }) => {
-        // Update the message with the correct ID and mark as sent
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg === newMessage
-              ? { ...msg, id: response.messageId, isSent: true }
-              : msg
-          )
-        );
-      }
-    );
+        consultationId: Number(consultationId),
+        isSent: true,
+        read: false,
+        attachmentUrl: fileMessage.attachmentUrl,
+        attachmentType: fileMessage.attachmentType,
+      };
+
+      // Update the messages state to include the file message
+      setMessages((prevMessages) => [...prevMessages, newFileMessage]);
+    } else {
+      // Handle sending a text message (no file)
+      const newMessage: Message = {
+        message: messageText,
+        senderId: Number(userId),
+        consultationId: Number(consultationId),
+        isSent: false,
+        read: false,
+      };
+
+      // Optimistically add the message locally
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+      // Send the message via socket or API
+      socket.emit(
+        "sendMessage",
+        {
+          room: `${consultationId}`,
+          message: messageText,
+          consultationId: Number(consultationId),
+          senderId: Number(userId),
+        },
+        (response: { messageId: string }) => {
+          // Update the message with the correct ID and mark as sent
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg === newMessage
+                ? { ...msg, id: response.messageId, isSent: true }
+                : msg
+            )
+          );
+        }
+      );
+    }
   };
+
+  // const handleSendMessage = (messageText: string) => {
+  //   if (!isConnected || !socket || !userId) {
+  //     console.error(
+  //       "Socket is not connected or userId is missing. Message cannot be sent."
+  //     );
+  //     return;
+  //   }
+
+  //   // Prepare the message data to send without an ID
+  //   const newMessage: Message = {
+  //     message: messageText,
+  //     senderId: Number(userId), // Ensure senderId is a number
+  //     consultationId: Number(consultationId), // Ensure consultationId is a number
+  //     isSent: false,
+  //     read: false,
+  //   };
+
+  //   // Optimistically add the message locally
+  //   setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+  //   // Send the message via socket
+  //   socket.emit(
+  //     "sendMessage",
+  //     {
+  //       room: `${consultationId}`,
+  //       message: messageText,
+  //       consultationId: Number(consultationId),
+  //       senderId: Number(userId),
+  //     },
+  //     (response: { messageId: string }) => {
+  //       // Update the message with the correct ID and mark as sent
+  //       setMessages((prevMessages) =>
+  //         prevMessages.map((msg) =>
+  //           msg === newMessage
+  //             ? { ...msg, id: response.messageId, isSent: true }
+  //             : msg
+  //         )
+  //       );
+  //     }
+  //   );
+  // };
 
   // Loading spinner to display while messages are being loaded
   if (loading) {

@@ -3,18 +3,28 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 
 interface StickyMessageInputProps {
-  onSendMessage: (messageText: string, fileMessage: any) => void; // Pass the file message back to parent
+  onSendMessage: (messageText: string, fileMessage?: any) => void; // Handle both text and file messages
+  consultationId: number; // Ensure consultationId is passed down
 }
 
 const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   onSendMessage,
+  consultationId,
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null); // State for file input
   const [isModalOpen, setIsModalOpen] = useState(false); // State to show or hide modal
   const [isUploading, setIsUploading] = useState(false); // State to show spinner
+  const [isRecording, setIsRecording] = useState(false); // State for voice recording
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // Store recorded audio blob
+  const [recordingMessage, setRecordingMessage] = useState(""); // Visual recording indication
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]); // To store audio chunks while recording
   const inputRef = useRef<HTMLInputElement>(null);
+  const token = localStorage.getItem("labass_token");
+  const userId = localStorage.getItem("labass_userId");
 
   const handleFocus = () => {
     setInputFocused(true);
@@ -23,6 +33,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
+  // Handle file selection (e.g., image, document)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -42,10 +53,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         "senderId",
         String(Number(localStorage.getItem("labass_userId")))
       ); // Use localStorage for senderId
-      formData.append(
-        "consultationId",
-        String(Number(localStorage.getItem("labass_consultationId")))
-      ); // Use localStorage for consultationId
+      formData.append("consultationId", String(Number(consultationId))); // Use localStorage for consultationId
 
       try {
         const response = await axios.post(
@@ -70,6 +78,71 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         console.error("File upload failed:", error);
         setIsUploading(false); // Hide spinner on error
       }
+    }
+  };
+
+  // Handle voice recording start
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data); // Collect audio chunks
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingMessage("Recording..."); // UI feedback
+    } catch (error) {
+      console.error("Voice recording failed:", error);
+      setRecordingMessage("Recording failed. Please try again.");
+    }
+  };
+
+  // Handle voice recording stop and upload
+  const stopRecording = async () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+
+      mediaRecorderRef.current.onstop = async () => {
+        if (audioBlob) {
+          setIsUploading(true); // Show spinner while uploading
+
+          const formData = new FormData();
+          formData.append("file", audioBlob, "voice_note.webm");
+          formData.append("senderId", String(Number(userId)));
+          formData.append("consultationId", String(consultationId));
+
+          try {
+            console.log(
+              "API URL:",
+              `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`
+            );
+            const response = await axios.post(
+              `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`,
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${token}`, // JWT token
+                },
+              }
+            );
+
+            // Send the voice note to the parent
+            onSendMessage("", response.data.chat);
+            setIsUploading(false); // Hide spinner
+          } catch (error) {
+            console.error("Voice note upload failed: ", error ? error : error);
+            setIsUploading(false); // Hide spinner on error
+          }
+        }
+      };
     }
   };
 
@@ -106,10 +179,16 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         </label>
       </button>
 
-      {/* Mic Button for future voice note functionality */}
-      <button className="p-2 mx-2">
+      {/* Mic Button for Voice Recording */}
+      <button
+        className="p-2 mx-2"
+        onMouseDown={startRecording} // Start recording on mouse down
+        onMouseUp={stopRecording} // Stop recording on mouse up
+      >
         <svg
-          className="w-6 h-6 text-gray-500"
+          className={`w-6 h-6 ${
+            isRecording ? "text-red-500" : "text-gray-500"
+          }`} // Change color while recording
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="none"
@@ -138,7 +217,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       {/* Send Button for Text Messages */}
       <button
         className={`p-2 ${inputFocused ? "text-green-500" : "text-gray-500"}`}
-        onClick={() => onSendMessage(message, null)} // Only pass the message text
+        onClick={() => onSendMessage(message, null)} // Send text message
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path
@@ -155,7 +234,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-4 rounded-lg max-w-lg w-full">
-            <h2 className="text-lg font-bold mb-2">Review Attachment</h2>
+            <h2 className="text-md text-right font-bold mb-2">إضافة مرفقات</h2>
 
             {/* Preview the attachment */}
             {selectedFile?.type.startsWith("image/") ? (
