@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import StickyMessageInput from "./chatInputarea";
 
 interface Message {
@@ -25,9 +25,18 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
   messages,
   handleSendMessage,
 }) => {
+  const messageEndRef = useRef<HTMLDivElement>(null); // Reference for scrolling
+
   useEffect(() => {
     console.log("Consultation ID:", consultationId);
   }, [consultationId]);
+
+  // Scroll to the bottom when new messages are added
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   // Retrieve the current userId from localStorage
   const userId =
@@ -98,6 +107,8 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
             )}
           </div>
         ))}
+        {/* The div for scrolling to the bottom */}
+        <div ref={messageEndRef} />
       </div>
       {showActions && (
         <StickyMessageInput
