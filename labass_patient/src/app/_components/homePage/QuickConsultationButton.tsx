@@ -39,13 +39,13 @@ const ConsultationButton: React.FC = () => {
               استشارة طبية فورية
             </h2>
           </div>
-          <p className="my-2 text-xs font-semibold" dir="rtl">
+          <p className="my-2 text-xs font-bold" dir="rtl">
             وصفة طبية
           </p>
-          <p className="my-2  text-xs font-semibold" dir="rtl">
+          <p className="my-2  text-xs font-bold" dir="rtl">
             قراءة نتائج تحليل المختبرات
           </p>
-          <p className="my-2 text-xs font-semibold" dir="rtl">
+          <p className="my-2 text-xs font-bold" dir="rtl">
             إعادة صرف الأدوية
           </p>
           <div className="flex items-center w-full" dir="rtl">
