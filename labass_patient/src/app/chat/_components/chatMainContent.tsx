@@ -45,7 +45,7 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
       : null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-100 text-black w-full pb-20">
+    <div className="flex flex-col h-full bg-gray-100 text-black w-full ">
       {" "}
       {/* Added padding at bottom to avoid overlap */}
       <div

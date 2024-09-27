@@ -36,10 +36,10 @@ const ChatPage: React.FC = () => {
 
   const statusClass = `inline-block px-3 py-1 rounded-full text-xs font-medium ${
     status === "مفتوحة"
-      ? "bg-green-100 text-green-700 mb-2"
+      ? "bg-green-100 text-green-700 mb-1"
       : status === "مدفوعة"
-      ? "bg-blue-100 text-blue-700"
-      : "bg-gray-200 text-gray-700"
+      ? "bg-blue-100 text-blue-700 mb-1"
+      : "bg-gray-200 text-gray-700 mb-1"
   }`;
 
   useEffect(() => {
@@ -196,17 +196,17 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-screen bg-red-100">
       {/* Fixed header */}
-      <div className="sticky fixed top-0 w-full bg-white z-50">
+      <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
-        <div className="text-black mt-16 mb-0 px-4 text-right w-full">
-          <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
+        <div className="text-black mb-0 mt-16 px-4 text-right w-full">
+          <h2 className={`${statusClass}`}>حالة الاستشارة: {status}</h2>
           {doctorInfo ? (
-            <div className="p-0 text-right">
+            <div className="p-0 text-right mb-0">
               <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
               <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
-              <p className="text-xs text-gray-600 mb-2">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
+              <p className="text-xs text-gray-600">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
             </div>
           ) : (
             <div className="p-0 text-gray-500 text-right text-sm mb-0">
