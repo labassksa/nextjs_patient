@@ -24,7 +24,7 @@ const PromoCode: React.FC<{
     const token = localStorage.getItem("labass_token");
 
     if (!token) {
-      setResponseMessage("لم يتم العثور على رمز التوثيق");
+      setResponseMessage("سجل دخول أولا لاستخدام الخصم");
       setIsSuccess(false);
       return;
     }
