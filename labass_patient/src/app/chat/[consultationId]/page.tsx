@@ -3,9 +3,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Header from "../../../components/common/header";
 import ChatMainContents from "../../chat/_components/chatMainContent";
+import StickyMessageInput from "../../chat/_components/chatInputarea"; // Import StickyMessageInput
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
-import axios from "axios";
 
 interface Message {
   id?: string;
@@ -24,15 +24,11 @@ const ChatPage: React.FC = () => {
   const router = useRouter();
   const params = useParams();
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const websocketURL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
   const consultationId = params.consultationId;
-
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("labass_token") : null;
+  const websocketURL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
+  const token = localStorage.getItem("labass_token");
   const userId =
-    typeof window !== "undefined"
-      ? localStorage.getItem("labass_userId")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("labass_userId") : "";
 
   const statusClass = `inline-block px-3 py-1 rounded-full text-xs font-medium ${
     status === "مفتوحة"
@@ -98,32 +94,10 @@ const ChatPage: React.FC = () => {
       }
     };
 
-    const handleMessageStatus = ({
-      messageId,
-      read,
-    }: {
-      messageId: string;
-      read: boolean;
-    }) => {
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === messageId ? { ...msg, read: read } : msg
-        )
-      );
-    };
-
-    const handleConsultationStatusChange = (data: { status: string }) => {
-      setStatus(data.status === "Open" ? "مفتوحة" : data.status);
-    };
-
     socket.on("receiveMessage", handleReceiveMessage);
-    socket.on("messageStatus", handleMessageStatus);
-    socket.on("consultationStatus", handleConsultationStatusChange);
 
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
-      socket.off("messageStatus", handleMessageStatus);
-      socket.off("consultationStatus", handleConsultationStatusChange);
     };
   }, [socket, userId, consultationId]);
 
@@ -196,7 +170,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col  bg-red-100">
+    <div className="flex flex-col bg-red-100">
       {/* Fixed header */}
       <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
@@ -216,19 +190,21 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Chat container */}
-      <div className="w-full overflow-hidden ">
-        {consultationId && (
-          <div className="w-full h-full">
-            <ChatMainContents
-              consultationId={Number(consultationId)}
-              showActions={true}
-              messages={messages}
-              handleSendMessage={handleSendMessage}
-            />
-            <div ref={messageEndRef} />
-          </div>
-        )}
+      {/* ChatMainContents is scrollable */}
+      <div className="flex-grow overflow-y-auto">
+        <ChatMainContents
+          consultationId={Number(consultationId)}
+          messages={messages}
+        />
+        <div ref={messageEndRef} />
+      </div>
+
+      {/* StickyMessageInput is fixed at the bottom */}
+      <div className="shrink-0 sticky bottom-0 bg-white">
+        <StickyMessageInput
+          onSendMessage={handleSendMessage}
+          consultationId={Number(consultationId)}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import StickyMessageInput from "./chatInputarea";
 
 interface Message {
   message?: string;
@@ -14,22 +13,14 @@ interface Message {
 
 interface ChatMainContentsProps {
   consultationId: number;
-  showActions: boolean;
   messages: Message[];
-  handleSendMessage: (messageText: string, fileMessage?: any) => void;
 }
 
 const ChatMainContents: React.FC<ChatMainContentsProps> = ({
   consultationId,
-  showActions,
   messages,
-  handleSendMessage,
 }) => {
-  const messageEndRef = useRef<HTMLDivElement>(null); // Reference for scrolling
-
-  useEffect(() => {
-    console.log("Consultation ID:", consultationId);
-  }, [consultationId]);
+  const messageEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to the bottom when new messages are added
   useEffect(() => {
@@ -46,8 +37,6 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-gray-100 text-black w-full ">
-      {" "}
-      {/* Added padding at bottom to avoid overlap */}
       <div
         className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0 w-full"
         dir="rtl"
@@ -109,12 +98,6 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
         ))}
         <div ref={messageEndRef} />
       </div>
-      {showActions && (
-        <StickyMessageInput
-          onSendMessage={handleSendMessage}
-          consultationId={consultationId}
-        />
-      )}
     </div>
   );
 };
