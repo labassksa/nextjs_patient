@@ -3,13 +3,13 @@ import React, { useEffect, useRef } from "react";
 import StickyMessageInput from "./chatInputarea";
 
 interface Message {
-  message?: string; // Text message (optional if an attachment exists)
+  message?: string;
   senderId: number;
   consultationId: number;
   isSent: boolean;
   read: boolean;
-  attachmentUrl?: string; // URL for the attachment (image or file)
-  attachmentType?: string; // Type of attachment (e.g., "images", "pdf", etc.)
+  attachmentUrl?: string;
+  attachmentType?: string;
 }
 
 interface ChatMainContentsProps {
@@ -45,15 +45,13 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
       : null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-100 text-black relative w-full">
+    <div className="flex flex-col h-full bg-gray-100 text-black w-full pb-20">
       {" "}
-      {/* تأكد من عرض كامل */}
+      {/* Added padding at bottom to avoid overlap */}
       <div
         className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0 w-full"
         dir="rtl"
       >
-        {" "}
-        {/* مرونة العرض */}
         {messages.map((message, index) => (
           <div
             key={index}
@@ -64,7 +62,6 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
                 : "bg-white"
             }`}
           >
-            {/* المحتوى */}
             {message.attachmentUrl ? (
               message.attachmentType === "images" ? (
                 <img
@@ -86,7 +83,6 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
               <p>{message.message}</p>
             )}
 
-            {/* أيقونة الرسائل المقروءة */}
             {message.senderId === Number(userId) && (
               <div className="text-right">
                 {message.isSent && (

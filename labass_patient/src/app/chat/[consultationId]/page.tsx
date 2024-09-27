@@ -5,7 +5,6 @@ import Header from "../../../components/common/header";
 import ChatMainContents from "../../chat/_components/chatMainContent";
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
-import { ConsultationStatus } from "../../../models/consultation";
 import axios from "axios";
 
 interface Message {
@@ -18,16 +17,15 @@ interface Message {
 }
 
 const ChatPage: React.FC = () => {
-  const [status, setStatus] = useState(""); // Initial status
-  const [doctorInfo, setDoctorInfo] = useState<any>(null); // Doctor information
+  const [status, setStatus] = useState("");
+  const [doctorInfo, setDoctorInfo] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true); // Loading state for messages
-  const router = useRouter(); // Initialize router for redirection
-  const params = useParams(); // Extract dynamic params from the URL
-  const messageEndRef = useRef<HTMLDivElement>(null); // Reference for scrolling
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const params = useParams();
+  const messageEndRef = useRef<HTMLDivElement>(null);
   const websocketURL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
-  const consultationId = params.consultationId; // Retrieve consultationId from the URL
-  console.log("WebSocket URL:", websocketURL);
+  const consultationId = params.consultationId;
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("labass_token") : null;
@@ -129,7 +127,6 @@ const ChatPage: React.FC = () => {
     };
   }, [socket, userId, consultationId]);
 
-  // Scroll to the bottom when messages change
   useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -200,7 +197,7 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Wrap the header and doctor information in a fixed container */}
+      {/* Fixed header */}
       <div className="fixed top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
         <div className="text-black mt-16 mb-0 px-4 text-right w-full">
@@ -219,10 +216,8 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Add padding to the chat container to prevent overlapping with the fixed header */}
+      {/* Chat container */}
       <div className="flex-grow w-full overflow-hidden pt-32">
-        {" "}
-        {/* Adjust pt-32 to fit your header's height */}
         {consultationId && (
           <div className="w-full h-full">
             <ChatMainContents
