@@ -200,7 +200,7 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* StickyMessageInput is fixed at the bottom */}
-      <div className="shrink-0 sticky bottom-0 bg-white">
+      <div className="shrink-0 sticky fixed bottom-0 bg-white">
         <StickyMessageInput
           onSendMessage={handleSendMessage}
           consultationId={Number(consultationId)}
