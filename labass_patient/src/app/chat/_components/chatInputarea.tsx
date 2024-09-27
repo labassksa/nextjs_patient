@@ -157,7 +157,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   };
 
   return (
-    <div className="sticky fixed bottom-0 bg-white p-4 flex items-center border-t w-full max-w-full">
+    <div className="sticky bottom-0 bg-white p-4 flex items-center border-t w-full max-w-full h-auto min-h-[64px]">
       {/* File Upload Button */}
       <button className="p-2">
         <input
@@ -206,7 +206,6 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       </button>
 
       {/* Message Input */}
-      {/* Message Input */}
       <input
         ref={inputRef}
         type="text"
@@ -217,6 +216,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         className="flex-grow p-2 border text-black rounded-full outline-none w-full
              text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl
              px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 lg:px-10 lg:py-4"
+        style={{ fontSize: "16px" }} // Prevent zoom on focus
         onFocus={handleFocus}
         onBlur={() => setInputFocused(false)}
       />
