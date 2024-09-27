@@ -200,37 +200,41 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* تأكد من بقاء الهيدر ثابتًا في الجزء العلوي */}
-      <Header title="استشارة فورية" showBackButton={true} />
-      <div className="text-black mt-16 mb-0 px-4 text-right w-full">
+      {/* Wrap the header and doctor information in a fixed container */}
+      <div className="fixed top-0 w-full bg-white z-50">
+        <Header title="استشارة فورية" showBackButton={true} />
+        <div className="text-black mt-16 mb-0 px-4 text-right w-full">
+          <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
+          {doctorInfo ? (
+            <div className="p-0 text-right">
+              <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
+              <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
+              <p className="text-xs text-gray-600 mb-2">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
+            </div>
+          ) : (
+            <div className="p-0 text-gray-500 text-right text-sm mb-0">
+              بانتظار انضمام الدكتور
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Add padding to the chat container to prevent overlapping with the fixed header */}
+      <div className="flex-grow w-full overflow-hidden pt-32">
         {" "}
-        {/* تأكد من عرض كامل */}
-        <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
-        {doctorInfo ? (
-          <div className="p-0 text-right">
-            <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
-            <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
-            <p className="text-xs text-gray-600 mb-2">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
-          </div>
-        ) : (
-          <div className="p-0 text-gray-500 text-right text-sm mb-0">
-            بانتظار انضمام الدكتور
+        {/* Adjust pt-32 to fit your header's height */}
+        {consultationId && (
+          <div className="w-full h-full">
+            <ChatMainContents
+              consultationId={Number(consultationId)}
+              showActions={true}
+              messages={messages}
+              handleSendMessage={handleSendMessage}
+            />
+            <div ref={messageEndRef} />
           </div>
         )}
       </div>
-
-      {/* محادثة الدردشة */}
-      {consultationId && (
-        <div className="flex-grow w-full overflow-hidden">
-          <ChatMainContents
-            consultationId={Number(consultationId)}
-            showActions={true}
-            messages={messages}
-            handleSendMessage={handleSendMessage}
-          />
-          <div ref={messageEndRef} />
-        </div>
-      )}
     </div>
   );
 };

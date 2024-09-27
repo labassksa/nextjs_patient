@@ -13,19 +13,19 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null); // State for file input
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to show or hide modal
-  const [isUploading, setIsUploading] = useState(false); // State to show spinner
-  const [isRecording, setIsRecording] = useState(false); // State for voice recording
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // Store recorded audio blob
-  const [recordingMessage, setRecordingMessage] = useState(""); // Visual recording indication
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingMessage, setRecordingMessage] = useState("");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]); // To store audio chunks while recording
+  const audioChunksRef = useRef<Blob[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const token = localStorage.getItem("labass_token");
   const userId = localStorage.getItem("labass_userId");
 
+  // Focus input field
   const handleFocus = () => {
     setInputFocused(true);
     if (inputRef.current) {
@@ -33,7 +33,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
-  // Handle file selection (e.g., image, document)
+  // Handle file selection
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -46,31 +46,28 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     if (selectedFile) {
       setIsUploading(true); // Show spinner while uploading
 
-      // Handle file upload logic here
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append(
         "senderId",
         String(Number(localStorage.getItem("labass_userId")))
-      ); // Use localStorage for senderId
-      formData.append("consultationId", String(Number(consultationId))); // Use localStorage for consultationId
+      );
+      formData.append("consultationId", String(Number(consultationId)));
 
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attatchment`,
+          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`,
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem("labass_token")}`, // JWT token
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
         // Pass the response to the parent component to update chat
-        onSendMessage(message, response.data.chat);
-
-        // Clear file and close modal
+        onSendMessage("", response.data.chat);
         setSelectedFile(null);
         setIsModalOpen(false);
         setIsUploading(false); // Hide spinner after upload
@@ -81,8 +78,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
-  // Handle voice recording start
-  // Handle voice recording start
+  // Handle voice recording
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -104,14 +100,12 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
-  // Handle voice recording stop and upload
   const stopRecording = async () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
 
       mediaRecorderRef.current.onstop = async () => {
-        // Create the Blob from the audio chunks
         const audioBlob = new Blob(audioChunksRef.current, {
           type: "audio/webm",
         });
@@ -125,17 +119,13 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
           formData.append("consultationId", String(consultationId));
 
           try {
-            console.log(
-              "API URL:",
-              `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`
-            );
             const response = await axios.post(
               `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`,
               formData,
               {
                 headers: {
                   "Content-Type": "multipart/form-data",
-                  Authorization: `Bearer ${token}`, // JWT token
+                  Authorization: `Bearer ${token}`,
                 },
               }
             );
@@ -144,7 +134,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
             onSendMessage("", response.data.chat);
             setIsUploading(false); // Hide spinner
           } catch (error) {
-            console.error("Voice note upload failed: ", error ? error : error);
+            console.error("Voice note upload failed:", error);
             setIsUploading(false); // Hide spinner on error
           }
         }
@@ -152,14 +142,23 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     }
   };
 
+  // Handle sending text messages
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      onSendMessage(message, null);
+      setMessage(""); // Clear input after sending the message
+    }
+  };
+
+  // Cancel file selection
   const handleCancelFile = () => {
-    setSelectedFile(null); // Clear the selected file
-    setIsModalOpen(false); // Close the modal without sending
+    setSelectedFile(null);
+    setIsModalOpen(false);
   };
 
   return (
-    <div className="sticky bottom-0 bg-white p-4 flex items-center border-t">
-      {/* Plus Button for File Upload */}
+    <div className="sticky bottom-0 bg-white p-4 flex items-center border-t w-full max-w-full">
+      {/* File Upload Button */}
       <button className="p-2">
         <input
           type="file"
@@ -173,7 +172,6 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
@@ -215,15 +213,15 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         placeholder="اكتب رسالة..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="flex-grow p-2 border rounded-full outline-none text-sm"
+        className="flex-grow p-2 border rounded-full outline-none text-sm w-full"
         onFocus={handleFocus}
         onBlur={() => setInputFocused(false)}
       />
 
-      {/* Send Button for Text Messages */}
+      {/* Send Button */}
       <button
         className={`p-2 ${inputFocused ? "text-green-500" : "text-gray-500"}`}
-        onClick={() => onSendMessage(message, null)} // Send text message
+        onClick={handleSendMessage} // Send message when clicked
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path
@@ -256,7 +254,6 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
             )}
 
             <div className="flex justify-end space-x-4">
-              {/* Cancel Button */}
               <button
                 className="bg-red-500 text-white text-xs px-4 py-2 rounded"
                 onClick={handleCancelFile}
@@ -264,9 +261,8 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
                 إلغاء
               </button>
 
-              {/* Send Button */}
               <button
-                className="bg-custom-green text-white text-xs px-4 py-2 rounded"
+                className="bg-green-500 text-white text-xs px-4 py-2 rounded"
                 onClick={handleSendFile} // Trigger the file upload logic
               >
                 {isUploading ? <div className="spinner"></div> : "إرسال"}
