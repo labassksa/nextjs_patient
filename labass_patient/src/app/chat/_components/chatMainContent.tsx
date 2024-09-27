@@ -36,7 +36,7 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
       : null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-100 text-black w-full mb-16 ">
+    <div className="flex flex-col h-full bg-gray-100 text-black w-full mb-16 mt-32 ">
       <div
         className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0 w-full"
         dir="rtl"
