@@ -170,7 +170,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-red-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Fixed header */}
       <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
