@@ -46,14 +46,10 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-gray-100 text-black relative w-full">
-      {" "}
-      {/* تأكد من عرض كامل */}
       <div
         className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0 w-full"
         dir="rtl"
       >
-        {" "}
-        {/* مرونة العرض */}
         {messages.map((message, index) => (
           <div
             key={index}
@@ -64,7 +60,7 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
                 : "bg-white"
             }`}
           >
-            {/* المحتوى */}
+            {/* Display the message content or attachment */}
             {message.attachmentUrl ? (
               message.attachmentType === "images" ? (
                 <img
@@ -86,7 +82,7 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
               <p>{message.message}</p>
             )}
 
-            {/* أيقونة الرسائل المقروءة */}
+            {/* Checkmark for the sender */}
             {message.senderId === Number(userId) && (
               <div className="text-right">
                 {message.isSent && (
@@ -113,11 +109,15 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
         ))}
         <div ref={messageEndRef} />
       </div>
+
+      {/* Sticky input area */}
       {showActions && (
-        <StickyMessageInput
-          onSendMessage={handleSendMessage}
-          consultationId={consultationId}
-        />
+        <div className="sticky bottom-0 bg-white w-full px-4 py-2 z-20">
+          <StickyMessageInput
+            onSendMessage={handleSendMessage}
+            consultationId={consultationId}
+          />
+        </div>
       )}
     </div>
   );

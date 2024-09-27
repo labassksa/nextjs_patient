@@ -199,29 +199,31 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      {/* تأكد من بقاء الهيدر ثابتًا في الجزء العلوي */}
-      <Header title="استشارة فورية" showBackButton={true} />
-      <div className="text-black mt-16 mb-0 px-4 text-right w-full">
-        {" "}
-        {/* تأكد من عرض كامل */}
-        <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
-        {doctorInfo ? (
-          <div className="p-0 text-right">
-            <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
-            <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
-            <p className="text-xs text-gray-600 mb-2">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
-          </div>
-        ) : (
-          <div className="p-0 text-gray-500 text-right text-sm mb-0">
-            بانتظار انضمام الدكتور
-          </div>
-        )}
+    <div className="flex flex-col h-screen w-full bg-white relative">
+      {/* Keep the header fixed at the top */}
+      <div className="sticky top-0 z-10 bg-white w-full">
+        <Header title="Instant Consultation" showBackButton={true} />
+        <div className="text-black px-4 py-2 text-right w-full">
+          <h2 className={`${statusClass} mb-1`}>
+            Consultation Status: {status}
+          </h2>
+          {doctorInfo ? (
+            <div className="p-0 text-right">
+              <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :Dr`}</h3>
+              <p className="text-xs text-gray-600 mb-0">{`Specialty: ${doctorInfo.specialty}`}</p>
+              <p className="text-xs text-gray-600 mb-2">{`Medical License No: ${doctorInfo.medicalLicenseNumber}`}</p>
+            </div>
+          ) : (
+            <div className="p-0 text-gray-500 text-right text-sm mb-0">
+              Waiting for the doctor to join
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* محادثة الدردشة */}
+      {/* Chat content area */}
       {consultationId && (
-        <div className="flex-grow w-full overflow-hidden">
+        <div className="flex-grow w-full overflow-y-auto bg-gray-100">
           <ChatMainContents
             consultationId={Number(consultationId)}
             showActions={true}
