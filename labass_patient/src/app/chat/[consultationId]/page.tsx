@@ -201,7 +201,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Wrap the header and doctor information in a fixed container */}
-      <div className="fixed top-0 w-full bg-white z-50">
+      <div className="sticky fixed top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
         <div className="text-black mt-16 mb-0 px-4 text-right w-full">
           <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
