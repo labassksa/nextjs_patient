@@ -213,7 +213,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         placeholder="اكتب رسالة..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="flex-grow p-2 border rounded-full outline-none text-sm w-full"
+        className="flex-grow p-2 border text-black rounded-full outline-none text-sm w-full"
         onFocus={handleFocus}
         onBlur={() => setInputFocused(false)}
       />
