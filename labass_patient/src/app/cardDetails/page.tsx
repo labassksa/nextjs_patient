@@ -101,7 +101,7 @@ const CardDetails: React.FC = () => {
               `${apiUrl}/execute-payment`,
               {
                 SessionId: response.sessionId,
-                DisplayCurrencyIso: "KWD",
+                DisplayCurrencyIso: "SAU",
                 InvoiceValue: 50,
                 CallBackUrl: "https://labass.sa/cardDetails/success",
                 ErrorUrl: "https://labass.sa/cardDetails/error",
