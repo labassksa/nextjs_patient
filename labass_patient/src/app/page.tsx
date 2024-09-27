@@ -51,9 +51,9 @@ const Home: React.FC = () => {
       <TopBanner />
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">
+        <LinkInsurance />
         <ConsultationButton />
         {/* <HorizontalItemList items={items} /> */}
-        <LinkInsurance />
       </div>
       <BottomNavBar currentPath="/" />
     </div>
