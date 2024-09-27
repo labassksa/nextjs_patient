@@ -29,8 +29,8 @@ const ConsultationButton: React.FC = () => {
           <div className="flex justify-between gap-2">
             <div className="flex bg-custom-background rounded-2xl px-1 py-1 ">
               <div className="flex flex-row justify-center">
-                <p className=" text-xs font-semibold text-black " dir="rtl">
-                  أقل من دقيقة
+                <p className=" text-xs font-semibold text-black  " dir="rtl">
+                  خلال ٣ دقائق{" "}
                 </p>
               </div>
               <ClockIcon className="h-6 w-6 text-black" aria-hidden="true" />
@@ -39,13 +39,13 @@ const ConsultationButton: React.FC = () => {
               استشارة طبية فورية
             </h2>
           </div>
-          <p className="my-2 " dir="rtl">
+          <p className="my-2 text-xs font-semibold" dir="rtl">
             وصفة طبية
           </p>
-          <p className="my-2 " dir="rtl">
+          <p className="my-2  text-xs font-semibold" dir="rtl">
             قراءة نتائج تحليل المختبرات
           </p>
-          <p className="my-2" dir="rtl">
+          <p className="my-2 text-xs font-semibold" dir="rtl">
             إعادة صرف الأدوية
           </p>
           <div className="flex items-center w-full" dir="rtl">
