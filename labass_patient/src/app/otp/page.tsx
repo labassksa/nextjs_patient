@@ -57,7 +57,7 @@ const OTPPage = () => {
         console.log("OTP Verified:", result);
         router.push("/");
       } else if (result) {
-        setErrorMessage(result.message);
+        setErrorMessage(result.message ?? "حدث خطأ ، حاول مرة أخرى");
         console.error("Failed to verify OTP:", result.message);
       } else {
         setErrorMessage("حدث خطأ ، حاول مرة أخرى");
@@ -82,7 +82,7 @@ const OTPPage = () => {
         inputRefs.current[0]?.focus(); // Focus on the first input field
         setErrorMessage(null);
       } else if (result) {
-        setErrorMessage(result.message);
+        setErrorMessage(result.message ?? "حدث خطأ ، حاول مرة أخرى");
         console.error("Failed to resend OTP:", result.message);
       } else {
         setErrorMessage("حدث خطأ ، حاول مرة أخرى");
