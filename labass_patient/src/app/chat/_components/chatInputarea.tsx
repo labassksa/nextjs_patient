@@ -82,6 +82,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   };
 
   // Handle voice recording start
+  // Handle voice recording start
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -110,6 +111,11 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       setIsRecording(false);
 
       mediaRecorderRef.current.onstop = async () => {
+        // Create the Blob from the audio chunks
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
+
         if (audioBlob) {
           setIsUploading(true); // Show spinner while uploading
 

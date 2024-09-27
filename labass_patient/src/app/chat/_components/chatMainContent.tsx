@@ -45,22 +45,26 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
       : null;
 
   return (
-    <div className="flex flex-col h-full bg-gray-100 text-black relative">
+    <div className="flex flex-col h-full bg-gray-100 text-black relative w-full">
+      {" "}
+      {/* تأكد من عرض كامل */}
       <div
-        className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0"
+        className="flex-grow overflow-y-auto p-4 bg-gray-100 text-xs mt-0 w-full"
         dir="rtl"
       >
+        {" "}
+        {/* مرونة العرض */}
         {messages.map((message, index) => (
           <div
-            key={index} // Use index as key if no unique ID is provided
+            key={index}
             dir="rtl"
-            className={`mb-2 p-2 rounded-lg max-w-xs ${
+            className={`mb-2 p-2 rounded-lg max-w-xs w-auto ${
               message.senderId === Number(userId)
                 ? "bg-custom-background"
                 : "bg-white"
             }`}
           >
-            {/* Check if the message contains an attachment */}
+            {/* المحتوى */}
             {message.attachmentUrl ? (
               message.attachmentType === "images" ? (
                 <img
@@ -79,10 +83,10 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
                 </a>
               )
             ) : (
-              <p>{message.message}</p> // If there's no attachment, show the text message
+              <p>{message.message}</p>
             )}
 
-            {/* Only show checkmarks for the sender */}
+            {/* أيقونة الرسائل المقروءة */}
             {message.senderId === Number(userId) && (
               <div className="text-right">
                 {message.isSent && (
@@ -107,7 +111,6 @@ const ChatMainContents: React.FC<ChatMainContentsProps> = ({
             )}
           </div>
         ))}
-        {/* The div for scrolling to the bottom */}
         <div ref={messageEndRef} />
       </div>
       {showActions && (

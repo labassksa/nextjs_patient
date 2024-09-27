@@ -200,8 +200,11 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white">
+      {/* تأكد من بقاء الهيدر ثابتًا في الجزء العلوي */}
       <Header title="استشارة فورية" showBackButton={true} />
-      <div className="text-black mt-16 mb-0 px-4 text-right">
+      <div className="text-black mt-16 mb-0 px-4 text-right w-full">
+        {" "}
+        {/* تأكد من عرض كامل */}
         <h2 className={`${statusClass} mb-1`}>حالة الاستشارة: {status}</h2>
         {doctorInfo ? (
           <div className="p-0 text-right">
@@ -216,8 +219,9 @@ const ChatPage: React.FC = () => {
         )}
       </div>
 
+      {/* محادثة الدردشة */}
       {consultationId && (
-        <>
+        <div className="flex-grow w-full overflow-hidden">
           <ChatMainContents
             consultationId={Number(consultationId)}
             showActions={true}
@@ -225,7 +229,7 @@ const ChatPage: React.FC = () => {
             handleSendMessage={handleSendMessage}
           />
           <div ref={messageEndRef} />
-        </>
+        </div>
       )}
     </div>
   );
