@@ -196,7 +196,7 @@ const ChatPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-red-100">
+    <div className="flex flex-col  bg-red-100">
       {/* Fixed header */}
       <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
@@ -217,7 +217,7 @@ const ChatPage: React.FC = () => {
       </div>
 
       {/* Chat container */}
-      <div className="flex-grow w-full overflow-hidden pt-32">
+      <div className="w-full overflow-hidden ">
         {consultationId && (
           <div className="w-full h-full">
             <ChatMainContents

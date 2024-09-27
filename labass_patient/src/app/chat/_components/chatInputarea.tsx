@@ -46,28 +46,28 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
     if (selectedFile) {
       setIsUploading(true); // Show spinner while uploading
 
+      // Handle file upload logic here
       const formData = new FormData();
       formData.append("file", selectedFile);
       formData.append(
         "senderId",
         String(Number(localStorage.getItem("labass_userId")))
-      );
-      formData.append("consultationId", String(Number(consultationId)));
-
+      ); // Use localStorage for senderId
+      formData.append("consultationId", String(Number(consultationId))); // Use localStorage for consultationId
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`,
+          `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attatchment`,
           formData,
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${localStorage.getItem("labass_token")}`, // JWT token
             },
           }
         );
-
         // Pass the response to the parent component to update chat
-        onSendMessage("", response.data.chat);
+        onSendMessage(message, response.data.chat);
+        // Clear file and close modal
         setSelectedFile(null);
         setIsModalOpen(false);
         setIsUploading(false); // Hide spinner after upload
@@ -157,7 +157,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   };
 
   return (
-    <div className="sticky bottom-0 bg-white p-4 flex items-center border-t w-full max-w-full">
+    <div className="sticky fixed bottom-0 bg-white p-4 flex items-center border-t w-full max-w-full">
       {/* File Upload Button */}
       <button className="p-2">
         <input
