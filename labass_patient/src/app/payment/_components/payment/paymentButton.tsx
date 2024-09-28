@@ -221,13 +221,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentUrl = response.data.Data.PaymentURL;
 
         const paymentResponse = await axios.get(paymentUrl);
+        const consultationId = response.data.consultation;
+        // Push to the chat page with consultationId in the URL
+        router.push(`/chat/${consultationId}`);
 
         if (paymentResponse.status === 200) {
           console.log("Payment completed successfully:", paymentResponse.data);
           // Extract consultationId from the paymentResponse
-          const consultationId = response.data.consultation;
-          // Push to the chat page with consultationId in the URL
-          router.push(`/chat/${consultationId}`);
         } else {
           console.error("Failed to complete payment:", paymentResponse.data);
         }
