@@ -219,12 +219,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
         setConsultationId(consultationId); // Store consultationId
         setShowModal(true);
-
-        if (paymentResponse.status === 200) {
-          console.log("Payment completed successfully:", paymentResponse.data);
-        } else {
-          console.error("Failed to complete payment:", paymentResponse.data);
-        }
       } else {
         console.error("Payment execution failed:", response.data.Message);
         setPaymentMessage(`Payment failed: ${response.data.Message}`); // Set failure message
