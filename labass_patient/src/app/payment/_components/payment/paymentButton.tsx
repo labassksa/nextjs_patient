@@ -37,6 +37,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
+  const [consultationId, setConsultationId] = useState<string | null>(null); // Add state for consultationId
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -206,6 +207,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       if (response.data.IsSuccess) {
         setPaymentMessage(JSON.stringify(response.data, null, 2)); // Show the full response data in the modal
+        setConsultationId(response.data.consultation); // Store consultationId in state
         setShowModal(true);
       } else {
         setPaymentMessage(`Payment failed: ${response.data.Message}`);
@@ -215,6 +217,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       setPaymentMessage("An error occurred while processing the payment.");
       setShowModal(true);
       console.error("Error executing payment:", error);
+    }
+  };
+
+  const handleGoToChat = () => {
+    if (consultationId) {
+      router.push(`/chat/${consultationId}`); // Navigate to chat with consultationId
+    } else {
+      console.error("Consultation ID is missing.");
     }
   };
 
@@ -246,7 +256,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           <div className="modal-content">
             <pre>{paymentMessage}</pre>{" "}
             {/* Display the logged response in the modal */}
-            <button onClick={() => setShowModal(false)}>Close</button>
+            <button onClick={handleGoToChat}>انتقل الى الدردشة</button>{" "}
+            {/* Go to chat */}
           </div>
         </div>
       )}
