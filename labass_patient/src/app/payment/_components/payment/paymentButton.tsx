@@ -226,8 +226,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
     } catch (error) {
       console.error("Error executing payment:", error);
-      setPaymentMessage("حدث خطأ أثناء عملية الدفع"); // Error message in Arabic
+      setPaymentMessage(`error ${error}`); // Error message in Arabic
       setShowModal(true);
+      setConsultationId(consultationId); // Store consultationId
     }
   };
 
