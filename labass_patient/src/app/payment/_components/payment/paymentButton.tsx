@@ -35,9 +35,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
-  const [consultationId, setConsultationId] = useState<string | null>(null); // Add state for consultationId
+  const [showModal, setShowModal] = useState(false); // Modal state
+  const [paymentMessage, setPaymentMessage] = useState<string | null>(null); // Payment message state
+  const [consultationId, setConsultationId] = useState<string | null>(null); // State to store consultationId
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -114,18 +114,18 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     if (method === PaymentMethodEnum.ApplePay) {
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.innerHTML = "";
+        container.innerHTML = ""; // Clear the previous Apple Pay button
       }
-      initializeApplePay();
+      initializeApplePay(); // Reinitialize with new values
     }
   }, [discountedPrice, method]);
 
   const handlePaymentClick = async () => {
     const token = localStorage.getItem("labass_token");
     if (!token) {
-      router.push("/login");
+      router.push("/login"); // Navigate to login page
     }
-    if (loading) return;
+    if (loading) return; // Prevent multiple initiations
     setLoading(true);
     try {
       const response = await axios.post(`${apiUrl}/initiate-session`, {
@@ -188,13 +188,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         return;
       }
 
+      console.log(
+        `Executing payment with amount: ${discountedPrice} and promoCode: ${promoCode}`
+      );
+
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2),
-          PromoCode: promoCode,
+          InvoiceValue: discountedPrice.toFixed(2), // Ensure this is the discounted price
+          PromoCode: promoCode, // Include the applied promo code
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
@@ -207,21 +211,29 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       if (response.data.IsSuccess) {
         const paymentUrl = response.data.Data.PaymentURL;
-        const paymentResponse = await axios.get(paymentUrl);
 
-        console.log("Payment completed successfully:", paymentResponse.data);
-        setPaymentMessage("تمت عملية الدفع بنجاح"); // Show the full response data in the modal
-        setConsultationId(response.data.consultation); // Store consultationId in state
+        const paymentResponse = await axios.get(paymentUrl);
+        const consultationId = response.data.consultation;
+
+        // Show modal with success message
+        setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
+        setConsultationId(consultationId); // Store consultationId
         setShowModal(true);
+
+        if (paymentResponse.status === 200) {
+          console.log("Payment completed successfully:", paymentResponse.data);
+        } else {
+          console.error("Failed to complete payment:", paymentResponse.data);
+        }
       } else {
-        console.error("Failed to complete payment:");
-        setPaymentMessage(`Payment failed: ${response.data.Message}`);
+        console.error("Payment execution failed:", response.data.Message);
+        setPaymentMessage(`Payment failed: ${response.data.Message}`); // Set failure message
         setShowModal(true);
       }
     } catch (error) {
-      setPaymentMessage("حدث خطأ أثناء عملية الدفع");
-      setShowModal(true);
       console.error("Error executing payment:", error);
+      setPaymentMessage("حدث خطأ أثناء عملية الدفع"); // Error message in Arabic
+      setShowModal(true);
     }
   };
 
@@ -251,7 +263,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : `الدفع بالبطاقة`}
+          {loading ? "Processing..." : "الدفع بالبطاقة"}{" "}
         </button>
       )}
 
