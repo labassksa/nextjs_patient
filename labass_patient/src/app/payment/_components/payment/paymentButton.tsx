@@ -221,7 +221,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentUrl = response.data.Data.PaymentURL;
 
         const paymentResponse = await axios.get(paymentUrl);
-        const consultationId = response.data.consultation;
+        const consultationId = response.data.consultation.id;
         // Push to the chat page with consultationId in the URL
         router.push(`/chat/${consultationId}`);
 
