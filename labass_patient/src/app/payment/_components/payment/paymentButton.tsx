@@ -37,7 +37,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal state
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null); // Payment message state
-  const [consultationId, setConsultationId] = useState<string | null>(null); // State to store consultationId
+  const [consultationId, setConsultationId] = useState<number | null>(null); // State to store consultationId
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -223,11 +223,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
     } catch (error) {
       console.error("the consultationId:", consultationId);
-      setConsultationId(consultationId); // Store consultationId
-
-      setPaymentMessage(
-        `  ${consultationId}حدث خطأ أثناء عمليةالدفع لاستشارة `
-      ); // Error message in Arabic
+      setPaymentMessage(`حدث خطأ أثناء عمليةالدفع `); // Error message in Arabic
       setShowModal(true);
     }
   };
