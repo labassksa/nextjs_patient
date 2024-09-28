@@ -206,6 +206,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          validateStatus: (status) => {
+            return status >= 200 && status < 300; // Accept any 2xx status code
+          },
         }
       );
 
@@ -215,14 +218,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentResponse = await axios.get(paymentUrl);
         const consultationId = response.data.consultation;
 
-        if (paymentResponse.status === 201) {
+        if (paymentResponse.status >= 200 && paymentResponse.status < 300) {
           console.log("Payment completed successfully:", paymentResponse.data);
           // Show modal with success message
           setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
           setConsultationId(consultationId); // Store consultationId
           setShowModal(true);
         } else {
-          console.error("Failed to complete payment:", paymentResponse.data);
+          console.error("Failed to complete payment:");
           setPaymentMessage("حدث خطأ "); // Error message in Arabic
           setShowModal(true);
         }
