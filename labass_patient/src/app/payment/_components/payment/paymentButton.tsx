@@ -38,7 +38,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   const [showModal, setShowModal] = useState(false); // Modal state
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null); // Payment message state
   const [consultationId, setConsultationId] = useState<number | null>(null); // State to store consultationId
-  const [paymentURL, setPaymentURL] = useState<string | null>(null); // State to store consultationId
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -212,20 +211,19 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
       if (response.data.IsSuccess) {
         const paymentUrl = response.data.Data.PaymentURL;
-        setPaymentURL(paymentUrl);
         const consultationId = response.data.consultation;
 
         // Show modal with success message
         setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
         setConsultationId(consultationId); // Store consultationId
         setShowModal(true);
+        await axios.get(paymentUrl);
       }
     } catch (error) {
       console.error("the consultationId:", consultationId);
       setPaymentMessage(`${consultationId} حدث خطأ أثناء عمليةالدفع `); // Error message in Arabic
       setShowModal(true);
     }
-    await axios.get(paymentURL || "");
   };
 
   const handleGoToChat = () => {
