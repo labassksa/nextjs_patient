@@ -206,9 +206,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          validateStatus: (status) => {
-            return status >= 200 && status < 300; // Accept any 2xx status code
-          },
         }
       );
 
@@ -226,7 +223,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
     } catch (error) {
       console.error("the consultationId:", consultationId);
-      setPaymentMessage("حدث خطأ أثناء عملية الدفع"); // Error message in Arabic
+      setPaymentMessage(
+        `  ${consultationId}حدث خطأ أثناء عمليةالدفع لاستشارة `
+      ); // Error message in Arabic
       setShowModal(true);
     }
   };
