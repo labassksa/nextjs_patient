@@ -212,7 +212,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       if (response.data.IsSuccess) {
         const paymentUrl = response.data.Data.PaymentURL;
 
-        // const paymentResponse = await axios.get(paymentUrl);
+        await axios.get(paymentUrl);
         const consultationId = response.data.consultation;
 
         // Show modal with success message
