@@ -240,7 +240,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       {/* Modal to display the selected attachment */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded-lg max-w-lg w-full">
+          <div className="bg-white p-4 rounded-lg w-11/12 sm:max-w-lg md:max-w-xl lg:max-w-2xl">
             <h2 className="text-md text-right font-bold mb-2">إضافة مرفقات</h2>
 
             {/* Preview the attachment */}
@@ -248,7 +248,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
               <img
                 src={URL.createObjectURL(selectedFile)}
                 alt="Selected Attachment"
-                className="w-full h-auto mb-4"
+                className="w-full h-auto mb-4 object-contain max-h-80"
               />
             ) : (
               <p className="text-sm mb-4">
@@ -256,19 +256,23 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
               </p>
             )}
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col sm:flex-row justify-end sm:space-x-4 space-y-4 sm:space-y-0">
               <button
-                className="bg-red-500 text-white text-xs px-4 py-2 rounded"
+                className="bg-red-500 text-white text-xs px-4 py-2 rounded w-full sm:w-auto"
                 onClick={handleCancelFile}
               >
                 إلغاء
               </button>
 
               <button
-                className="bg-green-500 text-white text-xs px-4 py-2 rounded"
+                className="bg-green-500 text-white text-xs px-4 py-2 rounded w-full sm:w-auto"
                 onClick={handleSendFile} // Trigger the file upload logic
               >
-                {isUploading ? <div className="spinner"></div> : "إرسال"}
+                {isUploading ? (
+                  <div className="spinner text-white"></div>
+                ) : (
+                  "إرسال"
+                )}
               </button>
             </div>
           </div>
