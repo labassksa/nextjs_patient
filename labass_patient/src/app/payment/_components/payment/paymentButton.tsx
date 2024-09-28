@@ -215,10 +215,17 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentResponse = await axios.get(paymentUrl);
         const consultationId = response.data.consultation;
 
-        // Show modal with success message
-        setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
-        setConsultationId(consultationId); // Store consultationId
-        setShowModal(true);
+        if (paymentResponse.status === 200) {
+          console.log("Payment completed successfully:", paymentResponse.data);
+          // Show modal with success message
+          setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
+          setConsultationId(consultationId); // Store consultationId
+          setShowModal(true);
+        } else {
+          console.error("Failed to complete payment:", paymentResponse.data);
+          setPaymentMessage("حدث خطأ "); // Error message in Arabic
+          setShowModal(true);
+        }
       } else {
         console.error("Payment execution failed:", response.data.Message);
         setPaymentMessage(`Payment failed: ${response.data.Message}`); // Set failure message
@@ -226,8 +233,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       }
     } catch (error) {
       console.error("Error executing payment:", error);
-      setPaymentMessage(`error ${error}`); // Error message in Arabic
-      setConsultationId(consultationId); // Store consultationId
+      setPaymentMessage("حدث خطأ أثناء عملية الدفع"); // Error message in Arabic
       setShowModal(true);
     }
   };
