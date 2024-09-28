@@ -212,10 +212,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       if (response.data.IsSuccess) {
         const paymentUrl = response.data.Data.PaymentURL;
 
-        const paymentResponse = await axios.get(paymentUrl);
-        const consultationId = response.data;
+        // const paymentResponse = await axios.get(paymentUrl);
+        const consultationId = response.data.consultation;
 
-        console.log("Payment completed successfully:", paymentResponse.data);
         // Show modal with success message
         setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
         setConsultationId(consultationId); // Store consultationId
