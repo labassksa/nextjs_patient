@@ -209,16 +209,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentUrl = response.data.Data.PaymentURL;
         const paymentResponse = await axios.get(paymentUrl);
 
-        if (paymentResponse.status === 200) {
-          console.log("Payment completed successfully:", paymentResponse.data);
-          setPaymentMessage(JSON.stringify(response.data, null, 2)); // Show the full response data in the modal
-          setConsultationId(response.data.consultation); // Store consultationId in state
-          setShowModal(true);
-        } else {
-          console.error("Failed to complete payment:", paymentResponse.data);
-          setPaymentMessage(`Payment failed: ${response.data.Message}`);
-          setShowModal(true);
-        }
+        console.log("Payment completed successfully:", paymentResponse.data);
+        setPaymentMessage("تمت عملية الدفع بنجاح"); // Show the full response data in the modal
+        setConsultationId(response.data.consultation); // Store consultationId in state
+        setShowModal(true);
+      } else {
+        console.error("Failed to complete payment:");
+        setPaymentMessage(`Payment failed: ${response.data.Message}`);
+        setShowModal(true);
       }
     } catch (error) {
       setPaymentMessage("حدث خطأ أثناء عملية الدفع");
