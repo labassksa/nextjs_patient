@@ -35,11 +35,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Function to initialize or reinitialize Apple Pay
   const initializeApplePay = async () => {
     if (method === PaymentMethodEnum.ApplePay) {
       try {
@@ -62,12 +63,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             sessionCanceled: sessionCanceled,
           };
 
-          // Ensure the script is loaded and initialize Apple Pay
           if (scriptLoadedRef.current) {
             window.myFatoorahAP.init(applePayConfigRef.current);
             setIsInitialized(true);
-
-            // After initializing, update the amount displayed in Apple Pay
             window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           }
         } else {
@@ -79,7 +77,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
-  // Load Apple Pay script
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
@@ -91,12 +88,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
 
-        // Initialize Apple Pay when the script is loaded
         if (applePayConfigRef.current) {
           window.myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
-
-          // Update amount in Apple Pay after initialization
           window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
         }
       };
@@ -115,23 +109,22 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, []);
 
-  // Reinitialize Apple Pay when either the payment method or discounted price changes
   useEffect(() => {
     if (method === PaymentMethodEnum.ApplePay) {
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.innerHTML = ""; // Clear the previous Apple Pay button
+        container.innerHTML = "";
       }
-      initializeApplePay(); // Reinitialize with new values
+      initializeApplePay();
     }
   }, [discountedPrice, method]);
 
   const handlePaymentClick = async () => {
     const token = localStorage.getItem("labass_token");
     if (!token) {
-      router.push("/login"); // Navigate to login page
+      router.push("/login");
     }
-    if (loading) return; // Prevent multiple initiations
+    if (loading) return;
     setLoading(true);
     try {
       const response = await axios.post(`${apiUrl}/initiate-session`, {
@@ -161,8 +154,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           if (scriptLoadedRef.current) {
             window.myFatoorahAP.init(applePayConfigRef.current);
             setIsInitialized(true);
-
-            // Update Apple Pay amount after re-initialization
             window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           }
         }
@@ -196,17 +187,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         return;
       }
 
-      console.log(
-        `Executing payment with amount: ${discountedPrice} and promoCode: ${promoCode}`
-      );
-
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2), // Ensure this is the discounted price
-          PromoCode: promoCode, // Include the applied promo code
+          InvoiceValue: discountedPrice.toFixed(2),
+          PromoCode: promoCode,
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
@@ -218,23 +205,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       );
 
       if (response.data.IsSuccess) {
-        const paymentUrl = response.data.Data.PaymentURL;
-
-        const paymentResponse = await axios.get(paymentUrl);
-        const consultationId = response.data.consultation;
-        // Push to the chat page with consultationId in the URL
-        router.push("/chat");
-
-        if (paymentResponse.status === 200) {
-          console.log("Payment completed successfully:", paymentResponse.data);
-          // Extract consultationId from the paymentResponse
-        } else {
-          console.error("Failed to complete payment:", paymentResponse.data);
-        }
+        setPaymentMessage(JSON.stringify(response.data, null, 2)); // Show the full response data in the modal
+        setShowModal(true);
       } else {
-        console.error("Payment execution failed:", response.data.Message);
+        setPaymentMessage(`Payment failed: ${response.data.Message}`);
+        setShowModal(true);
       }
     } catch (error) {
+      setPaymentMessage("An error occurred while processing the payment.");
+      setShowModal(true);
       console.error("Error executing payment:", error);
     }
   };
@@ -257,10 +236,54 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : `الدفع بالبطاقة`}{" "}
-          {/* Show updated price */}
+          {loading ? "Processing..." : `الدفع بالبطاقة`}
         </button>
       )}
+
+      {/* Modal for showing the response message */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <pre>{paymentMessage}</pre>{" "}
+            {/* Display the logged response in the modal */}
+            <button onClick={() => setShowModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .modal-content {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+        }
+        pre {
+          text-align: left;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+        button {
+          margin-top: 20px;
+          padding: 10px 20px;
+          background-color: #0070f3;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 };
