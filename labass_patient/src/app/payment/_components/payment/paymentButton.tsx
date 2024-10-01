@@ -226,7 +226,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
   const handleGoToChat = () => {
     if (consultationId) {
-      router.push(`/chat/${consultationId}`); // Navigate to chat with consultationId
+      router.push(`/fillpersonalInfo/${consultationId}`); // Navigate to chat with consultationId
     } else {
       console.error("Consultation ID is missing.");
     }
@@ -257,10 +257,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       {/* Modal for showing the response message */}
       {showModal && (
         <div className="modal">
-          <div className="modal-content">
+          <div className="modal-content text-black">
             <pre>{paymentMessage}</pre>{" "}
             {/* Display the logged response in the modal */}
-            <button onClick={handleGoToChat}>انتقل الى الدردشة</button>{" "}
+            <button
+              className="text-white bg-custom-green"
+              onClick={handleGoToChat}
+            >
+              أكمل معلوماتك
+            </button>{" "}
             {/* Go to chat */}
           </div>
         </div>
