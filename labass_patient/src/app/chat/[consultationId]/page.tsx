@@ -130,9 +130,15 @@ const ChatPage: React.FC = () => {
       setStatus(newStatus);
     });
 
+    // New listener for doctor info updates
+    socket.on("doctorInfo", (data) => {
+      setDoctorInfo(data.doctorInfo); // Assuming doctorInfo is structured correctly in your state
+    });
+
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
       socket.off("consultationStatus"); // Clean up the consultation status listener
+      socket.off("doctorInfo"); // Clean up the doctor info listener
     };
   }, [socket, userId, consultationId]);
 
