@@ -61,7 +61,7 @@ const PromoCode: React.FC<{
         setResponseMessage("الرمز الترويجي غير موجود");
         setIsSuccess(false); // Handle invalid promo code
       } else if (response.data.message === "Promotional code is already used") {
-        setResponseMessage("تم استخدام الرمز الترويجي بالفعل");
+        setResponseMessage("تم استخدام الرمز الترويجي سابقا");
         setIsSuccess(false); // Handle already used promo code
       } else if (response.data.consultationId != null) {
         setResponseMessage("لديك استشارة مجانية");

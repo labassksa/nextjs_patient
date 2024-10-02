@@ -120,7 +120,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
 
           try {
             const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attachment`,
+              `${process.env.NEXT_PUBLIC_API_URL}/upload-consultation-attatchment`,
               formData,
               {
                 headers: {
