@@ -126,7 +126,23 @@ const ChatPage: React.FC = () => {
 
     socket.on("receiveMessage", handleReceiveMessage);
 
+    // Listen for the message status (read status) update
+    const handleMessageStatus = ({
+      messageId,
+      read,
+    }: {
+      messageId: string;
+      read: boolean;
+    }) => {
+      setMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.id === messageId ? { ...msg, read } : msg
+        )
+      );
+    };
+    socket.on("messageStatus", handleMessageStatus);
     // New listener for consultation status updates
+
     socket.on("consultationStatus", (data) => {
       const newStatus = data.status === "Paid" ? "مدفوعة" : "مفتوحة";
       setStatus(newStatus);
@@ -142,6 +158,7 @@ const ChatPage: React.FC = () => {
       socket.off("receiveMessage", handleReceiveMessage);
       socket.off("consultationStatus"); // Clean up the consultation status listener
       socket.off("doctorInfo"); // Clean up the doctor info listener
+      socket.off("messageStatus", handleMessageStatus); // Cleanup messageStatus listener
     };
   }, [socket, userId, consultationId]);
 
