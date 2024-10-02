@@ -72,6 +72,34 @@ const ChatPage: React.FC = () => {
 
   const { socket, isConnected } = useSocket(websocketURL, token || "");
 
+  // useEffect(() => {
+  //   if (!socket || !userId || !consultationId) return;
+
+  //   socket.emit("joinRoom", { room: `${consultationId}` });
+
+  //   socket.emit(
+  //     "loadMessages",
+  //     { consultationId },
+  //     (loadedMessages: Message[]) => {
+  //       setMessages(loadedMessages);
+  //       setLoading(false);
+  //     }
+  //   );
+
+  //   const handleReceiveMessage = (newMessage: Message) => {
+  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+  //     if (newMessage.senderId !== Number(userId)) {
+  //       socket.emit("messageReceived", { messageId: newMessage.id });
+  //     }
+  //   };
+
+  //   socket.on("receiveMessage", handleReceiveMessage);
+
+  //   return () => {
+  //     socket.off("receiveMessage", handleReceiveMessage);
+  //   };
+  // }, [socket, userId, consultationId]);
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
 
@@ -96,8 +124,15 @@ const ChatPage: React.FC = () => {
 
     socket.on("receiveMessage", handleReceiveMessage);
 
+    // New listener for consultation status updates
+    socket.on("consultationStatus", (data) => {
+      const newStatus = data.status === "Paid" ? "مدفوعة" : "مفتوحة";
+      setStatus(newStatus);
+    });
+
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
+      socket.off("consultationStatus"); // Clean up the consultation status listener
     };
   }, [socket, userId, consultationId]);
 
