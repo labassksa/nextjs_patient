@@ -14,6 +14,8 @@ interface Message {
   consultationId: number;
   isSent: boolean;
   read: boolean;
+  attachmentUrl?: string;
+  attachmentType?: string;
 }
 
 const ChatPage: React.FC = () => {
@@ -134,6 +136,7 @@ const ChatPage: React.FC = () => {
     socket.on("doctorInfo", (data) => {
       setDoctorInfo(data.doctorInfo); // Assuming doctorInfo is structured correctly in your state
     });
+    // Listener for uploaded attachments
 
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
@@ -167,6 +170,28 @@ const ChatPage: React.FC = () => {
       };
 
       setMessages((prevMessages) => [...prevMessages, newFileMessage]);
+      // Emit the sendMessage event with file information
+      socket.emit(
+        "sendMessage",
+        {
+          room: `${consultationId}`,
+          message: "", // No text for file message
+          consultationId: Number(consultationId),
+          senderId: Number(userId),
+          attachmentUrl: fileMessage.attachmentUrl,
+          attachmentType: fileMessage.attachmentType,
+        },
+        (response: { messageId: string }) => {
+          // Update message with the correct messageId once confirmed by the backend
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg === newFileMessage
+                ? { ...msg, id: response.messageId, isSent: true }
+                : msg
+            )
+          );
+        }
+      );
     } else {
       const newMessage: Message = {
         message: messageText,
