@@ -184,6 +184,7 @@ const ChatPage: React.FC = () => {
         read: false,
         attachmentUrl: fileMessage.attachmentUrl,
         attachmentType: fileMessage.attachmentType,
+        recordedTime: fileMessage.recordedTime,
       };
 
       setMessages((prevMessages) => [...prevMessages, newFileMessage]);
@@ -197,6 +198,7 @@ const ChatPage: React.FC = () => {
           senderId: Number(userId),
           attachmentUrl: fileMessage.attachmentUrl,
           attachmentType: fileMessage.attachmentType,
+          recordedtime: fileMessage.recordedTime,
         },
         (response: { messageId: string }) => {
           // Update message with the correct messageId once confirmed by the backend
