@@ -110,7 +110,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
 
       mediaRecorderRef.current.onstop = async () => {
         const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
+          type: "audio/mp4",
         });
 
         setIsRecording(false); // Ensure this happens immediately after stopping the recording
@@ -126,7 +126,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
             setIsUploading(true); // Show spinner while uploading
 
             const formData = new FormData();
-            formData.append("file", audioBlob, "voice_note.webm");
+            formData.append("file", audioBlob, "voice_note.mp4");
             formData.append("senderId", String(Number(userId)));
             formData.append("consultationId", String(consultationId));
             formData.append("recordedTime", String(Number(recordedTime))); // Add recorded time

@@ -6,6 +6,7 @@ import ChatMainContents from "../../chat/_components/chatMainContent";
 import StickyMessageInput from "../../chat/_components/chatInputarea"; // Import StickyMessageInput
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
+import { ConsultationStatus } from "@/models/consultation";
 
 interface Message {
   id?: string;
@@ -33,10 +34,12 @@ const ChatPage: React.FC = () => {
     typeof window !== "undefined" ? localStorage.getItem("labass_userId") : "";
 
   const statusClass = `inline-block px-3 py-1 rounded-full text-xs font-medium ${
-    status === "مفتوحة"
+    status === ConsultationStatus.Open
       ? "bg-green-100 text-green-700 mb-1"
-      : status === "مدفوعة"
+      : status === ConsultationStatus.Paid
       ? "bg-blue-100 text-blue-700 mb-1"
+      : status === ConsultationStatus.Closed
+      ? "bg-red-100 text-red-700 mb-1"
       : "bg-gray-200 text-gray-700 mb-1"
   }`;
 
