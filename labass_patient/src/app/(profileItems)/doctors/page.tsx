@@ -34,7 +34,7 @@ const DoctorsPage = () => {
                     className="font-normal text-sm text-custom-green mt-2"
                     dir="rtl"
                   >
-                    طبيب مرخص من هيئة التخصصات الصحية ترخيص رقم 1287495
+                    طبيب مرخص من هيئة التخصصات الصحية ترخيص رقم 24621428
                   </h3>
                   <h3
                     className="font-normal text-sm text-custom-green mt-2"
