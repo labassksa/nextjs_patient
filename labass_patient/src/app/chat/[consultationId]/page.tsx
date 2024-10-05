@@ -50,14 +50,8 @@ const ChatPage: React.FC = () => {
       const consultation = await getConsultationById(Number(consultationId));
 
       if (consultation && consultation.status) {
-        setStatus(
-          consultation.status === ConsultationStatus.Paid
-            ? "مدفوعة"
-            : consultation.status === ConsultationStatus.Open
-            ? "مفتوحة"
-            : consultation.status
-        );
-
+        setStatus(consultation.status); // Set the status code directly
+        // No need to translate here
         if (consultation.doctor && consultation.doctor.user) {
           setDoctorInfo(consultation.doctor);
         } else {
@@ -76,35 +70,19 @@ const ChatPage: React.FC = () => {
   }, [token, userId, consultationId, router]);
 
   const { socket, isConnected } = useSocket(websocketURL, token || "");
+  const getStatusDisplay = (statusCode: any) => {
+    switch (statusCode) {
+      case ConsultationStatus.Paid:
+        return "مدفوعة";
+      case ConsultationStatus.Open:
+        return "مفتوحة";
+      case ConsultationStatus.Closed:
+        return "مغلقة";
+      default:
+        return "غير معروف"; // Default case for unknown statuses
+    }
+  };
 
-  // useEffect(() => {
-  //   if (!socket || !userId || !consultationId) return;
-
-  //   socket.emit("joinRoom", { room: `${consultationId}` });
-
-  //   socket.emit(
-  //     "loadMessages",
-  //     { consultationId },
-  //     (loadedMessages: Message[]) => {
-  //       setMessages(loadedMessages);
-  //       setLoading(false);
-  //     }
-  //   );
-
-  //   const handleReceiveMessage = (newMessage: Message) => {
-  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
-
-  //     if (newMessage.senderId !== Number(userId)) {
-  //       socket.emit("messageReceived", { messageId: newMessage.id });
-  //     }
-  //   };
-
-  //   socket.on("receiveMessage", handleReceiveMessage);
-
-  //   return () => {
-  //     socket.off("receiveMessage", handleReceiveMessage);
-  //   };
-  // }, [socket, userId, consultationId]);
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
 
@@ -147,7 +125,8 @@ const ChatPage: React.FC = () => {
     // New listener for consultation status updates
 
     socket.on("consultationStatus", (data) => {
-      const newStatus = data.status === "Paid" ? "مدفوعة" : "مفتوحة";
+      const newStatus =
+        data.status === ConsultationStatus.Paid ? "مدفوعة" : "مفتوحة";
       setStatus(newStatus);
     });
 
@@ -263,7 +242,9 @@ const ChatPage: React.FC = () => {
       <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
         <div className="text-black mb-0 mt-16 px-4 text-right w-full">
-          <h2 className={`${statusClass}`}>حالة الاستشارة: {status}</h2>
+          <h2 className={`${statusClass}`}>
+            حالة الاستشارة:{getStatusDisplay(status)}{" "}
+          </h2>
           {doctorInfo ? (
             <div className="p-0 text-right mb-0">
               <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
