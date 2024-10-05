@@ -51,9 +51,9 @@ const ChatPage: React.FC = () => {
 
       if (consultation && consultation.status) {
         setStatus(
-          consultation.status === "Paid"
+          consultation.status === ConsultationStatus.Paid
             ? "مدفوعة"
-            : consultation.status === "Open"
+            : consultation.status === ConsultationStatus.Open
             ? "مفتوحة"
             : consultation.status
         );
