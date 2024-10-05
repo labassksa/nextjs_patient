@@ -40,7 +40,7 @@ const DoctorsPage = () => {
                     className="font-normal text-sm text-custom-green mt-2"
                     dir="rtl"
                   >
-                    الخبرة: سنتين{" "}
+                    الخبرة: 5 سنوات{" "}
                   </h3>
                 </div>
               </div>
