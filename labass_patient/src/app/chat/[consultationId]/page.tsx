@@ -125,31 +125,31 @@ const ChatPage: React.FC = () => {
     socket.on("messageStatus", handleMessageStatus);
     // New listener for consultation status updates
 
-    // Usage inside the socket event listener
     socket.on("consultationStatus", (data) => {
-      const newStatus = handleConsultationStatus(data.status);
+      const newStatus =
+        data.status === ConsultationStatus.Paid ? "مدفوعة" : "مفتوحة";
       setStatus(newStatus);
     });
-    const handleConsultationStatus = (status: ConsultationStatus) => {
-      let newStatus = "";
+    // const handleConsultationStatus = (status: ConsultationStatus) => {
+    //   let newStatus = "";
 
-      switch (status) {
-        case ConsultationStatus.Paid:
-          newStatus = "مدفوعة";
-          break;
-        case ConsultationStatus.Open:
-          newStatus = "مفتوحة";
-          break;
-        case ConsultationStatus.Closed:
-          newStatus = "مغلقة";
-          break;
-        default:
-          newStatus = "ملغاة"; // Fallback for unknown statuses
-          break;
-      }
+    //   switch (status) {
+    //     case ConsultationStatus.Paid:
+    //       newStatus = "مدفوعة";
+    //       break;
+    //     case ConsultationStatus.Open:
+    //       newStatus = "مفتوحة";
+    //       break;
+    //     case ConsultationStatus.Closed:
+    //       newStatus = "مغلقة";
+    //       break;
+    //     default:
+    //       newStatus = "ملغاة"; // Fallback for unknown statuses
+    //       break;
+    //   }
 
-      return newStatus;
-    };
+    //   return newStatus;
+    // };
 
     // New listener for doctor info updates
     socket.on("doctorInfo", (data) => {
