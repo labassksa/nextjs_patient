@@ -17,6 +17,7 @@ interface Message {
   read: boolean;
   attachmentUrl?: string;
   attachmentType?: string;
+  recordedTime?: string;
 }
 
 const ChatPage: React.FC = () => {
