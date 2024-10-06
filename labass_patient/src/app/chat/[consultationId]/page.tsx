@@ -17,7 +17,7 @@ interface Message {
   read: boolean;
   attachmentUrl?: string;
   attachmentType?: string;
-  recordedTime?: string;
+  recordedTime?: number;
 }
 
 const ChatPage: React.FC = () => {
@@ -181,7 +181,7 @@ const ChatPage: React.FC = () => {
           senderId: Number(userId),
           attachmentUrl: fileMessage.attachmentUrl,
           attachmentType: fileMessage.attachmentType,
-          recordedtime: fileMessage.recordedTime,
+          recordedTime: fileMessage.recordedTime,
         },
         (response: { messageId: string }) => {
           // Update message with the correct messageId once confirmed by the backend
