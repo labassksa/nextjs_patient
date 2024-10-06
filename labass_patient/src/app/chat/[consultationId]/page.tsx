@@ -125,10 +125,15 @@ const ChatPage: React.FC = () => {
     socket.on("messageStatus", handleMessageStatus);
     // New listener for consultation status updates
 
+    // Usage inside the socket event listener
     socket.on("consultationStatus", (data) => {
+      const newStatus = handleConsultationStatus(data.status);
+      setStatus(newStatus);
+    });
+    const handleConsultationStatus = (status: ConsultationStatus) => {
       let newStatus;
 
-      switch (data.status) {
+      switch (status) {
         case ConsultationStatus.Paid:
           newStatus = "مدفوعة";
           break;
@@ -143,8 +148,8 @@ const ChatPage: React.FC = () => {
           break;
       }
 
-      setStatus(newStatus);
-    });
+      return newStatus;
+    };
 
     // New listener for doctor info updates
     socket.on("doctorInfo", (data) => {
