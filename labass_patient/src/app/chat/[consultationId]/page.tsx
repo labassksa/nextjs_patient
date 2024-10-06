@@ -71,7 +71,7 @@ const ChatPage: React.FC = () => {
   }, [token, userId, consultationId, router]);
 
   const { socket, isConnected } = useSocket(websocketURL, token || "");
-  const getStatusDisplay = (statusCode: any) => {
+  const getStatusDisplay = (statusCode: string) => {
     switch (statusCode) {
       case ConsultationStatus.Paid:
         return "مدفوعة";
@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
       case ConsultationStatus.Closed:
         return "مغلقة";
       default:
-        return "ملغاة"; // Default case for unknown statuses
+        return "getStatusDisplay"; // Default case for unknown statuses
     }
   };
 
@@ -130,19 +130,19 @@ const ChatPage: React.FC = () => {
 
       switch (status) {
         case ConsultationStatus.Paid:
-          newStatus = "مدفوعة";
+          newStatus = ConsultationStatus.Paid;
           break;
         case ConsultationStatus.Open:
-          newStatus = "مفتوحة";
+          newStatus = ConsultationStatus.Open;
           break;
         case ConsultationStatus.Closed:
-          newStatus = "مغلقة";
+          newStatus = ConsultationStatus.Closed;
           break;
         case ConsultationStatus.PendingPayment:
-          newStatus = "في انتظار الدفع";
+          newStatus = ConsultationStatus.PendingPayment;
           break;
         case ConsultationStatus.Failed:
-          newStatus = "فشلت";
+          newStatus = ConsultationStatus.Failed;
           break;
         default:
           newStatus = "ملغاة"; // Fallback for unknown or canceled statuses
