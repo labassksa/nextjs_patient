@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
       case ConsultationStatus.Closed:
         return "مغلقة";
       default:
-        return "غير معروف"; // Default case for unknown statuses
+        return "ملغاة"; // Default case for unknown statuses
     }
   };
 
@@ -126,8 +126,23 @@ const ChatPage: React.FC = () => {
     // New listener for consultation status updates
 
     socket.on("consultationStatus", (data) => {
-      const newStatus =
-        data.status === ConsultationStatus.Paid ? "مدفوعة" : "مفتوحة";
+      let newStatus;
+
+      switch (data.status) {
+        case ConsultationStatus.Paid:
+          newStatus = "مدفوعة";
+          break;
+        case ConsultationStatus.Open:
+          newStatus = "مفتوحة";
+          break;
+        case ConsultationStatus.Closed:
+          newStatus = "مغلقة";
+          break;
+        default:
+          newStatus = "ملغاة"; // Fallback for unknown statuses
+          break;
+      }
+
       setStatus(newStatus);
     });
 
