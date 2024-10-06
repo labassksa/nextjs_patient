@@ -131,7 +131,7 @@ const ChatPage: React.FC = () => {
       setStatus(newStatus);
     });
     const handleConsultationStatus = (status: ConsultationStatus) => {
-      let newStatus;
+      let newStatus = "";
 
       switch (status) {
         case ConsultationStatus.Paid:
