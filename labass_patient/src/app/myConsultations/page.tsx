@@ -17,12 +17,17 @@ const MyConsultationsPage = () => {
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
+      setError(""); // Reset error on each new load
       try {
         const result = await fetchConsultations();
-        setConsultations(result);
-      } catch (error) {
-        console.log(`${error}`);
-        setError("Failed to fetch data. ");
+        if (result.length === 0) {
+          setError("No consultations found.");
+        } else {
+          setConsultations(result);
+        }
+      } catch (error: any) {
+        console.error(error);
+        setError(error.message); // Set the error message to display on screen
       } finally {
         setIsLoading(false);
       }
@@ -39,6 +44,8 @@ const MyConsultationsPage = () => {
           <p className="text-center">Loading...</p>
         ) : error ? (
           <p className="text-red-500 text-center">{error}</p>
+        ) : consultations.length === 0 ? (
+          <p className="text-center">No consultations available.</p>
         ) : (
           consultations.map((consultation) => (
             <ConsultationCard
@@ -47,7 +54,6 @@ const MyConsultationsPage = () => {
               onSelect={(id: any) =>
                 console.log("Selected consultation ID:", id)
               }
-              // onChatClick={(id: any) => console.log("Chat clicked for ID:", id)}
             />
           ))
         )}
