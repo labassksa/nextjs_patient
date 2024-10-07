@@ -41,7 +41,7 @@ const MyConsultationsPage = () => {
       <Header title="استشاراتي" />
       <div className="pt-16">
         {isLoading ? (
-          <p className="text-center">Loading...</p>
+          <p className="spinner text-gray-500"></p>
         ) : error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : consultations.length === 0 ? (
