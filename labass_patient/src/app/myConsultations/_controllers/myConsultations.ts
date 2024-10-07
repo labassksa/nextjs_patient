@@ -9,7 +9,7 @@ export const fetchConsultations = async () => {
     }
 
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/consultations`,
+      `${process.env.NEXT_PUBLIC_API_URL}/patient-consultations`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
