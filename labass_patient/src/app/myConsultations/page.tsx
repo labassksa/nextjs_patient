@@ -45,7 +45,7 @@ const MyConsultationsPage = () => {
         ) : error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : consultations.length === 0 ? (
-          <p className="text-center">No consultations available.</p>
+          <p className="text-center text-gray-500">لا يوجد لديك استشارات</p>
         ) : (
           consultations.map((consultation) => (
             <ConsultationCard
