@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 const PromoCode: React.FC<{
   setDiscountedPrice: (price: number) => void;
@@ -11,6 +12,10 @@ const PromoCode: React.FC<{
   const [isSuccess, setIsSuccess] = useState(false); // Track success state
   const [isFieldFrozen, setIsFieldFrozen] = useState(false); // Track whether the field is frozen
   const [loading, setLoading] = useState(false); // Track loading state
+  const [showModal, setShowModal] = useState(false); // Modal state for success
+  const [consultationId, setConsultationId] = useState<number | null>(null); // State to store consultationId
+
+  const router = useRouter(); // Initialize router
 
   const defaultPrice = 2; // Default price
 
@@ -64,8 +69,11 @@ const PromoCode: React.FC<{
         setResponseMessage("تم استخدام الرمز الترويجي سابقا");
         setIsSuccess(false); // Handle already used promo code
       } else if (response.data.consultationId != null) {
-        setResponseMessage("لديك استشارة مجانية");
-        setIsSuccess(true); // Mark success
+        // Handle free consultation case
+        setConsultationId(response.data.consultationId); // Store the consultationId
+        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة مجانية!");
+        setIsSuccess(true);
+        setShowModal(true); // Show success modal
       }
     } catch (error: any) {
       setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
@@ -90,18 +98,45 @@ const PromoCode: React.FC<{
     setPromoCodeInput(newPromoCode); // Update input value
   };
 
+  const handleGoToFillPersonalInfo = () => {
+    if (consultationId) {
+      router.push(`/fillpersonalInfo?consultationId=${consultationId}`);
+    } else {
+      console.error("Consultation ID is missing.");
+    }
+  };
+
   return (
     <div className="relative flex flex-col border border-gray-200 rounded-lg bg-white mx-2 p-2">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-row ">
         <button
           onClick={handleApplyPromo}
-          className={`px-4 bg-custom-background text-custom-green rounded-lg flex items-center ${
-            isFieldFrozen ? "cursor-not-allowed opacity-50" : "" // Disable button if field is frozen
+          className={`flex items-center  ${
+            isFieldFrozen ? "cursor-not-allowed opacity-50" : ""
           }`}
-          disabled={loading || isFieldFrozen} // Disable the button when loading or field is frozen
+          style={{
+            margin: "0",
+            padding: "0 4px", // px-2 and py-0 equivalent
+            backgroundColor: "#22c55e", // Green background
+            color: "white", // Text color white
+            fontSize: "12px", // Equivalent to text-xs
+            borderRadius: "0.5rem", // Rounded corners
+            height: "32px", // Height for better button control
+            lineHeight: "normal", // Reset line height
+          }}
+          disabled={loading || isFieldFrozen}
         >
           {loading ? (
-            <div className="spinner-border animate-spin inline-block w-4 h-4 border border-t-transparent rounded-full"></div>
+            <div
+              style={{
+                borderTopColor: "transparent",
+                border: "2px solid white",
+                width: "16px",
+                height: "16px",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+              }}
+            ></div>
           ) : (
             "استخدام"
           )}
@@ -111,7 +146,7 @@ const PromoCode: React.FC<{
           value={promoCodeInput}
           onChange={handleInputChange}
           placeholder="أدخل الرمز الترويجي"
-          className={`flex-grow p-2 focus:outline-none  rounded-r-md text-black ${
+          className={`flex-grow text-sm focus:outline-none rounded-r-md text-black ${
             isFieldFrozen ? "bg-gray-200" : "" // Gray out the field if frozen
           }`}
           dir="rtl"
@@ -129,6 +164,50 @@ const PromoCode: React.FC<{
           {responseMessage}
         </p>
       )}
+
+      {/* Modal for success message */}
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content text-black">
+            <p>{responseMessage}</p>
+            <button
+              className="text-white background-custom-green"
+              onClick={handleGoToFillPersonalInfo}
+            >
+              أكمل معلوماتك
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .modal-content {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+        }
+        button {
+          margin-top: 20px;
+          padding: 10px 20px;
+          background-color: #0070f3;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 };
