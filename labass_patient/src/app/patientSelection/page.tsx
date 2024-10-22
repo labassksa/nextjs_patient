@@ -1,10 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import PatientCard from "./_components/patientSelection/patientCard";
 import Header from "../../components/common/header";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import Spinner from "./_components/patientSelection/spinner"; // Import the Spinner component
 
 const PatientSelection: React.FC = () => {
   const router = useRouter();
@@ -15,12 +16,14 @@ const PatientSelection: React.FC = () => {
   const [selectedDependentId, setSelectedDependentId] = useState<number | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const searchParams = useSearchParams();
   const consultationId = searchParams?.get("consultationId");
 
   // Fetch dependents from the API
   useEffect(() => {
     const fetchPatients = async () => {
+      setIsLoading(true); // Start loading
       try {
         const token = localStorage.getItem("labass_token");
         const response = await axios.get(
@@ -57,6 +60,8 @@ const PatientSelection: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching dependents:", error);
+      } finally {
+        setIsLoading(false); // End loading
       }
     };
 
@@ -101,40 +106,57 @@ const PatientSelection: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header title="اختر المريض" showBackButton />
-      <div className="flex-grow pt-16 px-2" dir="rtl">
-        <div
-          className="flex flex-row flex-wrap gap-2 overflow-y-auto"
-          style={{ maxHeight: "calc(100vh - 160px)" }}
-        >
-          <button
-            className="self-start w-24 h-28 text-sm py-2 px-4 bg-gray-100 rounded-lg text-black flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200"
-            onClick={() =>
-              router.push(`/addPatient/?consultationId=${consultationId}`)
-            }
-          >
-            <PlusIcon className="h-6 w-6 mb-2" />
-            إضافة مريض
-          </button>
-          {patients.map((patient) => (
-            <PatientCard
-              key={patient.nationalId}
-              patient={patient}
-              isSelected={selectedPatientId === patient.nationalId}
-              onSelect={() =>
-                handleSelectPatient(patient.nationalId, patient.patientId)
-              }
-            />
-          ))}
+
+      {isLoading ? (
+        <div className="flex-grow flex justify-center items-center">
+          <Spinner /> {/* Loading spinner while fetching */}
         </div>
-      </div>
-      <button
-        className="w-full py-3 bg-custom-green text-white rounded-3xl shadow sticky bottom-12"
-        onClick={handleNextClick}
-      >
-        التالي
-      </button>
+      ) : (
+        <>
+          <div className="flex-grow pt-16 px-2" dir="rtl">
+            <div
+              className="flex flex-row flex-wrap gap-2 overflow-y-auto"
+              style={{ maxHeight: "calc(100vh - 160px)" }}
+            >
+              <button
+                className="self-start w-24 h-28 text-sm py-2 px-4 bg-gray-100 rounded-lg text-black flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors duration-200"
+                onClick={() =>
+                  router.push(`/addPatient/?consultationId=${consultationId}`)
+                }
+              >
+                <PlusIcon className="h-6 w-6 mb-2" />
+                إضافة مريض
+              </button>
+              {patients.map((patient) => (
+                <PatientCard
+                  key={patient.nationalId}
+                  patient={patient}
+                  isSelected={selectedPatientId === patient.nationalId}
+                  onSelect={() =>
+                    handleSelectPatient(patient.nationalId, patient.patientId)
+                  }
+                />
+              ))}
+            </div>
+          </div>
+
+          <button
+            className="w-full py-3 bg-custom-green text-white rounded-3xl shadow sticky bottom-12"
+            onClick={handleNextClick}
+          >
+            التالي
+          </button>
+        </>
+      )}
     </div>
   );
 };
 
-export default PatientSelection;
+// Wrap in Suspense to handle useSearchParams
+export default function SuspenseWrapper() {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <PatientSelection />
+    </Suspense>
+  );
+}
