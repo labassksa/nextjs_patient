@@ -1,13 +1,13 @@
 import React from "react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import {
   Consultation,
   ConsultationStatus,
 } from "../../../../models/consultation";
 import { NewspaperSharp } from "@mui/icons-material";
 import { ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
-import { translateGender } from "../../../../utils/translateGender"; // Import the translation functions
-import { translateStatus } from "../../../../utils/translateStatus"; // Import the translation functions
+import { translateGender } from "../../../../utils/translateGender";
+import { translateStatus } from "../../../../utils/translateStatus";
 
 interface ConsultationCardProps {
   consultation: Consultation;
@@ -18,11 +18,10 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
   consultation,
   onSelect,
 }) => {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
   const handleSelect = () => onSelect(consultation.id);
 
-  // Parse and format the createdAt date and time
   const formattedDateTime = new Date(consultation.createdAt).toLocaleString(
     "en-US",
     {
@@ -31,7 +30,7 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true, // Use 12-hour clock (AM/PM)
+      hour12: true,
     }
   );
 
@@ -41,52 +40,34 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
   let icon = null;
   let redirectUrl = "";
 
-  if (
-    consultation.status === ConsultationStatus.Paid &&
-    consultation.patient?.user.firstName
-  ) {
+  if (consultation.status === ConsultationStatus.Paid) {
+    buttonLabel = "اختر المريض";
+    buttonClass = "bg-custom-green text-xs";
+    redirectUrl = `/patientSelection?consultationId=${consultation.id}`;
+  } else if (consultation.status === ConsultationStatus.Open) {
     buttonLabel = "مراسلة";
-    buttonClass = "bg-custom-green text-xs ";
+    buttonClass = "bg-custom-green text-xs";
     icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
-    redirectUrl = `/chat/${consultation.id}`; // Use consultation.id directly here
-  } else if (consultation.status === ConsultationStatus.Paid) {
-    buttonLabel = "أكمل معلوماتك";
-    buttonClass = "bg-custom-green text-xs"; // Add a new class for the "أكمل معلوماتك" button if needed
-    redirectUrl = `/fillpersonalInfo?consultationId=${consultation.id}`;
-  } else {
-    switch (consultation.status) {
-      case ConsultationStatus.Open:
-        buttonLabel = "مراسلة";
-        buttonClass = "bg-custom-green text-xs";
-        icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
-        redirectUrl = `/chat/${consultation.id}`; // Use consultation.id directly here
-        break;
-      case ConsultationStatus.Closed:
-        buttonLabel = "مكتملة";
-        buttonClass = "bg-blue-500";
-        icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
-        break;
-      case ConsultationStatus.Failed:
-        buttonLabel = "ملغاة";
-        buttonClass = "bg-red-500";
-        icon = <ChatBubbleOvalLeftIcon className="text-white w-6" />;
-        break;
-      default:
-        buttonLabel = "";
-        buttonClass = "";
-        icon = null;
-    }
+    redirectUrl = `/chat/${consultation.id}`;
+  } else if (consultation.status === ConsultationStatus.Closed) {
+    buttonLabel = "مكتملة";
+    buttonClass = "bg-blue-500";
+    icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
+  } else if (consultation.status === ConsultationStatus.Failed) {
+    buttonLabel = "ملغاة";
+    buttonClass = "bg-red-500";
+    icon = <ChatBubbleOvalLeftIcon className="text-white w-6" />;
   }
 
   const handleButtonClick = () => {
     if (redirectUrl) {
-      router.push(redirectUrl); // Navigate to the appropriate page
+      router.push(redirectUrl);
     }
   };
 
   const handlePrescriptionClick = () => {
     if (consultation.prescription?.pdfURL) {
-      window.open(consultation.prescription.pdfURL, "_blank"); // Open the prescription PDF in a new tab
+      window.open(consultation.prescription.pdfURL, "_blank");
     }
   };
 
@@ -152,7 +133,7 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
           {consultation.prescription && (
             <button
               className="flex items-center border border-gray-300 rounded-lg p-3 bg-blue-100 hover:bg-blue-200 text-blue-600 font-semibold text-xs transition duration-300 ease-in-out"
-              onClick={handlePrescriptionClick} // Open the prescription PDF
+              onClick={handlePrescriptionClick}
             >
               <NewspaperSharp className="text-blue-600 mr-2 text-base" /> الوصفة
               الطبية
@@ -162,7 +143,7 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
           {buttonLabel && (
             <button
               className={`flex items-center justify-center w-full p-2 ${buttonClass} text-sm text-white font-bold rounded-lg`}
-              onClick={handleButtonClick} // Use handleButtonClick for navigation
+              onClick={handleButtonClick}
             >
               <span className="ml-2">{buttonLabel}</span>
               {icon}

@@ -226,7 +226,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
   const handleGoToChat = () => {
     if (consultationId) {
-      router.push(`/fillpersonalInfo?consultationId=${consultationId}`); // Navigate to chat with consultationId
+      console.log("inside Payment Button");
+
+      router.push(`/patientSelection?consultationId=${consultationId}`); // Navigate to chat with consultationId
     } else {
       console.error("Consultation ID is missing.");
     }

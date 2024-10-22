@@ -17,7 +17,7 @@ const PromoCode: React.FC<{
 
   const router = useRouter(); // Initialize router
 
-  const defaultPrice = 2; // Default price
+  const defaultPrice = 89; // Default price
 
   const handleApplyPromo = async () => {
     if (promoCodeInput.length !== 7) {
@@ -51,6 +51,7 @@ const PromoCode: React.FC<{
           },
         }
       );
+      console.log(`the response.data ${response.data.discountedPrice}`);
 
       if (response.data.discountedPrice) {
         setDiscountedPrice(response.data.discountedPrice); // Update discounted price
@@ -100,7 +101,8 @@ const PromoCode: React.FC<{
 
   const handleGoToFillPersonalInfo = () => {
     if (consultationId) {
-      router.push(`/fillpersonalInfo?consultationId=${consultationId}`);
+      console.log("inside PromoCode");
+      router.push(`/patientSelection?consultationId=${consultationId}`);
     } else {
       console.error("Consultation ID is missing.");
     }

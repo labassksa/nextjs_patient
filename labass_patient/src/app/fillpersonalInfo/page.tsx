@@ -1,17 +1,19 @@
-// src/pages/PersonalInfoPage.tsx
-import React, { Suspense } from "react";
-import PersonalInfoHeader from "./_components/userPersonalInfo/Header";
-import PersonalInfoForm from "./_components/userPersonalInfo/form";
+"use client";
+import React from "react";
+import Header from "../../components/common/header";
+import PersonalInfoForm from "./_components/userInformation/form";
 
-const PersonalInfoPage: React.FC = () => {
+const PersonalInfo = () => {
   return (
-    <div className="bg-custom-background min-h-screen flex flex-col">
-      <PersonalInfoHeader />
-      <Suspense fallback={<div>Loading...</div>}>
+    <div className="flex flex-col bg-gray-100 min-h-screen">
+      <Header title="أدخل المعلومات الشخصية" showBackButton />
+      <div className="pt-16 w-full">
+        {" "}
+        {/* Adjust this padding to match your header height */}
         <PersonalInfoForm />
-      </Suspense>
+      </div>
     </div>
   );
 };
 
-export default PersonalInfoPage;
+export default PersonalInfo;
