@@ -82,7 +82,7 @@ const PatientSelection: React.FC = () => {
     setIsLoading(true); // Start loading when the button is clicked
     if (selectedPatientId === "123456789") {
       // If "أنا" is selected, navigate to fillPersonalInfo page
-      router.push(`/fillPatientInfo/${consultationId}`);
+      router.push(`/fillPatientInfo/?consultationId=${consultationId}`);
     } else if (selectedDependentId && consultationId) {
       // If another patient is selected, make a POST request to attach the patient to the consultation
       const token = localStorage.getItem("labass_token");

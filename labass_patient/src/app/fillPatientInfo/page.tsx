@@ -1,8 +1,15 @@
 "use client";
+
 import React, { Suspense } from "react";
 import Header from "../../components/common/header";
-import PersonalInfoForm from "./_components/form";
-import Spinner from "./_components/spinner"; // Import the Spinner component
+import dynamic from "next/dynamic";
+import Spinner from "./_components/spinner";
+
+// Dynamically import PersonalInfoForm
+const PersonalInfoForm = dynamic(() => import("./_components/form"), {
+  ssr: false, // Disable SSR for the form
+  loading: () => <Spinner />, // Show spinner while loading
+});
 
 const PersonalInfo = () => {
   return (
@@ -15,7 +22,7 @@ const PersonalInfo = () => {
   );
 };
 
-// Wrap in Suspense to handle any client-side fetching and ensure the `useSearchParams` (if used inside `PersonalInfoForm`) works properly.
+// Wrap the entire component in Suspense for client-side fetching
 export default function SuspenseWrapper() {
   return (
     <Suspense fallback={<Spinner />}>
