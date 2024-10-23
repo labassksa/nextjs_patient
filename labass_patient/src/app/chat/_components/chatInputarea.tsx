@@ -5,13 +5,13 @@ import axios from "axios";
 interface StickyMessageInputProps {
   onSendMessage: (messageText: string, fileMessage?: any) => void; // Handle both text and file messages
   consultationId: number; // Ensure consultationId is passed down
-  isConsultationOpen: boolean;
+  isConsultationOpenOrPaid: boolean;
 }
 
 const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   onSendMessage,
   consultationId,
-  isConsultationOpen,
+  isConsultationOpenOrPaid,
 }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [message, setMessage] = useState("");
@@ -24,8 +24,8 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const token = localStorage.getItem("labass_doctor_token");
-  const userId = localStorage.getItem("labass_doctor_userId");
+  const token = localStorage.getItem("labass_token");
+  const userId = localStorage.getItem("labass_userId");
 
   // Focus input field
   const handleFocus = () => {
@@ -53,7 +53,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       formData.append("file", selectedFile);
       formData.append(
         "senderId",
-        String(Number(localStorage.getItem("labass_doctor_userId")))
+        String(Number(localStorage.getItem("labass_userId")))
       ); // Use localStorage for senderId
       formData.append("consultationId", String(Number(consultationId))); // Use localStorage for consultationId
       try {
@@ -63,9 +63,7 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
           {
             headers: {
               "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${localStorage.getItem(
-                "labass_doctor_token"
-              )}`, // JWT token
+              Authorization: `Bearer ${localStorage.getItem("labass_token")}`, // JWT token
             },
           }
         );
@@ -192,19 +190,19 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       {/* File Upload Button */}
       <button
         className="p-2"
-        disabled={!isConsultationOpen} // Disable if consultation is not open
+        disabled={!isConsultationOpenOrPaid} // Disable if consultation is not open
       >
         <input
           type="file"
           onChange={handleFileChange}
           className="hidden"
           id="file-input"
-          disabled={!isConsultationOpen} // Disable file input if consultation is not open
+          disabled={!isConsultationOpenOrPaid} // Disable file input if consultation is not open
         />
         <label htmlFor="file-input">
           <svg
             className={`w-6 h-6 ${
-              !isConsultationOpen ? "text-gray-300" : "text-gray-500"
+              !isConsultationOpenOrPaid ? "text-gray-300" : "text-gray-500"
             }`} // Change color if disabled
             fill="none"
             stroke="currentColor"
@@ -223,15 +221,15 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
       {/* Mic Button for Voice Recording */}
       <button
         className={`p-2 mx-2 ${
-          !isConsultationOpen ? "text-gray-300" : "text-gray-500"
+          !isConsultationOpenOrPaid ? "text-gray-300" : "text-gray-500"
         }`}
-        disabled={!isConsultationOpen} // Disable voice recording if consultation is not open
-        onMouseDown={isConsultationOpen ? startRecording : undefined}
-        onMouseUp={isConsultationOpen ? stopRecording : undefined}
+        disabled={!isConsultationOpenOrPaid} // Disable voice recording if consultation is not open
+        onMouseDown={isConsultationOpenOrPaid ? startRecording : undefined}
+        onMouseUp={isConsultationOpenOrPaid ? stopRecording : undefined}
       >
         <svg
           className={`w-6 h-6 ${
-            !isConsultationOpen
+            !isConsultationOpenOrPaid
               ? "text-gray-300"
               : isRecording
               ? "text-green-500"
@@ -254,25 +252,25 @@ const StickyMessageInput: React.FC<StickyMessageInputProps> = ({
         ref={inputRef}
         type="text"
         dir="rtl"
-        placeholder={isConsultationOpen ? "اكتب رسالة..." : "مغلقة"}
+        placeholder={isConsultationOpenOrPaid ? "اكتب رسالة..." : "مغلقة"}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         className={`flex-grow p-2  border text-black rounded-full outline-none w-full ${
-          isConsultationOpen ? "" : "bg-gray-200 text-gray-500"
+          isConsultationOpenOrPaid ? "" : "bg-gray-200 text-gray-500"
         }`}
         style={{ fontSize: "16px" }} // Prevent zoom on focus
-        onFocus={isConsultationOpen ? handleFocus : undefined}
+        onFocus={isConsultationOpenOrPaid ? handleFocus : undefined}
         onBlur={() => setInputFocused(false)}
-        disabled={!isConsultationOpen} // Disable input if consultation is not open
+        disabled={!isConsultationOpenOrPaid} // Disable input if consultation is not open
       />
 
       {/* Send Button */}
       <button
         className={`p-2 ${
-          !isConsultationOpen ? "text-gray-300" : "text-green-500"
+          !isConsultationOpenOrPaid ? "text-gray-300" : "text-green-500"
         }`}
-        onClick={isConsultationOpen ? handleSendMessage : undefined}
-        disabled={!isConsultationOpen} // Disable send button if consultation is not open
+        onClick={isConsultationOpenOrPaid ? handleSendMessage : undefined}
+        disabled={!isConsultationOpenOrPaid} // Disable send button if consultation is not open
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
           <path
