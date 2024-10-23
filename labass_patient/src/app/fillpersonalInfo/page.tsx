@@ -1,7 +1,7 @@
 "use client";
 import React, { Suspense } from "react";
 import Header from "../../components/common/header";
-import PersonalInfoForm from "./_components/form";
+import PersonalInfoForm from "./_components/userInformation/form";
 import Spinner from "./_components/spinner"; // Import the Spinner component
 
 const PersonalInfo = () => {
