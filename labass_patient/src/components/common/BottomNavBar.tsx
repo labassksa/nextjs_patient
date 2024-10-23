@@ -25,7 +25,7 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentPath }) => {
       <NavLink
         href="/myConsultations"
         icon={ChatBubbleIcon}
-        label="استشاراتي"
+        label="الاستشارات"
         active={isActive("/myConsultations")}
       />
       <NavLink
