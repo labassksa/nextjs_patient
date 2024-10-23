@@ -302,7 +302,10 @@ const ChatPage: React.FC = () => {
         <StickyMessageInput
           onSendMessage={handleSendMessage}
           consultationId={Number(consultationId)}
-          isConsultationOpen={status === ConsultationStatus.Open}
+          isConsultationOpenOrPaid={
+            status === ConsultationStatus.Open ||
+            status === ConsultationStatus.Paid
+          }
         />
       </div>
     </div>

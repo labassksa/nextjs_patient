@@ -79,6 +79,7 @@ const PatientSelection: React.FC = () => {
 
   // Handle the "next" button click
   const handleNextClick = async () => {
+    setIsLoading(true); // Start loading when the button is clicked
     if (selectedPatientId === "123456789") {
       // If "أنا" is selected, navigate to fillPersonalInfo page
       router.push("/fillPersonalInfo");
@@ -99,6 +100,8 @@ const PatientSelection: React.FC = () => {
         router.push(`/chat/${consultationId}`);
       } catch (error) {
         console.error("Error attaching patient to consultation:", error);
+      } finally {
+        setIsLoading(false); // End loading after navigation or error
       }
     }
   };
@@ -141,10 +144,12 @@ const PatientSelection: React.FC = () => {
           </div>
 
           <button
-            className="w-full py-3 bg-custom-green text-white rounded-3xl shadow sticky bottom-12"
+            className="w-full py-3 bg-custom-green text-white rounded-3xl shadow sticky bottom-12 flex justify-center items-center"
             onClick={handleNextClick}
+            disabled={isLoading} // Disable the button while loading
           >
-            التالي
+            {isLoading ? <Spinner /> : "التالي"}{" "}
+            {/* Show spinner when loading */}
           </button>
         </>
       )}

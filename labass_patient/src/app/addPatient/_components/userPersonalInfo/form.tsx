@@ -40,7 +40,7 @@ const PersonalInfoForm: React.FC = () => {
 
   const handleSuccessConfirmation = () => {
     if (consultationId) {
-      router.push(`/patientSelection/${consultationId}`); // Navigate to the chat page with the consultationId
+      router.push(`patientSelection?consultationId=${consultationId}`); // Navigate to the chat page with the consultationId
     }
   };
 
