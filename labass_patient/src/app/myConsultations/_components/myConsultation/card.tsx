@@ -48,7 +48,7 @@ const ConsultationCard: React.FC<ConsultationCardProps> = ({
     buttonLabel = "مراسلة";
     buttonClass = "bg-custom-green text-xs";
     icon = <ChatBubbleOvalLeftIcon className="text-white w-4" />;
-    redirectUrl = `/chat/${consultation.id}`;
+    redirectUrl = `/patientSelection?consultationId=${consultation.id}`;
   } else if (consultation.status === ConsultationStatus.Closed) {
     buttonLabel = "مكتملة";
     buttonClass = "bg-blue-500";
