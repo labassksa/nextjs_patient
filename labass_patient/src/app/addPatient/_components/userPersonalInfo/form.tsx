@@ -12,7 +12,6 @@ const PersonalInfoForm: React.FC = () => {
     dob: "",
     gender: "male", // Default value set to "male"
     phoneNumber: "", // Added phone number field
-    email: "", // Added email field
   });
 
   const [idError, setIdError] = useState<string | null>(null);
@@ -56,6 +55,11 @@ const PersonalInfoForm: React.FC = () => {
       return; // Prevent form submission if validation fails
     }
 
+    // Prefix +966 to phone number if not already present
+    const prefixedPhoneNumber = formData.phoneNumber.startsWith("+966")
+      ? formData.phoneNumber
+      : `+966${formData.phoneNumber}`;
+
     setIsLoading(true); // Set loading to true when submitting
 
     try {
@@ -68,8 +72,7 @@ const PersonalInfoForm: React.FC = () => {
           gender: formData.gender,
           nationalId: formData.idNumber,
           dateOfBirth: formData.dob,
-          phoneNumber: formData.phoneNumber, // Added phone number to the request
-          email: formData.email, // Added email to the request
+          phoneNumber: prefixedPhoneNumber, // Send prefixed phone number
         },
         {
           headers: {
@@ -197,17 +200,6 @@ const PersonalInfoForm: React.FC = () => {
             placeholder="رقم الجوال"
             onChange={handleChange}
             value={formData.phoneNumber} // Added phone number field
-            className="w-full p-3 border rounded text-right focus:outline-none focus:border-custom-green text-xs"
-            required
-          />
-
-          {/* Email Input Field */}
-          <input
-            type="email"
-            name="email"
-            placeholder="البريد الإلكتروني"
-            onChange={handleChange}
-            value={formData.email} // Added email field
             className="w-full p-3 border rounded text-right focus:outline-none focus:border-custom-green text-xs"
             required
           />
