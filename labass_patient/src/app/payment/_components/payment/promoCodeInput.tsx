@@ -72,7 +72,7 @@ const PromoCode: React.FC<{
       } else if (response.data.consultationId != null) {
         // Handle free consultation case
         setConsultationId(response.data.consultationId); // Store the consultationId
-        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة مجانية!");
+        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة !");
         setIsSuccess(true);
         setShowModal(true); // Show success modal
       }
