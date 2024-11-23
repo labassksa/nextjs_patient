@@ -17,9 +17,22 @@ const ProfilePage: React.FC = () => {
     router.push("/login");
   };
 
+  const navigateToMarketerPage = () => {
+    router.push("/becomeAmarketer");
+  };
+
   return (
     <div className="profile-page bg-gray-100 min-h-screen p-4 text-black">
       <Header />
+
+      {/* "Join as a Marketer" Section */}
+      <div
+        className="bg-blue-500 text-white text-center py-3 mb-4 rounded cursor-pointer hover:bg-blue-600 transition duration-200"
+        onClick={navigateToMarketerPage}
+      >
+        انضم كمسوق
+      </div>
+
       <Menu />
       <AddressAndWhatsAppSection />
       <ComplaintsSection />
@@ -29,7 +42,7 @@ const ProfilePage: React.FC = () => {
         className="w-full mb-16 py-2.5 px-4 border border-blue-500 text-blue-500 rounded transition duration-200 hover:bg-blue-500 hover:text-white flex items-center justify-center"
       >
         <ArrowRightOnRectangleIcon className="h-6 w-6 mr-2" />
-        تسجيل الخروج{" "}
+        تسجيل الخروج
       </button>
     </div>
   );
