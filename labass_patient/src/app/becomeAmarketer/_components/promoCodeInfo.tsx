@@ -25,7 +25,7 @@ const PromoCodeInfo: React.FC = () => {
       <ul dir="rtl" className="list-disc list-inside space-y-2">
         <li>
           <strong>كود ٧٠% نسبة خصم</strong>: لتصبح قيمة الاستشارة الفورية مع
-          طبيب عام مرخص ٣٠ ريال
+          طبيب عام مرخص ٢٧ ريال
         </li>
         <li>
           <strong>كود ٥٠% نسبة خصم</strong>: لتصبح قيمة الاستشارة الفورية مع

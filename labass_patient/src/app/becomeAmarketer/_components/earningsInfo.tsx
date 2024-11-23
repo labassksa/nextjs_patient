@@ -31,7 +31,7 @@ const EarningsInfo: React.FC = () => {
         <div className="flex items-center mb-4">
           <li>
             للتحقق من مستحقاتك، تواصل مع الدعم المالي على{" "}
-            <strong>٠٥٠٥١١٧٥٥١</strong>.
+            <strong>٠٥٠٥١١٧٥٥١</strong>
           </li>
           <div className="relative w-8 h-8 ml-2 flex-shrink-0">
             <Image

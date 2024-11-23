@@ -15,7 +15,7 @@ const BecomeAMarketerPage = () => {
       <BottomBanner />
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 pt-40 space-y-8">
+      <div className="max-w-4xl mx-auto px-6 pt-60 space-y-8">
         {/* Back Button */}
 
         <EarningsInfo />
