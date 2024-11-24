@@ -28,7 +28,7 @@ const BecomeAMarketerPage = () => {
         <PromoCodeInfo />
 
         {/* Registration Form Section with Gradient */}
-        <div className="bg-gradient-to-b from-blue-500 to-blue-200 p-6 rounded-lg shadow-lg text-white">
+        <div className="bg-gradient-to-b from-yellow-600 to-yellow-200 p-6 rounded-lg shadow-lg text-white">
           <div className="flex items-center mb-2">
             {/* النص والصورة بجانب بعضهما البعض */}
             <h2 className="text-xl font-semibold flex items-center">
@@ -41,18 +41,25 @@ const BecomeAMarketerPage = () => {
                   className="rounded-lg"
                 />
               </div>
-              <span className="text-3xl font-bold text-black ">
+              <span className="text-3xl font-bold text-black">
                 {" "}
                 انضم كمسوّق{" "}
               </span>
             </h2>
           </div>
-          <p className="text-lg mb-6 text-black">
-            انضم إلى برنامجنا التسويقي واحصل على أكواد خصم خاصة بك، وابدأ الكسب
-            من خلال الترويج لخدمة الاستشارة الطبية الفورية والوصفات المعتمدة عن
-            بعد. قم بالتسجيل أدناه للحصول على الرموز الترويجية ومعرفة الأرباح
-            الأسبوعية.
-          </p>
+
+          {/* Bullet Points */}
+          <ul className="list-disc list-inside text-lg text-black mb-6 space-y-2">
+            <li>احصل على أكواد خصم خاصة بك.</li>
+            <li>ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية.</li>
+            <li>روّج للوصفات المعتمدة عن بعد.</li>
+            <li>
+              قم بالتسجيل أدناه للحصول على الرموز الترويجية ومعرفة الأرباح
+              الأسبوعية.
+            </li>
+          </ul>
+
+          {/* Registration Form */}
           <MarketerRegistrationForm />
         </div>
       </div>

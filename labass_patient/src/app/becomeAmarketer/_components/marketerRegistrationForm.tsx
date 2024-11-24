@@ -24,7 +24,7 @@ const MarketerRegistrationForm: React.FC = () => {
       </p>
       <div dir="rtl" className=" text-black space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-bold">
+          <label htmlFor="name" className="block text-sm font-bold p-2">
             الاسم الكامل
           </label>
           <input
@@ -38,7 +38,7 @@ const MarketerRegistrationForm: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="phone" className="block text-sm font-bold">
+          <label htmlFor="phone" className="block text-sm font-bold p-2">
             رقم الجوال (رقم سعودي)
           </label>
           <input
