@@ -47,17 +47,20 @@ const BecomeAMarketerPage = () => {
               </span>
             </h2>
           </div>
-
+          <div className="flex items-center mb-2">
+            {/* النص والصورة بجانب بعضهما البعض */}
+            <h2 className="text-sm font-semibold flex items-center">
+              <ul className="list-disc list-inside  text-black mb-6 space-y-2">
+                <li>احصل على أكواد خصم خاصة بك</li>
+                <li>
+                  ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية
+                </li>
+                <li>روّج للوصفات المعتمدة عن بعد</li>
+                <li>قم بالتسجيل أدناه للحصول على الرموز الترويجية</li>
+              </ul>
+            </h2>
+          </div>
           {/* Bullet Points */}
-          <ul className="list-disc list-inside text-lg text-black mb-6 space-y-2">
-            <li>احصل على أكواد خصم خاصة بك.</li>
-            <li>ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية.</li>
-            <li>روّج للوصفات المعتمدة عن بعد.</li>
-            <li>
-              قم بالتسجيل أدناه للحصول على الرموز الترويجية ومعرفة الأرباح
-              الأسبوعية.
-            </li>
-          </ul>
 
           {/* Registration Form */}
           <MarketerRegistrationForm />
