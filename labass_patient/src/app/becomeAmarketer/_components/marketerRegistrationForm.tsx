@@ -6,46 +6,48 @@ const MarketerRegistrationForm: React.FC = () => {
 
   const handleSubmit = () => {
     if (!name || !phone) {
-      alert("Please enter both your name and phone number.");
+      alert("يرجى إدخال اسمك الكامل ورقم هاتفك.");
       return;
     }
 
     // Simulate API call here
-    alert(
-      "Your details have been saved, and promo codes will be generated for you!"
-    );
+    alert("تم حفظ بياناتك وسيتم إنشاء رموز ترويجية لك!");
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Register as a Marketer</h2>
-      <p className="mb-4">
-        Enter your details below to register and proceed to learn how it works.
+    <div dir="rtl">
+      <h2 className="text-black text-xl font-semibold mb-4 text-black">
+        انضم كمسوّق{" "}
+      </h2>
+      <p className="mb-4 text-black">
+        أدخل بياناتك أدناه للتسجيل والبدء في معرفة كيفية العمل.
       </p>
-      <div className="space-y-4">
+      <div dir="rtl" className=" text-black space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium">
-            Full Name
+            الاسم الكامل
           </label>
           <input
+            dir="rtl"
             id="name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your full name"
+            placeholder="أدخل اسمك الكامل"
             className="w-full border border-gray-300 rounded-md p-2"
           />
         </div>
         <div>
           <label htmlFor="phone" className="block text-sm font-medium">
-            Phone Number
+            رقم الهاتف
           </label>
           <input
+            dir="rtl"
             id="phone"
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter your phone number"
+            placeholder="أدخل رقم هاتفك"
             className="w-full border border-gray-300 rounded-md p-2"
           />
         </div>
@@ -53,7 +55,7 @@ const MarketerRegistrationForm: React.FC = () => {
           onClick={handleSubmit}
           className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
         >
-          Proceed
+          طلب أكواد خصم{" "}
         </button>
       </div>
     </div>

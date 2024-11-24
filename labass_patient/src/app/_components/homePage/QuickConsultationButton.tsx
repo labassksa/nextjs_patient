@@ -3,7 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 import { ClockIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { isAuthenticated } from "../../../utils/auth";
 
 const ConsultationButton: React.FC = () => {
@@ -29,7 +29,7 @@ const ConsultationButton: React.FC = () => {
             <div className="flex bg-custom-background rounded-2xl px-1 py-1 ">
               <div className="flex flex-row justify-center">
                 <p className=" text-xs font-semibold text-black  " dir="rtl">
-                  خلال ٣ دقائق{" "}
+                  أقل من دقيقة{" "}
                 </p>
               </div>
               <ClockIcon className="h-6 w-6 text-black" aria-hidden="true" />
