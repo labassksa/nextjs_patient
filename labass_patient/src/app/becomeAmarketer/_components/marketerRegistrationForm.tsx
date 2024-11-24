@@ -16,7 +16,7 @@ const MarketerRegistrationForm: React.FC = () => {
 
   return (
     <div dir="rtl">
-      <h2 className="text-black text-xl font-semibold mb-4 text-black">
+      <h2 className="text-black text-xl font-semibold mb-2 text-black">
         انضم كمسوّق{" "}
       </h2>
       <p className="mb-4 text-black">
@@ -24,7 +24,7 @@ const MarketerRegistrationForm: React.FC = () => {
       </p>
       <div dir="rtl" className=" text-black space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium">
+          <label htmlFor="name" className="block text-sm font-bold">
             الاسم الكامل
           </label>
           <input
@@ -38,8 +38,8 @@ const MarketerRegistrationForm: React.FC = () => {
           />
         </div>
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium">
-            رقم الهاتف
+          <label htmlFor="phone" className="block text-sm font-bold">
+            رقم الجوال (رقم سعودي)
           </label>
           <input
             dir="rtl"
@@ -53,7 +53,7 @@ const MarketerRegistrationForm: React.FC = () => {
         </div>
         <button
           onClick={handleSubmit}
-          className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
+          className="w-full bg-blue-900 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
         >
           طلب أكواد خصم{" "}
         </button>
