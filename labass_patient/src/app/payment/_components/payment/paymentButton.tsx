@@ -116,7 +116,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       if (container) {
         container.innerHTML = ""; // Clear the previous Apple Pay button
       }
-      initializeApplePay(); // Reinitialize with new values
+      initializeApplePay(); // Initialize Apple Pay
+    } else {
+      // Remove Apple Pay button if it exists
+      const container = document.getElementById("apple-pay-container");
+      if (container) {
+        container.innerHTML = ""; // Clear the container when method is not ApplePay
+      }
     }
   }, [discountedPrice, method]);
 
