@@ -17,12 +17,48 @@ const BecomeAMarketerPage = () => {
       <BottomBanner />
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 pt-60 space-y-8">
-        {/* Medical Consultation Card */}
-        <MedicalConsultationInfo />
+      <div className="max-w-4xl mx-auto px-6 pt-60 space-y-12">
+        <div>
+          {/* Medical Consultation Card */}
+          <div className="flex items-center mb-2">
+            {/* النص والصورة بجانب بعضهما البعض */}
+            <h2 className="text-xl text-black mb-2 font-semibold flex items-center">
+              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+                <Image
+                  src="/icons/what_is_the_service.png"
+                  alt="رمز الاستشارة الطبية"
+                  fill
+                  objectFit="contain"
+                  className="rounded-lg"
+                />
+              </div>
+              <span> ماهي الخدمة التي تستطيع تقديمها لعملائك؟</span>
+            </h2>
+          </div>
+
+          <MedicalConsultationInfo />
+        </div>
 
         {/* Earnings Section */}
-        <EarningsInfo />
+        <div>
+          <div className="flex items-center mb-2">
+            {/* النص والصورة بجانب بعضهما البعض */}
+            <h2 className="text-xl text-black mb-2 font-semibold flex items-center">
+              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+                <Image
+                  src="/icons/what_you_get_title.png"
+                  alt="رمز الاستشارة الطبية"
+                  fill
+                  objectFit="contain"
+                  className="rounded-lg"
+                />
+              </div>
+              <span> ماذا ستحصل عليه كمسوق لخدمة الاستشارات الفورية؟</span>
+            </h2>
+          </div>
+
+          <EarningsInfo />
+        </div>
 
         {/* Promo Codes Section */}
         <PromoCodeInfo />

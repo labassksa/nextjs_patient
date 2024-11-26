@@ -24,18 +24,12 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="profile-page bg-gray-100 min-h-screen p-4 text-black">
       <Header />
-
-      {/* "Join as a Marketer" Section */}
-      <div
-        className="bg-blue-500 text-white text-center py-3 mb-4 rounded cursor-pointer hover:bg-blue-600 transition duration-200"
-        onClick={navigateToMarketerPage}
-      >
-        انضم كمسوق
-      </div>
-
       <Menu />
+
       <AddressAndWhatsAppSection />
       <ComplaintsSection />
+      {/* "Join as a Marketer" Text Button */}
+
       <BottomNavBar currentPath={pathname} />
       <button
         onClick={handleSignOut}

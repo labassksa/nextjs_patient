@@ -1,5 +1,5 @@
 export enum PaymentMethodEnum {
-    Card = "card",
-    ApplePay = "apple"
-  }
-  
+  Card = "card",
+  ApplePay = "apple",
+  Cash = "cash",
+}

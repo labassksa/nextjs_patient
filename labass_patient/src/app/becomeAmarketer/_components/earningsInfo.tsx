@@ -9,7 +9,7 @@ const EarningsInfo: React.FC = () => {
     >
       <div className="flex items-center mb-2">
         {/* النص والصورة بجانب بعضهما البعض */}
-        <h2 className="text-xl font-semibold flex items-center">
+        <h2 className="text-lg mb-2 font-semibold flex items-center">
           <div className="relative w-8 h-8 ml-2 flex-shrink-0">
             <Image
               src="/icons/money2.svg"

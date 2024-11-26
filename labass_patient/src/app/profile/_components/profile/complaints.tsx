@@ -5,7 +5,7 @@ const ComplaintsSection: React.FC = () => {
   const whatsappLink = "https://wa.me/message/O3GWSJL2NBLAA1"; // Replace with your WhatsApp number
 
   return (
-    <div className="flex flex-col bg-white p-4 rounded-lg shadow-sm mb-12 mt-2">
+    <div className="flex flex-col bg-white p-4 rounded-lg shadow-sm mb-6 mt-2">
       <div className="flex flex-row justify-end items-center  ">
         <div className="text-right">
           <p className="text-sm font-semibold"> للشكاوى والاقتراحات</p>
