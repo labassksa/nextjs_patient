@@ -28,25 +28,25 @@ const PromoCodeInfo: React.FC = () => {
         <li>
           <strong>كود ٧٠% نسبة خصم</strong>: لتصبح قيمة الاستشارة الفورية مع
           طبيب عام مرخص ٢٧ ريال
-          <p className="text-blue-800 text-lg">
+          <div className="text-blue-800 text-lg">
             (دخل المسوّق من الاستشارة ١٠ ريال)
-          </p>
+          </div>
         </li>
         <li>
           <strong>كود ٥٠% نسبة خصم</strong>: لتصبح قيمة الاستشارة الفورية مع
           طبيب عام مرخص ٤٥ ريال
-          <p className="text-blue-800 text-lg">
+          <div className="text-blue-800 text-lg">
             (دخل المسوّق من الاستشارة ٢٠ ريال)
-          </p>
+          </div>
         </li>
         <li>
           <strong>كود نقدي</strong>: يمنح هذا الكود المريض استشارة مفتوحة
-          <p className="text-blue-800 text-lg font-semibold">
-            اجمع المبلغ نقداً من المريض، ثم قم بتزويده بالكود النقدي !
-          </p>
-          <p className="text-blue-800 text-lg">
+          <div className="text-blue-800 text-lg font-semibold">
+            اجمع المبلغ نقداً من المريض، ثم قم بتزويده بالكود النقدي!
+          </div>
+          <div className="text-blue-800 text-lg">
             (دخل المسوّق من الكود النقدي "الدفع بالكاش" ٤٠٪ من قيمة الاستشارة)
-          </p>
+          </div>
         </li>
       </ul>
     </div>
