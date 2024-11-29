@@ -6,7 +6,7 @@ const MedicalConsultationInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4 bg-gradient-to-l from-custom-green to-green-300 border rounded-lg text-black"
+      className="p-4 bg-gradient-to-l from-custom-green to-green-300 border  text-black"
     >
       <div className="flex items-center mb-2">
         {/* النص والصورة بجانب بعضهما البعض */}

@@ -17,12 +17,12 @@ const BecomeAMarketerPage = () => {
       <BottomBanner />
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 pt-60 space-y-12">
+      <div className="w-full mx-auto  pt-60 space-y-12">
         <div>
           {/* Medical Consultation Card */}
-          <div className="flex items-center mb-2">
+          <div className="flex items-center ">
             {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl text-black mb-2 font-semibold flex items-center">
+            <h2 className="text-xl text-black px-2 font-semibold flex items-center">
               <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
                 <Image
                   src="/icons/what_is_the_service.png"
@@ -41,9 +41,9 @@ const BecomeAMarketerPage = () => {
 
         {/* Earnings Section */}
         <div>
-          <div className="flex items-center mb-2">
+          <div className="flex items-center px-2">
             {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl text-black mb-2 font-semibold flex items-center">
+            <h2 className="text-xl text-black  font-semibold flex items-center">
               <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
                 <Image
                   src="/icons/what_you_get_title.png"
@@ -61,7 +61,24 @@ const BecomeAMarketerPage = () => {
         </div>
 
         {/* Promo Codes Section */}
-        <PromoCodeInfo />
+        <div>
+          <div className="flex items-center px-2">
+            {/* النص والصورة بجانب بعضهما البعض */}
+            <h2 className="text-xl text-black  font-semibold flex items-center">
+              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+                <Image
+                  src="/icons/what_you_get_title.png"
+                  alt="رمز الاستشارة الطبية"
+                  fill
+                  objectFit="contain"
+                  className="rounded-lg"
+                />
+              </div>
+              <span> كيف تعمل كمسوق للاستشارات الطبية؟</span>
+            </h2>
+          </div>
+          <PromoCodeInfo />
+        </div>
 
         {/* Registration Form Section with Gradient */}
         <div className="bg-gradient-to-b from-yellow-600 to-yellow-200 p-6 rounded-lg shadow-lg text-white">

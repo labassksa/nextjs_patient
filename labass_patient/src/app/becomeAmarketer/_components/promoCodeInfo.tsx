@@ -5,7 +5,7 @@ const PromoCodeInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4 bg-gradient-to-l from-orange-600 to-orange-300 border rounded-lg text-black"
+      className="p-4 bg-gradient-to-l from-orange-600 to-orange-300 border text-black"
     >
       <div className="flex items-center mb-2">
         {/* Text and Image Side by Side */}
@@ -22,7 +22,7 @@ const PromoCodeInfo: React.FC = () => {
         </h2>
       </div>
       <p className="mb-4">
-        عند التسجيل، ستحصل على كودين خصم لقيمة الاستشارة الفورية{" "}
+        عند التسجيل، ستحصل على ثلاثة رموز ترويجية لقيمة الاستشارة الفورية
       </p>
       <ul dir="rtl" className="list-disc list-inside space-y-2">
         <li>
@@ -37,6 +37,15 @@ const PromoCodeInfo: React.FC = () => {
           طبيب عام مرخص ٤٥ ريال
           <p className="text-blue-800 text-lg">
             (دخل المسوّق من الاستشارة ٢٠ ريال)
+          </p>
+        </li>
+        <li>
+          <strong>كود نقدي</strong>: يمنح هذا الكود المريض استشارة مفتوحة
+          <p className="text-blue-800 text-lg font-semibold">
+            اجمع المبلغ نقداً من المريض، ثم قم بتزويده بالكود النقدي !
+          </p>
+          <p className="text-blue-800 text-lg">
+            (دخل المسوّق من الكود النقدي "الدفع بالكاش" ٤٠٪ من قيمة الاستشارة)
           </p>
         </li>
       </ul>

@@ -5,7 +5,7 @@ const EarningsInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4 bg-gradient-to-l from-blue-600 to-blue-300 border rounded-lg text-black"
+      className="p-4  bg-gradient-to-l from-blue-600 to-blue-300   text-black"
     >
       <div className="flex items-center mb-2">
         {/* النص والصورة بجانب بعضهما البعض */}

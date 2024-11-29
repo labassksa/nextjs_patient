@@ -26,6 +26,7 @@ const PaymentPage: React.FC = () => {
           <PromoCode
             setDiscountedPrice={setDiscountedPrice}
             setPromoCode={setPromoCode}
+            selectedPaymentMethod={paymentMethod}
           />
         </div>
         <PaymentSummary discountedPrice={discountedPrice} />

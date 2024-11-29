@@ -1,23 +1,25 @@
 "use client";
 import React, { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useRouter } from "next/navigation";
+import { PaymentMethodEnum } from "../../../../types/paymentMethods"; // Import PaymentMethodEnum
 
 const PromoCode: React.FC<{
   setDiscountedPrice: (price: number) => void;
   setPromoCode: (code: string) => void;
-}> = ({ setDiscountedPrice, setPromoCode }) => {
-  const [promoCodeInput, setPromoCodeInput] = useState(""); // Promo code value
-  const [responseMessage, setResponseMessage] = useState(""); // Feedback message (success or error)
-  const [isSuccess, setIsSuccess] = useState(false); // Track success state
-  const [isFieldFrozen, setIsFieldFrozen] = useState(false); // Track whether the field is frozen
-  const [loading, setLoading] = useState(false); // Track loading state
-  const [showModal, setShowModal] = useState(false); // Modal state for success
-  const [consultationId, setConsultationId] = useState<number | null>(null); // State to store consultationId
+  selectedPaymentMethod: PaymentMethodEnum; // Use PaymentMethodEnum type
+}> = ({ setDiscountedPrice, setPromoCode, selectedPaymentMethod }) => {
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [cashAmount, setCashAmount] = useState(""); // State for cash amount input
+  const [responseMessage, setResponseMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isFieldFrozen, setIsFieldFrozen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [consultationId, setConsultationId] = useState<number | null>(null);
 
-  const router = useRouter(); // Initialize router
-
-  const defaultPrice = 89; // Default price
+  const router = useRouter();
+  const defaultPrice = 89;
 
   const handleApplyPromo = async () => {
     if (promoCodeInput.length !== 7) {
@@ -27,7 +29,6 @@ const PromoCode: React.FC<{
     }
 
     const token = localStorage.getItem("labass_token");
-
     if (!token) {
       setResponseMessage("سجل دخول أولا لاستخدام الخصم");
       setIsSuccess(false);
@@ -36,72 +37,63 @@ const PromoCode: React.FC<{
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-    setLoading(true); // Start loading spinner
-    setResponseMessage(""); // Clear previous messages
+    setLoading(true);
+    setResponseMessage("");
 
     try {
       const response = await axios.post(
         `${apiUrl}/use-promo`,
-        {
-          promoCode: promoCodeInput,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { promoCode: promoCodeInput },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(`the response.data ${response.data.discountedPrice}`);
 
       if (response.data.discountedPrice) {
-        setDiscountedPrice(response.data.discountedPrice); // Update discounted price
-        setPromoCode(promoCodeInput); // Set promo code in the parent state
+        setDiscountedPrice(response.data.discountedPrice);
+        setPromoCode(promoCodeInput);
         setResponseMessage(
           `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
             2
           )}`
         );
-        setIsSuccess(true); // Mark success
-        setIsFieldFrozen(true); // Freeze the field after successful application
+        setIsSuccess(true);
+        setIsFieldFrozen(true);
       } else if (response.data.message === "Promotional code not found") {
         setResponseMessage("الرمز الترويجي غير موجود");
-        setIsSuccess(false); // Handle invalid promo code
+        setIsSuccess(false);
       } else if (response.data.message === "Promotional code is already used") {
         setResponseMessage("تم استخدام الرمز الترويجي سابقا");
-        setIsSuccess(false); // Handle already used promo code
+        setIsSuccess(false);
       } else if (response.data.consultationId != null) {
-        // Handle free consultation case
-        setConsultationId(response.data.consultationId); // Store the consultationId
-        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة !");
+        setConsultationId(response.data.consultationId);
+        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة!");
         setIsSuccess(true);
-        setShowModal(true); // Show success modal
+        setShowModal(true);
       }
-    } catch (error: any) {
+    } catch (error) {
       setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
       setIsSuccess(false);
     } finally {
-      setLoading(false); // Stop loading spinner
+      setLoading(false);
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPromoCode = e.target.value;
-
-    // If the user touches the field after it is frozen, reset the field
     if (isFieldFrozen) {
-      setPromoCode(""); // Reset promo code to empty string
-      setDiscountedPrice(defaultPrice); // Reset to default price
-      setIsFieldFrozen(false); // Make the field editable again
-      setResponseMessage(""); // Clear success message if the code is being changed
-      setIsSuccess(false); // Reset success status
+      setPromoCode("");
+      setDiscountedPrice(defaultPrice);
+      setIsFieldFrozen(false);
+      setResponseMessage("");
+      setIsSuccess(false);
     }
+    setPromoCodeInput(e.target.value);
+  };
 
-    setPromoCodeInput(newPromoCode); // Update input value
+  const handleCashAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCashAmount(e.target.value);
   };
 
   const handleGoToFillPersonalInfo = () => {
     if (consultationId) {
-      console.log("inside PromoCode");
       router.push(`/patientSelection?consultationId=${consultationId}`);
     } else {
       console.error("Consultation ID is missing.");
@@ -110,21 +102,20 @@ const PromoCode: React.FC<{
 
   return (
     <div className="relative flex flex-col border border-gray-200 rounded-lg bg-white mx-2 p-2">
-      <div className="flex flex-row ">
+      <div className="flex flex-row">
         <button
           onClick={handleApplyPromo}
-          className={`flex items-center  ${
+          className={`flex items-center ${
             isFieldFrozen ? "cursor-not-allowed opacity-50" : ""
           }`}
           style={{
             margin: "0",
-            padding: "0 4px", // px-2 and py-0 equivalent
-            backgroundColor: "#22c55e", // Green background
-            color: "white", // Text color white
-            fontSize: "12px", // Equivalent to text-xs
-            borderRadius: "0.5rem", // Rounded corners
-            height: "32px", // Height for better button control
-            lineHeight: "normal", // Reset line height
+            padding: "0 4px",
+            backgroundColor: "#22c55e",
+            color: "white",
+            fontSize: "12px",
+            borderRadius: "0.5rem",
+            height: "32px",
           }}
           disabled={loading || isFieldFrozen}
         >
@@ -149,14 +140,13 @@ const PromoCode: React.FC<{
           onChange={handleInputChange}
           placeholder="أدخل الرمز الترويجي"
           className={`flex-grow text-sm focus:outline-none rounded-r-md text-black ${
-            isFieldFrozen ? "bg-gray-200" : "" // Gray out the field if frozen
+            isFieldFrozen ? "bg-gray-200" : ""
           }`}
           dir="rtl"
-          disabled={loading || isFieldFrozen} // Disable input when frozen or loading
+          disabled={loading || isFieldFrozen}
         />
       </div>
 
-      {/* Display error/success message below the input */}
       {responseMessage && (
         <p
           className={`mt-2 text-sm text-right ${
@@ -167,13 +157,32 @@ const PromoCode: React.FC<{
         </p>
       )}
 
-      {/* Modal for success message */}
+      {/* Conditional input for cash payment */}
+      {selectedPaymentMethod === PaymentMethodEnum.Cash && (
+        <div className="mt-4">
+          <label
+            htmlFor="cashAmount"
+            className="block text-sm font-medium text-black"
+          >
+            أدخل المبلغ النقدي
+          </label>
+          <input
+            id="cashAmount"
+            type="number"
+            value={cashAmount}
+            onChange={handleCashAmountChange}
+            placeholder="أدخل المبلغ النقدي"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-custom-green focus:ring-custom-green sm:text-sm"
+          />
+        </div>
+      )}
+
       {showModal && (
         <div className="modal">
           <div className="modal-content text-black">
             <p>{responseMessage}</p>
             <button
-              className="text-white background-custom-green"
+              className="text-white bg-green-500 px-4 py-2 rounded"
               onClick={handleGoToFillPersonalInfo}
             >
               أكمل معلوماتك
@@ -203,7 +212,7 @@ const PromoCode: React.FC<{
         button {
           margin-top: 20px;
           padding: 10px 20px;
-          background-color: #0070f3;
+          background-color: #22c55e;
           color: white;
           border: none;
           border-radius: 5px;
