@@ -11,15 +11,16 @@ import Image from "next/image";
 
 const BecomeAMarketerPage = () => {
   return (
-    <div dir="rtl" className="relative pb-20 bg-gray-50">
+    <div dir="rtl" className="relative pb-20 bg-white">
       {/* Banners */}
       <TopBanner />
       <BottomBanner />
 
       {/* Title Section */}
       <div className="mt-36 text-black bg-gradient-to-l from-custom-green to-white py-10 px-6 text-center">
-        <h1 className="text-3xl font-bold mb-4">
-          منصة لابأس: إرشاد المرضى المحتاجين لاستشارة طبية فورية (اونلاين)
+        <h1 className="text-3xl font-bold mb-4">منصة لابأس</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          إرشاد المرضى المحتاجين لاستشارة طبية فورية (اونلاين)
         </h1>
         <p className="text-lg">
           أرشد المريض المحتاج للعلاج إلى استشارة فورية واحصل على فرصة لتقديم
