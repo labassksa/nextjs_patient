@@ -47,13 +47,13 @@ const MarketerRegistrationForm: React.FC = () => {
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="أدخل رقم هاتفك"
+            placeholder="05xx"
             className="w-full border border-gray-300 rounded-md p-2"
           />
         </div>
         <button
           onClick={handleSubmit}
-          className="w-full bg-blue-900 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
+          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
         >
           طلب أكواد خصم{" "}
         </button>

@@ -88,7 +88,7 @@ const BecomeAMarketerPage = () => {
         </section>
 
         {/* Registration Form Section */}
-        <section className="bg-gradient-to-b from-yellow-500 to-yellow-200 p-6 rounded-lg shadow-lg text-white">
+        <section className="bg-gradient-to-b from-custom-green to-white p-6 rounded-lg shadow-lg text-white">
           <div className="flex items-center mb-4">
             <h2 className="text-3xl font-bold flex items-center">
               <div className="relative w-12 h-12 ml-4 flex-shrink-0">
