@@ -28,11 +28,20 @@ const EarningsInfo: React.FC = () => {
       <ul className="list-disc list-inside space-y-2">
         <li>ترتبط مستحقاتك المالية برقم هاتفك</li>
         <li>سيتم تحويل المستحقات إليك أسبوعيًا</li>
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold text-black">
+            طرق استلام أرباحك
+          </h3>
+          <ul className="list-disc list-inside text-gray-800 space-y-2 mt-2">
+            <li>STC Pay</li>
+            <li>تحويل بنكي</li>
+          </ul>
+        </div>
         <div className="flex items-center mb-4">
-          <li>
+          <h1>
             للتحقق من مستحقاتك، تواصل مع الدعم المالي على{" "}
             <strong>٠٥٠٥١١٧٥٥١</strong>
-          </li>
+          </h1>
           <div className="relative w-8 h-8 ml-2 flex-shrink-0">
             <Image
               src="/icons/whatapp.png"
