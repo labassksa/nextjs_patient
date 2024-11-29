@@ -11,19 +11,29 @@ import Image from "next/image";
 
 const BecomeAMarketerPage = () => {
   return (
-    <div dir="rtl" className="relative pb-20 bg-white">
+    <div dir="rtl" className="relative pb-20 bg-gray-50">
       {/* Banners */}
       <TopBanner />
       <BottomBanner />
 
+      {/* Title Section */}
+      <div className="mt-36 text-black bg-gradient-to-l from-custom-green to-white py-10 px-6 text-center">
+        <h1 className="text-3xl font-bold mb-4">
+          منصة لابأس: إرشاد المرضى المحتاجين لاستشارة طبية فورية (اونلاين)
+        </h1>
+        <p className="text-lg">
+          أرشد المريض المحتاج للعلاج إلى استشارة فورية واحصل على فرصة لتقديم
+          خدمة ذات قيمة عالية
+        </p>
+      </div>
+
       {/* Main Content */}
-      <div className="w-full mx-auto  pt-60 space-y-12">
-        <div>
-          {/* Medical Consultation Card */}
-          <div className="flex items-center ">
-            {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl text-black px-2 font-semibold flex items-center">
-              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+      <div className="w-full mx-auto pt-12 space-y-12 max-w-4xl">
+        {/* Medical Consultation Info Section */}
+        <section>
+          <div className="flex items-center px-4">
+            <h2 className="text-xl text-black font-semibold flex items-center">
+              <div className="relative w-8 h-8 ml-2 flex-shrink-0">
                 <Image
                   src="/icons/what_is_the_service.png"
                   alt="رمز الاستشارة الطبية"
@@ -32,92 +42,79 @@ const BecomeAMarketerPage = () => {
                   className="rounded-lg"
                 />
               </div>
-              <span> ماهي الخدمة التي تستطيع تقديمها لعملائك؟</span>
+              <span>ما هي الخدمة التي تستطيع تقديمها للمرضى؟</span>
             </h2>
           </div>
-
           <MedicalConsultationInfo />
-        </div>
+        </section>
 
         {/* Earnings Section */}
-        <div>
-          <div className="flex items-center px-2">
-            {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl text-black  font-semibold flex items-center">
-              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+        <section>
+          <div className="flex items-center px-4">
+            <h2 className="text-xl text-black font-semibold flex items-center">
+              <div className="relative w-8 h-8 ml-2 flex-shrink-0">
                 <Image
                   src="/icons/what_you_get_title.png"
-                  alt="رمز الاستشارة الطبية"
+                  alt="رمز الأرباح"
                   fill
                   objectFit="contain"
                   className="rounded-lg"
                 />
               </div>
-              <span> ماذا ستحصل عليه كمسوق لخدمة الاستشارات الفورية؟</span>
+              <span>ماذا ستحصل عليه كمسوق لخدمة الاستشارات الفورية؟</span>
             </h2>
           </div>
-
           <EarningsInfo />
-        </div>
+        </section>
 
         {/* Promo Codes Section */}
-        <div>
-          <div className="flex items-center px-2">
-            {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl text-black  font-semibold flex items-center">
-              <div className="relative  w-8 h-8 ml-2 flex-shrink-0">
+        <section>
+          <div className="flex items-center px-4">
+            <h2 className="text-xl text-black font-semibold flex items-center">
+              <div className="relative w-8 h-8 ml-2 flex-shrink-0">
                 <Image
-                  src="/icons/what_you_get_title.png"
-                  alt="رمز الاستشارة الطبية"
+                  src="/icons/gears.png"
+                  alt="رمز التروس"
                   fill
                   objectFit="contain"
                   className="rounded-lg"
                 />
               </div>
-              <span> كيف تعمل كمسوق للاستشارات الطبية؟</span>
+              <span>كيف تعمل كمسوق للاستشارات الطبية وماهي أرباحك؟</span>
             </h2>
           </div>
           <PromoCodeInfo />
-        </div>
+        </section>
 
-        {/* Registration Form Section with Gradient */}
-        <div className="bg-gradient-to-b from-yellow-600 to-yellow-200 p-6 rounded-lg shadow-lg text-white">
-          <div className="flex items-center mb-2">
-            {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-xl font-semibold flex items-center">
-              <div className="relative w-12 h-12 ml-2 flex-shrink-0 text-black">
+        {/* Registration Form Section */}
+        <section className="bg-gradient-to-b from-yellow-500 to-yellow-200 p-6 rounded-lg shadow-lg text-white">
+          <div className="flex items-center mb-4">
+            <h2 className="text-3xl font-bold flex items-center">
+              <div className="relative w-12 h-12 ml-4 flex-shrink-0">
                 <Image
                   src="/icons/join_us.png"
-                  alt="رمز الاستشارة الطبية"
+                  alt="رمز الانضمام"
                   fill
                   objectFit="contain"
                   className="rounded-lg"
                 />
               </div>
-              <span className="text-3xl font-bold text-black">
-                {" "}
-                انضم كمسوّق{" "}
-              </span>
+              <span className="text-black">انضم كمسوّق</span>
             </h2>
           </div>
-          <div className="flex items-center mb-2">
-            {/* النص والصورة بجانب بعضهما البعض */}
-            <h2 className="text-sm font-semibold flex items-center">
-              <ul className="list-disc list-inside  text-black mb-6 space-y-2">
-                <li>احصل على أكواد خصم خاصة بك</li>
-                <li>
-                  ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية
-                </li>
-                <li>روّج للوصفات المعتمدة عن بعد</li>
-                <li>قم بالتسجيل أدناه للحصول على الرموز الترويجية</li>
-              </ul>
-            </h2>
-          </div>
-          {/* Bullet Points */}
-
-          {/* Registration Form */}
+          <p className="text-black mb-6">
+            انضم إلى فريق لابأس وابدأ بتحقيق الأرباح من خلال مساعدة المرضى في
+            الحصول على استشارات طبية فورية. ستتلقى رموز خصم ومزيداً من التفاصيل
+            حول كيفية البدء مباشرة على واتساب.
+          </p>
+          <ul className="list-disc list-inside text-black mb-6 space-y-2">
+            <li>احصل على أكواد خصم خاصة بك.</li>
+            <li>ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية.</li>
+            <li>روّج للوصفات المعتمدة عن بعد.</li>
+            <li>قم بالتسجيل أدناه للحصول على الرموز الترويجية.</li>
+          </ul>
           <MarketerRegistrationForm />
-        </div>
+        </section>
       </div>
     </div>
   );
