@@ -9,20 +9,32 @@ const MarketerRegistrationForm: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [promoterName] = useState("Mostafa");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = async () => {
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const convertedPhone = convertArabicToEnglishNumbers(e.target.value) || "";
+    setPhone(convertedPhone);
+    setErrorMessage(""); // Clear errors on input change
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!name || !phone) {
       alert("يرجى إدخال اسمك الكامل ورقم هاتفك.");
       return;
     }
 
-    const convertedPhone = convertArabicToEnglishNumbers(phone);
+    if (phone.length !== 10) {
+      setErrorMessage("يرجى إدخال رقم جوال صحيح مكون من 10 أرقام.");
+      return;
+    }
 
     setIsLoading(true);
 
     const result = await createMarketerAndGeneratePromoCodes(
       name,
-      convertedPhone,
+      phone,
       promoterName
     );
 
@@ -43,7 +55,7 @@ const MarketerRegistrationForm: React.FC = () => {
       <p className="mb-4 text-black">
         أدخل بياناتك أدناه للتسجيل والبدء في معرفة كيفية العمل.
       </p>
-      <div className="text-black space-y-4">
+      <form onSubmit={handleSubmit} className="text-black space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-bold p-2">
             الاسم الكامل
@@ -57,7 +69,7 @@ const MarketerRegistrationForm: React.FC = () => {
             className="w-full border border-gray-300 rounded-md p-2"
           />
         </div>
-        <div dir="rtl">
+        <div>
           <label htmlFor="phone" className="block text-sm font-bold p-2">
             رقم الجوال (رقم سعودي)
           </label>
@@ -65,20 +77,23 @@ const MarketerRegistrationForm: React.FC = () => {
             id="phone"
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={handlePhoneNumberChange}
             placeholder="05xx"
             className="w-full border border-gray-300 rounded-md p-2"
             dir="rtl"
           />
+          {errorMessage && (
+            <div className="text-red-400 text-sm m-2">{errorMessage}</div>
+          )}
         </div>
         <button
-          onClick={handleSubmit}
+          type="submit"
           disabled={isLoading}
-          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700"
+          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md "
         >
-          {isLoading ? "جاري التنفيذ..." : "طلب أكواد خصم"}
+          {isLoading ? <div className="spinner"></div> : "طلب أكواد خصم"}
         </button>
-      </div>
+      </form>
     </div>
   );
 };

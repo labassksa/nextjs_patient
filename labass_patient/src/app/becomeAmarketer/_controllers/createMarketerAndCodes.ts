@@ -18,7 +18,7 @@ export const createMarketerAndGeneratePromoCodes = async (
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const response = await axios.post(
-      `${apiUrl}/createMarketerandGeneratePromoCodes`,
+      `${apiUrl}/create-marketer-and-generate-codes`,
       data
     );
 
