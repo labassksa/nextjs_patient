@@ -89,7 +89,7 @@ const MarketerRegistrationForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md "
+          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md flex justify-center items-center "
         >
           {isLoading ? <div className="spinner"></div> : "طلب أكواد خصم"}
         </button>
