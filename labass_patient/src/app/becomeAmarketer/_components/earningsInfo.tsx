@@ -5,7 +5,7 @@ const EarningsInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4  bg-gradient-to-l from-blue-600 to-blue-300   text-black"
+      className="p-4  bg-gradient-to-l from-blue-600 to-white   text-black"
     >
       <div className="flex items-center mb-2">
         {/* النص والصورة بجانب بعضهما البعض */}
@@ -19,15 +19,16 @@ const EarningsInfo: React.FC = () => {
               className="rounded-lg"
             />
           </div>
-          <span>المستحقات المالية</span>
+          <span>أرباحك </span>
         </h2>
       </div>
       <p className="mb-4">
-        تعتمد مستحقاتك المالية على عدد العملاء الذين يستخدمون رموزك الترويجية
+        تعتمد أرباحك على عدد العملاء الذين يستخدمون رموزك الترويجية (أكواد الخصم
+        )
       </p>
       <ul className="list-disc list-inside space-y-2">
-        <li>ترتبط مستحقاتك المالية برقم هاتفك</li>
-        <li>سيتم تحويل المستحقات إليك أسبوعيًا</li>
+        <li>ترتبط أرباحك برقم هاتفك</li>
+        <li>سيتم تحويل أرباحك إليك أسبوعيًا</li>
         <div className="mt-4">
           <h3 className="text-lg font-semibold text-black">
             طرق استلام أرباحك

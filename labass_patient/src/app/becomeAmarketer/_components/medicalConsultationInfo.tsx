@@ -6,7 +6,7 @@ const MedicalConsultationInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4 bg-gradient-to-l from-custom-green to-white border  text-black"
+      className="p-4 bg-gradient-to-l from-custom-green to-white border text-black"
     >
       <div className="flex items-center mb-2">
         {/* النص والصورة بجانب بعضهما البعض */}
@@ -23,14 +23,13 @@ const MedicalConsultationInfo: React.FC = () => {
           <span>استشارة طبية فورية (اونلاين)</span>
         </h2>
       </div>
-      <p className="mb-4">الوصول للطبيب في أقل من دقيقة </p>
+      <p className="mb-4">الوصول للطبيب في أقل من دقيقة</p>
       <p className="mb-4">
         تمكّنك الاستشارات الطبية من الحصول على خدمات فورية للمرضى تشمل:
       </p>
       <div className="flex justify-between items-center mb-4">
         <ul className="list-disc list-inside space-y-2">
           <li>
-            {" "}
             وصفة طبية معتمدة ومرخصة من وزارة الصحة (تشمل المضادات الحيوية)
           </li>
           <li>قراءة نتائج تحليل المختبرات</li>
@@ -41,10 +40,18 @@ const MedicalConsultationInfo: React.FC = () => {
             src="/icons/drug.png"
             alt="رمز الاستشارة الطبية"
             fill
-            objectFit="fit"
+            objectFit="contain"
             className="rounded-lg"
           />
         </div>
+      </div>
+      {/* أوقات العمل Section */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">أوقات العمل</h3>
+        <p className="text-sm text-black">
+          <strong className="text-base">24/7</strong> دعم فني وطبي على مدار
+          الساعة طوال أيام الأسبوع
+        </p>
       </div>
     </div>
   );

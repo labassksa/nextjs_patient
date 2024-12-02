@@ -108,12 +108,27 @@ const BecomeAMarketerPage = () => {
             الحصول على استشارات طبية فورية. ستتلقى رموز خصم ومزيداً من التفاصيل
             حول كيفية البدء مباشرة على واتساب.
           </p>
-          <ul className="list-disc list-inside text-black mb-6 space-y-2">
-            <li>احصل على أكواد خصم خاصة بك.</li>
-            <li>ابدأ الكسب من خلال الترويج لخدمة الاستشارة الطبية الفورية.</li>
-            <li>روّج للوصفات المعتمدة عن بعد.</li>
-            <li>قم بالتسجيل أدناه للحصول على الرموز الترويجية.</li>
-          </ul>
+          <ol className="list-decimal list-inside text-black mb-2 space-y-4">
+            <li>
+              <strong> </strong> سجل كمسوق بإدخال رقم جوالك واسمك.
+            </li>
+            <li>
+              <strong> </strong> ستصلك أكواد خصم عبر الواتساب والمزيد من
+              التفاصيل
+            </li>
+            <li>
+              <strong> </strong> أرشد المرضى لاستخدام الخدمة عبر الموقع
+            </li>
+          </ol>
+          <h2 className="mb-4">
+            <a
+              href="https://www.labass.sa"
+              className="text-blue-500 underline ml-1"
+            >
+              www.labass.sa
+            </a>
+          </h2>
+
           <MarketerRegistrationForm />
         </section>
       </div>

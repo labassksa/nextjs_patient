@@ -5,7 +5,7 @@ const PromoCodeInfo: React.FC = () => {
   return (
     <div
       dir="rtl"
-      className="p-4 bg-gradient-to-l from-orange-600 to-orange-300 border text-black"
+      className="p-4 bg-gradient-to-l from-yellow-600 to-white border text-black"
     >
       <div className="flex items-center mb-2">
         {/* Text and Image Side by Side */}
