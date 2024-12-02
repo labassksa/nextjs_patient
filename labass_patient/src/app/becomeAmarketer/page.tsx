@@ -62,7 +62,9 @@ const BecomeAMarketerPage = () => {
                   className="rounded-lg"
                 />
               </div>
-              <span>ماذا ستحصل عليه كمسوق لخدمة الاستشارات الفورية؟</span>
+              <span>
+                ماذا ستحصل عليه كمسوق لخدمة الاستشارات الطبية الفوريّة؟
+              </span>
             </h2>
           </div>
           <EarningsInfo />
@@ -81,7 +83,7 @@ const BecomeAMarketerPage = () => {
                   className="rounded-lg"
                 />
               </div>
-              <span>كيف تعمل كمسوق للاستشارات الطبية وماهي أرباحك؟</span>
+              <span>ماذا يمكنك تقديمه للمرضى وما هي أرباحك؟</span>
             </h2>
           </div>
           <PromoCodeInfo />
