@@ -15,14 +15,14 @@ export const createMarketerAndGeneratePromoCodes = async (
       promoterName,
     };
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    const apiUrl = "http://34.28.55.24:4000/api_labass/";
 
     const response = await axios.post(
       `${apiUrl}/create-marketer-and-generate-codes`,
       data
     );
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       return { success: true, data: response.data };
     } else {
       return { success: false, message: "Unexpected response status code" };

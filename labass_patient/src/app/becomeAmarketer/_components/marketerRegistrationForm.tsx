@@ -29,12 +29,12 @@ const MarketerRegistrationForm: React.FC = () => {
       setErrorMessage("يرجى إدخال رقم جوال صحيح مكون من 10 أرقام.");
       return;
     }
-
+    const cleanedPhoneNumber = phone.startsWith("0") ? phone.slice(1) : phone;
     setIsLoading(true);
 
     const result = await createMarketerAndGeneratePromoCodes(
       name,
-      phone,
+      cleanedPhoneNumber,
       promoterName
     );
 
@@ -42,7 +42,7 @@ const MarketerRegistrationForm: React.FC = () => {
 
     if (result.success) {
       alert(
-        "تم اضافة اسم المسوق ورقم جواله ، وتم إرسال أكواد الخصم مع مزيد من التفاصيل عبر الواتس"
+        `تم اضافة اسم المسوق ${name} ورقم جواله ${phone}، وتم إرسال أكواد الخصم مع مزيد من التفاصيل عبر الواتس`
       );
     } else {
       alert(result.message || "لم يتم اضافتك كمسوق حدث خطأ");
@@ -89,9 +89,13 @@ const MarketerRegistrationForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md flex justify-center items-center "
+          className="w-full bg-custom-green text-white font-bold py-3 px-4 rounded-md flex justify-center items-center"
         >
-          {isLoading ? <div className="spinner"></div> : "طلب أكواد خصم"}
+          {isLoading ? (
+            <div className="spinner border-t-4 border-white border-solid rounded-full w-6 h-6 animate-spin"></div>
+          ) : (
+            "طلب أكواد خصم"
+          )}
         </button>
       </form>
     </div>

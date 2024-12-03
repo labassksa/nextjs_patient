@@ -83,7 +83,7 @@ const BecomeAMarketerPage = () => {
                   className="rounded-lg"
                 />
               </div>
-              <span>ماذا يمكنك تقديمه للمرضى وما هي أرباحك؟</span>
+              <span>ماهي تكلفة الاستشارة الطبية وما هي أرباحك؟</span>
             </h2>
           </div>
           <PromoCodeInfo />
