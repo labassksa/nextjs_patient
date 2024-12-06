@@ -8,6 +8,7 @@ export class SOAP {
     public objective: string,
     public assessment: string,
     public plan: string,
-    public consultation: Consultation
+    public consultation: Consultation,
+    public pdfURL?: string // Added pdfURL field
   ) {}
 }

@@ -9,6 +9,7 @@ export const fetchConsultations = async () => {
     }
 
     const response = await axios.get(
+      // `${process.env.NEXT_PUBLIC_API_URL}/patient-consultations`,
       `${process.env.NEXT_PUBLIC_API_URL}/patient-consultations`,
       {
         headers: {

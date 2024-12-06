@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { PaymentMethodEnum } from "../../../../types/paymentMethods"; // Import PaymentMethodEnum
+import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish"; // Import the utility function for conversion
 
 const PromoCode: React.FC<{
   setDiscountedPrice: (price: number) => void;
@@ -43,35 +44,67 @@ const PromoCode: React.FC<{
     try {
       const response = await axios.post(
         `${apiUrl}/use-promo`,
-        { promoCode: promoCodeInput },
+        { promoCode: promoCodeInput, price: cashAmount || undefined },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data.discountedPrice) {
-        setDiscountedPrice(response.data.discountedPrice);
-        setPromoCode(promoCodeInput);
-        setResponseMessage(
-          `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
-            2
-          )}`
-        );
-        setIsSuccess(true);
-        setIsFieldFrozen(true);
-      } else if (response.data.message === "Promotional code not found") {
-        setResponseMessage("الرمز الترويجي غير موجود");
+      console.log("API Response:", response.data);
+
+      // Handle successful response
+      if (response.status === 200) {
+        if (response.data.discountedPrice) {
+          setDiscountedPrice(response.data.discountedPrice);
+          setPromoCode(promoCodeInput);
+          setResponseMessage(
+            `تم تطبيق الرمز! السعر المخفض: ${response.data.discountedPrice.toFixed(
+              2
+            )}`
+          );
+          setIsSuccess(true);
+          setIsFieldFrozen(true);
+        } else if (response.data.consultationId != null) {
+          setConsultationId(response.data.consultationId);
+          setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة!");
+          setIsSuccess(true);
+          setShowModal(true);
+        } else {
+          setResponseMessage("حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى");
+          setIsSuccess(false);
+        }
+      } else {
+        console.error("Unexpected status code:", response.status);
+        setResponseMessage("حدث خطأ أثناء معالجة الطلب");
         setIsSuccess(false);
-      } else if (response.data.message === "Promotional code is already used") {
-        setResponseMessage("تم استخدام الرمز الترويجي سابقا");
-        setIsSuccess(false);
-      } else if (response.data.consultationId != null) {
-        setConsultationId(response.data.consultationId);
-        setResponseMessage("تمت العملية بنجاح - لقد حصلت على استشارة!");
-        setIsSuccess(true);
-        setShowModal(true);
       }
-    } catch (error) {
-      setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
-      setIsSuccess(false);
+    } catch (error: unknown) {
+      console.error("Error during promo application:", error);
+
+      // Narrow down the error type
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        const errorMessage = error.response.data.message;
+        console.log("Backend Error Message:", errorMessage); // Debug log
+
+        if (errorMessage === "Promotional code not found") {
+          setResponseMessage("الرمز الترويجي غير موجود");
+          setIsSuccess(false);
+        } else if (errorMessage === "Promotional code is already used") {
+          setResponseMessage("تم استخدام الرمز الترويجي سابقا");
+          setIsSuccess(false);
+        } else if (errorMessage === "Price is required for 100% discount") {
+          console.log("Price condition matched.");
+          setResponseMessage(
+            "اختر الدفع نقدا وأدخل مبلغ الكاش للحصول على فاتورة الكترونية"
+          );
+          setIsSuccess(false);
+        } else {
+          setResponseMessage("حدث خطأ أثناء معالجة الطلب، يرجى المحاولة لاحقا");
+          setIsSuccess(false);
+        }
+      } else {
+        // Fallback for unexpected errors
+        setResponseMessage("حدث خطأ أثناء محاولة تطبيق الرمز الترويجي");
+        setIsSuccess(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -89,7 +122,11 @@ const PromoCode: React.FC<{
   };
 
   const handleCashAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCashAmount(e.target.value);
+    // Filter out anything that's not a number and convert Arabic numerals
+    const inputValue = e.target.value;
+    const filteredValue = inputValue.replace(/[^٠١٢٣٤٥٦٧٨٩0-9]/g, ""); // Remove non-numeric characters
+    const convertedValue = convertArabicToEnglishNumbers(filteredValue); // Convert Arabic to English in real-time
+    setCashAmount(convertedValue); // Set the converted value directly
   };
 
   const handleGoToFillPersonalInfo = () => {
@@ -163,16 +200,15 @@ const PromoCode: React.FC<{
           <label
             htmlFor="cashAmount"
             className="block text-sm font-medium text-black"
-          >
-            أدخل المبلغ النقدي
-          </label>
+          ></label>
           <input
             id="cashAmount"
-            type="number"
+            type="text" // Use text type to allow Arabic numerals and control input
             value={cashAmount}
             onChange={handleCashAmountChange}
             placeholder="أدخل المبلغ النقدي"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-custom-green focus:ring-custom-green sm:text-sm"
+            dir="rtl"
+            className="mt-1 rtl block w-full text-black rounded-md border-gray-300 shadow-sm focus:border-custom-green focus:ring-custom-green sm:text-sm"
           />
         </div>
       )}
