@@ -15,10 +15,8 @@ export const createMarketerAndGeneratePromoCodes = async (
       promoterName,
     };
 
-    const apiUrl = "http://34.28.55.24:4000/api_labass/";
-
     const response = await axios.post(
-      `${apiUrl}/create-marketer-and-generate-codes`,
+      `${process.env.NEXT_PUBLIC_API_URL}/create-marketer-and-generate-codes`,
       data
     );
 
