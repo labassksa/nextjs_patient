@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUrl = "http://34.28.55.24:4000/api_labass/";
+const apiUrl = "process.env.NEXT_PUBLIC_API_URL";
 
 export const fetchInvoiceLink = async (
   consultationId: number
