@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
 export const fetchInvoiceLink = async (
   consultationId: number
 ): Promise<string | null> => {
@@ -12,7 +10,7 @@ export const fetchInvoiceLink = async (
     }
 
     const response = await axios.post(
-      `${apiUrl}create-invoice`,
+      `${process.env.NEXT_PUBLIC_API_URL}/create-invoice`,
       { consultationId },
       {
         headers: {
