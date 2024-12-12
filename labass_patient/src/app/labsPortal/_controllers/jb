@@ -1,0 +1,260 @@
+[
+  {
+    "createdAt": "2024-10-24T20:42:30.922Z",
+    "id": 1,
+    "phoneNumber": "+966557908522",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "admin",
+      "patient",
+      "doctor"
+    ]
+  },
+  {
+    "createdAt": "2024-10-24T20:42:30.922Z",
+    "id": 1,
+    "phoneNumber": "+966557908522",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "admin",
+      "patient",
+      "doctor"
+    ]
+  },
+  {
+    "createdAt": "2024-10-24T20:42:30.922Z",
+    "id": 1,
+    "phoneNumber": "+966557908522",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "admin",
+      "patient",
+      "doctor"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T07:01:59.739Z",
+    "id": 1009,
+    "phoneNumber": "+966505117551",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T07:01:59.739Z",
+    "id": 1009,
+    "phoneNumber": "+966505117551",
+    "firstName": null,
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-09T17:36:12.579Z",
+    "id": 1008,
+    "phoneNumber": "+966591717024",
+    "firstName": "yazeed",
+    "lastName": "engineer",
+    "email": "yazeed@example.com",
+    "gender": "male",
+    "nationalId": "1073508365",
+    "dateOfBirth": "2024-12-11",
+    "registrationToken": null,
+    "role": [
+      "marketer",
+      "admin",
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T11:57:05.669Z",
+    "id": 1011,
+    "phoneNumber": "+966545863927",
+    "firstName": "Hamoud",
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T12:14:37.395Z",
+    "id": 1012,
+    "phoneNumber": "+966049281111",
+    "firstName": "Saud",
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T12:14:37.395Z",
+    "id": 1012,
+    "phoneNumber": "+966049281111",
+    "firstName": "Saud",
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T12:16:24.026Z",
+    "id": 1013,
+    "phoneNumber": "+966019292837",
+    "firstName": "ALi",
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  },
+  {
+    "createdAt": "2024-12-11T12:19:47.280Z",
+    "id": 1014,
+    "phoneNumber": "+966000009988",
+    "firstName": "MAHA",
+    "lastName": null,
+    "email": null,
+    "gender": null,
+    "nationalId": null,
+    "dateOfBirth": null,
+    "registrationToken": null,
+    "role": [
+      "patient"
+    ]
+  }
+]
