@@ -90,7 +90,12 @@ const PromoCode: React.FC<{
         } else if (errorMessage === "Promotional code is already used") {
           setResponseMessage("تم استخدام الرمز الترويجي سابقا");
           setIsSuccess(false);
-        } else if (errorMessage === "Price is required for 100% discount") {
+        } else if (
+          errorMessage === "This free promo code has already been used"
+        ) {
+          setResponseMessage("تم استخدام الرمز الترويجي سابقا");
+          setIsSuccess(false);
+        } else if (errorMessage === "Price is required") {
           console.log("Price condition matched.");
           setResponseMessage(
             "اختر الدفع نقدا وأدخل مبلغ الكاش للحصول على فاتورة الكترونية"
