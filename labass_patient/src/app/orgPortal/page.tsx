@@ -76,7 +76,7 @@ const LabPatientsPage = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Top Header */}
       <Header
-        title={currentView === "patients" ? "المرضى" : "تسجيل مستخدم جديد"}
+        title={currentView === "patients" ? "المرضى" : "تسجيل مريض جديد"}
       />
 
       {/* Fixed Banner Below Header */}

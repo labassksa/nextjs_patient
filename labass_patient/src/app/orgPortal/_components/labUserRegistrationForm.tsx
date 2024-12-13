@@ -45,7 +45,7 @@ const LabUserRegistrationForm: React.FC = () => {
   return (
     <div dir="rtl" className="p-4">
       <h2 className="text-black  text-xl font-semibold mb-2">
-        تسجيل مريض في المختبر
+        تسجيل مريض جديد
       </h2>
       <p className="mb-4 text-black">
         أدخل بيانات المريض أدناه لإتمام عملية التسجيل وإرسال استشارة طبية للمريض
