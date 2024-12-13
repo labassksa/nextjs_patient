@@ -19,7 +19,7 @@ interface LabPatient {
 
 const LabPatientsPage = () => {
   const [currentView, setCurrentView] = useState<"patients" | "registration">(
-    "patients"
+    "registration"
   );
   const [patients, setPatients] = useState<LabPatient[]>([]);
   const [isLoading, setIsLoading] = useState(false);
