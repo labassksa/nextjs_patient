@@ -1,7 +1,7 @@
 // app/page.js
 export const metadata = {
-  title: "Your Custom Title",
-  description: "Your custom description",
+  title: "لاباس",
+  description: "استشارات طبية فورية",
   openGraph: {
     title: "Your Custom Title",
     description: "Your custom description for WhatsApp preview",
