@@ -1,10 +1,10 @@
 // app/page.js
 export const metadata = {
-  title: "Labass",
-  description: "Quick Medical Consultations",
+  title: "لاباس",
+  description: "استشارات طبية فورية",
   openGraph: {
-    title: "Your Custom Title",
-    description: "Your custom description for WhatsApp preview",
+    title: "لاباس",
+    description: "استشارات طبية فورية",
     images: ["https://example.com/your-image.jpg"],
   },
 };
