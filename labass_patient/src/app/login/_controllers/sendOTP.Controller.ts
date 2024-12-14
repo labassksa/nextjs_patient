@@ -1,43 +1,38 @@
 import axios from "axios";
 
-// Function to handle login logic for patients
-export const loginPatient = async (phoneNumber: string) => {
+// Modify the function to accept a countryCode parameter
+export const loginPatient = async (
+  phoneNumber: string,
+  countryCode: string
+) => {
   try {
-    // Check if the phone number already starts with '+966'
-    const formattedPhoneNumber = phoneNumber.startsWith("+966")
+    // Ensure the phone number starts with the selected country code
+    const formattedPhoneNumber = phoneNumber.startsWith(countryCode)
       ? phoneNumber
-      : `+966${phoneNumber}`;
+      : `${countryCode}${phoneNumber}`;
 
-    // Prepare the payload with the corrected phone number and role
     const data = {
-      phoneNumber: formattedPhoneNumber, // Use the formatted phone number
-      role: "patient", // Specify the role as 'patient'
+      phoneNumber: formattedPhoneNumber,
+      role: "patient",
     };
 
-    // Use environment variable for the backend URL
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-    // Send the data to the backend using Axios
     const response = await axios.post(`${apiUrl}/send-otp`, data);
 
-    // Check for successful response
     if (response.status === 200) {
       return { success: true };
     } else {
       return { success: false, message: "Unexpected response status code" };
     }
-  } catch (error) {
+  } catch (error: any) {
     if (axios.isAxiosError(error) && error.response && error.response.data) {
-      // Extract error message from backend response
       const backendMessage =
         error.response.data.error || "حدث خطأ ، حاول مرة أخرى";
-
-      // Use regex to extract the role from the error message
       const roleMatch = backendMessage.match(/role "(\w+)"/);
       let translatedMessage = "حدث خطأ ، حاول مرة أخرى";
 
       if (roleMatch) {
-        const role = roleMatch[1]; // Extract the role (e.g., patient, doctor, marketer, admin)
+        const role = roleMatch[1];
 
         switch (role) {
           case "doctor":
@@ -63,7 +58,6 @@ export const loginPatient = async (phoneNumber: string) => {
 
       return { success: false, message: translatedMessage };
     } else {
-      // Handle unexpected errors
       return {
         success: false,
         message: "حدث خطأ ، حاول مرة أخرى",

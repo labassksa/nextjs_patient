@@ -3,27 +3,43 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginPatient } from "../../_controllers/sendOTP.Controller";
 import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish";
-import { ArrowBack } from "@mui/icons-material"; // Import the back arrow icon
+import { ArrowBack } from "@mui/icons-material";
+
+const countryCodes = [
+  { code: "+966", label: "🇸🇦 +966" },
+  { code: "+971", label: "🇦🇪 +971" },
+  { code: "+965", label: "🇰🇼 +965" },
+  { code: "+973", label: "🇧🇭 +973" },
+  { code: "+974", label: "🇶🇦 +974" },
+  { code: "+20", label: "🇪🇬 +20" },
+  { code: "+1", label: "🇺🇸 +1" },
+];
 
 const SimpleLoginForm = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>(""); // Explicitly type as string
-  const [errorMessage, setErrorMessage] = useState<string>(""); // Explicitly type as string
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [countryCode, setCountryCode] = useState<string>(countryCodes[0].code);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handlePhoneNumberChange = (e: { target: { value: string } }) => {
-    const convertedNumber = convertArabicToEnglishNumbers(e.target.value) || ""; // Default to an empty string if undefined
-    setPhoneNumber(convertedNumber); // Ensure setPhoneNumber always receives a string
+  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const convertedNumber = convertArabicToEnglishNumbers(e.target.value) || "";
+    setPhoneNumber(convertedNumber);
     setErrorMessage("");
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setIsLoading(true); // Start loading
+  const handleCountryCodeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCountryCode(e.target.value);
+    setErrorMessage("");
+  };
 
-    if (phoneNumber.length !== 10) {
-      setErrorMessage("يرجى إدخال رقم جوال صحيح مكون من 10 أرقام");
-      setIsLoading(false); // Stop loading if the phone number is invalid
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (phoneNumber.length < 7 || phoneNumber.length > 14) {
+      setErrorMessage("يرجى إدخال رقم جوال صحيح");
+      setIsLoading(false);
       return;
     }
 
@@ -31,45 +47,60 @@ const SimpleLoginForm = () => {
       ? phoneNumber.slice(1)
       : phoneNumber;
 
-    // TypeScript now knows that result has success and message properties
-    const result = await loginPatient(cleanedPhoneNumber);
+    const result = await loginPatient(cleanedPhoneNumber, countryCode);
 
-    setIsLoading(false); // Stop loading after API response
+    setIsLoading(false);
 
     if (result.success) {
-      console.log(`the result from login is ${result}`);
-      router.push(`/otp?phoneNumber=%2B966${cleanedPhoneNumber}`);
+      router.push(
+        `/otp?phoneNumber=${encodeURIComponent(
+          `${countryCode}${cleanedPhoneNumber}`
+        )}`
+      );
     } else {
       setErrorMessage(result.message || "حدث خطأ غير معروف");
     }
   };
 
   const handleBackClick = () => {
-    router.back(); // Navigate to the previous page
+    router.back();
   };
 
   return (
     <div className="flex flex-col h-screen justify-between">
-      {/* Login form */}
       <form onSubmit={handleSubmit} className="text-right m-2" id="loginForm">
-        <label htmlFor="phoneNumber" className="block m-2">
+        <label htmlFor="phoneNumber" className="block mb-2">
           أدخل رقم الجوال
         </label>
-        <input
-          id="phoneNumber"
-          type="tel"
-          value={phoneNumber}
-          onChange={handlePhoneNumberChange}
-          placeholder="05xxxxxxx"
-          required
-          className="w-full p-3 text-right text-lg border border-gray-200 rounded-md focus:outline-none focus:border-custom-green direction-rtl"
-        />
+        <div className="flex">
+          <select
+            id="countryCode"
+            value={countryCode}
+            onChange={handleCountryCodeChange}
+            className="p-3 text-right text-lg border border-gray-200 rounded-l-md focus:outline-none focus:border-custom-green direction-rtl"
+          >
+            {countryCodes.map((cc) => (
+              <option key={cc.code} value={cc.code}>
+                {cc.label}
+              </option>
+            ))}
+          </select>
+          <input
+            id="phoneNumber"
+            type="tel"
+            value={phoneNumber}
+            onChange={handlePhoneNumberChange}
+            placeholder="5xxxxxxx"
+            required
+            className="w-full p-3 text-right text-lg border border-gray-200 rounded-r-md focus:outline-none focus:border-custom-green direction-rtl"
+          />
+        </div>
+
         {errorMessage && (
-          <div className="text-red-400 text-sm m-2">{errorMessage}</div>
+          <div className="text-red-400 text-sm mt-2">{errorMessage}</div>
         )}
       </form>
 
-      {/* Footer */}
       <div className="p-6 mb-60">
         <div className="text-xs text-right">
           مع الاستمرار بتسجيل الدخول، أنت توافق على{" "}
