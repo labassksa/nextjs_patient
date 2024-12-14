@@ -5,8 +5,8 @@ import Header from "../../components/common/header";
 import OTPTopText from "./_components/otp/otpTopText";
 import OTPBottomText from "./_components/otp/otpBottomText";
 import { useRouter } from "next/navigation";
-import { verifyOTPandLogin } from "./_controllers/verifyOTPandLogin"; // Adjust the import path as necessary
-import { loginPatient } from "../login/_controllers/sendOTP.Controller"; // Adjust the import path as necessary
+import { verifyOTPandLogin } from "./_controllers/verifyOTPandLogin";
+import { loginPatient } from "../login/_controllers/sendOTP.Controller";
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -16,14 +16,31 @@ const OTPPage = () => {
     null,
     null,
   ]);
-  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+
+  // Instead of storing a single phoneNumber, store both countryCode and localPhoneNumber separately
+  const [countryCode, setCountryCode] = useState<string | null>(null);
+  const [localPhoneNumber, setLocalPhoneNumber] = useState<string | null>(null);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const phoneNumber = searchParams.get("phoneNumber");
-    setPhoneNumber(phoneNumber);
+    const fullPhoneNumber = searchParams.get("phoneNumber");
+
+    if (fullPhoneNumber) {
+      // Attempt to match a phone number in the format +<countryCode><localNumber>
+      const match = fullPhoneNumber.match(/^(\+\d{1,3})(\d{7,14})$/);
+      if (match) {
+        setCountryCode(match[1]); // e.g. +966
+        setLocalPhoneNumber(match[2]); // e.g. 5xxxxxxx
+      } else {
+        // Fallback behavior if the format doesn't match
+        // You can adjust this logic based on your requirements
+        setCountryCode("+966");
+        setLocalPhoneNumber(fullPhoneNumber.replace(/^\+966/, ""));
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -44,24 +61,22 @@ const OTPPage = () => {
   };
 
   const handleVerifyOTP = async () => {
-    if (!phoneNumber) {
-      console.error("Phone number is missing in the OTP page.");
+    if (!localPhoneNumber || !countryCode) {
+      console.error("Phone number or country code is missing.");
       return;
     }
 
     const otpCode = otp.join("");
     try {
-      const result = await verifyOTPandLogin("patient", phoneNumber, otpCode);
+      const fullNumber = `${countryCode}${localPhoneNumber}`;
+      const result = await verifyOTPandLogin("patient", fullNumber, otpCode);
 
       if (result && result.success) {
-        console.log("OTP Verified:", result);
         router.push("/");
       } else if (result) {
         setErrorMessage(result.message ?? "حدث خطأ ، حاول مرة أخرى");
-        console.error("Failed to verify OTP:", result.message);
       } else {
         setErrorMessage("حدث خطأ ، حاول مرة أخرى");
-        console.error("Failed to verify OTP: Result is undefined");
       }
     } catch (error) {
       setErrorMessage("حدث خطأ ، حاول مرة أخرى");
@@ -70,23 +85,23 @@ const OTPPage = () => {
   };
 
   const handleResendOTP = async () => {
-    if (!phoneNumber) {
-      console.error("Phone number is missing in the OTP page.");
+    if (!localPhoneNumber || !countryCode) {
+      console.error("Phone number or country code is missing.");
       return;
     }
 
     try {
-      const result = await loginPatient(phoneNumber);
+      // Now call loginPatient with both localPhoneNumber and countryCode
+      const result = await loginPatient(localPhoneNumber, countryCode);
       if (result && result.success) {
-        setOtp(["", "", "", ""]); // Clear the OTP input fields
-        inputRefs.current[0]?.focus(); // Focus on the first input field
+        setOtp(["", "", "", ""]);
+        inputRefs.current[0]?.focus();
         setErrorMessage(null);
       } else if (result) {
         setErrorMessage(result.message ?? "حدث خطأ ، حاول مرة أخرى");
         console.error("Failed to resend OTP:", result.message);
       } else {
         setErrorMessage("حدث خطأ ، حاول مرة أخرى");
-        console.error("Failed to resend OTP: Result is undefined");
       }
     } catch (error) {
       setErrorMessage("حدث خطأ ، حاول مرة أخرى");
@@ -98,7 +113,9 @@ const OTPPage = () => {
     <div className="bg-white min-h-screen">
       <div className="flex flex-col justify-between">
         <Header title="التحقق" showBackButton />
-        {phoneNumber ? <OTPTopText phoneNumber={phoneNumber} /> : null}
+        {countryCode && localPhoneNumber ? (
+          <OTPTopText phoneNumber={`${countryCode}${localPhoneNumber}`} />
+        ) : null}
         <div className="flex mt-10 justify-center">
           {otp.map((value, index) => (
             <OTPInput

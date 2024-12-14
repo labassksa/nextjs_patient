@@ -6,7 +6,7 @@ interface OTPBottomTextProps {
 }
 
 const OTPBottomText: React.FC<OTPBottomTextProps> = ({ onResend }) => {
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(60);
 
   useEffect(() => {
     const timer = setInterval(() => {
