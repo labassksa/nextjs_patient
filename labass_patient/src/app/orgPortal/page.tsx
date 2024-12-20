@@ -76,7 +76,11 @@ const LabPatientsPage = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Top Header */}
       <Header
-        title={currentView === "patients" ? "المرضى" : "تسجيل مريض جديد"}
+        title={
+          currentView === "patients"
+            ? "متابعة الاستشارات"
+            : "إرسال استشارة طبية"
+        }
       />
 
       {/* Fixed Banner Below Header */}
@@ -132,7 +136,17 @@ const LabPatientsPage = () => {
             </div>
           )
         ) : (
-          <LabUserRegistrationForm />
+          <div>
+            {/* Raidx Logo */}
+            <div className="flex justify-center mb-6">
+              <img
+                src="/images/labslogos/raidx.png"
+                alt="Raidx Logo"
+                className="h-16"
+              />
+            </div>
+            <LabUserRegistrationForm />
+          </div>
         )}
       </div>
 
