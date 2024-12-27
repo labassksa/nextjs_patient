@@ -3,7 +3,7 @@ import axios from "axios";
 interface CreateLabUserData {
   name: string;
   phoneNumber: string;
-  age: string;
+  dateOfBirth: Date | null;
   nationality: string;
   gender: string;
   testType: string;
@@ -16,11 +16,16 @@ export const createLabUser = async (data: CreateLabUserData) => {
       ? data.phoneNumber
       : `+966${data.phoneNumber}`;
 
+    // Format dateOfBirth to string if not null
+    const formattedDateOfBirth = data.dateOfBirth
+      ? data.dateOfBirth.toISOString().split("T")[0] // Convert to YYYY-MM-DD
+      : "";
+
     // Prepare FormData
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("phoneNumber", formattedPhoneNumber);
-    formData.append("age", data.age);
+    formData.append("dateOfBirth", formattedDateOfBirth); // Append formatted string
     formData.append("nationality", data.nationality);
     formData.append("gender", data.gender);
     formData.append("testType", data.testType);

@@ -1,22 +1,48 @@
+// ./_components/LabUserRegistrationForm.tsx
 "use client";
 
 import React, { useState } from "react";
 import { createLabUser } from "../_controllers/createLabUser";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
+import ConsultationTypeSection from "./ConsultationTypeSection"; // Ensure correct path
+
+// Define the props interface
+interface LabUserRegistrationFormProps {
+  orgType: "pharmacy" | "laboratory" | "";
+  onSubmit: (data: LabUserFormData) => void; // Adjust the type as needed
+}
+
+// Define the form data interface for better type safety
+interface LabUserFormData {
+  name: string;
+  phoneNumber: string;
+  dateOfBirth: Date | null;
+  nationality: string;
+  gender: string;
+  nationalId?: string;
+  testType: string;
+  pdfFiles: File[];
+}
 
 const nationalities = ["سعودي", "مصري", "إماراتي", "قطري", "كويتي", "أخرى"];
 const genders = ["ذكر", "أنثى"];
-const testTypes = ["استشارة قبل التحليل", "استشارة بعد التحليل"];
 
-const LabUserRegistrationForm: React.FC = () => {
+const LabUserRegistrationForm: React.FC<LabUserRegistrationFormProps> = ({
+  orgType,
+  onSubmit,
+}) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [nationality, setNationality] = useState("سعودي");
   const [gender, setGender] = useState("");
   const [nationalId, setNationalId] = useState("");
+
+  // Consultation Type and PDF Files
   const [testType, setTestType] = useState("استشارة قبل التحليل");
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -31,26 +57,35 @@ const LabUserRegistrationForm: React.FC = () => {
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const convertedAge = convertArabicToEnglishNumbers(e.target.value) || "";
     setAge(convertedAge);
+
+    if (convertedAge) {
+      const ageInYears = parseInt(convertedAge, 10);
+      if (!isNaN(ageInYears)) {
+        const today = new Date();
+        const birthDate = new Date(
+          today.getFullYear() - ageInYears,
+          today.getMonth(),
+          today.getDate()
+        );
+        console.log("Date of Birth:", birthDate); // Log the Date object
+        setDateOfBirth(birthDate); // Assuming setDateOfBirth expects a Date object
+      } else {
+        console.log("Invalid age input.");
+        setDateOfBirth(null); // Clear DOB for invalid input, use null for Date types
+      }
+    } else {
+      console.log("Age input is empty.");
+      setDateOfBirth(null); // Clear DOB if no age is provided
+    }
   };
-  // Handle age input change
+
+  // Handle National ID or Iqama change
   const handleNationalIdorIqamaChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const convertedNationalId =
       convertArabicToEnglishNumbers(e.target.value) || "";
     setNationalId(convertedNationalId);
-  };
-
-  // Handle file addition
-  const handleAddPdf = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setPdfFiles([...pdfFiles, ...Array.from(e.target.files)]);
-    }
-  };
-
-  // Handle file removal
-  const handleRemovePdf = (index: number) => {
-    setPdfFiles(pdfFiles.filter((_, i) => i !== index));
   };
 
   // Form submission
@@ -74,12 +109,12 @@ const LabUserRegistrationForm: React.FC = () => {
 
     setIsLoading(true);
 
-    const formData = {
+    const formData: LabUserFormData = {
       name,
       phoneNumber: phone.startsWith("0")
         ? `+966${phone.slice(1)}`
         : `+966${phone}`,
-      age,
+      dateOfBirth,
       nationality,
       gender,
       nationalId: nationalId || undefined,
@@ -87,38 +122,46 @@ const LabUserRegistrationForm: React.FC = () => {
       pdfFiles,
     };
 
-    const result = await createLabUser(formData);
+    try {
+      const result = await createLabUser(formData);
+      setIsLoading(false);
 
-    setIsLoading(false);
+      if (result.success) {
+        alert(`تم تسجيل المريض ${name} بنجاح.`);
+        // Reset form
+        setName("");
+        setPhone("");
+        setAge("");
+        setNationality("سعودي");
+        setGender("");
+        setNationalId("");
+        setTestType("استشارة قبل التحليل");
+        setPdfFiles([]);
 
-    if (result.success) {
-      alert(`تم تسجيل المريض ${name} بنجاح.`);
-      // Reset form
-      setName("");
-      setPhone("");
-      setAge("");
-      setNationality("سعودي");
-      setGender("");
-      setNationalId("");
-      setTestType("");
-      setPdfFiles([]);
-    } else {
-      alert(result.message || "حدث خطأ أثناء تسجيل المريض.");
+        // Notify parent component
+        onSubmit(formData);
+      } else {
+        alert(result.message || "حدث خطأ أثناء تسجيل المريض.");
+      }
+    } catch (error) {
+      console.error("Error creating lab user:", error);
+      alert("حدث خطأ أثناء تسجيل المريض.");
+      setIsLoading(false);
     }
   };
 
   return (
     <div dir="rtl" className="p-4">
-      <h2
-        className="text-black text-xl font-
-       mb-4"
-      >
-        إرسال استشارة طبية{" "}
+      <h2 className="text-black text-xl font-semibold mb-4">
+        إرسال استشارة طبية
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Patient Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-normal p-2">
+          <label
+            htmlFor="name"
+            className="block text-sm text-black font-normal p-2"
+          >
             اسم المريض
           </label>
           <input
@@ -126,7 +169,7 @@ const LabUserRegistrationForm: React.FC = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
             required
           />
         </div>
@@ -135,8 +178,7 @@ const LabUserRegistrationForm: React.FC = () => {
         <div>
           <label
             htmlFor="phone"
-            className="block text-sm font-normal
-           p-2"
+            className="block text-black text-sm font-normal p-2"
           >
             رقم الجوال
           </label>
@@ -147,7 +189,7 @@ const LabUserRegistrationForm: React.FC = () => {
             placeholder="05xxx"
             value={phone}
             onChange={handlePhoneNumberChange}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
             required
           />
           {errorMessage && (
@@ -157,7 +199,10 @@ const LabUserRegistrationForm: React.FC = () => {
 
         {/* Age */}
         <div>
-          <label htmlFor="age" className="block text-sm font-normal p-2">
+          <label
+            htmlFor="age"
+            className="block text-black text-sm font-normal p-2"
+          >
             العمر
           </label>
           <input
@@ -166,7 +211,7 @@ const LabUserRegistrationForm: React.FC = () => {
             inputMode="numeric"
             value={age}
             onChange={handleAgeChange}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
             required
           />
         </div>
@@ -175,7 +220,7 @@ const LabUserRegistrationForm: React.FC = () => {
         <div>
           <label
             htmlFor="nationality"
-            className="block text-sm font-normal p-2"
+            className="block text-sm text-black font-normal p-2"
           >
             الجنسية
           </label>
@@ -183,14 +228,14 @@ const LabUserRegistrationForm: React.FC = () => {
             id="nationality"
             value={nationality}
             onChange={(e) => setNationality(e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full text-black border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
             required
           >
             {nationalities.map((nat) => (
               <option
                 key={nat}
                 value={nat}
-                className="bg-white focus:bg-custom-green"
+                className="bg-white text-black focus:bg-custom-green"
               >
                 {nat}
               </option>
@@ -200,22 +245,29 @@ const LabUserRegistrationForm: React.FC = () => {
 
         {/* Gender */}
         <div>
-          <label className="block text-sm font-normal p-2">الجنس</label>
+          <label className="block text-black text-sm font-normal p-2">
+            الجنس
+          </label>
           <div className="bg-white p-4 rounded-lg">
             {genders.map((g) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => setGender(g)}
-                className="flex items-center justify-between p-2 w-full text-black"
+                className={`flex items-center justify-between p-2 w-full text-black focus:outline-none rounded-md mb-2 ${
+                  gender === g
+                    ? "bg-custom-green text-white"
+                    : "bg-gray-100 hover:bg-gray-200"
+                }`}
+                aria-pressed={gender === g}
               >
                 <div className="flex items-center">
                   <div
                     className={`w-4 h-4 rounded-full ml-2 ${
-                      gender === g ? "bg-custom-green" : "bg-gray-400"
+                      gender === g ? "bg-white" : "bg-gray-400"
                     }`}
                   />
-                  {g}
+                  <span>{g}</span>
                 </div>
               </button>
             ))}
@@ -224,7 +276,10 @@ const LabUserRegistrationForm: React.FC = () => {
 
         {/* National ID (Optional) */}
         <div>
-          <label htmlFor="nationalId" className="block text-sm font-normal p-2">
+          <label
+            htmlFor="nationalId"
+            className="block text-black text-sm font-normal p-2"
+          >
             رقم الهوية الوطنية
           </label>
           <input
@@ -232,78 +287,20 @@ const LabUserRegistrationForm: React.FC = () => {
             type="text"
             value={nationalId}
             onChange={handleNationalIdorIqamaChange}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
           />
         </div>
 
-        {/* Test Type */}
-        <div>
-          <label className="block text-sm font-normal p-2">وقت الاستشارة</label>
-          <div className="bg-white p-4 rounded-lg">
-            {testTypes.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setTestType(type)}
-                className="flex items-center justify-between p-2 w-full text-black"
-              >
-                <div className="flex items-center">
-                  <div
-                    className={`w-4 h-4 rounded-full ml-2 ${
-                      testType === type ? "bg-custom-green" : "bg-gray-400"
-                    }`}
-                  />
-                  {type}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* PDF Files */}
-        {testType === "استشارة بعد التحليل" && (
-          <div>
-            <label htmlFor="pdfFiles" className="block text-sm font-normal p-2">
-              إضافة ملف
-            </label>
-            <input
-              id="pdfFiles"
-              type="file"
-              accept="application/pdf"
-              multiple
-              onChange={handleAddPdf}
-              className="w-full border border-gray-300 rounded-md p-2 file:mr-2 file:py-1 file:px-4 file:border-0 file:bg-custom-green file:text-white file:rounded-md file:cursor-pointer focus:ring-2 focus:ring-custom-green"
-            />
-            {pdfFiles.length > 0 && (
-              <div className="mt-2">
-                {pdfFiles.map((file, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between"
-                  >
-                    <span>{file.name}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemovePdf(index)}
-                      className="text-red-400"
-                    >
-                      إزالة
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-custom-green text-white py-3 px-4 rounded-md"
-        >
-          {isLoading ? <div className="spinner"></div> : "إرسال استشارة طبية"}
-        </button>
+        <div className="fixed bottom-12 left-0 w-full p-4 shadow-md">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-custom-green text-white py-3 px-4 rounded-md"
+          >
+            {isLoading ? <div className="spinner"></div> : "إرسال استشارة طبية"}
+          </button>
+        </div>
       </form>
     </div>
   );
