@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import LabPatientCard from "./_components/patientsCard";
 import Header from "../../components/common/header";
 import LabBottomNavBar from "./_components/bottomNavBar";
-import LabUserRegistrationForm from "./_components/orgUserRegistrationForm";
 import ConsultationTypeSection from "./_components/ConsultationTypeSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
@@ -13,6 +12,7 @@ import { getOrganization } from "./_controllers/getOrganization";
 import { DealType } from "./_types/dealType";
 import { OrganizationTypes } from "./_types/organizationTypes";
 import { PaymentMethod } from "./_types/paymentMethodTypes";
+import OrgUserRegistrationForm from "./_components/orgUserRegistrationForm";
 
 interface OrgPatient {
   id: number;
@@ -188,7 +188,7 @@ const OrgPatientsPage: React.FC = () => {
           )
         ) : (
           <div className="mt-16">
-            <LabUserRegistrationForm
+            <OrgUserRegistrationForm
               orgType={orgType}
               name={name}
               setName={setName}
