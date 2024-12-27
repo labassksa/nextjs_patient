@@ -38,8 +38,10 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
       className="max-w-md text-black mx-auto bg-white p-4 mt-6 rounded shadow-md"
       dir="rtl"
     >
-      <h3 className="text-lg font-bold mb-2">طريقة الدفع</h3>
-      <p className="text-sm text-gray-700 mb-4">اختر طريقة الدفع المناسبة:</p>
+      <h3 className="text-lg font-bold mb-2">طريقة دفع المريض</h3>
+      <p className="text-sm text-gray-700 mb-4">
+        اختر طريقة الدفع المناسبة للمريض:
+      </p>
       <div className="flex flex-col gap-2">
         {possiblePaymentMethods
           .filter((method) => method === "cash" || method === "online") // Only include cash and online
@@ -47,31 +49,33 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
             method === "cash" && paymentMethod === "cash" ? (
               <div
                 key={method}
-                className="border-2 border-green-500 rounded-md p-2 flex flex-col gap-2"
+                className="border-2 border-custom-green rounded-md p-1 flex flex-col gap-2"
               >
                 <button
                   type="button"
                   onClick={() => setPaymentMethod(method)}
                   className="flex items-center justify-between p-2 w-full text-center rounded-md transition-colors duration-200 bg-custom-green text-white"
                 >
-                  <span>كاش</span>
+                  <span> استلام المبلغ من المريض (كاش او اونلاين) </span>
                   <span className="text-white font-bold">✔</span>
                 </button>
                 <div className="mt-2">
-                  <label className="font-semibold block mb-1">مبلغ الكاش</label>
+                  <label className="font-semibold block mb-1">
+                    المبلغ المستلم{" "}
+                  </label>
                   <p className="font-normal text-xs text-custom-green block mb-2">
-                    أدخل المبلغ المستلم من المريض لإصدار فاتورة الكترونية بهذا
-                    المبلغ
+                    أدخل المبلغ المستلم من المريض (كاش او شبكة) لإصدار فاتورة
+                    إلكترونية بهذا المبلغ
                   </p>
                   <input
-                    type="number"
+                    type="numeric"
                     min={15}
                     className={`border px-2 py-1 w-full rounded ${
                       error ? "border-red-500" : "border-gray-300"
                     } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     value={cashPrice !== null ? cashPrice : ""}
                     onChange={handleCashPriceChange}
-                    placeholder="أدخل مبلغ الكاش"
+                    placeholder="أدخل المبلغ "
                   />
                   {error && (
                     <p className="text-red-500 text-sm mt-1">{error}</p>
@@ -89,7 +93,11 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
                     : "bg-gray-100 hover:bg-gray-200 text-black"
                 }`}
               >
-                <span>{method === "online" ? "أونلاين" : "كاش"}</span>
+                <span>
+                  {method === "online"
+                    ? " اونلاين عن طريق موقع لاباس"
+                    : "استلام المبلغ من المريض (كاش او شبكة)"}
+                </span>
                 {paymentMethod === method && (
                   <span className="text-white font-bold">✔</span>
                 )}

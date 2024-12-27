@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import LabPatientCard from "./_components/patientsCard";
 import Header from "../../components/common/header";
 import LabBottomNavBar from "./_components/bottomNavBar";
-import LabUserRegistrationForm from "./_components/LabUserRegistrationForm";
+import LabUserRegistrationForm from "./_components/orgUserRegistrationForm";
 import ConsultationTypeSection from "./_components/ConsultationTypeSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
@@ -14,7 +14,7 @@ import { DealType } from "./_types/dealType";
 import { OrganizationTypes } from "./_types/organizationTypes";
 import { PaymentMethod } from "./_types/paymentMethodTypes";
 
-interface LabPatient {
+interface OrgPatient {
   id: number;
   phoneNumber: string;
   firstName: string | null;
@@ -24,19 +24,28 @@ interface LabPatient {
   duplicateCount?: number;
 }
 
-const LabPatientsPage: React.FC = () => {
+const OrgPatientsPage: React.FC = () => {
   const [currentView, setCurrentView] = useState<"patients" | "registration">(
     "registration"
   );
-  const [patients, setPatients] = useState<LabPatient[]>([]);
+  const [patients, setPatients] = useState<OrgPatient[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // DealType: SUBSCRIPTION or REVENUE_SHARE (or empty)
+  // DealType and Organization Type
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
 
-  // Consultation type and files
+  // Form Data
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [age, setAge] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [nationality, setNationality] = useState("سعودي");
+  const [gender, setGender] = useState("");
+  const [nationalId, setNationalId] = useState("");
+
+  // Consultation Type and Files
   const [consultationType, setConsultationType] = useState<string>("");
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
 
@@ -46,37 +55,19 @@ const LabPatientsPage: React.FC = () => {
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const possiblePrices = [15, 25, 35, 50];
 
-  // Payment methods based on dealType
-  const subscriptionPaymentMethods: PaymentMethod[] = [
-    "online",
-    "cash",
-    "free",
-  ];
-  const revenueSharePaymentMethods: PaymentMethod[] = ["online", "cash"];
-
   const possiblePaymentMethods: PaymentMethod[] =
     dealType === DealType.SUBSCRIPTION
-      ? subscriptionPaymentMethods
+      ? ["online", "cash"]
       : dealType === DealType.REVENUE_SHARE
-      ? revenueSharePaymentMethods
+      ? ["online", "cash"]
       : [];
 
   useEffect(() => {
     const fetchOrg = async () => {
       const orgResponse = await getOrganization();
       if (orgResponse.success && orgResponse.data) {
-        if (
-          orgResponse.data.dealType === DealType.REVENUE_SHARE ||
-          orgResponse.data.dealType === DealType.SUBSCRIPTION
-        ) {
-          setDealType(orgResponse.data.dealType);
-        }
-        if (
-          orgResponse.data.type === OrganizationTypes.Pharmacy ||
-          orgResponse.data.type === OrganizationTypes.Laboratory
-        ) {
-          setOrgType(orgResponse.data.type);
-        }
+        setDealType(orgResponse.data.dealType);
+        setOrgType(orgResponse.data.type);
       } else {
         console.warn("Failed to fetch organization or no data returned.");
       }
@@ -85,40 +76,66 @@ const LabPatientsPage: React.FC = () => {
     fetchOrg();
   }, []);
 
-  useEffect(() => {
-    if (currentView === "patients") {
-      loadPatients();
+  const handleSubmit = async () => {
+    if (phone.length !== 10) {
+      alert("يرجى إدخال رقم جوال صحيح مكون من 10 أرقام.");
+      return;
     }
-  }, [currentView]);
 
-  const loadPatients = async () => {
-    setIsLoading(true);
-    setError("");
+    if (consultationType === "استشارة بعد التحليل" && pdfFiles.length === 0) {
+      alert("يرجى تحميل ملف أو أكثر بصيغة PDF عند اختيار استشارة بعد التحليل.");
+      return;
+    }
+    if (
+      !name ||
+      !phone ||
+      !age ||
+      !nationality ||
+      !gender ||
+      !consultationType
+    ) {
+      alert("يرجى ملء جميع الحقول المطلوبة.");
+      return;
+    }
+
+    const formData = {
+      name,
+      phoneNumber: phone.startsWith("0")
+        ? `+966${phone.slice(1)}`
+        : `+966${phone}`,
+      dateOfBirth,
+      nationality,
+      gender,
+      nationalId,
+      consultationType,
+      pdfFiles,
+      paymentMethod,
+      cashPrice,
+      selectedPrice,
+    };
+
     try {
       const result = await getLabPatients();
       if (result.success) {
-        const patientMap = new Map<string, LabPatient>();
-        result.data.forEach((p: LabPatient) => {
-          if (patientMap.has(p.phoneNumber)) {
-            const existing = patientMap.get(p.phoneNumber)!;
-            existing.duplicateCount = (existing.duplicateCount || 1) + 1;
-          } else {
-            patientMap.set(p.phoneNumber, { ...p, duplicateCount: 1 });
-          }
-        });
-        setPatients(Array.from(patientMap.values()));
+        alert(`تم تسجيل المريض ${name} بنجاح.`);
+        setName("");
+        setPhone("");
+        setAge("");
+        setNationality("سعودي");
+        setGender("");
+        setNationalId("");
+        setConsultationType("");
+        setPdfFiles([]);
+        setPaymentMethod("");
+        setCashPrice(null);
+        setSelectedPrice(null);
       } else {
-        setError(result.message || "No patients found.");
+        alert("فشل في تسجيل المريض.");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to load patients.");
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error(err);
+      alert("حدث خطأ أثناء التسجيل.");
     }
-  };
-
-  const handleToggleView = (view: "patients" | "registration") => {
-    setCurrentView(view);
   };
 
   return (
@@ -130,18 +147,6 @@ const LabPatientsPage: React.FC = () => {
             : "إرسال استشارة طبية"
         }
       />
-
-      {currentView === "patients" && (
-        <div
-          className={`${
-            dealType ? "top-28" : "top-16"
-          } fixed left-0 w-full bg-blue-100 py-2 px-4 shadow-md flex justify-between items-center z-10`}
-        >
-          <p className="text-sm text-blue-700 font-semibold">
-            {`عدد العملاء: ${patients.length}`}
-          </p>
-        </div>
-      )}
 
       <div className={`pt-${dealType ? "40" : "28"} pb-28`}>
         {currentView === "patients" ? (
@@ -161,7 +166,7 @@ const LabPatientsPage: React.FC = () => {
                   patientName={
                     p.firstName
                       ? `${p.firstName} ${p.lastName || ""}`
-                      : `غير معروف`
+                      : "غير معروف"
                   }
                   date={new Date(p.createdAt).toLocaleString("ar-EG", {
                     year: "numeric",
@@ -185,7 +190,22 @@ const LabPatientsPage: React.FC = () => {
           <div className="mt-16">
             <LabUserRegistrationForm
               orgType={orgType}
-              onSubmit={(formData) => console.log(formData)}
+              name={name}
+              setName={setName}
+              phone={phone}
+              setPhone={setPhone}
+              age={age}
+              setAge={setAge}
+              dateOfBirth={dateOfBirth}
+              setDateOfBirth={setDateOfBirth}
+              nationality={nationality}
+              setNationality={setNationality}
+              gender={gender}
+              setGender={setGender}
+              nationalId={nationalId}
+              setNationalId={setNationalId}
+              pdfFiles={pdfFiles}
+              setPdfFiles={setPdfFiles}
             />
 
             <ConsultationTypeSection
@@ -196,15 +216,14 @@ const LabPatientsPage: React.FC = () => {
               setPdfFiles={setPdfFiles}
             />
 
-            {dealType !== DealType.SUBSCRIPTION && (
-              <PaymentMethodSection
-                paymentMethod={paymentMethod}
-                setPaymentMethod={setPaymentMethod}
-                possiblePaymentMethods={possiblePaymentMethods}
-                cashPrice={cashPrice}
-                setCashPrice={setCashPrice}
-              />
-            )}
+            <PaymentMethodSection
+              paymentMethod={paymentMethod}
+              setPaymentMethod={setPaymentMethod}
+              possiblePaymentMethods={possiblePaymentMethods}
+              cashPrice={cashPrice}
+              setCashPrice={setCashPrice}
+            />
+
             {paymentMethod === "online" &&
               dealType === DealType.REVENUE_SHARE && (
                 <ConsultationPriceSection
@@ -217,12 +236,21 @@ const LabPatientsPage: React.FC = () => {
         )}
       </div>
 
+      <div className="fixed bottom-12 left-0 w-full px-4">
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-custom-green text-white py-3 px-4 rounded-md"
+        >
+          إرسال استشارة طبية
+        </button>
+      </div>
+
       <LabBottomNavBar
-        onToggleView={handleToggleView}
+        onToggleView={setCurrentView}
         currentView={currentView}
       />
     </div>
   );
 };
 
-export default LabPatientsPage;
+export default OrgPatientsPage;
