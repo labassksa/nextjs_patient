@@ -1,11 +1,15 @@
+// src/app/orgPortal/_components/OrgUserRegistrationForm.tsx
+
 "use client";
 
 import React from "react";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
+import { Gender } from "../_types/genderType";
+import { OrganizationTypes } from "../_types/organizationTypes";
 
 // Define the props interface
 interface OrgUserRegistrationFormProps {
-  orgType: "pharmacy" | "laboratory" | "";
+  orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | "";
   name: string;
   setName: React.Dispatch<React.SetStateAction<string>>;
   phone: string;
@@ -16,8 +20,8 @@ interface OrgUserRegistrationFormProps {
   setDateOfBirth: React.Dispatch<React.SetStateAction<Date | null>>;
   nationality: string;
   setNationality: React.Dispatch<React.SetStateAction<string>>;
-  gender: string;
-  setGender: React.Dispatch<React.SetStateAction<string>>;
+  gender: Gender; // Updated to use Gender enum
+  setGender: React.Dispatch<React.SetStateAction<Gender>>;
   nationalId: string;
   setNationalId: React.Dispatch<React.SetStateAction<string>>;
   pdfFiles: File[];
@@ -25,9 +29,17 @@ interface OrgUserRegistrationFormProps {
 }
 
 const nationalities = ["سعودي", "مصري", "إماراتي", "قطري", "كويتي", "أخرى"];
-const genders = ["ذكر", "أنثى"];
 
-const LabUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
+//Genders
+const genders = [Gender.Male, Gender.Female];
+
+// Mapping from Gender enum to Arabic labels
+const genderLabels: Record<Gender, string> = {
+  [Gender.Male]: "ذكر",
+  [Gender.Female]: "أنثى",
+};
+
+const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   orgType,
   name,
   setName,
@@ -195,7 +207,7 @@ const LabUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                       gender === g ? "bg-white" : "bg-gray-400"
                     }`}
                   />
-                  <span>{g}</span>
+                  <span>{genderLabels[g]}</span> {/* Display Arabic Label */}
                 </div>
               </button>
             ))}
@@ -223,4 +235,4 @@ const LabUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   );
 };
 
-export default LabUserRegistrationForm;
+export default OrgUserRegistrationForm;
