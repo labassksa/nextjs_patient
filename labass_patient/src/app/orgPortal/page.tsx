@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import LabPatientCard from "./_components/patientsCard";
 import Header from "../../components/common/header";
 import LabBottomNavBar from "./_components/bottomNavBar";
-import ConsultationTypeSection from "./_components/ConsultationTypeSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
-import { getLabPatients } from "./_controllers/getLabPatients";
 import { getOrganization } from "./_controllers/getOrganization";
 import { DealType } from "./_types/dealType";
 import { OrganizationTypes } from "./_types/organizationTypes";
-import { PaymentMethod } from "./_types/paymentMethodTypes";
 import OrgUserRegistrationForm from "./_components/orgUserRegistrationForm";
+import { PaymentMethodEnum } from "@/types/paymentMethods";
+import { createMagicLink } from "./_controllers/createMagicLink";
+import LabPatientCard from "./_components/patientsCard";
+import { LabtestType } from "./_types/labTestTypes";
+import { Gender } from "./_types/genderType";
+import TestTypeSection from "./_components/testType";
 
 interface OrgPatient {
   id: number;
@@ -29,112 +31,128 @@ const OrgPatientsPage: React.FC = () => {
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // DealType and Organization Type
+  const [isLoadingOrg, setIsLoadingOrg] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orgError, setOrgError] = useState("");
+  const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
-
-  // Form Data
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [nationality, setNationality] = useState("سعودي");
-  const [gender, setGender] = useState("");
+  const [gender, setGender] = useState(Gender.Male);
   const [nationalId, setNationalId] = useState("");
-
-  // Consultation Type and Files
-  const [consultationType, setConsultationType] = useState<string>("");
+  const [testType, settestType] = useState<LabtestType | "">("");
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
-
-  // Payment Method and Prices
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodEnum>(
+    PaymentMethodEnum.THROUGH_ORGANIZATION
+  );
   const [cashPrice, setCashPrice] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const possiblePrices = [15, 25, 35, 50];
+  const possiblePrices = [80, 70, 50, 35, 25, 15];
 
-  const possiblePaymentMethods: PaymentMethod[] =
+  const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
-      ? ["online", "cash"]
+      ? [
+          PaymentMethodEnum.THROUGH_LABASS,
+          PaymentMethodEnum.THROUGH_ORGANIZATION,
+        ]
       : dealType === DealType.REVENUE_SHARE
-      ? ["online", "cash"]
+      ? [
+          PaymentMethodEnum.THROUGH_LABASS,
+          PaymentMethodEnum.THROUGH_ORGANIZATION,
+        ]
       : [];
 
-  useEffect(() => {
-    const fetchOrg = async () => {
+  const fetchOrg = async () => {
+    setIsLoadingOrg(true);
+    setOrgError("");
+    try {
       const orgResponse = await getOrganization();
       if (orgResponse.success && orgResponse.data) {
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
+        console.log(
+          "Organization details fetched successfully:",
+          orgResponse.data
+        );
       } else {
-        console.warn("Failed to fetch organization or no data returned.");
+        throw new Error("Failed to fetch organization or no data returned.");
       }
-    };
+    } catch (err: any) {
+      if (err.message === "Network Error" || !err.response) {
+        setOrgError(
+          "خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
+        );
+      } else {
+        setOrgError(
+          "We cannot get your organization info. Contact customer support or refresh the page later."
+        );
+      }
+      console.error("Error fetching organization details:", err);
+    } finally {
+      setIsLoadingOrg(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrg();
   }, []);
 
   const handleSubmit = async () => {
-    if (phone.length !== 10) {
-      alert("يرجى إدخال رقم جوال صحيح مكون من 10 أرقام.");
-      return;
-    }
-
-    if (consultationType === "استشارة بعد التحليل" && pdfFiles.length === 0) {
-      alert("يرجى تحميل ملف أو أكثر بصيغة PDF عند اختيار استشارة بعد التحليل.");
-      return;
-    }
-    if (
-      !name ||
-      !phone ||
-      !age ||
-      !nationality ||
-      !gender ||
-      !consultationType
-    ) {
+    console.log("Form submission initiated.");
+    setIsSubmitting(true);
+    setSubmitError("");
+    if (!name || !phone || !dateOfBirth || !gender || !nationality) {
       alert("يرجى ملء جميع الحقول المطلوبة.");
+      setIsSubmitting(false);
       return;
     }
 
-    const formData = {
-      name,
-      phoneNumber: phone.startsWith("0")
-        ? `+966${phone.slice(1)}`
-        : `+966${phone}`,
-      dateOfBirth,
-      nationality,
-      gender,
-      nationalId,
-      consultationType,
-      pdfFiles,
+    const magicLinkData = {
+      patientInfo: {
+        firstName: name.trim(),
+        phoneNumber: phone.startsWith("0")
+          ? `+966${phone.slice(1)}`
+          : `+966${phone}`,
+        role: ["patient"],
+        gender,
+        nationality,
+        nationalId: nationalId.trim() || null,
+        dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+      },
       paymentMethod,
-      cashPrice,
-      selectedPrice,
+      orgType,
+      dealType,
+      consultationPrice: selectedPrice || cashPrice,
+      testType,
+      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
     };
 
+    console.log("Prepared JSON Payload:", magicLinkData);
+
     try {
-      const result = await getLabPatients();
+      const result = await createMagicLink(magicLinkData);
       if (result.success) {
-        alert(`تم تسجيل المريض ${name} بنجاح.`);
-        setName("");
-        setPhone("");
-        setAge("");
-        setNationality("سعودي");
-        setGender("");
-        setNationalId("");
-        setConsultationType("");
-        setPdfFiles([]);
-        setPaymentMethod("");
-        setCashPrice(null);
-        setSelectedPrice(null);
+        alert(`تم إنشاء الرابط بنجاح: ${result.data.link}`);
       } else {
-        alert("فشل في تسجيل المريض.");
+        throw new Error(result.message);
       }
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء التسجيل.");
+    } catch (err: any) {
+      console.error("Error submitting magic link:", err);
+      if (err.message === "Network Error" || !err.response) {
+        setSubmitError(
+          "Network error: Please check your connection and try again."
+        );
+      } else {
+        setSubmitError(
+          "Failed to create the magic link. Please try again later."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -149,14 +167,27 @@ const OrgPatientsPage: React.FC = () => {
       />
 
       <div className={`pt-${dealType ? "40" : "28"} pb-28`}>
-        {currentView === "patients" ? (
-          isLoading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <p className="spinner"></p>
-            </div>
-          ) : error ? (
-            <p className="text-red-500 text-center">{error}</p>
-          ) : patients.length === 0 ? (
+        {orgError ? (
+          <div className="flex flex-col items-center justify-center min-h-[50vh]">
+            <p className="text-red-500 text-center mb-4">{orgError}</p>
+            <button
+              onClick={fetchOrg}
+              className="bg-custom-green text-white py-2 px-4 rounded-md flex justify-center items-center"
+              disabled={isLoadingOrg}
+            >
+              {isLoadingOrg ? (
+                <div className="spinner"></div>
+              ) : (
+                "إعادة المحاولة"
+              )}
+            </button>
+          </div>
+        ) : isLoadingOrg ? (
+          <div className="flex items-center justify-center min-h-[50vh]">
+            <div className="spinner"></div>
+          </div>
+        ) : currentView === "patients" ? (
+          patients.length === 0 ? (
             <p className="text-center text-gray-500">لا يوجد مرضى حاليًا</p>
           ) : (
             <div>
@@ -207,41 +238,48 @@ const OrgPatientsPage: React.FC = () => {
               pdfFiles={pdfFiles}
               setPdfFiles={setPdfFiles}
             />
-
-            <ConsultationTypeSection
+            <TestTypeSection
               orgType={orgType}
-              testType={consultationType}
-              setTestType={setConsultationType}
+              testType={testType}
+              setTestType={settestType}
               pdfFiles={pdfFiles}
               setPdfFiles={setPdfFiles}
             />
-
-            <PaymentMethodSection
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-              possiblePaymentMethods={possiblePaymentMethods}
-              cashPrice={cashPrice}
-              setCashPrice={setCashPrice}
-            />
-
-            {paymentMethod === "online" &&
-              dealType === DealType.REVENUE_SHARE && (
+            {dealType === DealType.REVENUE_SHARE && (
+              <>
+                <PaymentMethodSection
+                  paymentMethod={paymentMethod}
+                  setPaymentMethod={setPaymentMethod}
+                  possiblePaymentMethods={possiblePaymentMethods}
+                  cashPrice={cashPrice}
+                  setCashPrice={setCashPrice}
+                />
                 <ConsultationPriceSection
                   selectedPrice={selectedPrice}
                   onChange={(price) => setSelectedPrice(price)}
                   possiblePrices={possiblePrices}
                 />
-              )}
+              </>
+            )}
           </div>
         )}
       </div>
 
-      <div className="fixed bottom-12 left-0 w-full px-4">
+      {submitError && (
+        <div className="text-red-500 text-center py-4">{submitError}</div>
+      )}
+
+      <div className="fixed bottom-16 left-0 w-full px-4">
         <button
           onClick={handleSubmit}
-          className="w-full bg-custom-green text-white py-3 px-4 rounded-md"
+          className="w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
+          disabled={isSubmitting}
         >
-          إرسال استشارة طبية
+          {isSubmitting ? (
+            <div className="spinner"></div>
+          ) : (
+            "إرسال استشارة طبية"
+          )}
         </button>
       </div>
 
