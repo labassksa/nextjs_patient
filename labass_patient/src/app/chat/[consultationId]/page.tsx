@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Header from "../../../components/common/header";
 import ChatMainContents from "../../chat/_components/chatMainContent";
-import StickyMessageInput from "../../chat/_components/chatInputarea"; // Import StickyMessageInput
+import StickyMessageInput from "../../chat/_components/chatInputarea";
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
 import { ConsultationStatus } from "@/models/consultation";
+import { getMagicLink } from "../_controllers/getMagicLink";
 
 interface Message {
   id?: string;
@@ -25,52 +26,21 @@ const ChatPage: React.FC = () => {
   const [doctorInfo, setDoctorInfo] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isConsultationLoaded, setIsConsultationLoaded] = useState(false);
+  const [hasValidConsultation, setHasValidConsultation] = useState(false);
   const router = useRouter();
   const params = useParams();
   const messageEndRef = useRef<HTMLDivElement>(null);
-  const consultationId = params.consultationId;
+  const consultationId = Number(params.consultationId);
   const websocketURL = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "";
-  const token = localStorage.getItem("labass_token");
+  const searchParams = useSearchParams();
+  let tokenUUID = searchParams.get("tokenUUID");
   const userId =
     typeof window !== "undefined" ? localStorage.getItem("labass_userId") : "";
 
-  const statusClass = `inline-block px-3 py-1 rounded-full text-xs font-medium ${
-    status === ConsultationStatus.Open
-      ? "bg-green-100 text-green-700 mb-1"
-      : status === ConsultationStatus.Paid
-      ? "bg-blue-100 text-blue-700 mb-1"
-      : status === ConsultationStatus.Closed
-      ? "bg-red-100 text-red-700 mb-1"
-      : "bg-gray-200 text-gray-700 mb-1"
-  }`;
-
-  useEffect(() => {
-    const fetchConsultation = async () => {
-      if (!consultationId) return;
-
-      const consultation = await getConsultationById(Number(consultationId));
-
-      if (consultation && consultation.status) {
-        setStatus(consultation.status); // Set the status code directly
-        // No need to translate here
-        if (consultation.doctor && consultation.doctor.user) {
-          setDoctorInfo(consultation.doctor);
-        } else {
-          setDoctorInfo(null);
-        }
-      }
-    };
-
-    fetchConsultation();
-  }, [consultationId]);
-
-  useEffect(() => {
-    if (!token || !userId || !consultationId) {
-      router.push("/login");
-    }
-  }, [token, userId, consultationId, router]);
-
-  const { socket, isConnected } = useSocket(websocketURL, token || "");
+  if (!tokenUUID && typeof window !== "undefined") {
+    tokenUUID = localStorage.getItem("labass_tokenUUID") || "";
+  }
   const getStatusDisplay = (statusCode: string) => {
     switch (statusCode) {
       case ConsultationStatus.Paid:
@@ -83,6 +53,96 @@ const ChatPage: React.FC = () => {
         return "getStatusDisplay"; // Default case for unknown statuses
     }
   };
+  useEffect(() => {
+    const handleMagicLinkFlow = async () => {
+      if (tokenUUID) {
+        try {
+          console.log("Using magic link flow.");
+          const response = await getMagicLink(
+            tokenUUID,
+            Number(consultationId)
+          );
+
+          console.log("Magic link response:", response);
+          const { tokenJWT, consultation } = response;
+
+          // Save tokenJWT and user ID to localStorage
+          localStorage.setItem("labass_token", tokenJWT);
+          localStorage.setItem("labass_userId", consultation.patient.user.id);
+
+          // Set consultation status and doctor info
+          setStatus(consultation.status);
+          setDoctorInfo(consultation.doctor || null);
+          setHasValidConsultation(true);
+          setIsConsultationLoaded(true);
+        } catch (error) {
+          console.error("Error during magic link validation:", error || error);
+          alert(error || "An error occurred while processing the magic link.");
+          router.push("/login");
+        }
+      } else {
+        console.log("Checking for normal flow token.");
+        const tokenJWT = localStorage.getItem("labass_token");
+        const userId = localStorage.getItem("labass_userId");
+
+        if (!tokenJWT || !userId) {
+          console.warn(
+            "Missing tokenJWT or userId in localStorage. Redirecting to login."
+          );
+          router.push("/login");
+          return;
+        }
+
+        console.log(
+          "Token found in localStorage. Proceeding with normal flow."
+        );
+        setIsConsultationLoaded(true);
+      }
+    };
+
+    handleMagicLinkFlow();
+  }, [tokenUUID, consultationId, router]);
+
+  useEffect(() => {
+    const fetchConsultation = async () => {
+      if (!consultationId || !isConsultationLoaded) {
+        console.warn("Cannot fetch consultation without a valid token.");
+        return;
+      }
+
+      console.log("Fetching consultation details for ID:", consultationId);
+      const consultation = await getConsultationById(Number(consultationId));
+
+      if (consultation && consultation.status) {
+        setStatus(consultation.status);
+        console.log("Consultation status:", consultation.status);
+        if (consultation.doctor && consultation.doctor.user) {
+          setDoctorInfo(consultation.doctor);
+          console.log("Doctor info set:", consultation.doctor);
+        } else {
+          setDoctorInfo(null);
+          console.log("No doctor info available.");
+        }
+        setHasValidConsultation(true);
+        setLoading(false);
+      } else {
+        console.warn("Failed to fetch consultation. Redirecting to login.");
+        router.push("/login");
+      }
+    };
+
+    if (consultationId && isConsultationLoaded) {
+      fetchConsultation();
+    }
+  }, [consultationId, isConsultationLoaded, router]);
+
+  console.log("TokenUUID after fallback check:", tokenUUID);
+  console.log("Initial userId:", userId);
+  console.log("Consultation ID:", consultationId);
+
+  console.log("WebSocket URL:", websocketURL);
+
+  const { socket, isConnected } = useSocket(websocketURL, tokenUUID || "");
 
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
@@ -254,7 +314,8 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !hasValidConsultation) {
+    console.log("Loading consultation page...");
     return (
       <div className="flex justify-center items-center bg-gray-200 h-screen">
         <div
@@ -267,12 +328,22 @@ const ChatPage: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Fixed header */}
       <div className="sticky top-0 w-full bg-white z-50">
         <Header title="استشارة فورية" showBackButton={true} />
         <div className="text-black mb-0 mt-16 px-4 text-right w-full">
-          <h2 className={`${statusClass}`}>
-            حالة الاستشارة:{getStatusDisplay(status)}{" "}
+          <h2
+            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+              status === ConsultationStatus.Open
+                ? "bg-green-100 text-green-700 mb-1"
+                : status === ConsultationStatus.Paid
+                ? "bg-blue-100 text-blue-700 mb-1"
+                : status === ConsultationStatus.Closed
+                ? "bg-red-100 text-red-700 mb-1"
+                : "bg-gray-200 text-gray-700 mb-1"
+            }`}
+          >
+            حالة الاستشارة:
+            {getStatusDisplay(status)}
           </h2>
           {doctorInfo ? (
             <div className="p-0 text-right mb-0">
@@ -288,7 +359,6 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ChatMainContents is scrollable */}
       <div className="flex-grow overflow-y-auto">
         <ChatMainContents
           consultationId={Number(consultationId)}
@@ -297,7 +367,6 @@ const ChatPage: React.FC = () => {
         <div ref={messageEndRef} />
       </div>
 
-      {/* StickyMessageInput is fixed at the bottom */}
       <div className="shrink-0 fixed bottom-0 w-full bg-white">
         <StickyMessageInput
           onSendMessage={handleSendMessage}
