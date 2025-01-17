@@ -7,7 +7,7 @@ import StickyMessageInput from "../../chat/_components/chatInputarea";
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
 import { ConsultationStatus } from "../../../models/consultation";
-import { getMagicLink } from "../_controllers/getMagicLink";
+import { getMagicLink } from "../_controllers/getMAgicLink";
 
 interface Message {
   id?: string;
