@@ -57,7 +57,7 @@ const ChatPage: React.FC = () => {
     const handleMagicLinkFlow = async () => {
       if (tokenUUID) {
         try {
-          console.log("Using magic link flow.");
+          console.log("  Using magic link flow.");
           const response = await getMagicLink(
             tokenUUID,
             Number(consultationId)
