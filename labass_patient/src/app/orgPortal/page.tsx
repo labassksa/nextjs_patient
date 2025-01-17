@@ -68,32 +68,31 @@ const OrgPatientsPage: React.FC = () => {
 
   const fetchOrg = async () => {
     setIsLoadingOrg(true);
-    setOrgError("");
+    setOrgError(""); // Reset error state
     try {
       const orgResponse = await getOrganization();
+
+      console.log("Organization Response:", orgResponse);
+
       if (orgResponse.success && orgResponse.data) {
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
-        console.log(
-          "Organization details fetched successfully:",
-          orgResponse.data
-        );
       } else {
-        throw new Error("Failed to fetch organization or no data returned.");
+        throw new Error(orgResponse.message || "Unknown error occurred.");
       }
     } catch (err: any) {
-      if (err.message === "Network Error" || !err.response) {
-        setOrgError(
-          "خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
-        );
-      } else {
-        setOrgError(
-          "We cannot get your organization info. Contact customer support or refresh the page later."
-        );
-      }
-      console.error("Error fetching organization details:", err);
+      console.error("Fetch Organization Error:", err);
+
+      // Extract correct backend error message
+      const backendMessage =
+        err.response?.data?.message || err.message || "Unknown error";
+
+      console.log("Extracted Backend Message:", backendMessage);
+
+      // Display the extracted backend message instead of a generic fallback
+      setOrgError(backendMessage);
     } finally {
-      setIsLoadingOrg(false);
+      setIsLoadingOrg(false); // Stop the loading spinner
     }
   };
 
@@ -102,7 +101,6 @@ const OrgPatientsPage: React.FC = () => {
   }, []);
 
   const handleSubmit = async () => {
-    console.log("Form submission initiated.");
     setIsSubmitting(true);
     setSubmitError("");
     if (!name || !phone || !dateOfBirth || !gender || !nationality) {
@@ -131,24 +129,21 @@ const OrgPatientsPage: React.FC = () => {
       pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
     };
 
-    console.log("Prepared JSON Payload:", magicLinkData);
-
     try {
       const result = await createMagicLink(magicLinkData);
       if (result.success) {
-        alert(`تم إنشاء الرابط بنجاح: ${result.data.link}`);
+        alert(`تم إرسال الاستشارة الطبية للعميل بنجاح: ${result.data.link}`);
       } else {
         throw new Error(result.message);
       }
     } catch (err: any) {
-      console.error("Error submitting magic link:", err);
       if (err.message === "Network Error" || !err.response) {
         setSubmitError(
-          "Network error: Please check your connection and try again."
+          "خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
         );
       } else {
         setSubmitError(
-          "Failed to create the magic link. Please try again later."
+          "فشل إنشاء الرابط السحري. يرجى المحاولة مرة أخرى لاحقًا."
         );
       }
     } finally {
@@ -167,22 +162,26 @@ const OrgPatientsPage: React.FC = () => {
       />
 
       <div className={`pt-${dealType ? "40" : "28"} pb-28`}>
-        {orgError ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <p className="text-red-500 text-center mb-4">{orgError}</p>
-            <button
-              onClick={fetchOrg}
-              className="bg-custom-green text-white py-2 px-4 rounded-md flex justify-center items-center"
-              disabled={isLoadingOrg}
-            >
-              {isLoadingOrg ? (
-                <div className="spinner"></div>
-              ) : (
-                "إعادة المحاولة"
-              )}
-            </button>
+        {orgError && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
+              <p className="text-red-500 text-lg mb-4">{orgError}</p>
+              <button
+                onClick={fetchOrg}
+                className="bg-custom-green text-white py-2 px-4 rounded-md"
+                disabled={isLoadingOrg}
+              >
+                {isLoadingOrg ? (
+                  <div className="spinner"></div>
+                ) : (
+                  "إعادة المحاولة"
+                )}
+              </button>
+            </div>
           </div>
-        ) : isLoadingOrg ? (
+        )}
+
+        {isLoadingOrg ? (
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="spinner"></div>
           </div>
@@ -266,7 +265,17 @@ const OrgPatientsPage: React.FC = () => {
       </div>
 
       {submitError && (
-        <div className="text-red-500 text-center py-4">{submitError}</div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
+            <p className="text-red-500 text-lg mb-4">{submitError}</p>
+            <button
+              onClick={() => setSubmitError("")}
+              className="bg-gray-300 text-black py-2 px-4 rounded-md"
+            >
+              موافق
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="fixed bottom-16 left-0 w-full px-4">
