@@ -132,7 +132,7 @@ const OrgPatientsPage: React.FC = () => {
     try {
       const result = await createMagicLink(magicLinkData);
       if (result.success) {
-        alert(`تم إرسال الاستشارة الطبية للعميل بنجاح: ${result.data.link}`);
+        alert(`تم إرسال الاستشارة الطبية للعميل بنجاح`);
       } else {
         throw new Error(result.message);
       }
