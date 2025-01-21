@@ -35,63 +35,20 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 }) => {
   const router = useRouter();
 
-  // States
+  // Local states
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
   const [consultationId, setConsultationId] = useState<number | null>(null);
 
-  // Refs to store Apple Pay config and script load status
+  // Apple Pay references
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // -----------------------------
-  // 1) Initialize Apple Pay
-  // -----------------------------
-  const initializeApplePay = async () => {
-    if (method === PaymentMethodEnum.ApplePay) {
-      try {
-        // Always send the discounted price to initiate-session
-        const response = await axios.post(`${apiUrl}/initiate-session`, {
-          InvoiceAmount: discountedPrice,
-          CurrencyIso: "SAR",
-        });
-
-        if (response.data.IsSuccess) {
-          const { SessionId, CountryCode } = response.data.Data;
-
-          // Create Apple Pay config with discountedPrice
-          applePayConfigRef.current = {
-            sessionId: SessionId,
-            countryCode: "SAU",
-            currencyCode: "SAR",
-            amount: discountedPrice.toFixed(2),
-            cardViewId: "apple-pay-container",
-            callback: payment,
-            sessionStarted: sessionStarted,
-            sessionCanceled: sessionCanceled,
-          };
-
-          // If script is already loaded, init Apple Pay right now
-          if (scriptLoadedRef.current) {
-            window.myFatoorahAP.init(applePayConfigRef.current);
-            setIsInitialized(true);
-            // Update amount to discounted price
-            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
-          }
-        } else {
-          console.error("Failed to initiate session:", response.data.Message);
-        }
-      } catch (error) {
-        console.error("Error initiating session:", error);
-      }
-    }
-  };
-
-  // -----------------------------
-  // 2) Load Apple Pay Script Once
-  // -----------------------------
+  // ----------------------------------------------------------------
+  // 1. Load the Apple Pay script once
+  // ----------------------------------------------------------------
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
@@ -103,11 +60,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
 
-        // If we already have a config (e.g. from initializeApplePay), init now
+        // If config is ready, init right away
         if (applePayConfigRef.current) {
           window.myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
-          // Update to discounted price
+          // Reflect the discounted price
           window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
         }
       };
@@ -126,21 +83,60 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, []);
 
-  // -----------------------------
-  // 3) Re-initialize ApplePay
-  //    when discountedPrice or method changes
-  // -----------------------------
+  // ----------------------------------------------------------------
+  // 2. Initialize Apple Pay with discounted price
+  // ----------------------------------------------------------------
+  const initializeApplePay = async () => {
+    if (method === PaymentMethodEnum.ApplePay) {
+      try {
+        const response = await axios.post(`${apiUrl}/initiate-session`, {
+          InvoiceAmount: discountedPrice, // always use discounted
+          CurrencyIso: "SAR",
+        });
+
+        if (response.data.IsSuccess) {
+          const { SessionId } = response.data.Data;
+          applePayConfigRef.current = {
+            sessionId: SessionId,
+            countryCode: "SAU",
+            currencyCode: "SAR",
+            amount: discountedPrice.toFixed(2),
+            cardViewId: "apple-pay-container",
+            callback: paymentCallback, // see below
+            sessionStarted: sessionStarted,
+            sessionCanceled: sessionCanceled,
+          };
+
+          if (scriptLoadedRef.current) {
+            // init Apple Pay immediately
+            window.myFatoorahAP.init(applePayConfigRef.current);
+            setIsInitialized(true);
+            // update to discounted price
+            window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
+          }
+        } else {
+          console.error("Failed to initiate session:", response.data.Message);
+        }
+      } catch (err) {
+        console.error("Error initiating Apple Pay session:", err);
+      }
+    }
+  };
+
+  // ----------------------------------------------------------------
+  // 3. Re-initialize ApplePay if discountedPrice or method changes
+  // ----------------------------------------------------------------
   useEffect(() => {
     if (method === PaymentMethodEnum.ApplePay) {
-      // Clear existing Apple Pay button
+      // Clear old Apple Pay button if it exists
       const container = document.getElementById("apple-pay-container");
       if (container) {
         container.innerHTML = "";
       }
-      // Now re-initialize with the new discounted price
+      // Now initialize with the new discounted price
       initializeApplePay();
     } else {
-      // If user switched away from ApplePay, remove the Apple Pay button
+      // Remove Apple Pay if user switched method
       const container = document.getElementById("apple-pay-container");
       if (container) {
         container.innerHTML = "";
@@ -148,41 +144,44 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, [discountedPrice, method]);
 
-  // -----------------------------
-  // 4) Generic "Pay" button for other methods
-  //    (Card or Apple Pay fallback)
-  // -----------------------------
+  // ----------------------------------------------------------------
+  // 4. The "handlePaymentClick" for other methods (e.g. Card)
+  // ----------------------------------------------------------------
   const handlePaymentClick = async () => {
     const token = localStorage.getItem("labass_token");
     if (!token) {
-      router.push("/login"); // Navigate to login page if not logged in
+      router.push("/login");
     }
-    if (loading) return; // Prevent multiple initiations
+
+    if (loading) return;
+
     setLoading(true);
 
     try {
+      // We also do "initiate-session" if user picks card
       const response = await axios.post(`${apiUrl}/initiate-session`, {
-        InvoiceAmount: discountedPrice, // discounted price again
+        InvoiceAmount: discountedPrice, // discounted price
         CurrencyIso: "SAR",
       });
 
       if (response.data.IsSuccess) {
         const { SessionId, CountryCode } = response.data.Data;
 
+        // If method is Card, go to the card details page
         if (method === PaymentMethodEnum.Card) {
-          // If user chose Card, redirect to card details with session
           router.push(
             `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
           );
-        } else if (method === PaymentMethodEnum.ApplePay) {
-          // Re-init ApplePay config with discounted price
+        }
+        // If method is ApplePay, we do the same ApplePay init logic
+        else if (method === PaymentMethodEnum.ApplePay) {
           applePayConfigRef.current = {
             sessionId: SessionId,
             countryCode: "SAU",
             currencyCode: "SAR",
             amount: discountedPrice.toFixed(2),
             cardViewId: "apple-pay-container",
-            callback: payment,
+            callback: paymentCallback,
             sessionStarted: sessionStarted,
             sessionCanceled: sessionCanceled,
           };
@@ -196,74 +195,89 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       } else {
         console.error("Failed to initiate session:", response.data.Message);
       }
-    } catch (error) {
-      console.error("Error initiating session:", error);
+    } catch (err) {
+      console.error("Error initiating session:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // -----------------------------
-  // 5) Payment & Execution
-  // -----------------------------
-  const payment = (response: {
+  // ----------------------------------------------------------------
+  // 5. Payment callback => user approved Apple Pay
+  // ----------------------------------------------------------------
+  const paymentCallback = (response: {
     sessionId: string;
     cardBrand: string;
     cardIdentifier: string;
   }) => {
-    const sessionId = response.sessionId;
-    console.log(`Payment session: ${sessionId}`);
-    executePayment(sessionId);
+    console.log("Apple Pay callback triggered:", response);
+    // Now we finalize the payment
+    executePayment(response.sessionId);
   };
 
+  // ----------------------------------------------------------------
+  // 6. Final executePayment call
+  // ----------------------------------------------------------------
   const executePayment = async (sessionId: string) => {
     try {
       const token = localStorage.getItem("labass_token");
       if (!token) {
-        console.error("Token not found in localStorage.");
+        console.error("No token found in localStorage.");
         return;
       }
 
       console.log(
-        `Executing payment with discounted amount: ${discountedPrice}, promoCode: ${promoCode}`
+        "Execute payment with discountedPrice:",
+        discountedPrice,
+        "promoCode:",
+        promoCode
       );
 
+      // Send discounted price & promo code to server
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2), // discounted price
-          PromoCode: promoCode, // pass the code if applied
+          InvoiceValue: discountedPrice.toFixed(2),
+          PromoCode: promoCode,
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       if (response.data.IsSuccess) {
+        // Payment success
         const paymentUrl = response.data.Data.PaymentURL;
-        const consultationId = response.data.consultation;
+        const newConsultationId = response.data.consultation;
 
-        // Show success modal
         setPaymentMessage("تمت عملية الدفع بنجاح");
-        setConsultationId(consultationId);
+        setConsultationId(newConsultationId);
         setShowModal(true);
 
-        // This next line might be a "tracking" request or redirect
-        // If it redirects, ensure it doesn't break your UI
+        // Possibly do a GET request to paymentUrl
+        // (some setups might do a redirect or tracking)
         await axios.get(paymentUrl);
+      } else {
+        console.error("executePayment failed:", response.data);
       }
     } catch (error) {
-      console.error("Error executing payment:", error);
+      console.error("Error in executePayment:", error);
     }
   };
 
-  // Modal button callback
+  // Apple Pay session events
+  const sessionStarted = () => {
+    console.log("Apple Pay session started");
+  };
+  const sessionCanceled = () => {
+    console.log("Apple Pay session canceled");
+  };
+
+  // 7. Modal callback
   const handleGoToChat = () => {
     if (consultationId) {
       router.push(`/patientSelection?consultationId=${consultationId}`);
@@ -272,36 +286,27 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
-  // Apple Pay session events
-  const sessionStarted = () => {
-    console.log("Session started");
-  };
-
-  const sessionCanceled = () => {
-    console.log("Session canceled");
-  };
-
-  // -----------------------------
-  // 6) Render
-  // -----------------------------
+  // ----------------------------------------------------------------
+  // 8. Render
+  // ----------------------------------------------------------------
   return (
     <div>
-      {/* Apple Pay button container */}
+      {/* Apple Pay container */}
       <div id="apple-pay-container"></div>
 
-      {/* If the method is Card, show the standard pay button */}
+      {/* If method is Card, show a pay button */}
       {method === PaymentMethodEnum.Card && (
         <button
           className="sticky bottom-0 p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
-          dir="rtl"
           onClick={handlePaymentClick}
           disabled={loading}
+          dir="rtl"
         >
           {loading ? "Processing..." : "الدفع بالبطاقة"}
         </button>
       )}
 
-      {/* Payment success/failure modal */}
+      {/* Payment success modal */}
       {showModal && (
         <div className="modal">
           <div className="modal-content text-black">
@@ -316,7 +321,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         </div>
       )}
 
-      {/* Basic styling for the modal */}
+      {/* Basic modal styling */}
       <style jsx>{`
         .modal {
           position: fixed;
