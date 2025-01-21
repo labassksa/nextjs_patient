@@ -1,4 +1,6 @@
 "use client";
+export const dynamic = "force-dynamic"; // <-- Add this line
+
 import React, { useEffect, useState } from "react";
 import PaymentIntro from "./_components/payment/paymentIntro";
 import PaymentMethod from "./_components/payment/paymentMethod";
