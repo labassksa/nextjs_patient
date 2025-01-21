@@ -34,17 +34,25 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   promoCode,
 }) => {
   const router = useRouter();
+
+  // States
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false); // Modal state
-  const [paymentMessage, setPaymentMessage] = useState<string | null>(null); // Payment message state
-  const [consultationId, setConsultationId] = useState<number | null>(null); // State to store consultationId
+  const [showModal, setShowModal] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState<string | null>(null);
+  const [consultationId, setConsultationId] = useState<number | null>(null);
+
+  // Refs to store Apple Pay config and script load status
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
+  // -----------------------------
+  // 1) Initialize Apple Pay
+  // -----------------------------
   const initializeApplePay = async () => {
     if (method === PaymentMethodEnum.ApplePay) {
       try {
+        // Always send the discounted price to initiate-session
         const response = await axios.post(`${apiUrl}/initiate-session`, {
           InvoiceAmount: discountedPrice,
           CurrencyIso: "SAR",
@@ -53,6 +61,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         if (response.data.IsSuccess) {
           const { SessionId, CountryCode } = response.data.Data;
 
+          // Create Apple Pay config with discountedPrice
           applePayConfigRef.current = {
             sessionId: SessionId,
             countryCode: "SAU",
@@ -64,9 +73,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
             sessionCanceled: sessionCanceled,
           };
 
+          // If script is already loaded, init Apple Pay right now
           if (scriptLoadedRef.current) {
             window.myFatoorahAP.init(applePayConfigRef.current);
             setIsInitialized(true);
+            // Update amount to discounted price
             window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
           }
         } else {
@@ -78,6 +89,9 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
+  // -----------------------------
+  // 2) Load Apple Pay Script Once
+  // -----------------------------
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
@@ -89,9 +103,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         console.log("Apple Pay script loaded successfully.");
         scriptLoadedRef.current = true;
 
+        // If we already have a config (e.g. from initializeApplePay), init now
         if (applePayConfigRef.current) {
           window.myFatoorahAP.init(applePayConfigRef.current);
           setIsInitialized(true);
+          // Update to discounted price
           window.myFatoorahAP.updateAmount(discountedPrice.toFixed(2));
         }
       };
@@ -110,32 +126,43 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   }, []);
 
+  // -----------------------------
+  // 3) Re-initialize ApplePay
+  //    when discountedPrice or method changes
+  // -----------------------------
   useEffect(() => {
     if (method === PaymentMethodEnum.ApplePay) {
+      // Clear existing Apple Pay button
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.innerHTML = ""; // Clear the previous Apple Pay button
+        container.innerHTML = "";
       }
-      initializeApplePay(); // Initialize Apple Pay
+      // Now re-initialize with the new discounted price
+      initializeApplePay();
     } else {
-      // Remove Apple Pay button if it exists
+      // If user switched away from ApplePay, remove the Apple Pay button
       const container = document.getElementById("apple-pay-container");
       if (container) {
-        container.innerHTML = ""; // Clear the container when method is not ApplePay
+        container.innerHTML = "";
       }
     }
   }, [discountedPrice, method]);
 
+  // -----------------------------
+  // 4) Generic "Pay" button for other methods
+  //    (Card or Apple Pay fallback)
+  // -----------------------------
   const handlePaymentClick = async () => {
     const token = localStorage.getItem("labass_token");
     if (!token) {
-      router.push("/login"); // Navigate to login page
+      router.push("/login"); // Navigate to login page if not logged in
     }
     if (loading) return; // Prevent multiple initiations
     setLoading(true);
+
     try {
       const response = await axios.post(`${apiUrl}/initiate-session`, {
-        InvoiceAmount: discountedPrice,
+        InvoiceAmount: discountedPrice, // discounted price again
         CurrencyIso: "SAR",
       });
 
@@ -143,10 +170,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const { SessionId, CountryCode } = response.data.Data;
 
         if (method === PaymentMethodEnum.Card) {
+          // If user chose Card, redirect to card details with session
           router.push(
             `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
           );
         } else if (method === PaymentMethodEnum.ApplePay) {
+          // Re-init ApplePay config with discounted price
           applePayConfigRef.current = {
             sessionId: SessionId,
             countryCode: "SAU",
@@ -174,28 +203,29 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     }
   };
 
+  // -----------------------------
+  // 5) Payment & Execution
+  // -----------------------------
   const payment = (response: {
     sessionId: string;
     cardBrand: string;
     cardIdentifier: string;
   }) => {
     const sessionId = response.sessionId;
-    console.log(`Payment ${sessionId}`);
-
+    console.log(`Payment session: ${sessionId}`);
     executePayment(sessionId);
   };
 
   const executePayment = async (sessionId: string) => {
     try {
       const token = localStorage.getItem("labass_token");
-
       if (!token) {
         console.error("Token not found in localStorage.");
         return;
       }
 
       console.log(
-        `Executing payment with amount: ${discountedPrice} and promoCode: ${promoCode}`
+        `Executing payment with discounted amount: ${discountedPrice}, promoCode: ${promoCode}`
       );
 
       const response = await axios.post(
@@ -203,12 +233,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         {
           SessionId: sessionId,
           DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2), // Ensure this is the discounted price
-          PromoCode: promoCode, // Include the applied promo code
+          InvoiceValue: discountedPrice.toFixed(2), // discounted price
+          PromoCode: promoCode, // pass the code if applied
           CallBackUrl: "https://yoursite.com/success",
           ErrorUrl: "https://yoursite.com/error",
         },
-
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -220,27 +249,30 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         const paymentUrl = response.data.Data.PaymentURL;
         const consultationId = response.data.consultation;
 
-        // Show modal with success message
-        setPaymentMessage("تمت عملية الدفع بنجاح"); // Set success message
-        setConsultationId(consultationId); // Store consultationId
+        // Show success modal
+        setPaymentMessage("تمت عملية الدفع بنجاح");
+        setConsultationId(consultationId);
         setShowModal(true);
+
+        // This next line might be a "tracking" request or redirect
+        // If it redirects, ensure it doesn't break your UI
         await axios.get(paymentUrl);
       }
     } catch (error) {
-      console.error("the consultationId:", consultationId);
+      console.error("Error executing payment:", error);
     }
   };
 
+  // Modal button callback
   const handleGoToChat = () => {
     if (consultationId) {
-      console.log("inside Payment Button");
-
-      router.push(`/patientSelection?consultationId=${consultationId}`); // Navigate to chat with consultationId
+      router.push(`/patientSelection?consultationId=${consultationId}`);
     } else {
       console.error("Consultation ID is missing.");
     }
   };
 
+  // Apple Pay session events
   const sessionStarted = () => {
     console.log("Session started");
   };
@@ -249,9 +281,15 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     console.log("Session canceled");
   };
 
+  // -----------------------------
+  // 6) Render
+  // -----------------------------
   return (
     <div>
+      {/* Apple Pay button container */}
       <div id="apple-pay-container"></div>
+
+      {/* If the method is Card, show the standard pay button */}
       {method === PaymentMethodEnum.Card && (
         <button
           className="sticky bottom-0 p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
@@ -259,27 +297,26 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           onClick={handlePaymentClick}
           disabled={loading}
         >
-          {loading ? "Processing..." : "الدفع بالبطاقة"}{" "}
+          {loading ? "Processing..." : "الدفع بالبطاقة"}
         </button>
       )}
 
-      {/* Modal for showing the response message */}
+      {/* Payment success/failure modal */}
       {showModal && (
         <div className="modal">
           <div className="modal-content text-black">
-            <pre>{paymentMessage}</pre>{" "}
-            {/* Display the logged response in the modal */}
+            <pre>{paymentMessage}</pre>
             <button
               className="text-white bg-custom-green"
               onClick={handleGoToChat}
             >
               أكمل معلوماتك
-            </button>{" "}
-            {/* Go to chat */}
+            </button>
           </div>
         </div>
       )}
 
+      {/* Basic styling for the modal */}
       <style jsx>{`
         .modal {
           position: fixed;
