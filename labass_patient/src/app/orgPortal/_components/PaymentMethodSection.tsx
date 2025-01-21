@@ -103,7 +103,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
               <span>
                 {method === PaymentMethodEnum.THROUGH_LABASS
                   ? " اونلاين عن طريق موقع لاباس"
-                  : "استلام المبلغ من المريض (كاش او شبكة)"}
+                  : "استلام المبلغ من المريض (كاش)"}
               </span>
               {paymentMethod === method && (
                 <span className="text-white font-bold">✔</span>
