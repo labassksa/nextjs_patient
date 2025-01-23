@@ -6,7 +6,6 @@ import Script from "next/script";
 import axios from "axios";
 import Header from "../../components/common/header";
 
-// Make sure to extend the global Window interface only if needed
 declare global {
   interface Window {
     myFatoorah: any;
@@ -60,6 +59,7 @@ const CardDetails: React.FC = () => {
       promoCode
     );
 
+    // Listen for "MF-3DSecure" messages from MyFatoorah
     window.addEventListener("message", handle3DSRedirection, false);
 
     return () => {
@@ -82,14 +82,16 @@ const CardDetails: React.FC = () => {
           countryCode,
         }
       );
+
+      // Initialize the card fields
       window.myFatoorah.init({
-        // If your gateway expects "SAR" for currency, you can hardcode:
+        // If your gateway specifically needs "SAR", you can hardcode it here:
         // countryCode: "SAR",
-        // Otherwise, rely on param:
+        // Otherwise, if you want to respect the param, use:
         countryCode,
         sessionId,
-        cardViewId: "card-element", // This is where MyFatoorah will inject the card fields
-        supportedNetworks: "v,m,md,ae", // Example
+        cardViewId: "card-element",
+        supportedNetworks: "v,m,md,ae",
       });
 
       myFatoorahInitializedRef.current = true;
@@ -126,6 +128,7 @@ const CardDetails: React.FC = () => {
     }
 
     try {
+      // This triggers tokenization & initial validation
       console.log(
         "[handlePaymentSubmit] Calling myFatoorah.submit() with sessionId:",
         sessionId
@@ -144,7 +147,7 @@ const CardDetails: React.FC = () => {
           return;
         }
 
-        // Send to our backend -> /execute-payment
+        // Make the /execute-payment call to get a PaymentURL
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL;
           console.log(
@@ -152,12 +155,12 @@ const CardDetails: React.FC = () => {
             token
           );
 
+          // Keep the fallback as a number "89"
           const invoiceValue = discountedPrice
             ? Number(discountedPrice).toFixed(2)
-            : 89;
+            : "89";
 
-          // If your backend expects "SAR" specifically, use that.
-          // Otherwise, use countryCode param if that's what's needed.
+          // Hardcode "SAR" if your account is strictly for SAR
           const displayCurrencyIso = "SAR";
 
           const executePaymentResponse =
@@ -168,7 +171,7 @@ const CardDetails: React.FC = () => {
                 DisplayCurrencyIso: displayCurrencyIso,
                 InvoiceValue: invoiceValue,
                 PromoCode: promoCode,
-                // The URLs to which MyFatoorah will redirect after the OTP:
+                // The URLs for final callbacks
                 CallBackUrl: "https://labass.sa/cardDetails/success",
                 ErrorUrl: "https://labass.sa/cardDetails/error",
               },
@@ -188,6 +191,7 @@ const CardDetails: React.FC = () => {
               "[handlePaymentSubmit] PaymentURL for 3D Secure:",
               paymentUrl
             );
+
             // Now open the 3D Secure page in an iFrame:
             handle3DSecure(paymentUrl);
           } else {
@@ -356,7 +360,6 @@ const CardDetails: React.FC = () => {
   );
 };
 
-// If you are using the Next.js "app" directory, you can wrap your page in a Suspense boundary:
 const App: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
