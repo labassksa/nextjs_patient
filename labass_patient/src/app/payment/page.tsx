@@ -13,8 +13,8 @@ export default function PaymentPage() {
 // A basic fallback for Suspense
 function LoadingIndicator() {
   return (
-    <div style={{ textAlign: "center", paddingTop: 40 }}>
-      <p>Loading Payment Page...</p>
+    <div className="bg-gray-600">
+      <div className="spinner"></div>{" "}
     </div>
   );
 }
