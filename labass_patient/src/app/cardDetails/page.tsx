@@ -31,6 +31,8 @@ const CardDetails: React.FC = () => {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
   const countryCode = searchParams.get("countryCode");
+  const discountedPrice = searchParams.get("discountedPrice");
+  const promoCode = searchParams.get("promoCode");
   const myFatoorahInitializedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
@@ -102,9 +104,12 @@ const CardDetails: React.FC = () => {
               {
                 SessionId: response.sessionId,
                 DisplayCurrencyIso: "SAU",
-                InvoiceValue: 50,
+                InvoiceValue: discountedPrice
+                  ? Number(discountedPrice).toFixed(2)
+                  : 89,
                 CallBackUrl: "https://labass.sa/cardDetails/success",
                 ErrorUrl: "https://labass.sa/cardDetails/error",
+                PromoCode: promoCode,
               },
               {
                 headers: {
