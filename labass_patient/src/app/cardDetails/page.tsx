@@ -6,6 +6,7 @@ import Script from "next/script";
 import axios from "axios";
 import Header from "../../components/common/header";
 
+// Make sure to extend the global Window interface only if needed
 declare global {
   interface Window {
     myFatoorah: any;
@@ -28,131 +29,208 @@ type ExecutePaymentResponse = {
 };
 
 const CardDetails: React.FC = () => {
+  // ---------------------------------------------
+  // 1. Read URL parameters
+  // ---------------------------------------------
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("sessionId");
-  const countryCode = searchParams.get("countryCode"); // e.g. "SAU"
+  const countryCode = searchParams.get("countryCode"); // e.g. "SAU", or "SAR"
   const discountedPrice = searchParams.get("discountedPrice");
   const promoCode = searchParams.get("promoCode");
 
+  // ---------------------------------------------
+  // 2. State and Refs
+  // ---------------------------------------------
   const myFatoorahInitializedRef = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ---------------------------------------------
+  // 3. On mount, add postMessage listener
+  // ---------------------------------------------
   useEffect(() => {
+    console.log(
+      "[CardDetails] Mounted. sessionId:",
+      sessionId,
+      "countryCode:",
+      countryCode,
+      "discountedPrice:",
+      discountedPrice,
+      "promoCode:",
+      promoCode
+    );
+
     window.addEventListener("message", handle3DSRedirection, false);
+
     return () => {
+      console.log("[CardDetails] Unmounted. Removing event listener.");
       window.removeEventListener("message", handle3DSRedirection, false);
     };
-  }, []);
+  }, [sessionId, countryCode, discountedPrice, promoCode]);
 
+  // ---------------------------------------------
+  // 4. Initialize MyFatoorah
+  // ---------------------------------------------
   const initializeMyFatoorah = () => {
+    console.log("[initializeMyFatoorah] Attempting init...");
+
     if (!myFatoorahInitializedRef.current && window.myFatoorah) {
-      console.log("Initializing MyFatoorah with:", { countryCode, sessionId });
+      console.log(
+        "[initializeMyFatoorah] MyFatoorah found. Initializing with:",
+        {
+          sessionId,
+          countryCode,
+        }
+      );
       window.myFatoorah.init({
         // If your gateway expects "SAR" for currency, you can hardcode:
         // countryCode: "SAR",
-        // Otherwise, if you rely on the query param being correct:
+        // Otherwise, rely on param:
         countryCode,
         sessionId,
-        cardViewId: "card-element",
-        supportedNetworks: "v,m,md,ae",
+        cardViewId: "card-element", // This is where MyFatoorah will inject the card fields
+        supportedNetworks: "v,m,md,ae", // Example
       });
-      console.log("MyFatoorah initialized successfully.");
+
       myFatoorahInitializedRef.current = true;
       setIsInitialized(true);
+      console.log("[initializeMyFatoorah] Successfully initialized.");
     } else {
-      console.error("MyFatoorah script not available or already initialized.");
+      console.warn(
+        "[initializeMyFatoorah] MyFatoorah script not available or already initialized."
+      );
     }
   };
 
+  // ---------------------------------------------
+  // 5. Submit Payment
+  // ---------------------------------------------
   const handlePaymentSubmit = async () => {
+    console.log("[handlePaymentSubmit] Submitting payment...");
     setLoading(true);
-    console.log("Submitting payment...");
 
+    // Check if .submit exists
     if (!window.myFatoorah || typeof window.myFatoorah.submit !== "function") {
-      console.error("window.myFatoorah.submit is not available.");
+      console.error(
+        "[handlePaymentSubmit] window.myFatoorah.submit is not available."
+      );
       setLoading(false);
       return;
     }
 
+    // Check sessionId
     if (!sessionId) {
-      console.error("Session ID is missing. Unable to proceed with payment.");
+      console.error("[handlePaymentSubmit] No sessionId found in URL.");
       setLoading(false);
       return;
     }
 
     try {
-      console.log("Submitting payment with sessionId:", sessionId);
-      const response = await window.myFatoorah.submit();
-      console.log("Submit response received:", response);
+      console.log(
+        "[handlePaymentSubmit] Calling myFatoorah.submit() with sessionId:",
+        sessionId
+      );
+      const submitResponse = await window.myFatoorah.submit();
+      console.log("[handlePaymentSubmit] submit response:", submitResponse);
 
-      if (response) {
+      if (submitResponse) {
+        // Retrieve token from localStorage
         const token = localStorage.getItem("labass_token");
         if (!token) {
-          console.error("Token not found in localStorage.");
+          console.error(
+            "[handlePaymentSubmit] No token found in localStorage."
+          );
           setLoading(false);
           return;
         }
 
+        // Send to our backend -> /execute-payment
         try {
           const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          console.log(
+            "[handlePaymentSubmit] Posting to /execute-payment with token:",
+            token
+          );
+
+          const invoiceValue = discountedPrice
+            ? Number(discountedPrice).toFixed(2)
+            : 89;
+
+          // If your backend expects "SAR" specifically, use that.
+          // Otherwise, use countryCode param if that's what's needed.
+          const displayCurrencyIso = "SAR";
+
           const executePaymentResponse =
             await axios.post<ExecutePaymentResponse>(
               `${apiUrl}/execute-payment`,
               {
-                SessionId: response.sessionId,
-                // If your backend expects "SAR", replace countryCode with "SAR"
-                DisplayCurrencyIso: "SAR",
-                InvoiceValue: discountedPrice
-                  ? Number(discountedPrice).toFixed(2)
-                  : 89,
+                SessionId: submitResponse.sessionId,
+                DisplayCurrencyIso: displayCurrencyIso,
+                InvoiceValue: invoiceValue,
+                PromoCode: promoCode,
+                // The URLs to which MyFatoorah will redirect after the OTP:
                 CallBackUrl: "https://labass.sa/cardDetails/success",
                 ErrorUrl: "https://labass.sa/cardDetails/error",
-                PromoCode: promoCode,
               },
               {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
               }
             );
 
+          console.log(
+            "[handlePaymentSubmit] /execute-payment result:",
+            executePaymentResponse.data
+          );
+
           if (executePaymentResponse.data.IsSuccess) {
+            const paymentUrl = executePaymentResponse.data.Data.PaymentURL;
             console.log(
-              `Payment URL: ${executePaymentResponse.data.Data.PaymentURL}`
+              "[handlePaymentSubmit] PaymentURL for 3D Secure:",
+              paymentUrl
             );
-            handle3DSecure(executePaymentResponse.data.Data.PaymentURL);
+            // Now open the 3D Secure page in an iFrame:
+            handle3DSecure(paymentUrl);
           } else {
             console.error(
-              "Execute payment failed:",
+              "[handlePaymentSubmit] Execute payment failed:",
               executePaymentResponse.data.Message
             );
             setLoading(false);
           }
         } catch (error) {
-          console.error("Error executing payment:", error);
+          console.error(
+            "[handlePaymentSubmit] Error calling /execute-payment:",
+            error
+          );
           setLoading(false);
         }
       } else {
-        console.error("Payment submission failed:", response);
+        console.error(
+          "[handlePaymentSubmit] Payment submission failed. Response:",
+          submitResponse
+        );
         setLoading(false);
       }
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("[handlePaymentSubmit] Payment error:", error);
       setLoading(false);
     }
   };
 
-  /**
-   * Creates/clears a dedicated container and injects an iframe
-   * so you don't wipe out the entire React DOM.
-   */
+  // ---------------------------------------------
+  // 6. Open 3D Secure in iFrame
+  // ---------------------------------------------
   const handle3DSecure = (paymentUrl: string) => {
-    const iframeUrl = `${paymentUrl}&iframeEnabled=true`;
+    console.log(
+      "[handle3DSecure] Creating iFrame for 3DS. PaymentUrl:",
+      paymentUrl
+    );
+    const iframeUrl = `${paymentUrl}&iframeEnabled=true`; // MyFatoorah param
 
-    // Create a container for the iFrame if it doesn't exist
+    // Create or reuse the container
     let container = document.getElementById("threeDS-container");
     if (!container) {
+      console.log("[handle3DSecure] Creating #threeDS-container in DOM.");
       container = document.createElement("div");
       container.id = "threeDS-container";
       container.style.position = "fixed";
@@ -164,48 +242,85 @@ const CardDetails: React.FC = () => {
       document.body.appendChild(container);
     }
 
-    // Clear previous content if any
+    // Clear the container
     container.innerHTML = "";
 
-    // Create and style the iframe
+    // Create iframe
     const iframe = document.createElement("iframe");
     iframe.src = iframeUrl;
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
 
-    // Append to the container
+    // Attach the iframe
     container.appendChild(iframe);
+    console.log(
+      "[handle3DSecure] iFrame attached. User should see OTP entry screen."
+    );
   };
 
+  // ---------------------------------------------
+  // 7. Handle 3D Secure Redirection
+  // ---------------------------------------------
   const handle3DSRedirection = (event: MessageEvent) => {
+    console.log("[handle3DSRedirection] Received message:", event.data);
     if (!event.data) return;
 
     try {
       const message = JSON.parse(event.data);
+      console.log("[handle3DSRedirection] Parsed JSON message:", message);
+
+      // MyFatoorah uses sender = "MF-3DSecure"
       if (message.sender === "MF-3DSecure") {
         const redirectionUrl = message.url;
+        console.log(
+          "[handle3DSRedirection] The final redirection URL is:",
+          redirectionUrl
+        );
+
+        // If the callback has "error" in it, handle as error
         if (redirectionUrl.includes("error")) {
+          console.error(
+            "[handle3DSRedirection] 3DS flow returned error. Redirecting..."
+          );
           window.location.href = "https://labass.sa/cardDetails/error";
         } else {
+          console.log(
+            "[handle3DSRedirection] 3DS flow success. Redirecting..."
+          );
           window.location.href = "https://labass.sa/cardDetails/success";
         }
       }
     } catch (error) {
-      console.error("Error handling 3DS redirection:", error);
+      console.error(
+        "[handle3DSRedirection] Error handling 3DS message:",
+        error
+      );
     }
   };
 
+  // ---------------------------------------------
+  // 8. Render
+  // ---------------------------------------------
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col justify-between">
+      {/* MyFatoorah Script */}
       <Script
         src="https://sa.myfatoorah.com/cardview/v2/session.js"
         strategy="lazyOnload"
-        onLoad={initializeMyFatoorah}
-        onError={() => console.error("MyFatoorah script failed to load.")}
+        onLoad={() => {
+          console.log("[Script] MyFatoorah session.js loaded. Initializing...");
+          initializeMyFatoorah();
+        }}
+        onError={() =>
+          console.error("[Script] MyFatoorah script failed to load.")
+        }
       />
+
+      {/* Page Header */}
       <Header title="ادفع" showBackButton />
 
+      {/* Card Info Form */}
       <div>
         <h1
           className="flex flex-row text-black text-md font-bold mb-4 mt-20 mr-2"
@@ -220,6 +335,7 @@ const CardDetails: React.FC = () => {
         </div>
       </div>
 
+      {/* Pay Button */}
       <div>
         <button
           className="sticky bottom-0 p-2 my-2 w-full font-bold bg-custom-green text-white text-sm rounded-3xl"
@@ -230,15 +346,17 @@ const CardDetails: React.FC = () => {
         </button>
       </div>
 
+      {/* Loading Indicator */}
       {loading && (
         <div className="text-center mt-4">
-          Processing payment, please wait...
+          <p>Processing payment, please wait...</p>
         </div>
       )}
     </div>
   );
 };
 
+// If you are using the Next.js "app" directory, you can wrap your page in a Suspense boundary:
 const App: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
