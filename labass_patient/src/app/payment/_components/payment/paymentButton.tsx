@@ -170,7 +170,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         // If method is Card, go to the card details page
         if (method === PaymentMethodEnum.Card) {
           router.push(
-            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}`
+            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}`
           );
         }
         // If method is ApplePay, we do the same ApplePay init logic
@@ -241,8 +241,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           DisplayCurrencyIso: "SAR",
           InvoiceValue: discountedPrice.toFixed(2),
           PromoCode: promoCode,
-          CallBackUrl: "https://yoursite.com/success",
-          ErrorUrl: "https://yoursite.com/error",
+          CallBackUrl: "https://labass.sa/success",
+          ErrorUrl: "https://labass.sa/error",
         },
         {
           headers: { Authorization: `Bearer ${token}` },
