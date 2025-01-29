@@ -51,8 +51,8 @@ const OrgPatientsPage: React.FC = () => {
   );
   const [cashPrice, setCashPrice] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const possiblePrices = [80, 70, 50, 35, 25, 15];
 
+  const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
       ? [
@@ -68,31 +68,21 @@ const OrgPatientsPage: React.FC = () => {
 
   const fetchOrg = async () => {
     setIsLoadingOrg(true);
-    setOrgError(""); // Reset error state
+    setOrgError("");
     try {
       const orgResponse = await getOrganization();
-
-      console.log("Organization Response:", orgResponse);
-
       if (orgResponse.success && orgResponse.data) {
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
       } else {
-        throw new Error(orgResponse.message || "Unknown error occurred.");
+        throw new Error(orgResponse.data.message || "Unknown error occurred.");
       }
     } catch (err: any) {
-      console.error("Fetch Organization Error:", err);
-
-      // Extract correct backend error message
       const backendMessage =
         err.response?.data?.message || err.message || "Unknown error";
-
-      console.log("Extracted Backend Message:", backendMessage);
-
-      // Display the extracted backend message instead of a generic fallback
       setOrgError(backendMessage);
     } finally {
-      setIsLoadingOrg(false); // Stop the loading spinner
+      setIsLoadingOrg(false);
     }
   };
 
@@ -103,6 +93,7 @@ const OrgPatientsPage: React.FC = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmitError("");
+
     if (!name || !phone || !dateOfBirth || !gender || !nationality) {
       alert("يرجى ملء جميع الحقول المطلوبة.");
       setIsSubmitting(false);
@@ -161,7 +152,11 @@ const OrgPatientsPage: React.FC = () => {
         }
       />
 
-      <div className={`pt-${dealType ? "40" : "28"} pb-28`}>
+      {/* Wrap main content in container for responsiveness */}
+      <div
+        className={`container mx-auto px-4 pt-${dealType ? "40" : "28"} pb-28`}
+      >
+        {/* Display org error in a modal if any */}
         {orgError && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
@@ -181,89 +176,100 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
+        {/* Loading Spinner */}
         {isLoadingOrg ? (
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="spinner"></div>
           </div>
-        ) : currentView === "patients" ? (
-          patients.length === 0 ? (
-            <p className="text-center text-gray-500">لا يوجد مرضى حاليًا</p>
-          ) : (
-            <div>
-              {patients.map((p) => (
-                <LabPatientCard
-                  key={p.phoneNumber}
-                  patientName={
-                    p.firstName
-                      ? `${p.firstName} ${p.lastName || ""}`
-                      : "غير معروف"
-                  }
-                  date={new Date(p.createdAt).toLocaleString("ar-EG", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                  packageType={p.role.join(", ")}
-                  additionalInfo={`عدد الرموز المرسلة للعميل: ${
-                    p.duplicateCount || 1
-                  }`}
-                  onSelect={() =>
-                    console.log(
-                      `Selected patient: ${p.phoneNumber} (ID ${p.id})`
-                    )
-                  }
-                />
-              ))}
-            </div>
-          )
         ) : (
-          <div className="mt-16">
-            <OrgUserRegistrationForm
-              orgType={orgType}
-              name={name}
-              setName={setName}
-              phone={phone}
-              setPhone={setPhone}
-              age={age}
-              setAge={setAge}
-              dateOfBirth={dateOfBirth}
-              setDateOfBirth={setDateOfBirth}
-              nationality={nationality}
-              setNationality={setNationality}
-              gender={gender}
-              setGender={setGender}
-              nationalId={nationalId}
-              setNationalId={setNationalId}
-              pdfFiles={pdfFiles}
-              setPdfFiles={setPdfFiles}
-            />
-            <TestTypeSection
-              orgType={orgType}
-              testType={testType}
-              setTestType={settestType}
-              pdfFiles={pdfFiles}
-              setPdfFiles={setPdfFiles}
-            />
-            {dealType === DealType.REVENUE_SHARE && (
-              <>
-                <PaymentMethodSection
-                  paymentMethod={paymentMethod}
-                  setPaymentMethod={setPaymentMethod}
-                  possiblePaymentMethods={possiblePaymentMethods}
-                  cashPrice={cashPrice}
-                  setCashPrice={setCashPrice}
+          // Use grid to separate content or adapt for wide screens
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {currentView === "patients" ? (
+              <div>
+                {/* Patients List */}
+                {patients.length === 0 ? (
+                  <p className="text-center text-gray-500">
+                    لا يوجد مرضى حاليًا
+                  </p>
+                ) : (
+                  patients.map((p) => (
+                    <LabPatientCard
+                      key={p.phoneNumber}
+                      patientName={
+                        p.firstName
+                          ? `${p.firstName} ${p.lastName || ""}`
+                          : "غير معروف"
+                      }
+                      date={new Date(p.createdAt).toLocaleString("ar-EG", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                      packageType={p.role.join(", ")}
+                      additionalInfo={`عدد الرموز المرسلة للعميل: ${
+                        p.duplicateCount || 1
+                      }`}
+                      onSelect={() =>
+                        console.log(
+                          `Selected patient: ${p.phoneNumber} (ID ${p.id})`
+                        )
+                      }
+                    />
+                  ))
+                )}
+              </div>
+            ) : (
+              // Registration / Form View
+              <div className="mt-16 lg:mt-0">
+                <OrgUserRegistrationForm
+                  orgType={orgType}
+                  name={name}
+                  setName={setName}
+                  phone={phone}
+                  setPhone={setPhone}
+                  age={age}
+                  setAge={setAge}
+                  dateOfBirth={dateOfBirth}
+                  setDateOfBirth={setDateOfBirth}
+                  nationality={nationality}
+                  setNationality={setNationality}
+                  gender={gender}
+                  setGender={setGender}
+                  nationalId={nationalId}
+                  setNationalId={setNationalId}
+                  pdfFiles={pdfFiles}
+                  setPdfFiles={setPdfFiles}
                 />
-                <ConsultationPriceSection
-                  selectedPrice={selectedPrice}
-                  onChange={(price) => setSelectedPrice(price)}
-                  possiblePrices={possiblePrices}
+                <TestTypeSection
+                  orgType={orgType}
+                  testType={testType}
+                  setTestType={settestType}
+                  pdfFiles={pdfFiles}
+                  setPdfFiles={setPdfFiles}
                 />
-              </>
+                {dealType === DealType.REVENUE_SHARE && (
+                  <>
+                    <PaymentMethodSection
+                      paymentMethod={paymentMethod}
+                      setPaymentMethod={setPaymentMethod}
+                      possiblePaymentMethods={possiblePaymentMethods}
+                      cashPrice={cashPrice}
+                      setCashPrice={setCashPrice}
+                    />
+                    <ConsultationPriceSection
+                      selectedPrice={selectedPrice}
+                      onChange={(price) => setSelectedPrice(price)}
+                      possiblePrices={possiblePrices}
+                    />
+                  </>
+                )}
+              </div>
             )}
           </div>
         )}
       </div>
 
+      {/* Submit Error Modal */}
       {submitError && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
@@ -278,6 +284,7 @@ const OrgPatientsPage: React.FC = () => {
         </div>
       )}
 
+      {/* Fixed "إرسال استشارة طبية" Button */}
       <div className="fixed bottom-16 left-0 w-full px-4">
         <button
           onClick={handleSubmit}
@@ -292,6 +299,7 @@ const OrgPatientsPage: React.FC = () => {
         </button>
       </div>
 
+      {/* Bottom Nav for Mobile */}
       <LabBottomNavBar
         onToggleView={setCurrentView}
         currentView={currentView}

@@ -7,8 +7,11 @@ import {
 } from "@mui/icons-material";
 
 interface LabBottomNavBarProps {
-  onToggleView: (view: "patients" | "registration") => void;
+  onToggleView: React.Dispatch<
+    React.SetStateAction<"patients" | "registration">
+  >;
   currentView: "patients" | "registration";
+  className?: string; // Add this line
 }
 
 const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
