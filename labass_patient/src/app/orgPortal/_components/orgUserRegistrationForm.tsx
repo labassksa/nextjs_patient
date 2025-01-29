@@ -1,8 +1,6 @@
-// src/app/orgPortal/_components/OrgUserRegistrationForm.tsx
-
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 import { Gender } from "../_types/genderType";
 import { OrganizationTypes } from "../_types/organizationTypes";
@@ -20,7 +18,7 @@ interface OrgUserRegistrationFormProps {
   setDateOfBirth: React.Dispatch<React.SetStateAction<Date | null>>;
   nationality: string;
   setNationality: React.Dispatch<React.SetStateAction<string>>;
-  gender: Gender; // Updated to use Gender enum
+  gender: Gender;
   setGender: React.Dispatch<React.SetStateAction<Gender>>;
   nationalId: string;
   setNationalId: React.Dispatch<React.SetStateAction<string>>;
@@ -28,9 +26,21 @@ interface OrgUserRegistrationFormProps {
   setPdfFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
-const nationalities = ["سعودي", "مصري", "إماراتي", "قطري", "كويتي", "أخرى"];
-
-//Genders
+const ALL_NATIONALITIES = [
+  "سعودي",
+  "مصري",
+  "إماراتي",
+  "قطري",
+  "كويتي",
+  "بحريني",
+  "لبناني",
+  "سوري",
+  "أردني",
+  "فلسطيني",
+  "ليبي",
+  "سوداني",
+  "أخرى",
+];
 const genders = [Gender.Male, Gender.Female];
 
 // Mapping from Gender enum to Arabic labels
@@ -58,9 +68,34 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   pdfFiles,
   setPdfFiles,
 }) => {
+  // State for custom dropdown
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter the nationalities based on the search term
+  const filteredNationalities = ALL_NATIONALITIES.filter((nat) =>
+    nat.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Clicking outside the dropdown to close it:
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handlers
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const convertedPhone = convertArabicToEnglishNumbers(e.target.value) || "";
-    setPhone(convertedPhone);
+    const converted = convertArabicToEnglishNumbers(e.target.value) || "";
+    setPhone(converted);
   };
 
   const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,9 +123,14 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   const handleNationalIdorIqamaChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const convertedNationalId =
-      convertArabicToEnglishNumbers(e.target.value) || "";
-    setNationalId(convertedNationalId);
+    const convertedId = convertArabicToEnglishNumbers(e.target.value) || "";
+    setNationalId(convertedId);
+  };
+
+  // Handle selection of a nationality
+  const handleSelectNationality = (selectedNat: string) => {
+    setNationality(selectedNat);
+    setShowDropdown(false);
   };
 
   return (
@@ -98,6 +138,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
       <h2 className="text-black text-xl font-semibold mb-4">
         إرسال استشارة طبية
       </h2>
+
       <form className="space-y-4">
         {/* Patient Name */}
         <div>
@@ -156,31 +197,56 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
           />
         </div>
 
-        {/* Nationality */}
-        <div>
+        {/* Nationality - Custom Combo Box with search inside dropdown */}
+        <div className="relative" ref={dropdownRef}>
           <label
             htmlFor="nationality"
             className="block text-sm text-black font-normal p-2"
           >
             الجنسية
           </label>
-          <select
+          {/* "Clickable" field showing selected nationality */}
+          <button
+            type="button"
             id="nationality"
-            value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
-            className="w-full text-black border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
-            required
+            onClick={() => setShowDropdown((prev) => !prev)}
+            className="w-full flex justify-between items-center border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
           >
-            {nationalities.map((nat) => (
-              <option
-                key={nat}
-                value={nat}
-                className="bg-white text-black focus:bg-custom-green"
-              >
-                {nat}
-              </option>
-            ))}
-          </select>
+            {nationality || "اختر الجنسية"}
+            <span className="ml-2 text-gray-600">▼</span>
+          </button>
+
+          {/* Dropdown menu */}
+          {showDropdown && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg p-2">
+              {/* Search input at top */}
+              <input
+                type="text"
+                placeholder="ابحث هنا..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full border text-black border-gray-300 rounded-md p-2 mb-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+              />
+              <ul className="max-h-40 overflow-auto">
+                {filteredNationalities.map((nat) => (
+                  <li key={nat}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectNationality(nat)}
+                      className={`block w-full text-right px-2 py-1 hover:bg-gray-200 ${
+                        nat === nationality ? "bg-custom-green text-white" : ""
+                      }`}
+                    >
+                      {nat}
+                    </button>
+                  </li>
+                ))}
+                {filteredNationalities.length === 0 && (
+                  <li className="text-gray-500 px-2 py-1">لا توجد نتائج</li>
+                )}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Gender */}
@@ -207,7 +273,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                       gender === g ? "bg-white" : "bg-gray-400"
                     }`}
                   />
-                  <span>{genderLabels[g]}</span> {/* Display Arabic Label */}
+                  <span>{genderLabels[g]}</span>
                 </div>
               </button>
             ))}
