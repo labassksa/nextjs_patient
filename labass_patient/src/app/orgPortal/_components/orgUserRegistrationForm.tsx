@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 import { Gender } from "../_types/genderType";
 import { OrganizationTypes } from "../_types/organizationTypes";
@@ -33,6 +33,7 @@ const ALL_NATIONALITIES = [
   "قطري",
   "كويتي",
   "بحريني",
+  "يمني",
   "لبناني",
   "سوري",
   "أردني",
@@ -79,7 +80,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 
   // Clicking outside the dropdown to close it:
   const dropdownRef = useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
@@ -134,8 +135,8 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   };
 
   return (
-    <div dir="rtl" className="p-4">
-      <h2 className="text-black text-xl font-semibold mb-4">
+    <div dir="rtl" className="max-w-xl mx-auto bg-white rounded-lg  p-6 mt-8">
+      <h2 className="text-gray-800 text-2xl font-semibold mb-4 text-center">
         إرسال استشارة طبية
       </h2>
 
@@ -144,7 +145,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         <div>
           <label
             htmlFor="name"
-            className="block text-sm text-black font-normal p-2"
+            className="block text-sm text-gray-700 font-medium mb-1"
           >
             اسم المريض
           </label>
@@ -153,7 +154,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
             required
           />
         </div>
@@ -162,7 +163,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         <div>
           <label
             htmlFor="phone"
-            className="block text-black text-sm font-normal p-2"
+            className="block text-sm text-gray-700 font-medium mb-1"
           >
             رقم الجوال
           </label>
@@ -173,7 +174,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             placeholder="05xxx"
             value={phone}
             onChange={handlePhoneNumberChange}
-            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
             required
           />
         </div>
@@ -182,7 +183,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         <div>
           <label
             htmlFor="age"
-            className="block text-black text-sm font-normal p-2"
+            className="block text-sm text-gray-700 font-medium mb-1"
           >
             العمر
           </label>
@@ -192,7 +193,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             inputMode="numeric"
             value={age}
             onChange={handleAgeChange}
-            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
             required
           />
         </div>
@@ -201,7 +202,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         <div className="relative" ref={dropdownRef}>
           <label
             htmlFor="nationality"
-            className="block text-sm text-black font-normal p-2"
+            className="block text-sm text-gray-700 font-medium mb-1"
           >
             الجنسية
           </label>
@@ -210,7 +211,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             type="button"
             id="nationality"
             onClick={() => setShowDropdown((prev) => !prev)}
-            className="w-full flex justify-between items-center border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full flex justify-between items-center border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
           >
             {nationality || "اختر الجنسية"}
             <span className="ml-2 text-gray-600">▼</span>
@@ -225,7 +226,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                 placeholder="ابحث هنا..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full border text-black border-gray-300 rounded-md p-2 mb-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+                className="w-full border border-gray-300 rounded-md p-2 mb-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
               />
               <ul className="max-h-40 overflow-auto">
                 {filteredNationalities.map((nat) => (
@@ -234,7 +235,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                       type="button"
                       onClick={() => handleSelectNationality(nat)}
                       className={`block w-full text-right px-2 py-1 hover:bg-gray-200 ${
-                        nat === nationality ? "bg-custom-green text-white" : ""
+                        nat === nationality ? "bg-green-500 text-white" : ""
                       }`}
                     >
                       {nat}
@@ -251,19 +252,19 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 
         {/* Gender */}
         <div>
-          <label className="block text-black text-sm font-normal p-2">
+          <label className="block text-gray-700 text-sm font-medium mb-1">
             الجنس
           </label>
-          <div className="bg-white p-4 rounded-lg">
+          <div className="bg-gray-50 p-4 rounded-lg">
             {genders.map((g) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => setGender(g)}
-                className={`flex items-center justify-between p-2 w-full text-black focus:outline-none rounded-md mb-2 ${
+                className={`flex items-center justify-between p-2 w-full focus:outline-none rounded-md mb-2 transition-colors ${
                   gender === g
-                    ? "bg-custom-green text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                 }`}
                 aria-pressed={gender === g}
               >
@@ -273,7 +274,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                       gender === g ? "bg-white" : "bg-gray-400"
                     }`}
                   />
-                  <span>{genderLabels[g]}</span>
+                  <span className="text-sm">{genderLabels[g]}</span>
                 </div>
               </button>
             ))}
@@ -284,7 +285,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         <div>
           <label
             htmlFor="nationalId"
-            className="block text-black text-sm font-normal p-2"
+            className="block text-gray-700 text-sm font-medium mb-1"
           >
             رقم الهوية الوطنية
           </label>
@@ -293,7 +294,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             type="text"
             value={nationalId}
             onChange={handleNationalIdorIqamaChange}
-            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green"
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
           />
         </div>
       </form>

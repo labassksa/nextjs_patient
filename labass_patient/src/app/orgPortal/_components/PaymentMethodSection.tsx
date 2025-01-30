@@ -36,7 +36,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
 
   return (
     <div
-      className="max-w-md text-black mx-auto bg-white p-4 mt-6 rounded shadow-md"
+      className="max-w-md text-black mx-auto bg-white p-4 mt-6 rounded "
       dir="rtl"
     >
       <h3 className="text-lg font-bold mb-2">طريقة دفع المريض</h3>

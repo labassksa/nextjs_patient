@@ -37,6 +37,8 @@ const OrgPatientsPage: React.FC = () => {
   const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
+
+  // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
@@ -75,11 +77,11 @@ const OrgPatientsPage: React.FC = () => {
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
       } else {
-        throw new Error(orgResponse.data.message || "Unknown error occurred.");
+        throw new Error(orgResponse.message || "Unknown error occurred.");
       }
     } catch (err: any) {
       const backendMessage =
-        err.response?.data?.message || err.message || "Unknown error";
+        err.response?.message || err.message || "Unknown error";
       setOrgError(backendMessage);
     } finally {
       setIsLoadingOrg(false);
@@ -144,19 +146,45 @@ const OrgPatientsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header
-        title={
-          currentView === "patients"
-            ? "متابعة الاستشارات"
-            : "إرسال استشارة طبية"
-        }
-      />
+      {/* Hide the Header on large screens, show only on mobile */}
+      <div className="lg:hidden">
+        <Header
+          title={
+            currentView === "patients"
+              ? "متابعة الاستشارات"
+              : "إرسال استشارة طبية"
+          }
+        />
+      </div>
 
-      {/* Wrap main content in container for responsiveness */}
+      {/* Desktop Nav Bar (Hidden on mobile) */}
+      <div className="hidden lg:flex justify-center bg-white shadow-md p-4">
+        <button
+          onClick={() => setCurrentView("patients")}
+          className={`mx-4 px-4 py-2 rounded-md ${
+            currentView === "patients"
+              ? "bg-custom-green text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          المرضى
+        </button>
+        <button
+          onClick={() => setCurrentView("registration")}
+          className={`mx-4 px-4 py-2 rounded-md ${
+            currentView === "registration"
+              ? "bg-custom-green text-white"
+              : "bg-gray-200 text-gray-700"
+          }`}
+        >
+          تسجيل
+        </button>
+      </div>
+
+      {/* Main Content */}
       <div
-        className={`container mx-auto px-4 pt-${dealType ? "40" : "28"} pb-28`}
+        className={`max-w-screen-lg mx-auto pt-${dealType ? "40" : "28"} pb-28`}
       >
-        {/* Display org error in a modal if any */}
         {orgError && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
@@ -176,17 +204,21 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Loading Spinner */}
         {isLoadingOrg ? (
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="spinner"></div>
           </div>
         ) : (
-          // Use grid to separate content or adapt for wide screens
+          /* 2 columns: left for text, right for form/patients */
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left column (Desktop only) */}
+            <div className="hidden lg:block bg-white shadow-sm p-6 rounded-md">
+              <p className="text-black text-xl font-bold">أهلا بك في لاباس</p>
+            </div>
+
+            {/* Right column fills remaining space */}
             {currentView === "patients" ? (
-              <div>
-                {/* Patients List */}
+              <div className="bg-white p-6 rounded-md shadow-sm w-full">
                 {patients.length === 0 ? (
                   <p className="text-center text-gray-500">
                     لا يوجد مرضى حاليًا
@@ -219,8 +251,7 @@ const OrgPatientsPage: React.FC = () => {
                 )}
               </div>
             ) : (
-              // Registration / Form View
-              <div className="mt-16 lg:mt-0">
+              <div className="bg-white p-6 rounded-md shadow-sm w-full">
                 <OrgUserRegistrationForm
                   orgType={orgType}
                   name={name}
@@ -263,13 +294,25 @@ const OrgPatientsPage: React.FC = () => {
                     />
                   </>
                 )}
+
+                {/* Bottom Button for Web (not fixed) */}
+                <button
+                  onClick={handleSubmit}
+                  className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <div className="spinner" />
+                  ) : (
+                    "إرسال استشارة طبية"
+                  )}
+                </button>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Submit Error Modal */}
       {submitError && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
@@ -284,8 +327,8 @@ const OrgPatientsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Fixed "إرسال استشارة طبية" Button */}
-      <div className="fixed bottom-16 left-0 w-full px-4">
+      {/* Bottom Fixed Button for Mobile Only */}
+      {/* <div className="fixed bottom-16 left-0 w-full px-4 lg:hidden">
         <button
           onClick={handleSubmit}
           className="w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
@@ -297,13 +340,15 @@ const OrgPatientsPage: React.FC = () => {
             "إرسال استشارة طبية"
           )}
         </button>
-      </div>
+      </div> */}
 
-      {/* Bottom Nav for Mobile */}
-      <LabBottomNavBar
-        onToggleView={setCurrentView}
-        currentView={currentView}
-      />
+      {/* Mobile Bottom Nav (Hidden on Desktop) */}
+      <div className="lg:hidden">
+        <LabBottomNavBar
+          onToggleView={setCurrentView}
+          currentView={currentView}
+        />
+      </div>
     </div>
   );
 };

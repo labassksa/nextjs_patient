@@ -46,12 +46,13 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
   }
 
   return (
-    <div className="mb-4" dir="rtl">
+    <div className="mb-4 " dir="rtl">
       {/* Consultation Type Selection */}
       <div>
-        <label className="block text-sm text-black font-normal p-2">
+        <label className="block text-lg font-bold text-black  p-2">
           نوع الاستشارة
         </label>
+        <p className="text-sm text-gray-700 mb-4">اختر نوع الاستشارة </p>
         <div className="bg-white p-4 rounded-lg">
           {testTypes.map((type) => (
             <button

@@ -15,10 +15,7 @@ const ConsultationPriceSection: React.FC<ConsultationPriceProps> = ({
   possiblePrices,
 }) => {
   return (
-    <div
-      className="max-w-md mx-auto bg-white p-4 mt-6 mb-2 rounded shadow-md"
-      dir="rtl"
-    >
+    <div className="max-w-md mx-auto bg-white p-4 mt-6 mb-2 rounded " dir="rtl">
       <h3 className="text-lg font-bold mb-2">سعر الاستشارة</h3>
       <p className="text-sm text-gray-700 mb-2">اختر قيمة سعر الاستشارة:</p>
       <div className="bg-white p-4 rounded-lg">
