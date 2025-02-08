@@ -145,7 +145,7 @@ const OrgPatientsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 text-black">
       {/* Hide the Header on large screens, show only on mobile */}
       <div className="lg:hidden">
         <Header
