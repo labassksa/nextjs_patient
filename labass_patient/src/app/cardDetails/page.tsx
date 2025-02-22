@@ -75,7 +75,7 @@ const CardDetailsContent: React.FC = () => {
       currencyCode: 'SAR',
       amount: String(discountedPrice),
       callback: payment,
-      containerId: "embedded-payment",
+      cardViewId: "embedded-payment",
       paymentOptions: ["Card"],
       language: 'ar'
     };
