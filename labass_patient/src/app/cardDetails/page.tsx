@@ -73,10 +73,10 @@ const CardDetailsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!isScriptLoaded || !window.myFatoorah) return;
+    if (!isScriptLoaded || !window.myFatoorah || !sessionId || !discountedPrice) return;
 
     const config = {
-      sessionId,
+      sessionId: sessionId,
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
@@ -87,7 +87,7 @@ const CardDetailsPage: React.FC = () => {
 
     console.log('[Debug] Initializing with config:', config);
     window.myFatoorah.init(config);
-  }, [isScriptLoaded]);
+  }, [isScriptLoaded, sessionId, discountedPrice]);
 
   // Handle 3D Secure messages
   useEffect(() => {
