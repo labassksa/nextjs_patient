@@ -16,101 +16,73 @@ const CardDetailsContent: React.FC = () => {
 
   const payment = (response: any) => {
     console.log("[Payment] Response:", response);
-    setIsSubmitting(false);
-
+    
     if (response.isSuccess) {
-      switch (response.paymentType) {
-        case "Card":
-          if (response.data?.Data?.CardIdentifier) {
-            executePayment(response.data.Data.CardIdentifier);
-          } else {
-            console.error('No card identifier found');
-            router.push('/cardDetails/error');
-          }
-          break;
-        default:
-          console.log("Unknown payment type");
-          router.push('/cardDetails/error');
-          break;
+      // Get PaymentURL from response
+      const paymentUrl = response.data?.Data?.PaymentURL;
+      if (paymentUrl) {
+        showSecureIframe(paymentUrl);
+      } else {
+        console.error('No payment URL found');
+        router.push('/cardDetails/error');
       }
     } else {
+      setIsSubmitting(false);
       console.error('Payment failed:', response);
       router.push('/cardDetails/error');
     }
   };
 
-  const executePayment = async (paymentSessionId: string) => {
-    try {
-      const token = localStorage.getItem('labass_token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          SessionId: paymentSessionId,
-          InvoiceValue: Number(discountedPrice)
-        }),
-      });
-
-      const data = await response.json();
-      if (data.PaymentURL) {
-        // Show 3D Secure iframe
-        const container = document.getElementById('secure-container');
-        if (container) {
-          container.style.display = 'block';
-          container.innerHTML = `
-            <iframe 
-              src="${data.PaymentURL}"
-              style="width: 100%; height: 100%; border: none;"
-            ></iframe>
-          `;
-        }
-      }
-    } catch (error) {
-      console.error('Payment execution failed:', error);
-      router.push('/cardDetails/error');
+  const showSecureIframe = (paymentUrl: string) => {
+    const container = document.getElementById('secure-container');
+    if (container) {
+      container.style.display = 'flex'; // Changed to flex for centering
+      container.innerHTML = `
+        <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg" style="height: 80vh;">
+          <iframe 
+            src="${paymentUrl}"
+            style="width: 100%; height: 100%; border: none;"
+            id="secure-frame"
+          ></iframe>
+          <button 
+            onclick="document.getElementById('secure-container').style.display='none';"
+            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
+        </div>
+      `;
     }
   };
-
-  useEffect(() => {
-    if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
-
-    const config = {
-      sessionId,
-      countryCode,
-      currencyCode: 'SAR',
-      amount: String(discountedPrice),
-      cardViewId: "embedded-payment",
-      callback: payment,
-      paymentOptions: ["Card"],
-      language: 'ar'
-    };
-
-    (window as any).myFatoorah.init(config);
-  }, [isScriptLoaded, sessionId, discountedPrice]);
 
   useEffect(() => {
     const handle3DSecure = (event: MessageEvent) => {
       if (!event.data) return;
       try {
         const message = JSON.parse(typeof event.data === 'string' ? event.data : JSON.stringify(event.data));
-        if (message.sender === "MF-3DSecure" && message.url) {
-          // Hide 3D Secure iframe
+        console.log('[3DSecure] Received message:', message);
+        
+        if (message.sender === "MF-3DSecure") {
+          const url = message.url;
+          console.log('[3DSecure] Redirect URL:', url);
+          
+          // Hide iframe
           const container = document.getElementById('secure-container');
           if (container) {
             container.style.display = 'none';
           }
-          // Redirect to success/error based on URL
-          if (message.url.includes('success')) {
+
+          setIsSubmitting(false);
+          
+          // Handle redirect
+          if (url.includes('success')) {
             router.push('/cardDetails/success');
           } else {
             router.push('/cardDetails/error');
           }
         }
       } catch (error) {
-        console.error('3D Secure error:', error);
+        console.error('[3DSecure] Error:', error);
       }
     };
 
@@ -141,7 +113,6 @@ const CardDetailsContent: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
         <div id="embedded-payment" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
         
-        {/* Payment Button */}
         <button
           onClick={handlePaymentSubmit}
           disabled={isSubmitting}
@@ -160,13 +131,13 @@ const CardDetailsContent: React.FC = () => {
             'إتمام الدفع'
           )}
         </button>
-        
-        <div 
-          id="secure-container"
-          className="fixed inset-0 bg-black bg-opacity-50 z-50"
-          style={{ display: 'none' }}
-        />
       </div>
+
+      <div 
+        id="secure-container"
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center"
+        style={{ display: 'none' }}
+      />
     </div>
   );
 };
