@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 
-const CardDetailsPage: React.FC = () => {
+const CardDetailsContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
@@ -92,6 +92,19 @@ const CardDetailsPage: React.FC = () => {
         />
       </div>
     </div>
+  );
+};
+
+// Wrapper component with Suspense
+const CardDetailsPage: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">جاري التحميل...</div>
+      </div>
+    }>
+      <CardDetailsContent />
+    </Suspense>
   );
 };
 
