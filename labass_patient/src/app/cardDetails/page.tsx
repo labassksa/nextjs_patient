@@ -15,19 +15,27 @@ const CardDetailsContent: React.FC = () => {
   const discountedPrice = searchParams.get('discountedPrice');
 
   const payment = (response: any) => {
-    console.log("Card response >> " + JSON.stringify(response));
+    console.log("[Payment] Response:", response);
     setIsSubmitting(false);
 
     if (response.isSuccess) {
       switch (response.paymentType) {
         case "Card":
-          // Send sessionId to backend for ExecutePayment
-          executePayment(response.sessionId);
+          if (response.data?.Data?.CardIdentifier) {
+            executePayment(response.data.Data.CardIdentifier);
+          } else {
+            console.error('No card identifier found');
+            router.push('/cardDetails/error');
+          }
           break;
         default:
           console.log("Unknown payment type");
+          router.push('/cardDetails/error');
           break;
       }
+    } else {
+      console.error('Payment failed:', response);
+      router.push('/cardDetails/error');
     }
   };
 
@@ -111,8 +119,14 @@ const CardDetailsContent: React.FC = () => {
   }, []);
 
   const handlePaymentSubmit = () => {
+    console.log('[handlePaymentSubmit] Submitting payment...');
     setIsSubmitting(true);
-    // Implement the logic to submit the payment
+    try {
+      (window as any).myFatoorah.submit();
+    } catch (error) {
+      console.error('[handlePaymentSubmit] Error:', error);
+      setIsSubmitting(false);
+    }
   };
 
   return (
