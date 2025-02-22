@@ -21,54 +21,23 @@ const CardDetailsContent: React.FC = () => {
     setIsSubmitting(false);
 
     if (response.isSuccess) {
-      switch (response.paymentType) {
-        case "Card":
-          console.log("Card response >> " + JSON.stringify(response));
-          if (response.data?.Data?.CardIdentifier) {
-            executePayment(response.data.Data.CardIdentifier);
-          } else {
-            console.error('No card identifier found');
-            router.push('/cardDetails/error');
-          }
-          break;
-        default:
-          console.log("Unknown payment type");
-          router.push('/cardDetails/error');
-          break;
+      if (response.data?.Data?.PaymentURL) {
+        // Create iframe for 3D Secure
+        const container = document.getElementById('secure-container');
+        if (container) {
+          container.innerHTML = `
+            <iframe 
+              src="${response.data.Data.PaymentURL}"
+              style="width: 100%; height: 100%; border: none;"
+              id="secure-frame"
+            ></iframe>
+          `;
+        }
+      } else {
+        router.push('/cardDetails/success');
       }
     } else {
       console.error('Payment failed:', response);
-      router.push('/cardDetails/error');
-    }
-  };
-
-  const executePayment = async (cardIdentifier: string) => {
-    try {
-      const token = localStorage.getItem('labass_token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          cardIdentifier,
-          consultationId: Number(consultationId),
-          ...(promoCode && { promoCode }),
-          ...(discountedPrice && { discountedPrice: Number(discountedPrice) }),
-        }),
-      });
-
-      const data = await response.json();
-      if (data.PaymentURL) {
-        window.location.href = data.PaymentURL;
-      } else if (data.IsSuccess) {
-        router.push('/cardDetails/success');
-      } else {
-        router.push('/cardDetails/error');
-      }
-    } catch (error) {
-      console.error('Error executing payment:', error);
       router.push('/cardDetails/error');
     }
   };
@@ -87,12 +56,6 @@ const CardDetailsContent: React.FC = () => {
   useEffect(() => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
 
-    console.log('Initializing payment with:', {
-      sessionId,
-      countryCode,
-      discountedPrice
-    });
-
     const config = {
       sessionId,
       countryCode,
@@ -101,9 +64,7 @@ const CardDetailsContent: React.FC = () => {
       callback: payment,
       cardViewId: "embedded-payment",
       paymentOptions: ["Card"],
-      language: 'ar',
-      showPayButton: true,
-      buttonLabel: 'إتمام الدفع'
+      language: 'ar'
     };
 
     try {
@@ -114,46 +75,80 @@ const CardDetailsContent: React.FC = () => {
     }
   }, [isScriptLoaded, sessionId, discountedPrice]);
 
+  // Handle 3D Secure completion
+  useEffect(() => {
+    const handle3DSecure = (event: MessageEvent) => {
+      if (!event.data) return;
+      try {
+        const message = JSON.parse(typeof event.data === 'string' ? event.data : JSON.stringify(event.data));
+        if (message.sender === "MF-3DSecure") {
+          // Close iframe and redirect
+          const container = document.getElementById('secure-container');
+          if (container) {
+            container.innerHTML = '';
+          }
+          router.push('/cardDetails/success');
+        }
+      } catch (error) {
+        console.error('Error handling 3D Secure:', error);
+        router.push('/cardDetails/error');
+      }
+    };
+
+    window.addEventListener("message", handle3DSecure);
+    return () => window.removeEventListener("message", handle3DSecure);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <Script
         src="https://sa.myfatoorah.com/cardview/v1/session.js"
-        onLoad={() => {
-          console.log('Script loaded');
-          setIsScriptLoaded(true);
-        }}
-        onError={(e) => console.error('Script failed to load:', e)}
+        onLoad={() => setIsScriptLoaded(true)}
         strategy="afterInteractive"
       />
       
-      <div className="max-w-3xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
+      <div className="w-full max-w-3xl mx-auto px-4 py-6 flex-grow flex flex-col">
+        <h1 className="text-xl md:text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
+        
+        {/* Payment Form Container */}
         <div 
           id="embedded-payment"
-          className="bg-white rounded-lg shadow-lg p-4 mb-4"
+          className="bg-white rounded-lg shadow-lg p-4 mb-4 flex-grow"
+          style={{ minHeight: '400px' }}
+        />
+
+        {/* 3D Secure Container */}
+        <div 
+          id="secure-container"
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
           style={{ 
-            minHeight: '600px',
-            width: '100%'
+            display: 'none',
+            height: '100vh',
+            width: '100vw'
           }}
         />
-        <button
-          onClick={handlePaymentSubmit}
-          disabled={isSubmitting}
-          className={`w-full bg-custom-green text-white py-3 rounded-lg font-bold relative ${
-            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-          }`}
-        >
-          {isSubmitting ? (
-            <>
-              <span className="opacity-0">إتمام الدفع</span>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              </div>
-            </>
-          ) : (
-            'إتمام الدفع'
-          )}
-        </button>
+
+        {/* Submit Button - Fixed at bottom on mobile */}
+        <div className="sticky bottom-0 left-0 right-0 p-4 bg-white md:bg-transparent">
+          <button
+            onClick={handlePaymentSubmit}
+            disabled={isSubmitting}
+            className={`w-full max-w-md mx-auto bg-custom-green text-white py-3 px-4 rounded-lg font-bold relative ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="opacity-0">إتمام الدفع</span>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+              </>
+            ) : (
+              'إتمام الدفع'
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
