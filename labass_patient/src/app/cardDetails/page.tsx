@@ -60,6 +60,15 @@ const CardDetailsContent: React.FC = () => {
     }
   };
 
+  const handlePaymentSubmit = () => {
+    console.log('[handlePaymentSubmit] Submitting payment...');
+    try {
+      (window as any).myFatoorah.submit();
+    } catch (error) {
+      console.error('[handlePaymentSubmit] Error:', error);
+    }
+  };
+
   useEffect(() => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
 
@@ -106,12 +115,18 @@ const CardDetailsContent: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
         <div 
           id="embedded-payment"
-          className="bg-white rounded-lg shadow-lg p-4"
+          className="bg-white rounded-lg shadow-lg p-4 mb-4"
           style={{ 
             minHeight: '600px',
             width: '100%'
           }}
         />
+        <button
+          onClick={handlePaymentSubmit}
+          className="w-full bg-custom-green text-white py-3 rounded-lg font-bold"
+        >
+          إتمام الدفع
+        </button>
       </div>
     </div>
   );
