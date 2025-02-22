@@ -18,21 +18,31 @@ const CardDetailsContent: React.FC = () => {
 
   const payment = (response: any) => {
     console.log('[Payment] Response:', response);
+    setIsSubmitting(false);
+
     if (response.isSuccess) {
       switch (response.paymentType) {
         case "Card":
           console.log("Card response >> " + JSON.stringify(response));
-          executePayment(response.sessionId);
+          if (response.data?.Data?.CardIdentifier) {
+            executePayment(response.data.Data.CardIdentifier);
+          } else {
+            console.error('No card identifier found');
+            router.push('/cardDetails/error');
+          }
           break;
         default:
           console.log("Unknown payment type");
           router.push('/cardDetails/error');
           break;
       }
+    } else {
+      console.error('Payment failed:', response);
+      router.push('/cardDetails/error');
     }
   };
 
-  const executePayment = async (sessionId: string) => {
+  const executePayment = async (cardIdentifier: string) => {
     try {
       const token = localStorage.getItem('labass_token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/execute`, {
@@ -42,7 +52,7 @@ const CardDetailsContent: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          sessionId,
+          cardIdentifier,
           consultationId: Number(consultationId),
           ...(promoCode && { promoCode }),
           ...(discountedPrice && { discountedPrice: Number(discountedPrice) }),
@@ -50,7 +60,9 @@ const CardDetailsContent: React.FC = () => {
       });
 
       const data = await response.json();
-      if (data.IsSuccess) {
+      if (data.PaymentURL) {
+        window.location.href = data.PaymentURL;
+      } else if (data.IsSuccess) {
         router.push('/cardDetails/success');
       } else {
         router.push('/cardDetails/error');
