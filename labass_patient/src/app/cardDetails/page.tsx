@@ -59,27 +59,44 @@ const CardDetailsContent: React.FC = () => {
       router.push('/cardDetails/error');
     }
   };
+
   useEffect(() => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
 
+    console.log('Initializing payment with:', {
+      sessionId,
+      countryCode,
+      discountedPrice
+    });
+
     const config = {
-      sessionId: sessionId,
+      sessionId,
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
       callback: payment,
       containerId: "embedded-payment",
-      paymentOptions: ["Card"]
+      paymentOptions: ["Card"],
+      language: 'ar'
     };
 
-    (window as any).myFatoorah.init(config);
+    try {
+      (window as any).myFatoorah.init(config);
+      console.log('Payment initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize payment:', error);
+    }
   }, [isScriptLoaded, sessionId, discountedPrice]);
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Script
-        src="https://sa.myfatoorah.com/payment/v1/session.js"
-        onLoad={() => setIsScriptLoaded(true)}
+        src="https://sa.myfatoorah.com/cardview/v1/session.js"
+        onLoad={() => {
+          console.log('Script loaded');
+          setIsScriptLoaded(true);
+        }}
+        onError={(e) => console.error('Script failed to load:', e)}
         strategy="afterInteractive"
       />
       
@@ -87,8 +104,11 @@ const CardDetailsContent: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
         <div 
           id="embedded-payment"
-          className="bg-white rounded-lg shadow-lg"
-          style={{ height: '600px' }}
+          className="bg-white rounded-lg shadow-lg p-4"
+          style={{ 
+            minHeight: '600px',
+            width: '100%'
+          }}
         />
       </div>
     </div>
