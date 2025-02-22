@@ -90,6 +90,29 @@ const CardDetailsContent: React.FC = () => {
     return () => window.removeEventListener("message", handle3DSecure);
   }, []);
 
+  useEffect(() => {
+    if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
+
+    const config = {
+      sessionId,
+      countryCode,
+      currencyCode: 'SAR',
+      amount: String(discountedPrice),
+      cardViewId: "embedded-payment",
+      callback: payment,
+      paymentOptions: ["Card"],
+      language: 'ar'
+    };
+
+    console.log('Initializing payment with config:', config);
+    try {
+      (window as any).myFatoorah.init(config);
+      console.log('Payment initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize payment:', error);
+    }
+  }, [isScriptLoaded, sessionId, discountedPrice]);
+
   const handlePaymentSubmit = () => {
     console.log('[handlePaymentSubmit] Submitting payment...');
     setIsSubmitting(true);
