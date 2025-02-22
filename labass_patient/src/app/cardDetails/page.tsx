@@ -74,8 +74,10 @@ const CardDetailsContent: React.FC = () => {
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
-      containerId: "embedded-payment",
-      callback: payment
+      cardViewId: "embedded-payment",
+      callback: payment,
+      paymentOptions: ["Card"],
+      language: 'ar'
     };
 
     (window as any).myFatoorah.init(config);
@@ -111,7 +113,7 @@ const CardDetailsContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Script
-        src="https://sa.myfatoorah.com/payment/v1/session.js"
+        src="https://sa.myfatoorah.com/cardview/v1/session.js"
         onLoad={() => setIsScriptLoaded(true)}
         strategy="afterInteractive"
       />
