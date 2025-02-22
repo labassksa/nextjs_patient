@@ -77,7 +77,9 @@ const CardDetailsContent: React.FC = () => {
       callback: payment,
       cardViewId: "embedded-payment",
       paymentOptions: ["Card"],
-      language: 'ar'
+      language: 'ar',
+      showPayButton: true,
+      buttonLabel: 'إتمام الدفع'
     };
 
     try {
