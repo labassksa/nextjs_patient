@@ -110,6 +110,11 @@ const CardDetailsContent: React.FC = () => {
     return () => window.removeEventListener("message", handle3DSecure);
   }, []);
 
+  const handlePaymentSubmit = () => {
+    setIsSubmitting(true);
+    // Implement the logic to submit the payment
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Script
@@ -120,7 +125,27 @@ const CardDetailsContent: React.FC = () => {
       
       <div className="max-w-3xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
-        <div id="embedded-payment" className="bg-white rounded-lg shadow-lg p-4" />
+        <div id="embedded-payment" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
+        
+        {/* Payment Button */}
+        <button
+          onClick={handlePaymentSubmit}
+          disabled={isSubmitting}
+          className={`w-full bg-custom-green text-white py-3 rounded-lg font-bold relative ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+          }`}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="opacity-0">إتمام الدفع</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            </>
+          ) : (
+            'إتمام الدفع'
+          )}
+        </button>
         
         <div 
           id="secure-container"
