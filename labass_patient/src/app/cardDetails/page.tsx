@@ -8,6 +8,7 @@ const CardDetailsContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sessionId = searchParams.get('sessionId');
   const countryCode = searchParams.get('countryCode') || 'SAU';
@@ -62,10 +63,12 @@ const CardDetailsContent: React.FC = () => {
 
   const handlePaymentSubmit = () => {
     console.log('[handlePaymentSubmit] Submitting payment...');
+    setIsSubmitting(true);
     try {
       (window as any).myFatoorah.submit();
     } catch (error) {
       console.error('[handlePaymentSubmit] Error:', error);
+      setIsSubmitting(false);
     }
   };
 
@@ -123,9 +126,21 @@ const CardDetailsContent: React.FC = () => {
         />
         <button
           onClick={handlePaymentSubmit}
-          className="w-full bg-custom-green text-white py-3 rounded-lg font-bold"
+          disabled={isSubmitting}
+          className={`w-full bg-custom-green text-white py-3 rounded-lg font-bold relative ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+          }`}
         >
-          إتمام الدفع
+          {isSubmitting ? (
+            <>
+              <span className="opacity-0">إتمام الدفع</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            </>
+          ) : (
+            'إتمام الدفع'
+          )}
         </button>
       </div>
     </div>
