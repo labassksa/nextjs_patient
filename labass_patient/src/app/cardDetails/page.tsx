@@ -80,60 +80,37 @@ const CardDetailsContent: React.FC = () => {
   };
 
   const showSecureIframe = (paymentUrl: string) => {
-    console.log("[showSecureIframe] Starting to show iframe");
     const container = document.getElementById('secure-container');
+    if (!container) return;
+
+    // Clear previous content
+    container.innerHTML = '';
     
-    if (!container) {
-      console.error("[showSecureIframe] Container not found");
-      return;
-    }
+    // Create iframe exactly as shown in docs
+    const iframe = document.createElement('iframe');
+    iframe.src = paymentUrl;
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = 'none';
     
-    try {
-      container.innerHTML = '';
-      
-      const iframeWrapper = document.createElement('div');
-      iframeWrapper.className = 'relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg';
-      iframeWrapper.style.height = '80vh';
-      
-      const iframe = document.createElement('iframe');
-      iframe.src = paymentUrl;
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = 'none';
-      iframe.id = 'secure-frame';
-      
-      iframe.onload = () => console.log("[showSecureIframe] Iframe loaded");
-      
-      const closeButton = document.createElement('button');
-      closeButton.className = 'absolute top-4 right-4 text-gray-500 hover:text-gray-700';
-      closeButton.textContent = '✕';
-      closeButton.onclick = () => {
-        console.log("[showSecureIframe] Closing iframe");
-        container.style.display = 'none';
-      };
-      
-      iframeWrapper.appendChild(iframe);
-      iframeWrapper.appendChild(closeButton);
-      container.appendChild(iframeWrapper);
-      
-      container.style.display = 'flex';
-      console.log("[showSecureIframe] Iframe should now be visible");
-    } catch (error) {
-      console.error("[showSecureIframe] Error showing iframe:", error);
-    }
+    // Add iframe to container
+    container.appendChild(iframe);
+    container.style.display = 'flex';
   };
 
   useEffect(() => {
     const handle3DSecure = (event: MessageEvent) => {
       if (!event.data) return;
       try {
-        const message = JSON.parse(typeof event.data === 'string' ? event.data : JSON.stringify(event.data));
+        // Parse the message exactly as shown in docs
+        const message = JSON.parse(event.data);
         console.log('[3DSecure] Received message:', message);
         
         if (message.sender === "MF-3DSecure") {
           const url = message.url;
           console.log('[3DSecure] Redirect URL:', url);
           
+          // Hide the iframe
           const container = document.getElementById('secure-container');
           if (container) {
             container.style.display = 'none';
@@ -141,6 +118,7 @@ const CardDetailsContent: React.FC = () => {
 
           setIsSubmitting(false);
           
+          // Handle the redirect based on URL
           if (url.includes('success')) {
             router.push('/cardDetails/success');
           } else {
@@ -148,13 +126,14 @@ const CardDetailsContent: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error('[3DSecure] Error:', error);
+        console.error('[3DSecure] Error handling message:', error);
+        return;
       }
     };
 
-    window.addEventListener("message", handle3DSecure);
-    return () => window.removeEventListener("message", handle3DSecure);
-  }, []);
+    window.addEventListener("message", handle3DSecure, false);
+    return () => window.removeEventListener("message", handle3DSecure, false);
+  }, [router]);
 
   useEffect(() => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId) return;
@@ -163,7 +142,7 @@ const CardDetailsContent: React.FC = () => {
       countryCode,
       sessionId,
       cardViewId: "card-element",
-      supportedNetworks: "v,m,md"
+      supportedNetworks: "v,m,md,ae"
     };
 
     console.log('Initializing payment with config:', config);
@@ -181,59 +160,66 @@ const CardDetailsContent: React.FC = () => {
     setIsSubmitting(true);
     
     (window as any).myFatoorah.submit()
-      .then((response: any) => {
-        console.log("[Payment] Card submission response:", response);
-        const { sessionId, cardBrand, cardIdentifier } = response;
-        
-        const token = localStorage.getItem("labass_token");
-        if (!token) {
-          console.error("No token found in localStorage.");
-          return;
-        }
+      .then(
+        function (response: any) {
+          console.log("[Payment] Card submission response:", response);
+          const sessionId = response.sessionId;
+          const cardBrand = response.cardBrand;
+          const cardIdentifier = response.cardIdentifier;
 
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-          console.error("NEXT_PUBLIC_API_URL is not defined");
-          return;
-        }
-
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-        
-        axios.post(
-          `${apiUrl}/execute-payment`,
-          {
-            SessionId: sessionId,
-            DisplayCurrencyIso: "SAR",
-            InvoiceValue: discountedPrice,
-            PromoCode: searchParams.get('promoCode'),
-            CallBackUrl: `${baseUrl}/cardDetails/success`,
-            ErrorUrl: `${baseUrl}/cardDetails/error`,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
+          const token = localStorage.getItem("labass_token");
+          if (!token) {
+            console.error("No token found in localStorage.");
+            return;
           }
-        )
-        .then(response => {
-          if (response.data.IsSuccess) {
-            const paymentUrl = response.data.Data.PaymentURL;
-            console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
-            showSecureIframe(paymentUrl);
-          } else {
-            console.error('[Payment] Execute payment failed:', response.data);
+
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL is not defined");
+            return;
+          }
+
+          axios.post(
+            `${apiUrl}/execute-payment`,
+            {
+              SessionId: sessionId,
+              InvoiceValue: discountedPrice,
+              CustomerName: "fname lname",
+              DisplayCurrencyIso: "SAR",
+              MobileCountryCode: "966",
+              CustomerMobile: "",
+              CustomerEmail: "",
+              CallBackUrl: `${window.location.origin}/cardDetails/success`,
+              ErrorUrl: `${window.location.origin}/cardDetails/error`,
+              Language: "ar",
+              CustomerReference: "card-payment",
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+          .then(response => {
+            if (response.data.IsSuccess) {
+              const paymentUrl = response.data.Data.PaymentURL;
+              console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+              showSecureIframe(paymentUrl);
+            } else {
+              console.error('[Payment] Execute payment failed:', response.data);
+              setIsSubmitting(false);
+              router.push('/cardDetails/error');
+            }
+          })
+          .catch(error => {
+            console.error('[Payment] Execute payment error:', error);
             setIsSubmitting(false);
             router.push('/cardDetails/error');
-          }
-        })
-        .catch(error => {
-          console.error('[Payment] Execute payment error:', error);
+          });
+        },
+        function (error: any) {
+          console.log(error);
           setIsSubmitting(false);
-          router.push('/cardDetails/error');
-        });
-      })
-      .catch((error: any) => {
-        console.error('[handlePaymentSubmit] Error:', error);
-        setIsSubmitting(false);
-      });
+        }
+      );
   };
 
   return (
@@ -270,16 +256,17 @@ const CardDetailsContent: React.FC = () => {
 
       <div 
         id="secure-container"
-        className="fixed inset-0 bg-black bg-opacity-50 z-[9999] items-center justify-center"
         style={{ 
           display: 'none',
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          alignItems: 'center',
-          justifyContent: 'center',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%',
+          maxWidth: '500px',
+          height: '600px',
+          backgroundColor: 'white',
+          zIndex: 9999,
         }}
       />
     </div>
