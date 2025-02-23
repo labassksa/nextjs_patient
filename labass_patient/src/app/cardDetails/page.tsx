@@ -17,14 +17,19 @@ const CardDetailsContent: React.FC = () => {
   const payment = (response: any) => {
     console.log("[Payment] Response:", response);
     
-    if (response.isSuccess) {
-      // Log the full response structure to debug
+    // Handle CardView message type
+    if (response.sender === "CardView") {
+      console.log("[Payment] Received CardView message");
+      return; // This is just card validation, wait for actual payment response
+    }
+
+    // Handle actual payment response
+    if (response.IsSuccess || response.isSuccess) {
       console.log("[Payment] Full response structure:", JSON.stringify(response, null, 2));
       
-      // Check multiple possible paths for PaymentURL
-      const paymentUrl = response.data?.Data?.PaymentURL || 
-                        response.Data?.PaymentURL || 
-                        response.data?.PaymentURL ||
+      // Try all possible paths for PaymentURL
+      const paymentUrl = response.Data?.PaymentURL || 
+                        response.data?.Data?.PaymentURL || 
                         response.PaymentURL;
       
       console.log("[Payment] Extracted payment URL:", paymentUrl);
@@ -34,6 +39,7 @@ const CardDetailsContent: React.FC = () => {
         showSecureIframe(paymentUrl);
       } else {
         console.error('[Payment] No payment URL found in response');
+        setIsSubmitting(false);
         router.push('/cardDetails/error');
       }
     } else {
@@ -139,8 +145,15 @@ const CardDetailsContent: React.FC = () => {
       amount: String(discountedPrice),
       cardViewId: "embedded-payment",
       callback: payment,
-      paymentOptions: ["Card"],
-      language: 'ar'
+      paymentOptions: ["MADA", "VISA", "MASTERCARD"], // Specify available payment methods
+      language: 'ar',
+      onSuccess: (response: any) => {
+        console.log("[MyFatoorah] Success:", response);
+      },
+      onError: (error: any) => {
+        console.error("[MyFatoorah] Error:", error);
+        setIsSubmitting(false);
+      }
     };
 
     console.log('Initializing payment with config:', config);
@@ -149,6 +162,7 @@ const CardDetailsContent: React.FC = () => {
       console.log('Payment initialized successfully');
     } catch (error) {
       console.error('Failed to initialize payment:', error);
+      setIsSubmitting(false);
     }
   }, [isScriptLoaded, sessionId, discountedPrice]);
 
@@ -197,14 +211,16 @@ const CardDetailsContent: React.FC = () => {
 
       <div 
         id="secure-container"
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center hidden"
+        className="fixed inset-0 bg-black bg-opacity-50 z-[9999] items-center justify-center"
         style={{ 
+          display: 'none',
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 9999
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       />
     </div>
