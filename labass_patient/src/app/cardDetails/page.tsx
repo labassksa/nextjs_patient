@@ -19,26 +19,39 @@ const CardDetailsContent: React.FC = () => {
     
     // Handle CardView message type
     if (response.sender === "CardView") {
-      console.log("[Payment] Received CardView message");
-      return; // This is just card validation, wait for actual payment response
+      console.log("[Payment] Received CardView message, type:", response.type);
+      
+      // Check if this is the payment response (type 1)
+      if (response.type === 1 && response.data?.IsSuccess) {
+        console.log("[Payment] Processing successful payment response");
+        const paymentData = response.data.Data;
+        console.log("[Payment] Payment data:", paymentData);
+        
+        // Check if we have a payment URL in the response
+        const paymentUrl = paymentData?.PaymentURL || paymentData?.paymentURL;
+        
+        if (paymentUrl) {
+          console.log("[Payment] Opening iframe with URL:", paymentUrl);
+          showSecureIframe(paymentUrl);
+        } else {
+          console.error('[Payment] No payment URL found in response data:', paymentData);
+          setIsSubmitting(false);
+          router.push('/cardDetails/error');
+        }
+      }
+      // Ignore other CardView message types
+      return;
     }
 
-    // Handle actual payment response
+    // Handle non-CardView responses
     if (response.IsSuccess || response.isSuccess) {
-      console.log("[Payment] Full response structure:", JSON.stringify(response, null, 2));
-      
-      // Try all possible paths for PaymentURL
       const paymentUrl = response.Data?.PaymentURL || 
                         response.data?.Data?.PaymentURL || 
                         response.PaymentURL;
       
-      console.log("[Payment] Extracted payment URL:", paymentUrl);
-      
       if (paymentUrl) {
-        console.log("[Payment] Opening iframe with URL:", paymentUrl);
         showSecureIframe(paymentUrl);
       } else {
-        console.error('[Payment] No payment URL found in response');
         setIsSubmitting(false);
         router.push('/cardDetails/error');
       }
@@ -145,13 +158,18 @@ const CardDetailsContent: React.FC = () => {
       amount: String(discountedPrice),
       cardViewId: "embedded-payment",
       callback: payment,
-      paymentOptions: ["MADA", "VISA", "MASTERCARD"], // Specify available payment methods
+      paymentOptions: ["MADA", "VISA", "MASTERCARD"],
       language: 'ar',
       onSuccess: (response: any) => {
-        console.log("[MyFatoorah] Success:", response);
+        console.log("[MyFatoorah] Success callback:", response);
+        payment(response); // Process the response through our payment handler
       },
       onError: (error: any) => {
         console.error("[MyFatoorah] Error:", error);
+        setIsSubmitting(false);
+      },
+      onCancel: () => {
+        console.log("[MyFatoorah] Payment cancelled");
         setIsSubmitting(false);
       }
     };
