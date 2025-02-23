@@ -18,12 +18,13 @@ const CardDetailsContent: React.FC = () => {
     console.log("[Payment] Response:", response);
     
     if (response.isSuccess) {
-      // Get PaymentURL from response
-      const paymentUrl = response.data?.Data?.PaymentURL;
+      // Make sure we're accessing the correct path to PaymentURL based on your response structure
+      const paymentUrl = response.data?.Data?.PaymentURL || response.Data?.PaymentURL;
       if (paymentUrl) {
+        console.log("[Payment] Opening iframe with URL:", paymentUrl);
         showSecureIframe(paymentUrl);
       } else {
-        console.error('No payment URL found');
+        console.error('[Payment] No payment URL found:', response);
         router.push('/cardDetails/error');
       }
     } else {
@@ -36,22 +37,34 @@ const CardDetailsContent: React.FC = () => {
   const showSecureIframe = (paymentUrl: string) => {
     const container = document.getElementById('secure-container');
     if (container) {
-      container.style.display = 'flex'; // Changed to flex for centering
-      container.innerHTML = `
-        <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg" style="height: 80vh;">
-          <iframe 
-            src="${paymentUrl}"
-            style="width: 100%; height: 100%; border: none;"
-            id="secure-frame"
-          ></iframe>
-          <button 
-            onclick="document.getElementById('secure-container').style.display='none';"
-            class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
-        </div>
-      `;
+      // Make sure to reset any previous content
+      container.innerHTML = '';
+      
+      // Create and append the iframe directly
+      const iframeWrapper = document.createElement('div');
+      iframeWrapper.className = 'relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg';
+      iframeWrapper.style.height = '80vh';
+      
+      const iframe = document.createElement('iframe');
+      iframe.src = paymentUrl;
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.id = 'secure-frame';
+      
+      const closeButton = document.createElement('button');
+      closeButton.className = 'absolute top-4 right-4 text-gray-500 hover:text-gray-700';
+      closeButton.textContent = '✕';
+      closeButton.onclick = () => {
+        container.style.display = 'none';
+      };
+      
+      iframeWrapper.appendChild(iframe);
+      iframeWrapper.appendChild(closeButton);
+      container.appendChild(iframeWrapper);
+      
+      // Show the container
+      container.style.display = 'flex';
     }
   };
 
