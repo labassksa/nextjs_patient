@@ -157,17 +157,13 @@ const CardDetailsContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
+    if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId) return;
 
     const config = {
-      sessionId,
       countryCode,
-      currencyCode: 'SAR',
-      amount: String(discountedPrice),
-      containerId: "embedded-payment",
-      callback: payment,
-      paymentOptions: ["Card"],
-      language: 'ar'
+      sessionId,
+      cardViewId: "card-element",
+      supportedNetworks: "v,m,md"
     };
 
     console.log('Initializing payment with config:', config);
@@ -178,30 +174,79 @@ const CardDetailsContent: React.FC = () => {
       console.error('Failed to initialize payment:', error);
       setIsSubmitting(false);
     }
-  }, [isScriptLoaded, sessionId, discountedPrice]);
+  }, [isScriptLoaded, sessionId, countryCode]);
 
   const handlePaymentSubmit = () => {
     console.log('[handlePaymentSubmit] Submitting payment...');
     setIsSubmitting(true);
-    try {
-      (window as any).myFatoorah.submit();
-    } catch (error) {
-      console.error('[handlePaymentSubmit] Error:', error);
-      setIsSubmitting(false);
-    }
+    
+    (window as any).myFatoorah.submit()
+      .then((response: any) => {
+        console.log("[Payment] Card submission response:", response);
+        const { sessionId, cardBrand, cardIdentifier } = response;
+        
+        const token = localStorage.getItem("labass_token");
+        if (!token) {
+          console.error("No token found in localStorage.");
+          return;
+        }
+
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl) {
+          console.error("NEXT_PUBLIC_API_URL is not defined");
+          return;
+        }
+
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+        
+        axios.post(
+          `${apiUrl}/execute-payment`,
+          {
+            SessionId: sessionId,
+            DisplayCurrencyIso: "SAR",
+            InvoiceValue: discountedPrice,
+            PromoCode: searchParams.get('promoCode'),
+            CallBackUrl: `${baseUrl}/cardDetails/success`,
+            ErrorUrl: `${baseUrl}/cardDetails/error`,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        .then(response => {
+          if (response.data.IsSuccess) {
+            const paymentUrl = response.data.Data.PaymentURL;
+            console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+            showSecureIframe(paymentUrl);
+          } else {
+            console.error('[Payment] Execute payment failed:', response.data);
+            setIsSubmitting(false);
+            router.push('/cardDetails/error');
+          }
+        })
+        .catch(error => {
+          console.error('[Payment] Execute payment error:', error);
+          setIsSubmitting(false);
+          router.push('/cardDetails/error');
+        });
+      })
+      .catch((error: any) => {
+        console.error('[handlePaymentSubmit] Error:', error);
+        setIsSubmitting(false);
+      });
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Script
-        src="https://sa.myfatoorah.com/cardview/v1/session.js"
+        src="https://sa.myfatoorah.com/cardview/v2/session.js"
         onLoad={() => setIsScriptLoaded(true)}
         strategy="afterInteractive"
       />
       
       <div className="max-w-3xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
-        <div id="embedded-payment" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
+        <div id="card-element" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
         
         <button
           onClick={handlePaymentSubmit}
