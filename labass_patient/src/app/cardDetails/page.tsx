@@ -18,10 +18,14 @@ const CardDetailsContent: React.FC = () => {
     console.log("[Payment] Response:", response);
     
     if (response.sender === "CardView") {
-      console.log("[Payment] Received CardView message, type:", response.type);
+      console.log("[Payment] Received CardView message, type:", response.type, "data:", response.data);
       
-      if (response.type === 1 && response.data?.IsSuccess) {
-        // Use the same session flow as Apple Pay
+      // Type 1 is the payment response after card details are entered
+      if (response.type === 1) {
+        const cardData = response.data?.Data;
+        console.log("[Payment] Card data:", cardData);
+        
+        // Make the execute payment call with card data
         fetch('/api/payments/execute', {
           method: 'POST',
           headers: {
@@ -29,15 +33,22 @@ const CardDetailsContent: React.FC = () => {
           },
           body: JSON.stringify({
             sessionId,
-            amount: discountedPrice
+            amount: discountedPrice,
+            cardToken: cardData?.CardToken,
+            cardBrand: cardData?.CardBrand,
+            // Add any other card-specific data needed
           })
         })
         .then(res => res.json())
         .then(data => {
+          console.log("[Payment] Execute response:", data);
           if (data.IsSuccess && data.Data?.PaymentURL) {
+            console.log("[Payment] Opening 3D secure iframe with URL:", data.Data.PaymentURL);
             showSecureIframe(data.Data.PaymentURL);
           } else {
-            throw new Error('No payment URL received');
+            console.error('[Payment] Execute payment failed:', data);
+            setIsSubmitting(false);
+            router.push('/cardDetails/error');
           }
         })
         .catch(error => {
@@ -46,6 +57,7 @@ const CardDetailsContent: React.FC = () => {
           router.push('/cardDetails/error');
         });
       }
+      // Type 3 might be validation or other messages, we can ignore them
       return;
     }
 
@@ -149,14 +161,19 @@ const CardDetailsContent: React.FC = () => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
 
     const config = {
-      sessionId, // Use the existing session ID
+      sessionId,
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
       cardViewId: "embedded-payment",
       callback: payment,
       paymentOptions: ["Card"],
-      language: 'ar'
+      language: 'ar',
+      // Add any additional required configuration
+      onError: (error: any) => {
+        console.error("[MyFatoorah] Error:", error);
+        setIsSubmitting(false);
+      }
     };
 
     console.log('Initializing payment with config:', config);
