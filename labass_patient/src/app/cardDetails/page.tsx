@@ -15,125 +15,31 @@ const CardDetailsContent: React.FC = () => {
   const countryCode = searchParams.get('countryCode') || 'SAU';
   const discountedPrice = searchParams.get('discountedPrice');
 
-  const payment = (response: any) => {
-    console.log("[Payment] Response:", response);
-    
-    if (response.isSuccess) {
-      switch (response.paymentType) {
-        case "Card":
-          console.log("Card payment response:", JSON.stringify(response));
-          const token = localStorage.getItem("labass_token");
-          if (!token) {
-            console.error("No token found in localStorage.");
-            return;
-          }
-
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-          if (!apiUrl) {
-            console.error("NEXT_PUBLIC_API_URL is not defined");
-            return;
-          }
-
-          // Use window.location.origin as fallback for base URL
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-
-          axios.post(
-            `${apiUrl}/execute-payment`,
-            {
-              SessionId: sessionId,
-              DisplayCurrencyIso: "SAR",
-              InvoiceValue: discountedPrice,
-              PromoCode: searchParams.get('promoCode'),
-              CallBackUrl: `${baseUrl}/cardDetails/success`,
-              ErrorUrl: `${baseUrl}/cardDetails/error`,
-            },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          )
-          .then(response => {
-            if (response.data.IsSuccess) {
-              const paymentUrl = response.data.Data.PaymentURL;
-              console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
-              showSecureIframe(paymentUrl);
-            } else {
-              console.error('[Payment] Execute payment failed:', response.data);
-              setIsSubmitting(false);
-              router.push('/cardDetails/error');
-            }
-          })
-          .catch(error => {
-            console.error('[Payment] Execute payment error:', error);
-            setIsSubmitting(false);
-            router.push('/cardDetails/error');
-          });
-          break;
-        default:
-          console.log("Unknown payment type");
-          break;
-      }
-    } else {
-      console.error('Payment not successful:', response);
-      setIsSubmitting(false);
-      router.push('/cardDetails/error');
-    }
-  };
-
   const showSecureIframe = (paymentUrl: string) => {
     const container = document.getElementById('secure-container');
     if (!container) return;
 
-    // Clear previous content
-    container.innerHTML = '';
-    
-    // Create iframe exactly as shown in docs
-    const iframe = document.createElement('iframe');
-    iframe.src = paymentUrl;
-    iframe.style.width = '100%';
-    iframe.style.height = '100%';
-    iframe.style.border = 'none';
-    
-    // Add iframe to container
-    container.appendChild(iframe);
-    container.style.display = 'flex';
+    container.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 500px;
+        height: 600px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+      ">
+        <iframe 
+          src="${paymentUrl}"
+          style="width: 100%; height: 100%; border: none;"
+        ></iframe>
+      </div>
+    `;
+    container.style.display = 'block';
   };
-
-  useEffect(() => {
-    const handle3DSecure = (event: MessageEvent) => {
-      if (!event.data) return;
-      try {
-        // Parse the message exactly as shown in docs
-        const message = JSON.parse(event.data);
-        console.log('[3DSecure] Received message:', message);
-        
-        if (message.sender === "MF-3DSecure") {
-          const url = message.url;
-          console.log('[3DSecure] Redirect URL:', url);
-          
-          // Hide the iframe
-          const container = document.getElementById('secure-container');
-          if (container) {
-            container.style.display = 'none';
-          }
-
-          setIsSubmitting(false);
-          
-          // Handle the redirect based on URL
-          if (url.includes('success')) {
-            router.push('/cardDetails/success');
-          } else {
-            router.push('/cardDetails/error');
-          }
-        }
-      } catch (error) {
-        console.error('[3DSecure] Error handling message:', error);
-        return;
-      }
-    };
-
-    window.addEventListener("message", handle3DSecure, false);
-    return () => window.removeEventListener("message", handle3DSecure, false);
-  }, [router]);
 
   useEffect(() => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId) return;
@@ -259,13 +165,11 @@ const CardDetailsContent: React.FC = () => {
         style={{ 
           display: 'none',
           position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '90%',
-          maxWidth: '500px',
-          height: '600px',
-          backgroundColor: 'white',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           zIndex: 9999,
         }}
       />
