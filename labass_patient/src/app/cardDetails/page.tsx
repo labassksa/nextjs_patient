@@ -3,6 +3,17 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
+import axios from 'axios';
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+if (!apiUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined");
+}
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+if (!baseUrl) {
+  throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
+}
 
 const CardDetailsContent: React.FC = () => {
   const router = useRouter();
@@ -17,65 +28,56 @@ const CardDetailsContent: React.FC = () => {
   const payment = (response: any) => {
     console.log("[Payment] Response:", response);
     
-    if (response.sender === "CardView") {
-      console.log("[Payment] Received CardView message, type:", response.type, "data:", response.data);
-      
-      // Type 1 is the payment response after card details are entered
-      if (response.type === 1) {
-        const cardData = response.data?.Data;
-        console.log("[Payment] Card data:", cardData);
-        
-        // Make the execute payment call with card data
-        fetch('/api/payments/execute', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            sessionId,
-            amount: discountedPrice,
-            cardToken: cardData?.CardToken,
-            cardBrand: cardData?.CardBrand,
-            // Add any other card-specific data needed
+    if (response.isSuccess) {
+      switch (response.paymentType) {
+        case "Card":
+          console.log("Card payment response:", JSON.stringify(response));
+          // Get token from localStorage like in paymentButton.tsx
+          const token = localStorage.getItem("labass_token");
+          if (!token) {
+            console.error("No token found in localStorage.");
+            return;
+          }
+
+          // Use axios and match the execute-payment call from paymentButton.tsx
+          axios.post(
+            `${apiUrl}/execute-payment`,
+            {
+              SessionId: sessionId,
+              DisplayCurrencyIso: "SAR",
+              InvoiceValue: discountedPrice,
+              PromoCode: searchParams.get('promoCode'),
+              CallBackUrl: `${baseUrl}/cardDetails/success`,
+              ErrorUrl: `${baseUrl}/cardDetails/error`,
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+          .then(response => {
+            if (response.data.IsSuccess) {
+              const paymentUrl = response.data.Data.PaymentURL;
+              console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+              showSecureIframe(paymentUrl);
+            } else {
+              console.error('[Payment] Execute payment failed:', response.data);
+              setIsSubmitting(false);
+              router.push('/cardDetails/error');
+            }
           })
-        })
-        .then(res => res.json())
-        .then(data => {
-          console.log("[Payment] Execute response:", data);
-          if (data.IsSuccess && data.Data?.PaymentURL) {
-            console.log("[Payment] Opening 3D secure iframe with URL:", data.Data.PaymentURL);
-            showSecureIframe(data.Data.PaymentURL);
-          } else {
-            console.error('[Payment] Execute payment failed:', data);
+          .catch(error => {
+            console.error('[Payment] Execute payment error:', error);
             setIsSubmitting(false);
             router.push('/cardDetails/error');
-          }
-        })
-        .catch(error => {
-          console.error('[Payment] Execute payment error:', error);
-          setIsSubmitting(false);
-          router.push('/cardDetails/error');
-        });
-      }
-      // Type 3 might be validation or other messages, we can ignore them
-      return;
-    }
-
-    if (response.IsSuccess || response.isSuccess) {
-      const paymentUrl = response.Data?.PaymentURL || 
-                        response.data?.Data?.PaymentURL || 
-                        response.PaymentURL;
-      
-      if (paymentUrl) {
-        showSecureIframe(paymentUrl);
-      } else {
-        setIsSubmitting(false);
-        console.error('Payment failed:', response);
-        router.push('/cardDetails/error');
+          });
+          break;
+        default:
+          console.log("Unknown payment type");
+          break;
       }
     } else {
+      console.error('Payment not successful:', response);
       setIsSubmitting(false);
-      console.error('Payment failed:', response);
       router.push('/cardDetails/error');
     }
   };
@@ -165,15 +167,10 @@ const CardDetailsContent: React.FC = () => {
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
-      cardViewId: "embedded-payment",
+      containerId: "embedded-payment",
       callback: payment,
       paymentOptions: ["Card"],
-      language: 'ar',
-      // Add any additional required configuration
-      onError: (error: any) => {
-        console.error("[MyFatoorah] Error:", error);
-        setIsSubmitting(false);
-      }
+      language: 'ar'
     };
 
     console.log('Initializing payment with config:', config);
