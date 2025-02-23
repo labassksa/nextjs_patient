@@ -25,21 +25,44 @@ const CardDetailsContent: React.FC = () => {
       if (response.type === 1 && response.data?.IsSuccess) {
         console.log("[Payment] Processing successful payment response");
         const paymentData = response.data.Data;
-        console.log("[Payment] Payment data:", paymentData);
         
-        // Check if we have a payment URL in the response
-        const paymentUrl = paymentData?.PaymentURL || paymentData?.paymentURL;
+        // Log the full payment data for debugging
+        console.log("[Payment] Full payment data:", JSON.stringify(paymentData, null, 2));
         
-        if (paymentUrl) {
-          console.log("[Payment] Opening iframe with URL:", paymentUrl);
-          showSecureIframe(paymentUrl);
+        // According to docs, we should call ExecutePayment on backend here
+        // The iframe should be shown after ExecutePayment returns the PaymentURL
+        
+        // For now, let's check if we have direct PaymentURL (though this might not be the case)
+        if (paymentData?.PaymentURL) {
+          showSecureIframe(paymentData.PaymentURL);
         } else {
-          console.error('[Payment] No payment URL found in response data:', paymentData);
-          setIsSubmitting(false);
-          router.push('/cardDetails/error');
+          // Here you should make a call to your backend to execute the payment
+          // The backend should call MyFatoorah's ExecutePayment endpoint
+          fetch('/api/execute-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              sessionId: response.data.SessionId || sessionId,
+              // Add any other required data
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.PaymentURL) {
+              showSecureIframe(data.PaymentURL);
+            } else {
+              throw new Error('No payment URL received');
+            }
+          })
+          .catch(error => {
+            console.error('[Payment] Execute payment error:', error);
+            setIsSubmitting(false);
+            router.push('/cardDetails/error');
+          });
         }
       }
-      // Ignore other CardView message types
       return;
     }
 
@@ -53,6 +76,7 @@ const CardDetailsContent: React.FC = () => {
         showSecureIframe(paymentUrl);
       } else {
         setIsSubmitting(false);
+        console.error('Payment failed:', response);
         router.push('/cardDetails/error');
       }
     } else {
@@ -158,20 +182,8 @@ const CardDetailsContent: React.FC = () => {
       amount: String(discountedPrice),
       cardViewId: "embedded-payment",
       callback: payment,
-      paymentOptions: ["MADA", "VISA", "MASTERCARD"],
-      language: 'ar',
-      onSuccess: (response: any) => {
-        console.log("[MyFatoorah] Success callback:", response);
-        payment(response); // Process the response through our payment handler
-      },
-      onError: (error: any) => {
-        console.error("[MyFatoorah] Error:", error);
-        setIsSubmitting(false);
-      },
-      onCancel: () => {
-        console.log("[MyFatoorah] Payment cancelled");
-        setIsSubmitting(false);
-      }
+      paymentOptions: ["Card"],
+      language: 'ar'
     };
 
     console.log('Initializing payment with config:', config);
