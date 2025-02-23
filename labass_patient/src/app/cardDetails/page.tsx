@@ -18,13 +18,22 @@ const CardDetailsContent: React.FC = () => {
     console.log("[Payment] Response:", response);
     
     if (response.isSuccess) {
-      // Make sure we're accessing the correct path to PaymentURL based on your response structure
-      const paymentUrl = response.data?.Data?.PaymentURL || response.Data?.PaymentURL;
+      // Log the full response structure to debug
+      console.log("[Payment] Full response structure:", JSON.stringify(response, null, 2));
+      
+      // Check multiple possible paths for PaymentURL
+      const paymentUrl = response.data?.Data?.PaymentURL || 
+                        response.Data?.PaymentURL || 
+                        response.data?.PaymentURL ||
+                        response.PaymentURL;
+      
+      console.log("[Payment] Extracted payment URL:", paymentUrl);
+      
       if (paymentUrl) {
         console.log("[Payment] Opening iframe with URL:", paymentUrl);
         showSecureIframe(paymentUrl);
       } else {
-        console.error('[Payment] No payment URL found:', response);
+        console.error('[Payment] No payment URL found in response');
         router.push('/cardDetails/error');
       }
     } else {
@@ -35,16 +44,24 @@ const CardDetailsContent: React.FC = () => {
   };
 
   const showSecureIframe = (paymentUrl: string) => {
+    console.log("[showSecureIframe] Starting to show iframe");
     const container = document.getElementById('secure-container');
-    if (container) {
-      // Make sure to reset any previous content
+    
+    if (!container) {
+      console.error("[showSecureIframe] Container not found");
+      return;
+    }
+    
+    try {
+      // Reset container
       container.innerHTML = '';
       
-      // Create and append the iframe directly
+      // Create wrapper
       const iframeWrapper = document.createElement('div');
       iframeWrapper.className = 'relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg';
       iframeWrapper.style.height = '80vh';
       
+      // Create iframe
       const iframe = document.createElement('iframe');
       iframe.src = paymentUrl;
       iframe.style.width = '100%';
@@ -52,19 +69,28 @@ const CardDetailsContent: React.FC = () => {
       iframe.style.border = 'none';
       iframe.id = 'secure-frame';
       
+      // Add loading indicator
+      iframe.onload = () => console.log("[showSecureIframe] Iframe loaded");
+      
+      // Create close button
       const closeButton = document.createElement('button');
       closeButton.className = 'absolute top-4 right-4 text-gray-500 hover:text-gray-700';
       closeButton.textContent = '✕';
       closeButton.onclick = () => {
+        console.log("[showSecureIframe] Closing iframe");
         container.style.display = 'none';
       };
       
+      // Assemble elements
       iframeWrapper.appendChild(iframe);
       iframeWrapper.appendChild(closeButton);
       container.appendChild(iframeWrapper);
       
-      // Show the container
+      // Show container
       container.style.display = 'flex';
+      console.log("[showSecureIframe] Iframe should now be visible");
+    } catch (error) {
+      console.error("[showSecureIframe] Error showing iframe:", error);
     }
   };
 
@@ -171,8 +197,15 @@ const CardDetailsContent: React.FC = () => {
 
       <div 
         id="secure-container"
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center"
-        style={{ display: 'none' }}
+        className="fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center hidden"
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999
+        }}
       />
     </div>
   );
