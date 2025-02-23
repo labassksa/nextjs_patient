@@ -17,56 +17,38 @@ const CardDetailsContent: React.FC = () => {
   const payment = (response: any) => {
     console.log("[Payment] Response:", response);
     
-    // Handle CardView message type
     if (response.sender === "CardView") {
       console.log("[Payment] Received CardView message, type:", response.type);
       
-      // Check if this is the payment response (type 1)
       if (response.type === 1 && response.data?.IsSuccess) {
-        console.log("[Payment] Processing successful payment response");
-        const paymentData = response.data.Data;
-        
-        // Log the full payment data for debugging
-        console.log("[Payment] Full payment data:", JSON.stringify(paymentData, null, 2));
-        
-        // According to docs, we should call ExecutePayment on backend here
-        // The iframe should be shown after ExecutePayment returns the PaymentURL
-        
-        // For now, let's check if we have direct PaymentURL (though this might not be the case)
-        if (paymentData?.PaymentURL) {
-          showSecureIframe(paymentData.PaymentURL);
-        } else {
-          // Here you should make a call to your backend to execute the payment
-          // The backend should call MyFatoorah's ExecutePayment endpoint
-          fetch('/api/execute-payment', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              sessionId: response.data.SessionId || sessionId,
-              // Add any other required data
-            })
+        // Use the same session flow as Apple Pay
+        fetch('/api/payments/execute', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            sessionId,
+            amount: discountedPrice
           })
-          .then(res => res.json())
-          .then(data => {
-            if (data.PaymentURL) {
-              showSecureIframe(data.PaymentURL);
-            } else {
-              throw new Error('No payment URL received');
-            }
-          })
-          .catch(error => {
-            console.error('[Payment] Execute payment error:', error);
-            setIsSubmitting(false);
-            router.push('/cardDetails/error');
-          });
-        }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.IsSuccess && data.Data?.PaymentURL) {
+            showSecureIframe(data.Data.PaymentURL);
+          } else {
+            throw new Error('No payment URL received');
+          }
+        })
+        .catch(error => {
+          console.error('[Payment] Execute payment error:', error);
+          setIsSubmitting(false);
+          router.push('/cardDetails/error');
+        });
       }
       return;
     }
 
-    // Handle non-CardView responses
     if (response.IsSuccess || response.isSuccess) {
       const paymentUrl = response.Data?.PaymentURL || 
                         response.data?.Data?.PaymentURL || 
@@ -96,15 +78,12 @@ const CardDetailsContent: React.FC = () => {
     }
     
     try {
-      // Reset container
       container.innerHTML = '';
       
-      // Create wrapper
       const iframeWrapper = document.createElement('div');
       iframeWrapper.className = 'relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg';
       iframeWrapper.style.height = '80vh';
       
-      // Create iframe
       const iframe = document.createElement('iframe');
       iframe.src = paymentUrl;
       iframe.style.width = '100%';
@@ -112,10 +91,8 @@ const CardDetailsContent: React.FC = () => {
       iframe.style.border = 'none';
       iframe.id = 'secure-frame';
       
-      // Add loading indicator
       iframe.onload = () => console.log("[showSecureIframe] Iframe loaded");
       
-      // Create close button
       const closeButton = document.createElement('button');
       closeButton.className = 'absolute top-4 right-4 text-gray-500 hover:text-gray-700';
       closeButton.textContent = '✕';
@@ -124,12 +101,10 @@ const CardDetailsContent: React.FC = () => {
         container.style.display = 'none';
       };
       
-      // Assemble elements
       iframeWrapper.appendChild(iframe);
       iframeWrapper.appendChild(closeButton);
       container.appendChild(iframeWrapper);
       
-      // Show container
       container.style.display = 'flex';
       console.log("[showSecureIframe] Iframe should now be visible");
     } catch (error) {
@@ -148,7 +123,6 @@ const CardDetailsContent: React.FC = () => {
           const url = message.url;
           console.log('[3DSecure] Redirect URL:', url);
           
-          // Hide iframe
           const container = document.getElementById('secure-container');
           if (container) {
             container.style.display = 'none';
@@ -156,7 +130,6 @@ const CardDetailsContent: React.FC = () => {
 
           setIsSubmitting(false);
           
-          // Handle redirect
           if (url.includes('success')) {
             router.push('/cardDetails/success');
           } else {
@@ -176,7 +149,7 @@ const CardDetailsContent: React.FC = () => {
     if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId || !discountedPrice) return;
 
     const config = {
-      sessionId,
+      sessionId, // Use the existing session ID
       countryCode,
       currencyCode: 'SAR',
       amount: String(discountedPrice),
