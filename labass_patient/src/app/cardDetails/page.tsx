@@ -5,16 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import axios from 'axios';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-if (!apiUrl) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
-}
-
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-if (!baseUrl) {
-  throw new Error("NEXT_PUBLIC_BASE_URL is not defined");
-}
-
 const CardDetailsContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,14 +22,21 @@ const CardDetailsContent: React.FC = () => {
       switch (response.paymentType) {
         case "Card":
           console.log("Card payment response:", JSON.stringify(response));
-          // Get token from localStorage like in paymentButton.tsx
           const token = localStorage.getItem("labass_token");
           if (!token) {
             console.error("No token found in localStorage.");
             return;
           }
 
-          // Use axios and match the execute-payment call from paymentButton.tsx
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL is not defined");
+            return;
+          }
+
+          // Use window.location.origin as fallback for base URL
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+
           axios.post(
             `${apiUrl}/execute-payment`,
             {
