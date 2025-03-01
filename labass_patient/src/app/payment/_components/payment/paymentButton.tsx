@@ -277,15 +277,19 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     console.log("Apple Pay session canceled");
   };
 
-  // 1. Adjusted handleGoToChat to check for promoCode
+  // 1. Adjusted handleGoToChat to check for promoCode source
   // ----------------------------------------------------------------
   const handleGoToChat = () => {
     if (consultationId) {
-      if (promoCode && promoCode.trim() !== "") {
-        // ✅ If promo code exists, go to consultation page
+      // Check if the promoCode came from the URL by looking at current URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPromoCode = urlParams.get('promoCode');
+      
+      // If promoCode exists AND it came from the URL, go to chat
+      if (promoCode && promoCode.trim() !== "" && urlPromoCode === promoCode) {
         router.push(`/chat/${consultationId}`);
       } else {
-        // Otherwise, go to patient selection
+        // Otherwise (promoCode from input field or no promoCode), go to patient selection
         router.push(`/patientSelection?consultationId=${consultationId}`);
       }
     } else {

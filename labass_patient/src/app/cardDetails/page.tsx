@@ -42,7 +42,11 @@ const CardDetailsContent: React.FC = () => {
 
           // Check success or error
           if (finalUrl.includes("/success")) {
-            router.push("/cardDetails/success");
+            // We can get consultationId and promoCode from localStorage
+            // The actual values were stored during execute-payment call
+            const consultationId = localStorage.getItem('temp_consultation_id');
+            const promoFromUrl = localStorage.getItem('temp_promo_from_url');
+            router.push(`/cardDetails/success?consultationId=${consultationId}&promoFromUrl=${promoFromUrl}`);
           } else {
             router.push("/cardDetails/error");
           }
@@ -133,11 +137,20 @@ const CardDetailsContent: React.FC = () => {
 
           if (data.IsSuccess) {
             const paymentUrl = data.Data.PaymentURL;
+            const consultationId = data.consultation; // Get consultation ID from response
             console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
 
             // Show the 3D-Secure in an iframe
             setIframeSrc(paymentUrl);
             setShowIframe(true);
+
+            // Store consultationId and promoCode for success page
+            localStorage.setItem('temp_consultation_id', consultationId);
+            localStorage.setItem('temp_promo_code', promoCode);
+            
+            // Store information about whether promoCode came from URL
+            const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
+            localStorage.setItem('temp_promo_from_url', isPromoFromUrl ? 'true' : 'false');
           } else {
             console.error("[Payment] Execute payment failed:", data);
             setIsSubmitting(false);
