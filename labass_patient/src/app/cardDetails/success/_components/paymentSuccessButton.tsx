@@ -1,3 +1,5 @@
+"use client";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";

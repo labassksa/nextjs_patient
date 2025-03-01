@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import StatusSection from "./_components/paymentSuccessButton";
 import Button from "../../waitingDoctor/_components/waitingDoctor/button";
@@ -30,7 +30,9 @@ const WaitingForConsultation = () => {
     <div className="flex flex-col min-h-screen w-full bg-gray-100">
       <div className="flex-grow pt-16 flex flex-col justify-between">
         <div className="p-4">
-          <StatusSection />
+          <Suspense fallback={<div>Loading...</div>}>
+            <StatusSection />
+          </Suspense>
         </div>
         <div className="w-full p-2">
           <Button />
