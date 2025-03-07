@@ -314,6 +314,11 @@ const CardDetailsContent: React.FC = () => {
     });
   };
 
+  // Add this after the other useEffect hooks
+  useEffect(() => {
+    console.log("[Iframe] State changed:", { showIframe, iframeSrc });
+  }, [showIframe, iframeSrc]);
+
   // ------------------------------------------------------------
   // 4) Render
   // ------------------------------------------------------------
