@@ -128,7 +128,7 @@ const CardDetailsContent: React.FC = () => {
     });
   };
 
-  // 3) Handle the payment submission process
+  // 3) Handle the payment submission process with an overall timeout of 30 seconds
   const handlePaymentSubmit = async () => {
     console.log("[handlePaymentSubmit] Submitting payment...");
     setIsSubmitting(true);
@@ -165,17 +165,17 @@ const CardDetailsContent: React.FC = () => {
     }
 
     console.log("[Payment] Proceeding with card submission");
-    // Set a timeout to avoid indefinite waiting (20 seconds)
-    const submitTimeout = setTimeout(() => {
-      console.error("[Payment] Submission timed out after 20 seconds");
+    // Set an overall timeout (30 seconds) for the entire submission process
+    const overallTimeout = setTimeout(() => {
+      console.error("[Payment] Submission timed out after 30 seconds");
       setIsSubmitting(false);
       alert("Payment processing timed out. Please try again.");
-    }, 20000);
+    }, 30000);
 
     try {
       const response = await mf.submit();
-      clearTimeout(submitTimeout);
       console.log("[Payment] Card submission response:", response);
+      // If mf.submit() returns successfully, proceed to execute the payment
       if (response?.type === 1 && response?.data?.IsSuccess) {
         const newSessionId = response.data.Data.SessionId;
         console.log("[Payment] Card validation successful, proceeding with execute-payment");
@@ -185,6 +185,7 @@ const CardDetailsContent: React.FC = () => {
         if (!token) {
           console.error("No token found in localStorage.");
           setIsSubmitting(false);
+          clearTimeout(overallTimeout);
           alert("You need to be logged in to make a payment. Please log in and try again.");
           return;
         }
@@ -192,6 +193,7 @@ const CardDetailsContent: React.FC = () => {
         if (!apiUrl) {
           console.error("NEXT_PUBLIC_API_URL is not defined");
           setIsSubmitting(false);
+          clearTimeout(overallTimeout);
           alert("Configuration error. Please contact support.");
           return;
         }
@@ -211,12 +213,12 @@ const CardDetailsContent: React.FC = () => {
           }
         );
         console.log("[Payment] Execute payment response:", data);
-
+        clearTimeout(overallTimeout);
         if (data.IsSuccess && data.Data.PaymentURL) {
           const paymentUrl = data.Data.PaymentURL;
           const consultationId = data.consultation; // Extract consultation ID from response
           console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
-          // Set the PaymentURL to show the OTP (3D Secure) page in an iframe
+          // Display the 3D Secure (OTP) page in an iframe overlay
           setIframeSrc(paymentUrl);
           setShowIframe(true);
           // Store temporary values for later redirection after OTP completion
@@ -227,16 +229,16 @@ const CardDetailsContent: React.FC = () => {
         } else {
           console.error("[Payment] Execute payment failed:", data);
           setIsSubmitting(false);
-          alert("Payment processing failed: " + (data.Message || "Unknown error"));
           router.push("/cardDetails/error");
         }
       } else {
         console.error("[Payment] Invalid response from card submission:", response);
         setIsSubmitting(false);
+        clearTimeout(overallTimeout);
         alert("Invalid response from payment gateway. Please try again.");
       }
     } catch (error: any) {
-      clearTimeout(submitTimeout);
+      clearTimeout(overallTimeout);
       console.error("[Payment] Card submit error:", error);
       setIsSubmitting(false);
       alert("Card validation failed. Please check your card details and try again.");
@@ -252,7 +254,7 @@ const CardDetailsContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-3xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
+        <h1 className="text-2xl font-bold mb-4 text-center text-black">بوابة الدفع</h1>
         {/* MyFatoorah CardView script */}
         <Script
           src="https://sa.myfatoorah.com/cardview/v2/session.js"
