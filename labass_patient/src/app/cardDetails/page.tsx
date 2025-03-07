@@ -30,6 +30,27 @@ const CardDetailsContent: React.FC = () => {
         const message = JSON.parse(event.data);
         console.log("[3DSecure] Received message:", message);
         
+        // Handle 3D-Secure completion
+        if (message.sender === "MF-3DSecure") {
+          const finalUrl = message.url;
+          console.log("[3DSecure] Completed, finalUrl:", finalUrl);
+
+          // Hide iframe
+          setShowIframe(false);
+          setIframeSrc(null);
+
+          // Check success or error
+          if (finalUrl.includes("/success")) {
+            const consultationId = localStorage.getItem('temp_consultation_id');
+            const promoFromUrl = localStorage.getItem('temp_promo_from_url');
+            router.push(`/cardDetails/success?consultationId=${consultationId}&promoFromUrl=${promoFromUrl}`);
+          } else {
+            router.push("/cardDetails/error");
+          }
+          return;
+        }
+
+        // Handle CardView messages
         if (message.sender === "CardView") {
           console.log("[CardView] Received message:", message);
           if (message.type === 1 && message.data?.IsSuccess) {
@@ -40,7 +61,7 @@ const CardDetailsContent: React.FC = () => {
             if (!newSessionId) {
               console.error("[CardView] No SessionId in successful response");
               setIsSubmitting(false);
-              alert("Payment validation failed. Please try again.");
+              router.push("/cardDetails/error");
               return;
             }
 
@@ -50,7 +71,7 @@ const CardDetailsContent: React.FC = () => {
               if (!token) {
                 console.error("No token found in localStorage.");
                 setIsSubmitting(false);
-                alert("You need to be logged in to make a payment. Please log in and try again.");
+                router.push("/cardDetails/error");
                 return;
               }
 
@@ -58,7 +79,7 @@ const CardDetailsContent: React.FC = () => {
               if (!apiUrl) {
                 console.error("NEXT_PUBLIC_API_URL is not defined");
                 setIsSubmitting(false);
-                alert("Configuration error. Please contact support.");
+                router.push("/cardDetails/error");
                 return;
               }
 
@@ -84,32 +105,35 @@ const CardDetailsContent: React.FC = () => {
                 const consultationId = data.consultation;
                 console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
                 
-                setIframeSrc(paymentUrl);
-                setShowIframe(true);
-                
+                // Store information before showing 3D-Secure iframe
                 localStorage.setItem("temp_consultation_id", consultationId);
                 localStorage.setItem("temp_promo_code", promoCode);
                 const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
                 localStorage.setItem("temp_promo_from_url", isPromoFromUrl ? "true" : "false");
+
+                // Show 3D-Secure iframe
+                setIframeSrc(paymentUrl);
+                setShowIframe(true);
               } else {
                 console.error("[Payment] Execute payment failed:", data);
                 setIsSubmitting(false);
-                alert("Payment processing failed. Please try again.");
+                router.push("/cardDetails/error");
               }
             } catch (error) {
               console.error("[Payment] Execute payment error:", error);
               setIsSubmitting(false);
-              alert("Error processing payment. Please try again.");
+              router.push("/cardDetails/error");
             }
           } else if (message.type === 2) {
             console.error("[CardView] Error:", message.data);
             setIsSubmitting(false);
-            alert("Card validation failed: " + (message.data?.Message || "Unknown error"));
+            router.push("/cardDetails/error");
           }
         }
-        // ... rest of the message handling (MF-3DSecure etc.)
       } catch (err) {
         console.error("[3DSecure] Error parsing message:", err);
+        setIsSubmitting(false);
+        router.push("/cardDetails/error");
       }
     };
 
