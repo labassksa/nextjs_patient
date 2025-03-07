@@ -64,7 +64,27 @@ const CardDetailsContent: React.FC = () => {
   // 2) Load MyFatoorah script and init
   // ------------------------------------------------------------
   useEffect(() => {
-    if (!isScriptLoaded || !(window as any).myFatoorah || !sessionId) return;
+    // Log when this effect runs and with what values
+    console.log("[MyFatoorah Init] Effect running with:", { 
+      isScriptLoaded, 
+      hasMyfatoorah: Boolean((window as any).myFatoorah), 
+      sessionId 
+    });
+    
+    if (!isScriptLoaded) {
+      console.log("[MyFatoorah Init] Waiting for script to load...");
+      return;
+    }
+    
+    if (!(window as any).myFatoorah) {
+      console.error("[MyFatoorah Init] Script loaded but myFatoorah object not found on window");
+      return;
+    }
+    
+    if (!sessionId) {
+      console.error("[MyFatoorah Init] No sessionId available");
+      return;
+    }
 
     const config = {
       countryCode,
@@ -73,12 +93,26 @@ const CardDetailsContent: React.FC = () => {
       supportedNetworks: "v,m,md,ae", // Visa, Master, Mada, Amex
     };
 
-    console.log("Initializing payment with config:", config);
+    console.log("[MyFatoorah Init] Initializing payment with config:", config);
+    
     try {
       (window as any).myFatoorah.init(config);
-      console.log("Payment initialized successfully");
+      console.log("[MyFatoorah Init] Payment initialized successfully");
+      
+      // Check if card element is actually populated
+      setTimeout(() => {
+        const cardElement = document.getElementById("card-element");
+        if (cardElement) {
+          console.log("[MyFatoorah Init] Card element check:", {
+            hasChildren: cardElement.children.length > 0,
+            innerHTML: cardElement.innerHTML.substring(0, 100) + "..." // Log first 100 chars
+          });
+        } else {
+          console.error("[MyFatoorah Init] Card element not found in DOM after initialization");
+        }
+      }, 1000);
     } catch (error) {
-      console.error("Failed to initialize payment:", error);
+      console.error("[MyFatoorah Init] Failed to initialize payment:", error);
       setIsSubmitting(false);
     }
   }, [isScriptLoaded, sessionId, countryCode]);
@@ -94,12 +128,48 @@ const CardDetailsContent: React.FC = () => {
     if (!mf) {
       console.error("myFatoorah not found on window");
       setIsSubmitting(false);
+      alert("Payment system not loaded. Please refresh the page and try again.");
       return;
     }
 
+    // Add additional validation checks
+    if (!sessionId) {
+      console.error("No sessionId available. Cannot process payment.");
+      setIsSubmitting(false);
+      alert("Payment session expired. Please go back and try again.");
+      return;
+    }
+
+    // Check if card element is properly mounted
+    const cardElement = document.getElementById("card-element");
+    if (!cardElement || cardElement.children.length === 0) {
+      console.error("Card element not properly loaded:", cardElement);
+      setIsSubmitting(false);
+      alert("Payment form not fully loaded. Please refresh and try again.");
+      return;
+    }
+
+    console.log("[Payment] Attempting to submit card details...");
+    
+    // Add a timeout to prevent infinite loading
+    const submitTimeout = setTimeout(() => {
+      console.error("[Payment] Submission timed out after 20 seconds");
+      setIsSubmitting(false);
+      alert("Payment processing timed out. Please try again.");
+    }, 20000); // 20 second timeout
+
     mf.submit()
       .then(async (response: any) => {
+        clearTimeout(submitTimeout);
         console.log("[Payment] Card submission response:", response);
+        
+        if (!response || !response.sessionId) {
+          console.error("[Payment] Invalid response from card submission:", response);
+          setIsSubmitting(false);
+          alert("Invalid response from payment gateway. Please try again.");
+          return;
+        }
+        
         const newSessionId = response.sessionId;
 
         // 3a) Now call our backend's execute-payment (like PaymentButton)
@@ -107,6 +177,7 @@ const CardDetailsContent: React.FC = () => {
         if (!token) {
           console.error("No token found in localStorage.");
           setIsSubmitting(false);
+          alert("You need to be logged in to make a payment. Please log in and try again.");
           return;
         }
 
@@ -114,10 +185,13 @@ const CardDetailsContent: React.FC = () => {
         if (!apiUrl) {
           console.error("NEXT_PUBLIC_API_URL is not defined");
           setIsSubmitting(false);
+          alert("Configuration error. Please contact support.");
           return;
         }
 
         try {
+          console.log("[Payment] Calling execute-payment with sessionId:", newSessionId);
+          
           // Use the same body shape as PaymentButton
           const { data } = await axios.post(
             `${apiUrl}/execute-payment`,
@@ -134,6 +208,8 @@ const CardDetailsContent: React.FC = () => {
               headers: { Authorization: `Bearer ${token}` },
             }
           );
+
+          console.log("[Payment] Execute payment response:", data);
 
           if (data.IsSuccess) {
             const paymentUrl = data.Data.PaymentURL;
@@ -154,17 +230,24 @@ const CardDetailsContent: React.FC = () => {
           } else {
             console.error("[Payment] Execute payment failed:", data);
             setIsSubmitting(false);
+            alert("Payment processing failed: " + (data.Message || "Unknown error"));
             router.push("/cardDetails/error");
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("[Payment] Execute payment error:", error);
+          console.error("[Payment] Error details:", error.response?.data || "No response data");
           setIsSubmitting(false);
+          alert("Error processing payment. Please try again later.");
           router.push("/cardDetails/error");
         }
       })
       .catch((error: any) => {
+        clearTimeout(submitTimeout);
         console.error("[Payment] Card submit error:", error);
+        console.error("[Payment] Error type:", typeof error);
+        console.error("[Payment] Error message:", error.message || "No error message");
         setIsSubmitting(false);
+        alert("Card validation failed. Please check your card details and try again.");
       });
   };
 
@@ -173,15 +256,45 @@ const CardDetailsContent: React.FC = () => {
   // ------------------------------------------------------------
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* MyFatoorah CardView script */}
-      <Script
-        src="https://sa.myfatoorah.com/cardview/v2/session.js"
-        onLoad={() => setIsScriptLoaded(true)}
-        strategy="afterInteractive"
-      />
-
       <div className="max-w-3xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
+        {/* MyFatoorah CardView script */}
+        <Script
+          src="https://sa.myfatoorah.com/cardview/v2/session.js"
+          onLoad={() => {
+            console.log("[Script] MyFatoorah script loaded successfully");
+            setIsScriptLoaded(true);
+          }}
+          onError={(e) => {
+            console.error("[Script] Error loading MyFatoorah script:", e);
+            // Try to reload after 3 seconds
+            setTimeout(() => {
+              console.log("[Script] Attempting to reload MyFatoorah script...");
+              const script = document.createElement('script');
+              script.src = "https://sa.myfatoorah.com/cardview/v2/session.js";
+              script.onload = () => {
+                console.log("[Script] MyFatoorah script reloaded successfully");
+                setIsScriptLoaded(true);
+              };
+              script.onerror = () => console.error("[Script] Failed to reload MyFatoorah script");
+              document.head.appendChild(script);
+            }, 3000);
+          }}
+          strategy="afterInteractive"
+        />
+
+        {/* Debug information - can be removed in production */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="bg-yellow-100 text-xs p-2 mb-4 rounded">
+            <p>Debug Info:</p>
+            <ul>
+              <li>Script Loaded: {isScriptLoaded ? '✅' : '❌'}</li>
+              <li>MyFatoorah Object: {(window as any)?.myFatoorah ? '✅' : '❌'}</li>
+              <li>Session ID: {sessionId ? `✅ (${sessionId.substring(0, 8)}...)` : '❌'}</li>
+            </ul>
+          </div>
+        )}
+
         {/* MyFatoorah card input container */}
         <div id="card-element" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
 
