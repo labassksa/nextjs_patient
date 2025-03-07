@@ -16,10 +16,10 @@ const CardDetailsContent: React.FC = () => {
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
   const [showIframe, setShowIframe] = useState<boolean>(false);
 
-  // Retrieve query parameters (provided from InitiateSession endpoint)
+  // Retrieve query parameters (from InitiateSession endpoint)
   const sessionId = searchParams.get("sessionId");
   const countryCode = searchParams.get("countryCode") || "SAU";
-  const currencyCode = "SAR"; // for Saudi Arabia
+  const currencyCode = "SAR"; // For Saudi Arabia
   const amount = searchParams.get("discountedPrice") || "0";
   const promoCode = searchParams.get("promoCode") || "";
 
@@ -27,11 +27,11 @@ const CardDetailsContent: React.FC = () => {
   const paymentCallback = async (response: any) => {
     console.log("[Payment Callback] Received response:", response);
     if (response.isSuccess) {
-      // Use the sessionId from response if available; otherwise, fallback to our initial sessionId
+      // Use response.sessionId if provided; otherwise fallback to our sessionId
       const currentSessionId = response.sessionId || sessionId;
       console.log("[Payment Callback] Payment form submitted successfully. SessionId:", currentSessionId);
 
-      // Now call ExecutePayment on your backend to process the transaction
+      // Call ExecutePayment on your backend to complete the transaction
       setIsSubmitting(true);
       try {
         const token = localStorage.getItem("labass_token");
@@ -48,7 +48,7 @@ const CardDetailsContent: React.FC = () => {
           alert("Configuration error. Please contact support.");
           return;
         }
-        const executeResponse = await axios.post(
+        const { data } = await axios.post(
           `${apiUrl}/execute-payment`,
           {
             SessionId: currentSessionId,
@@ -60,18 +60,19 @@ const CardDetailsContent: React.FC = () => {
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log("[ExecutePayment] Response:", executeResponse.data);
-        if (executeResponse.data.IsSuccess && executeResponse.data.Data.PaymentURL) {
-          const paymentUrl = executeResponse.data.Data.PaymentURL;
-          console.log("[ExecutePayment] Payment requires 3D Secure. Opening OTP iframe with URL:", paymentUrl);
+        console.log("[ExecutePayment] Response:", data);
+        if (data.IsSuccess && data.Data.PaymentURL) {
+          const paymentUrl = data.Data.PaymentURL;
+          console.log("[ExecutePayment] Payment requires 3D Secure; opening OTP iframe with URL:", paymentUrl);
           setIframeSrc(paymentUrl);
           setShowIframe(true);
-        } else if (executeResponse.data.IsSuccess) {
-          console.log("[ExecutePayment] Payment processed directly. Redirecting to success page.");
+        } else if (data.IsSuccess) {
+          console.log("[ExecutePayment] Payment processed directly; redirecting to success page");
           router.push("/cardDetails/success");
         } else {
-          console.error("[ExecutePayment] Failed:", executeResponse.data);
-          alert("Payment processing failed: " + (executeResponse.data.Message || "Unknown error"));
+          console.error("[ExecutePayment] Failed:", data);
+          setIsSubmitting(false);
+          alert("Payment processing failed: " + (data.Message || "Unknown error"));
           router.push("/cardDetails/error");
         }
       } catch (error: any) {
@@ -94,14 +95,13 @@ const CardDetailsContent: React.FC = () => {
       try {
         const message = JSON.parse(event.data);
         console.log("[3DSecure] Received message:", message);
-        // Proceed only if the sender is exactly "MF-3DSecure"
         if (message.sender === "MF-3DSecure") {
           const finalUrl = message.url;
           console.log("[3DSecure] Completed, finalUrl:", finalUrl);
           // Hide the OTP iframe
           setShowIframe(false);
           setIframeSrc(null);
-          // Redirect based on the final URL (which should be your callback or error URL)
+          // Redirect based on finalUrl (success or error)
           if (finalUrl.includes("/success")) {
             router.push("/cardDetails/success");
           } else {
@@ -112,14 +112,18 @@ const CardDetailsContent: React.FC = () => {
         console.error("[3DSecure] Error parsing message:", err);
       }
     };
+
     window.addEventListener("message", handle3DSMessage);
     return () => window.removeEventListener("message", handle3DSMessage);
   }, [router]);
 
-  // Initialize the MyFatoorah Embedded Payment UI once the script is loaded
+  // Initialize the MyFatoorah Embedded Payment UI once the script loads
   useEffect(() => {
     console.log("[MyFatoorah Init] Running with:", { isScriptLoaded, sessionId });
-    if (!isScriptLoaded) return;
+    if (!isScriptLoaded) {
+      console.log("[MyFatoorah Init] Waiting for script load...");
+      return;
+    }
     if (!(window as any).myFatoorah) {
       console.error("[MyFatoorah Init] Script loaded but myFatoorah object not found");
       return;
@@ -161,7 +165,7 @@ const CardDetailsContent: React.FC = () => {
           }}
           strategy="afterInteractive"
         />
-        {/* Container for rendering the payment form */}
+        {/* Container for rendering the embedded payment UI */}
         <div id="embedded-payment" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
         {isSubmitting && (
           <div className="text-center">
@@ -169,7 +173,7 @@ const CardDetailsContent: React.FC = () => {
           </div>
         )}
       </div>
-      {/* Iframe overlay for 3D-Secure OTP page */}
+      {/* Iframe overlay for 3D Secure OTP page */}
       {showIframe && iframeSrc && (
         <div
           style={{
