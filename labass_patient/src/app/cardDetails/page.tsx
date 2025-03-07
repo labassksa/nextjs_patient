@@ -262,11 +262,21 @@ const CardDetailsContent: React.FC = () => {
                 const paymentUrl = data.Data.PaymentURL;
                 const consultationId = data.consultation; // Get consultation ID from response
                 console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+<<<<<<< HEAD
+=======
+                console.log("[Payment] Current iframe state:", { showIframe, iframeSrc });
+>>>>>>> 3c70031 (fix the iframe)
 
                 // Show the 3D-Secure in an iframe
                 setIframeSrc(paymentUrl);
                 setShowIframe(true);
 
+<<<<<<< HEAD
+=======
+                // Log state after setting
+                console.log("[Payment] Updated iframe state:", { showIframe: true, iframeSrc: paymentUrl });
+
+>>>>>>> 3c70031 (fix the iframe)
                 // Store consultationId and promoCode for success page
                 localStorage.setItem('temp_consultation_id', consultationId);
                 localStorage.setItem('temp_promo_code', promoCode);
@@ -396,11 +406,42 @@ const CardDetailsContent: React.FC = () => {
               background: "white",
               borderRadius: "8px",
               overflow: "hidden",
+              position: "relative",
             }}
           >
+            <button
+              onClick={() => {
+                setShowIframe(false);
+                setIframeSrc(null);
+              }}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "30px",
+                height: "30px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10000,
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+              }}
+            >
+              ✕
+            </button>
             <iframe
               src={iframeSrc}
-              style={{ width: "100%", height: "100%", border: "none" }}
+              style={{ 
+                width: "100%", 
+                height: "100%", 
+                border: "none",
+                position: "relative",
+                zIndex: 9999,
+              }}
             />
           </div>
         </div>
