@@ -190,10 +190,20 @@ const CardDetailsContent: React.FC = () => {
     // Add a check for iframe readiness
     const checkIframeReady = () => {
       return new Promise((resolve) => {
-        const iframe = document.getElementById('iframe') as HTMLIFrameElement;
+        // Look for the iframe inside the card-element
+        const cardElement = document.getElementById("card-element");
+        if (!cardElement) {
+          console.error("[Payment] Card element not found");
+          resolve(false);
+          return;
+        }
+
+        const iframe = cardElement.querySelector('iframe');
         if (iframe && iframe.contentWindow) {
+          console.log("[Payment] Card iframe is ready");
           resolve(true);
         } else {
+          console.log("[Payment] Waiting for card iframe to be ready...");
           setTimeout(() => resolve(false), 100);
         }
       });
@@ -209,6 +219,18 @@ const CardDetailsContent: React.FC = () => {
         return;
       }
 
+      // Additional check to ensure iframe is properly loaded
+      const cardElement = document.getElementById("card-element");
+      const iframe = cardElement?.querySelector('iframe');
+      if (!iframe || !iframe.contentWindow) {
+        console.error("[Payment] Card iframe not properly loaded");
+        clearTimeout(submitTimeout);
+        setIsSubmitting(false);
+        alert("Payment form not properly loaded. Please refresh and try again.");
+        return;
+      }
+
+      console.log("[Payment] Card iframe is ready and properly loaded, proceeding with submission");
       mf.submit()
         .then(async (response: any) => {
           clearTimeout(submitTimeout);
@@ -388,61 +410,23 @@ const CardDetailsContent: React.FC = () => {
             position: "fixed",
             top: 0,
             left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "white",
             zIndex: 9999,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
           }}
         >
-          <div
-            style={{
-              width: "90%",
-              maxWidth: "500px",
-              height: "600px",
-              background: "white",
-              borderRadius: "8px",
-              overflow: "hidden",
-              position: "relative",
+          <iframe
+            src={iframeSrc}
+            style={{ 
+              width: "100%", 
+              height: "100%", 
+              border: "none",
+              position: "fixed",
+              top: 0,
+              left: 0,
             }}
-          >
-            <button
-              onClick={() => {
-                setShowIframe(false);
-                setIframeSrc(null);
-              }}
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                background: "white",
-                border: "none",
-                borderRadius: "50%",
-                width: "30px",
-                height: "30px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                zIndex: 10000,
-                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-              }}
-            >
-              ✕
-            </button>
-            <iframe
-              src={iframeSrc}
-              style={{ 
-                width: "100%", 
-                height: "100%", 
-                border: "none",
-                position: "relative",
-                zIndex: 9999,
-              }}
-            />
-          </div>
+          />
         </div>
       )}
     </div>
