@@ -262,21 +262,15 @@ const CardDetailsContent: React.FC = () => {
                 const paymentUrl = data.Data.PaymentURL;
                 const consultationId = data.consultation; // Get consultation ID from response
                 console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
-<<<<<<< HEAD
-=======
                 console.log("[Payment] Current iframe state:", { showIframe, iframeSrc });
->>>>>>> 3c70031 (fix the iframe)
 
                 // Show the 3D-Secure in an iframe
                 setIframeSrc(paymentUrl);
                 setShowIframe(true);
 
-<<<<<<< HEAD
-=======
                 // Log state after setting
                 console.log("[Payment] Updated iframe state:", { showIframe: true, iframeSrc: paymentUrl });
 
->>>>>>> 3c70031 (fix the iframe)
                 // Store consultationId and promoCode for success page
                 localStorage.setItem('temp_consultation_id', consultationId);
                 localStorage.setItem('temp_promo_code', promoCode);
@@ -463,4 +457,4 @@ const CardDetailsPage: React.FC = () => {
   );
 };
 
-export default CardDetailsPage;
+export default CardDetailsPage; 
