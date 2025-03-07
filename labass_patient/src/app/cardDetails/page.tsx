@@ -5,6 +5,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import axios from "axios";
 
+// Helper: Poll for window.myFatoorah until it is available (or timeout after maxWaitMs)
+const waitForMyFatoorahObject = async (maxWaitMs = 5000): Promise<boolean> => {
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const check = () => {
+      if ((window as any).myFatoorah) {
+        resolve(true);
+      } else if (Date.now() - startTime > maxWaitMs) {
+        resolve(false);
+      } else {
+        setTimeout(check, 100);
+      }
+    };
+    check();
+  });
+};
+
 const CardDetailsContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -117,36 +134,41 @@ const CardDetailsContent: React.FC = () => {
     return () => window.removeEventListener("message", handle3DSMessage);
   }, [router]);
 
-  // Initialize the MyFatoorah Embedded Payment UI once the script loads
+  // Initialize the MyFatoorah Embedded Payment UI once the script loads and myFatoorah object is available
   useEffect(() => {
-    console.log("[MyFatoorah Init] Running with:", { isScriptLoaded, sessionId });
-    if (!isScriptLoaded) {
-      console.log("[MyFatoorah Init] Waiting for script load...");
-      return;
-    }
-    if (!(window as any).myFatoorah) {
-      console.error("[MyFatoorah Init] Script loaded but myFatoorah object not found");
-      return;
-    }
-    if (!sessionId) {
-      console.error("[MyFatoorah Init] No sessionId available");
-      return;
-    }
-    const config = {
-      sessionId: sessionId,
-      countryCode: countryCode,
-      currencyCode: currencyCode,
-      amount: amount,
-      callback: paymentCallback,
-      containerId: "embedded-payment", // The div where the payment UI will be rendered
-      paymentOptions: ["Card", "ApplePay", "GooglePay", "STCPay"],
+    const initMyFatoorah = async () => {
+      console.log("[MyFatoorah Init] Running with:", { isScriptLoaded, sessionId });
+      if (!isScriptLoaded) {
+        console.log("[MyFatoorah Init] Waiting for script load...");
+        return;
+      }
+      // Poll until window.myFatoorah is available
+      const available = await waitForMyFatoorahObject();
+      if (!available) {
+        console.error("[MyFatoorah Init] myFatoorah object not found after waiting.");
+        return;
+      }
+      if (!sessionId) {
+        console.error("[MyFatoorah Init] No sessionId available");
+        return;
+      }
+      const config = {
+        sessionId: sessionId,
+        countryCode: countryCode,
+        currencyCode: currencyCode,
+        amount: amount,
+        callback: paymentCallback,
+        containerId: "embedded-payment", // The div where the payment UI will be rendered
+        paymentOptions: ["Card", "ApplePay", "GooglePay", "STCPay"],
+      };
+      try {
+        (window as any).myFatoorah.init(config);
+        console.log("[MyFatoorah Init] Embedded Payment initialized with config:", config);
+      } catch (error) {
+        console.error("[MyFatoorah Init] Failed to initialize embedded payment:", error);
+      }
     };
-    try {
-      (window as any).myFatoorah.init(config);
-      console.log("[MyFatoorah Init] Embedded Payment initialized with config:", config);
-    } catch (error) {
-      console.error("[MyFatoorah Init] Failed to initialize embedded payment:", error);
-    }
+    initMyFatoorah();
   }, [isScriptLoaded, sessionId, countryCode, currencyCode, amount]);
 
   return (
