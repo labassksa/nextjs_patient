@@ -12,29 +12,33 @@ const CardDetailsContent: React.FC = () => {
   // States
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // For 3D-Secure Iframe handling
   const [iframeSrc, setIframeSrc] = useState<string | null>(null);
   const [showIframe, setShowIframe] = useState<boolean>(false);
 
-  // Query parameters
+  // Retrieve query parameters
   const sessionId = searchParams.get("sessionId");
   const countryCode = searchParams.get("countryCode") || "SAU";
   const discountedPrice = searchParams.get("discountedPrice") || "0";
   const promoCode = searchParams.get("promoCode") || "";
 
-  // 1) Listen for 3D-Secure postMessage event
+  // 1) Listen for 3D-Secure postMessage event from MyFatoorah's 3DS page
   useEffect(() => {
     const handle3DSMessage = (event: MessageEvent) => {
       if (!event.data) return;
       try {
         const message = JSON.parse(event.data);
         console.log("[3DSecure] Received message:", message);
+        // Check for messages from MyFatoorah's 3DS iframe
         if (message.sender === "MF-3DSecure") {
-          const finalUrl = message.url;
+          const finalUrl = message.url; // Expected to be the CallBackUrl or ErrorUrl with paymentId
           console.log("[3DSecure] Completed, finalUrl:", finalUrl);
-          // Hide iframe and reset state
+
+          // Hide the iframe and clear its source
           setShowIframe(false);
           setIframeSrc(null);
-          // Route based on success/error
+
+          // Redirect based on the final URL (success or error)
           if (finalUrl.includes("/success")) {
             const consultationId = localStorage.getItem("temp_consultation_id");
             const promoFromUrl = localStorage.getItem("temp_promo_from_url");
@@ -63,9 +67,9 @@ const CardDetailsContent: React.FC = () => {
     return () => window.removeEventListener("message", handle3DSMessage);
   }, [router]);
 
-  // 2) Initialize MyFatoorah once the script is loaded
+  // 2) Load and initialize MyFatoorah script after it's loaded
   useEffect(() => {
-    console.log("[MyFatoorah Init] Effect running:", { isScriptLoaded, sessionId });
+    console.log("[MyFatoorah Init] Running with:", { isScriptLoaded, sessionId });
     if (!isScriptLoaded) {
       console.log("[MyFatoorah Init] Waiting for script load...");
       return;
@@ -89,6 +93,7 @@ const CardDetailsContent: React.FC = () => {
     try {
       (window as any).myFatoorah.init(config);
       console.log("[MyFatoorah Init] Payment initialized with config:", config);
+      // Optionally verify that the card element has been populated
       setTimeout(() => {
         const cardElement = document.getElementById("card-element");
         if (cardElement) {
@@ -103,7 +108,7 @@ const CardDetailsContent: React.FC = () => {
     }
   }, [isScriptLoaded, sessionId, countryCode]);
 
-  // Helper: Poll for iframe readiness
+  // Helper function: Poll for iframe readiness (up to 5 seconds)
   const waitForIframeReady = async (maxWaitMs = 5000): Promise<boolean> => {
     return new Promise((resolve) => {
       const startTime = Date.now();
@@ -123,10 +128,11 @@ const CardDetailsContent: React.FC = () => {
     });
   };
 
-  // 3) Handle payment submission
+  // 3) Handle the payment submission process
   const handlePaymentSubmit = async () => {
     console.log("[handlePaymentSubmit] Submitting payment...");
     setIsSubmitting(true);
+
     const mf = (window as any).myFatoorah;
     if (!mf) {
       console.error("myFatoorah not found on window");
@@ -140,6 +146,7 @@ const CardDetailsContent: React.FC = () => {
       alert("Payment session expired. Please go back and try again.");
       return;
     }
+
     const cardElement = document.getElementById("card-element");
     if (!cardElement || cardElement.children.length === 0) {
       console.error("Card element not properly loaded:", cardElement);
@@ -148,7 +155,7 @@ const CardDetailsContent: React.FC = () => {
       return;
     }
 
-    // Wait for the iframe to be ready
+    // Ensure the embedded iframe is ready before submission
     const iframeReady = await waitForIframeReady();
     if (!iframeReady) {
       console.error("[Payment] Iframe not ready for submission");
@@ -158,6 +165,7 @@ const CardDetailsContent: React.FC = () => {
     }
 
     console.log("[Payment] Proceeding with card submission");
+    // Set a timeout to avoid indefinite waiting (20 seconds)
     const submitTimeout = setTimeout(() => {
       console.error("[Payment] Submission timed out after 20 seconds");
       setIsSubmitting(false);
@@ -171,6 +179,8 @@ const CardDetailsContent: React.FC = () => {
       if (response?.type === 1 && response?.data?.IsSuccess) {
         const newSessionId = response.data.Data.SessionId;
         console.log("[Payment] Card validation successful, proceeding with execute-payment");
+
+        // Call backend API to execute payment
         const token = localStorage.getItem("labass_token");
         if (!token) {
           console.error("No token found in localStorage.");
@@ -185,7 +195,7 @@ const CardDetailsContent: React.FC = () => {
           alert("Configuration error. Please contact support.");
           return;
         }
-        // Call the backend's execute-payment endpoint
+
         const { data } = await axios.post(
           `${apiUrl}/execute-payment`,
           {
@@ -196,15 +206,20 @@ const CardDetailsContent: React.FC = () => {
             CallBackUrl: "https://labass.sa/cardDetails/success",
             ErrorUrl: "https://labass.sa/cardDetails/error",
           },
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
         );
         console.log("[Payment] Execute payment response:", data);
-        if (data.IsSuccess) {
+
+        if (data.IsSuccess && data.Data.PaymentURL) {
           const paymentUrl = data.Data.PaymentURL;
-          const consultationId = data.consultation;
-          console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+          const consultationId = data.consultation; // Extract consultation ID from response
+          console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
+          // Set the PaymentURL to show the OTP (3D Secure) page in an iframe
           setIframeSrc(paymentUrl);
           setShowIframe(true);
+          // Store temporary values for later redirection after OTP completion
           localStorage.setItem("temp_consultation_id", consultationId);
           localStorage.setItem("temp_promo_code", promoCode);
           const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
@@ -228,15 +243,17 @@ const CardDetailsContent: React.FC = () => {
     }
   };
 
+  // Debug log for iframe state changes
   useEffect(() => {
     console.log("[Iframe] showIframe:", showIframe, "iframeSrc:", iframeSrc);
   }, [showIframe, iframeSrc]);
 
-  // Render component
+  // Render the component
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-3xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">بوابة الدفع</h1>
+        {/* MyFatoorah CardView script */}
         <Script
           src="https://sa.myfatoorah.com/cardview/v2/session.js"
           onLoad={() => {
@@ -253,13 +270,14 @@ const CardDetailsContent: React.FC = () => {
                 console.log("[Script] MyFatoorah script reloaded successfully");
                 setIsScriptLoaded(true);
               };
-              script.onerror = () =>
-                console.error("[Script] Failed to reload MyFatoorah script");
+              script.onerror = () => console.error("[Script] Failed to reload MyFatoorah script");
               document.head.appendChild(script);
             }, 3000);
           }}
           strategy="afterInteractive"
         />
+
+        {/* Debug Info (remove in production) */}
         {process.env.NODE_ENV !== "production" && (
           <div className="bg-yellow-100 text-xs p-2 mb-4 rounded">
             <p>Debug Info:</p>
@@ -270,7 +288,11 @@ const CardDetailsContent: React.FC = () => {
             </ul>
           </div>
         )}
+
+        {/* Container for the card input element (populated by MyFatoorah) */}
         <div id="card-element" className="bg-white rounded-lg shadow-lg p-4 mb-4" />
+
+        {/* Payment Submit Button */}
         <button
           onClick={handlePaymentSubmit}
           disabled={isSubmitting}
@@ -290,6 +312,8 @@ const CardDetailsContent: React.FC = () => {
           )}
         </button>
       </div>
+
+      {/* Iframe overlay for 3D-Secure: This iframe displays the OTP page */}
       {showIframe && iframeSrc && (
         <div
           style={{
