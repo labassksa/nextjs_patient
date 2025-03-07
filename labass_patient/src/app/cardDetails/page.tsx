@@ -31,7 +31,12 @@ const CardDetailsContent: React.FC = () => {
       if (!event.data) return;
 
       try {
+        console.log("[3DSecure] Received message:", event.data);
         const message = JSON.parse(event.data);
+        
+        // Log all messages for debugging
+        console.log("[3DSecure] Parsed message:", message);
+        
         if (message.sender === "MF-3DSecure") {
           const finalUrl = message.url; // e.g. "https://labass.sa/success?paymentId=..."
           console.log("[3DSecure] Completed, finalUrl:", finalUrl);
@@ -50,9 +55,20 @@ const CardDetailsContent: React.FC = () => {
           } else {
             router.push("/cardDetails/error");
           }
+        } else if (message.sender === "MF-CardView") {
+          // Handle card view specific messages
+          console.log("[CardView] Received message:", message);
+          
+          if (message.type === "error") {
+            console.error("[CardView] Error:", message.error);
+            setIsSubmitting(false);
+            alert("Card validation failed: " + (message.error || "Unknown error"));
+          } else if (message.type === "success") {
+            console.log("[CardView] Success:", message);
+          }
         }
       } catch (err) {
-        // Ignore parse errors
+        console.error("[3DSecure] Error parsing message:", err);
       }
     }
 
@@ -149,7 +165,17 @@ const CardDetailsContent: React.FC = () => {
       return;
     }
 
+    // Check if iframe is loaded
+    const iframe = cardElement.querySelector('iframe');
+    if (!iframe) {
+      console.error("Card iframe not found");
+      setIsSubmitting(false);
+      alert("Payment form not properly loaded. Please refresh and try again.");
+      return;
+    }
+
     console.log("[Payment] Attempting to submit card details...");
+    console.log("[Payment] Iframe source:", iframe.src);
     
     // Add a timeout to prevent infinite loading
     const submitTimeout = setTimeout(() => {
@@ -158,97 +184,120 @@ const CardDetailsContent: React.FC = () => {
       alert("Payment processing timed out. Please try again.");
     }, 20000); // 20 second timeout
 
-    mf.submit()
-      .then(async (response: any) => {
+    // Add a check for iframe readiness
+    const checkIframeReady = () => {
+      return new Promise((resolve) => {
+        const iframe = document.getElementById('iframe') as HTMLIFrameElement;
+        if (iframe && iframe.contentWindow) {
+          resolve(true);
+        } else {
+          setTimeout(() => resolve(false), 100);
+        }
+      });
+    };
+
+    // Wait for iframe to be ready before submitting
+    checkIframeReady().then(isReady => {
+      if (!isReady) {
+        console.error("[Payment] Iframe not ready for submission");
         clearTimeout(submitTimeout);
-        console.log("[Payment] Card submission response:", response);
-        
-        if (!response || !response.sessionId) {
-          console.error("[Payment] Invalid response from card submission:", response);
-          setIsSubmitting(false);
-          alert("Invalid response from payment gateway. Please try again.");
-          return;
-        }
-        
-        const newSessionId = response.sessionId;
+        setIsSubmitting(false);
+        alert("Payment form not ready. Please refresh and try again.");
+        return;
+      }
 
-        // 3a) Now call our backend's execute-payment (like PaymentButton)
-        const token = localStorage.getItem("labass_token");
-        if (!token) {
-          console.error("No token found in localStorage.");
-          setIsSubmitting(false);
-          alert("You need to be logged in to make a payment. Please log in and try again.");
-          return;
-        }
-
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        if (!apiUrl) {
-          console.error("NEXT_PUBLIC_API_URL is not defined");
-          setIsSubmitting(false);
-          alert("Configuration error. Please contact support.");
-          return;
-        }
-
-        try {
-          console.log("[Payment] Calling execute-payment with sessionId:", newSessionId);
+      mf.submit()
+        .then(async (response: any) => {
+          clearTimeout(submitTimeout);
+          console.log("[Payment] Card submission response:", response);
           
-          // Use the same body shape as PaymentButton
-          const { data } = await axios.post(
-            `${apiUrl}/execute-payment`,
-            {
-              SessionId: newSessionId,
-              DisplayCurrencyIso: "SAR",
-              // Convert discountedPrice to number with 2 decimals
-              InvoiceValue: parseFloat(discountedPrice).toFixed(2),
-              PromoCode: promoCode, // pass the same code
-              CallBackUrl: "https://labass.sa/cardDetails/success",
-              ErrorUrl: "https://labass.sa/cardDetails/error",
-            },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          console.log("[Payment] Execute payment response:", data);
-
-          if (data.IsSuccess) {
-            const paymentUrl = data.Data.PaymentURL;
-            const consultationId = data.consultation; // Get consultation ID from response
-            console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
-
-            // Show the 3D-Secure in an iframe
-            setIframeSrc(paymentUrl);
-            setShowIframe(true);
-
-            // Store consultationId and promoCode for success page
-            localStorage.setItem('temp_consultation_id', consultationId);
-            localStorage.setItem('temp_promo_code', promoCode);
-            
-            // Store information about whether promoCode came from URL
-            const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
-            localStorage.setItem('temp_promo_from_url', isPromoFromUrl ? 'true' : 'false');
-          } else {
-            console.error("[Payment] Execute payment failed:", data);
+          if (!response || !response.sessionId) {
+            console.error("[Payment] Invalid response from card submission:", response);
             setIsSubmitting(false);
-            alert("Payment processing failed: " + (data.Message || "Unknown error"));
+            alert("Invalid response from payment gateway. Please try again.");
+            return;
+          }
+          
+          const newSessionId = response.sessionId;
+
+          // 3a) Now call our backend's execute-payment (like PaymentButton)
+          const token = localStorage.getItem("labass_token");
+          if (!token) {
+            console.error("No token found in localStorage.");
+            setIsSubmitting(false);
+            alert("You need to be logged in to make a payment. Please log in and try again.");
+            return;
+          }
+
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+          if (!apiUrl) {
+            console.error("NEXT_PUBLIC_API_URL is not defined");
+            setIsSubmitting(false);
+            alert("Configuration error. Please contact support.");
+            return;
+          }
+
+          try {
+            console.log("[Payment] Calling execute-payment with sessionId:", newSessionId);
+            
+            // Use the same body shape as PaymentButton
+            const { data } = await axios.post(
+              `${apiUrl}/execute-payment`,
+              {
+                SessionId: newSessionId,
+                DisplayCurrencyIso: "SAR",
+                // Convert discountedPrice to number with 2 decimals
+                InvoiceValue: parseFloat(discountedPrice).toFixed(2),
+                PromoCode: promoCode, // pass the same code
+                CallBackUrl: "https://labass.sa/cardDetails/success",
+                ErrorUrl: "https://labass.sa/cardDetails/error",
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            console.log("[Payment] Execute payment response:", data);
+
+            if (data.IsSuccess) {
+              const paymentUrl = data.Data.PaymentURL;
+              const consultationId = data.consultation; // Get consultation ID from response
+              console.log("[Payment] Opening 3D secure iframe with URL:", paymentUrl);
+
+              // Show the 3D-Secure in an iframe
+              setIframeSrc(paymentUrl);
+              setShowIframe(true);
+
+              // Store consultationId and promoCode for success page
+              localStorage.setItem('temp_consultation_id', consultationId);
+              localStorage.setItem('temp_promo_code', promoCode);
+              
+              // Store information about whether promoCode came from URL
+              const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
+              localStorage.setItem('temp_promo_from_url', isPromoFromUrl ? 'true' : 'false');
+            } else {
+              console.error("[Payment] Execute payment failed:", data);
+              setIsSubmitting(false);
+              alert("Payment processing failed: " + (data.Message || "Unknown error"));
+              router.push("/cardDetails/error");
+            }
+          } catch (error: any) {
+            console.error("[Payment] Execute payment error:", error);
+            console.error("[Payment] Error details:", error.response?.data || "No response data");
+            setIsSubmitting(false);
+            alert("Error processing payment. Please try again later.");
             router.push("/cardDetails/error");
           }
-        } catch (error: any) {
-          console.error("[Payment] Execute payment error:", error);
-          console.error("[Payment] Error details:", error.response?.data || "No response data");
+        })
+        .catch((error: any) => {
+          clearTimeout(submitTimeout);
+          console.error("[Payment] Card submit error:", error);
+          console.error("[Payment] Error type:", typeof error);
+          console.error("[Payment] Error message:", error.message || "No error message");
           setIsSubmitting(false);
-          alert("Error processing payment. Please try again later.");
-          router.push("/cardDetails/error");
-        }
-      })
-      .catch((error: any) => {
-        clearTimeout(submitTimeout);
-        console.error("[Payment] Card submit error:", error);
-        console.error("[Payment] Error type:", typeof error);
-        console.error("[Payment] Error message:", error.message || "No error message");
-        setIsSubmitting(false);
-        alert("Card validation failed. Please check your card details and try again.");
-      });
+          alert("Card validation failed. Please check your card details and try again.");
+        });
+    });
   };
 
   // ------------------------------------------------------------
