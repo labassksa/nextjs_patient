@@ -6,7 +6,7 @@ import Script from "next/script";
 import axios from "axios";
 
 // Helper: Poll for window.myFatoorah until it is available (or timeout after maxWaitMs)
-const waitForMyFatoorahObject = async (maxWaitMs = 10000): Promise<boolean> => {
+const waitForMyFatoorahObject = async (maxWaitMs = 5000): Promise<boolean> => {
   return new Promise((resolve) => {
     const startTime = Date.now();
     const check = () => {
@@ -144,7 +144,7 @@ const CardDetailsContent: React.FC = () => {
         console.log("[MyFatoorah Init] Waiting for script load...");
         return;
       }
-      // Poll until window.myFatoorah is available (wait up to 10 seconds)
+      // Poll until window.myFatoorah is available
       const available = await waitForMyFatoorahObject();
       if (!available) {
         console.error("[MyFatoorah Init] myFatoorah object not found after waiting.");
