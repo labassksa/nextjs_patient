@@ -42,17 +42,17 @@ const StatusSection = () => {
   }, [searchParams]);
 
   const handleContinue = () => {
-    if (consultationId) {
-      // Route to chat only if promo code came from URL
-      if (promoCode && promoCode.trim() !== "" && isPromoFromUrl) {
-        // If promo code exists AND it came from URL, go to chat
-        router.push(`/chat/${consultationId}`);
-      } else {
-        // Otherwise (promoCode from input or no promoCode), go to patient selection
-        router.push(`/patientSelection?consultationId=${consultationId}`);
-      }
-    } else {
+    if (!consultationId) {
       console.error("Consultation ID is missing.");
+      return;
+    }
+
+    if (isPromoFromUrl) {
+      // If promo code came from URL, go directly to chat
+      router.push(`/chat/${consultationId}`);
+    } else {
+      // Otherwise, go to patient selection
+      router.push(`/patientSelection?consultationId=${consultationId}`);
     }
   };
 
@@ -61,7 +61,10 @@ const StatusSection = () => {
       <CheckCircleIcon className="text-custom-green w-24 h-24" />
       <p className="text-lg font-semibold text-black mb-1">تم الدفع بنجاح </p>
       <p className="text-gray-600 text-xs mb-4">
-        أكمل معلوماتك للحصول على الاستشارة
+        {isPromoFromUrl 
+          ? "يمكنك الآن بدء الاستشارة"
+          : "أكمل معلوماتك للحصول على الاستشارة"
+        }
       </p>
       
       <button
@@ -69,7 +72,7 @@ const StatusSection = () => {
         className="p-2 w-full text-sm font-bold bg-custom-green text-white rounded-3xl"
         dir="rtl"
       >
-        أكمل معلوماتك
+        {isPromoFromUrl ? "بدء الاستشارة" : "أكمل معلوماتك"}
       </button>
     </div>
   );
