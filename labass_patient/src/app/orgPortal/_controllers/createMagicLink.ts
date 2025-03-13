@@ -5,30 +5,44 @@ import { LabtestType } from "../_types/labTestTypes";
 interface CreateMagicLinkData {
   patientInfo: {
     phoneNumber: string;
-    role: string[]; // e.g., ["patient"]
+    role: string[];
     firstName: string;
+    lastName: string;
     gender: Gender;
     nationality: string;
-    nationalId: string | null;
-    dateOfBirth: string; // YYYY-MM-DD format
+    nationalId: string;
+    dateOfBirth: string;
+    email?: string;
   };
-  paymentMethod: string; // e.g., "Through Labass Platform", "Through Organization Payment System"
-  orgType: string; // e.g., "pharmacy" | "laboratory"
-  dealType: string; // e.g., "SUBSCRIPTION" | "REVENUE_SHARE"
-  consultationPrice: number | null; // e.g., 99
-  testType: LabtestType | ""; // e.g., "pre_test" | "post_test"
-  pdfFiles?: File[]; // Optional, only for specific test types
+  paymentMethod: string;
+  orgType: string;
+  dealType: string;
+  consultationPrice: number | null;
+  testType: LabtestType | "";
+  pdfFiles?: File[];
 }
 
-export const createMagicLink = async (data: CreateMagicLinkData) => {
+interface CreateMagicLinkResponse {
+  message: string;
+  link: string;
+  discountPrice: number;
+  promoCode: string;
+}
+
+export const createMagicLink = async (data: CreateMagicLinkData): Promise<CreateMagicLinkResponse> => {
   try {
     console.log("Preparing data for createMagicLink API call.");
+
+    // Validate nationalId format
+    if (!/^\d{10}$/.test(data.patientInfo.nationalId)) {
+      throw new Error("رقم الهوية يجب أن يكون 10 أرقام");
+    }
 
     // Create a new FormData object to send the form and files together
     const formData = new FormData();
 
     // Append patient info and other data to formData
-    formData.append("patientInfo", JSON.stringify(data.patientInfo)); // Stringify the patientInfo to send it as a JSON string
+    formData.append("patientInfo", JSON.stringify(data.patientInfo));
     formData.append("paymentMethod", data.paymentMethod);
     formData.append("orgType", data.orgType);
     formData.append("dealType", data.dealType);
@@ -39,11 +53,7 @@ export const createMagicLink = async (data: CreateMagicLinkData) => {
     if (data.testType != "") {
       formData.append("testType", data.testType);
     }
-    console.log("patient info ", JSON.stringify(data.patientInfo));
-    console.log(
-      "type of patient info ",
-      typeof JSON.stringify(data.patientInfo)
-    );
+
     // Append the files if the testType is PostTest
     if (data.testType === LabtestType.PostTest && data.pdfFiles) {
       data.pdfFiles.forEach((file) => {
@@ -67,29 +77,15 @@ export const createMagicLink = async (data: CreateMagicLinkData) => {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+          "Content-Type": "multipart/form-data",
         },
       }
     );
 
     console.log("Received response from /magic-link:", response);
-
-    if (response.status === 200) {
-      console.log("Magic link created successfully.");
-      return { success: true, data: response.data };
-    } else {
-      console.warn("Unexpected response status code:", response.status);
-      return { success: false, message: "Unexpected response status code" };
-    }
+    return response.data;
   } catch (error: any) {
     console.error("Error in createMagicLink:", error);
-
-    return {
-      success: false,
-      message:
-        axios.isAxiosError(error) && error.response?.data?.message
-          ? error.response.data.message
-          : "حدث خطأ ، حاول مرة أخرى",
-    };
+    throw error;
   }
 };

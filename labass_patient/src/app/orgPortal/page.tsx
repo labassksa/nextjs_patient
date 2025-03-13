@@ -105,40 +105,32 @@ const OrgPatientsPage: React.FC = () => {
     const magicLinkData = {
       patientInfo: {
         firstName: name.trim(),
+        lastName: "",
         phoneNumber: phone.startsWith("0")
           ? `+966${phone.slice(1)}`
           : `+966${phone}`,
         role: ["patient"],
         gender,
         nationality,
-        nationalId: nationalId.trim() || null,
+        nationalId: nationalId.trim() || "",
         dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+        email: ""
       },
       paymentMethod,
       orgType,
       dealType,
       consultationPrice: selectedPrice || cashPrice,
       testType,
-      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
     };
 
     try {
       const result = await createMagicLink(magicLinkData);
-      if (result.success) {
-        alert(` ${result.data.link}تم إرسال الاستشارة الطبية للعميل بنجاح`);
-      } else {
-        throw new Error(result.message);
-      }
+      alert(`تم إرسال الاستشارة الطبية للعميل بنجاح\nالرابط: ${result.link}\nرمز الخصم: ${result.promoCode}`);
     } catch (err: any) {
-      if (err.message === "Network Error" || !err.response) {
-        setSubmitError(
-          "خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى."
-        );
-      } else {
-        setSubmitError(
-          "فشل إنشاء الرابط السحري. يرجى المحاولة مرة أخرى لاحقًا."
-        );
-      }
+      console.error("Error from backend:", err);
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || "حدث خطأ غير متوقع";
+      setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
