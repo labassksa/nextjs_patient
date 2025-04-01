@@ -15,14 +15,13 @@ const DoctorsPage = () => {
           <div className="w-full flex flex-col justify-between" dir="rtl">
             <div className="flex flex-row justify-between mb-2">
               <div className="flex flex-row items-center">
-                <img
+                {/* <img
                   src="/images/dr_mohammed.jpg"
                   alt="د. محمد"
                   className="w-12 h-12 rounded-full ml-2"
-                />
+                /> */}
                 <div className="flex flex-col jus">
-                  <h3 className="font-bold text-md text-black" dir="rtl">
-                    د. محمد ماهر عبدالله عوض الكريم
+                  <h3 className="font-bold text-md text-black" dir="rtl">د. احمد عز الدين محمود بغدادي  ه  
                   </h3>
                   <h3 className="font-normal text-sm text-black" dir="rtl">
                     الجنسية: سوداني
@@ -34,7 +33,7 @@ const DoctorsPage = () => {
                     className="font-normal text-sm text-custom-green mt-2"
                     dir="rtl"
                   >
-                    طبيب مرخص من هيئة التخصصات الصحية ترخيص رقم 24621428
+                    طبيب مرخص من هيئة التخصصات الصحية ترخيص رقم 24660368
                   </h3>
                   <h3
                     className="font-normal text-sm text-custom-green mt-2"
