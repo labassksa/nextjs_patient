@@ -15,6 +15,7 @@ import LabPatientCard from "./_components/patientsCard";
 import { LabtestType } from "./_types/labTestTypes";
 import { Gender } from "./_types/genderType";
 import TestTypeSection from "./_components/testType";
+import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
 
 interface OrgPatient {
   id: number;
@@ -53,6 +54,7 @@ const OrgPatientsPage: React.FC = () => {
   );
   const [cashPrice, setCashPrice] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [marketerConsultaion, setMarketerConsultaion] = useState<any>(null);
 
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -79,6 +81,15 @@ const OrgPatientsPage: React.FC = () => {
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
+      const marketerConsultaion = await getMarketerConsultaion();
+      if (marketerConsultaion.success && marketerConsultaion.data.consultations) {
+        setMarketerConsultaion(marketerConsultaion.data.consultations);
+      } else {
+        throw new Error(
+          marketerConsultaion.message || "Unknown error occurred."
+        );
+      }
+
     } catch (err: any) {
       const backendMessage =
         err.response?.message || err.message || "Unknown error";
@@ -138,41 +149,6 @@ const OrgPatientsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-black">
-      {/* Hide the Header on large screens, show only on mobile */}
-      <div className="lg:hidden">
-        <Header
-          title={
-            currentView === "patients"
-              ? "متابعة الاستشارات"
-              : "إرسال استشارة طبية"
-          }
-        />
-      </div>
-
-      {/* Desktop Nav Bar (Hidden on mobile) */}
-      <div className="hidden lg:flex justify-center bg-white shadow-md p-4">
-        <button
-          onClick={() => setCurrentView("patients")}
-          className={`mx-4 px-4 py-2 rounded-md ${
-            currentView === "patients"
-              ? "bg-custom-green text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          المرضى
-        </button>
-        <button
-          onClick={() => setCurrentView("registration")}
-          className={`mx-4 px-4 py-2 rounded-md ${
-            currentView === "registration"
-              ? "bg-custom-green text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          تسجيل
-        </button>
-      </div>
-
       {/* Main Content */}
       <div
         className={`max-w-screen-lg mx-auto pt-${dealType ? "40" : "28"} pb-28`}
@@ -202,40 +178,30 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         ) : (
           /* 2 columns: left for text, right for form/patients */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left column (Desktop only) */}
-            <div className="hidden lg:block bg-white shadow-sm p-6 rounded-md">
-              <p className="text-black text-xl font-bold">أهلا بك في لاباس</p>
-            </div>
+          <div className="grid grid-cols-1 gap-6">
 
             {/* Right column fills remaining space */}
             {currentView === "patients" ? (
-              <div className="bg-white p-6 rounded-md shadow-sm w-full">
-                {patients.length === 0 ? (
+                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                <h2 dir="rtl" className="text-gray-400 text-xl font-semibold mb-4 text-center">
+                  الاستشارات للثلاثين يوم الماضية: 
+                  <span className="mr-4 inline-block bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
+                  {marketerConsultaion.length}
+                </span>
+                </h2>
+                {marketerConsultaion.length === 0 ? (
                   <p className="text-center text-gray-500">
                     لا يوجد مرضى حاليًا
                   </p>
                 ) : (
-                  patients.map((p) => (
+                  marketerConsultaion.map((p:any, i:number) => (
                     <LabPatientCard
-                      key={p.phoneNumber}
-                      patientName={
-                        p.firstName
-                          ? `${p.firstName} ${p.lastName || ""}`
-                          : "غير معروف"
-                      }
-                      date={new Date(p.createdAt).toLocaleString("ar-EG", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                      packageType={p.role.join(", ")}
-                      additionalInfo={`عدد الرموز المرسلة للعميل: ${
-                        p.duplicateCount || 1
-                      }`}
+                      key={i}
+                      {...p}
+                      orgType={orgType}
                       onSelect={() =>
                         console.log(
-                          `Selected patient: ${p.phoneNumber} (ID ${p.id})`
+                          `Selected patient: ${p?.phoneNumber} (ID ${p?.id})`
                         )
                       }
                     />
@@ -335,12 +301,10 @@ const OrgPatientsPage: React.FC = () => {
       </div> */}
 
       {/* Mobile Bottom Nav (Hidden on Desktop) */}
-      <div className="lg:hidden">
         <LabBottomNavBar
           onToggleView={setCurrentView}
           currentView={currentView}
         />
-      </div>
     </div>
   );
 };
