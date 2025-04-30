@@ -3,7 +3,7 @@ import axios from "axios";
 export const getMarketerConsultaion = async () => {
   try {
     const token = localStorage.getItem("labass_token");
-    const userId = 6;//localStorage.getItem("labass_userId");
+    const userId = localStorage.getItem("labass_userId");
     if (!token && !userId) {
       throw new Error("No token found. Please log in to continue.");
     }
