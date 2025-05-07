@@ -54,7 +54,7 @@ const OrgPatientsPage: React.FC = () => {
   );
   const [cashPrice, setCashPrice] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [marketerConsultaion, setMarketerConsultaion] = useState<any>(null);
+  const [marketerConsultaion, setMarketerConsultaion] = useState<any>([]);
 
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
