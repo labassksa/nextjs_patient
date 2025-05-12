@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getMarketerConsultaion = async () => {
+export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => {
   try {
     const token = localStorage.getItem("labass_token");
     const userId = localStorage.getItem("labass_userId");
@@ -10,9 +10,13 @@ export const getMarketerConsultaion = async () => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/marketers/consultations/${userId}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        fromDate: fromDate ? fromDate.toISOString().split('T')[0] : undefined,
+        toDate: toDate ? toDate.toISOString().split('T')[0] : undefined,
+      }
       }
     );
 

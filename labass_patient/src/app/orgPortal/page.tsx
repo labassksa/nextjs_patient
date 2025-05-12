@@ -16,6 +16,8 @@ import { LabtestType } from "./_types/labTestTypes";
 import { Gender } from "./_types/genderType";
 import TestTypeSection from "./_components/testType";
 import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface OrgPatient {
   id: number;
@@ -32,6 +34,8 @@ const OrgPatientsPage: React.FC = () => {
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
+  const [fromDate, setFromDate] = useState<Date>(new Date(new Date().setDate(1))); // Default to start of current month
+  const [toDate, setToDate] = useState<Date>(new Date()); // Default to today
   const [isLoadingOrg, setIsLoadingOrg] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orgError, setOrgError] = useState("");
@@ -54,8 +58,10 @@ const OrgPatientsPage: React.FC = () => {
   );
   const [cashPrice, setCashPrice] = useState<number | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [marketerConsultaion, setMarketerConsultaion] = useState<any>([]);
-
+  const [marketerConsultaion, setMarketerConsultaion] = useState<any>(null);
+  const [marketers, setMarketers] = useState<string[]>([]);
+  const [selectedMarketer, setSelectedMarketer] = useState<string>();
+  const marketerName = orgType === OrganizationTypes.Pharmacy? 'الصيدلي' : 'الموظف';
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
@@ -81,14 +87,7 @@ const OrgPatientsPage: React.FC = () => {
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
-      const marketerConsultaion = await getMarketerConsultaion();
-      if (marketerConsultaion.success && marketerConsultaion.data.consultations) {
-        setMarketerConsultaion(marketerConsultaion.data.consultations);
-      } else {
-        throw new Error(
-          marketerConsultaion.message || "Unknown error occurred."
-        );
-      }
+
 
     } catch (err: any) {
       const backendMessage =
@@ -102,6 +101,23 @@ const OrgPatientsPage: React.FC = () => {
   useEffect(() => {
     fetchOrg();
   }, []);
+
+  useEffect(() =>{
+    (async () => {
+      const marketerConsultaion = await getMarketerConsultaion(fromDate, toDate);
+      if (marketerConsultaion.success && marketerConsultaion.data.consultations) {
+        setMarketerConsultaion(marketerConsultaion.data.consultations);
+        const uniqueMarketers: any[] = [...new Set(marketerConsultaion.data.consultations
+        .map((p:any) => `${p.marketer.firstName} ${p.marketer.lastName}`))];
+        setMarketers(uniqueMarketers);
+        console.log("Marketers: ", uniqueMarketers);
+      } else {
+        throw new Error(
+          marketerConsultaion.message || "Unknown error occurred."
+        );
+      }
+      })()
+  }, [fromDate, toDate]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -182,19 +198,76 @@ const OrgPatientsPage: React.FC = () => {
 
             {/* Right column fills remaining space */}
             {currentView === "patients" ? (
-                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+              <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                <div className="flex flex-wrap gap-4 mb-6 justify-center" dir="rtl">
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-600">من:</label>
+                    <DatePicker
+                      selected={fromDate}
+                      onChange={(date: Date | null) => {
+                        if (date) {
+                          setSelectedMarketer("");
+                          setFromDate(date);
+                        }
+                      }}
+                      className="border rounded-md p-2 text-right"
+                      dateFormat="yyyy/MM/dd"
+                      maxDate={toDate}
+                      placeholderText="اختر التاريخ"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-600">إلى:</label>
+                    <DatePicker
+                      selected={toDate}
+                      onChange={(date: Date | null) => {
+                        if(date){
+                          setSelectedMarketer("");
+                          setToDate(date);
+                        }
+                      }}
+                      className="border rounded-md p-2 text-right"
+                      dateFormat="yyyy/MM/dd"
+                      minDate={fromDate}
+                      maxDate={new Date()}
+                      placeholderText="اختر التاريخ"
+                    />
+                  </div>
+                  {marketers && (
+                  <div className="flex items-center gap-2">
+                    <label className="text-gray-600">{marketerName}:</label>
+                    <select 
+                      value={selectedMarketer || ""}
+                      onChange={(e) => setSelectedMarketer(e.target.value)}
+                      className="border rounded-md p-2 text-right"
+                    >
+                      <option value="">اختر {marketerName}</option>
+                      {marketers.map((marketer, index) => (
+                      <option key={index} value={marketer}>
+                        {marketer}
+                      </option>
+                      ))}
+                    </select>
+                  </div>)}
+                </div>
                 <h2 dir="rtl" className="text-gray-400 text-xl font-semibold mb-4 text-center">
-                  الاستشارات للثلاثين يوم الماضية: 
+                  {selectedMarketer ? `استشارات ${selectedMarketer}` : 'الاستشارات'}: 
                   <span className="mr-4 inline-block bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
-                  {marketerConsultaion.length}
-                </span>
+                    {marketerConsultaion.filter((m:any)=>
+                      selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                    ).length}
+                  </span>
                 </h2>
-                {marketerConsultaion.length === 0 ? (
+                {marketerConsultaion.filter((m:any)=>
+                      selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                    ).length === 0 ? (
                   <p className="text-center text-gray-500">
                     لا يوجد مرضى حاليًا
                   </p>
                 ) : (
-                  marketerConsultaion.map((p:any, i:number) => (
+                  marketerConsultaion.filter((m:any)=>
+                    selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                  ).map((p:any, i:number) => (
                     <LabPatientCard
                       key={i}
                       {...p}
