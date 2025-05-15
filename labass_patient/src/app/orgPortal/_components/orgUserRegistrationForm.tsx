@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 import { Gender } from "../_types/genderType";
 import { OrganizationTypes } from "../_types/organizationTypes";
@@ -26,30 +27,6 @@ interface OrgUserRegistrationFormProps {
   setPdfFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
-const ALL_NATIONALITIES = [
-  "سعودي",
-  "مصري",
-  "إماراتي",
-  "قطري",
-  "كويتي",
-  "بحريني",
-  "يمني",
-  "لبناني",
-  "سوري",
-  "أردني",
-  "فلسطيني",
-  "ليبي",
-  "سوداني",
-  "أخرى",
-];
-const genders = [Gender.Male, Gender.Female];
-
-// Mapping from Gender enum to Arabic labels
-const genderLabels: Record<Gender, string> = {
-  [Gender.Male]: "ذكر",
-  [Gender.Female]: "أنثى",
-};
-
 const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   orgType,
   name,
@@ -69,13 +46,39 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   pdfFiles,
   setPdfFiles,
 }) => {
+  const { t } = useTranslation();
+
+  const ALL_NATIONALITIES = [
+    { key: "سعودي", value: t("nationalities.saudi") },
+    { key: "مصري", value: t("nationalities.egyptian") },
+    { key: "إماراتي", value: t("nationalities.emirati") },
+    { key: "قطري", value: t("nationalities.qatari") },
+    { key: "كويتي", value: t("nationalities.kuwaiti") },
+    { key: "بحريني", value: t("nationalities.bahraini") },
+    { key: "يمني", value: t("nationalities.yemeni") },
+    { key: "لبناني", value: t("nationalities.lebanese") },
+    { key: "سوري", value: t("nationalities.syrian") },
+    { key: "أردني", value: t("nationalities.jordanian") },
+    { key: "فلسطيني", value: t("nationalities.palestinian") },
+    { key: "ليبي", value: t("nationalities.libyan") },
+    { key: "سوداني", value: t("nationalities.sudanese") },
+    { key: "أخرى", value: t("nationalities.other") },
+  ];
+
+  const genders = [Gender.Male, Gender.Female];
+
+  const genderLabels: Record<Gender, string> = {
+    [Gender.Male]: t("genders.male"),
+    [Gender.Female]: t("genders.female"),
+  };
+
   // State for custom dropdown
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter the nationalities based on the search term
   const filteredNationalities = ALL_NATIONALITIES.filter((nat) =>
-    nat.toLowerCase().includes(searchTerm.toLowerCase())
+    nat.value.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Clicking outside the dropdown to close it:
@@ -135,9 +138,9 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   };
 
   return (
-    <div dir="rtl" className="max-w-xl mx-auto bg-white rounded-lg  p-6 mt-8">
+    <div dir="rtl" className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-8">
       <h2 className="text-gray-800 text-2xl font-semibold mb-4 text-center">
-        إرسال استشارة طبية
+        {t("formTitle")}
       </h2>
 
       <form className="space-y-4">
@@ -147,7 +150,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             htmlFor="name"
             className="block text-sm text-gray-700 font-medium mb-1"
           >
-            اسم المريض
+            {t("patientName")}
           </label>
           <input
             id="name"
@@ -165,7 +168,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             htmlFor="phone"
             className="block text-sm text-gray-700 font-medium mb-1"
           >
-            رقم الجوال
+            {t("phoneNumber")}
           </label>
           <input
             id="phone"
@@ -185,7 +188,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             htmlFor="age"
             className="block text-sm text-gray-700 font-medium mb-1"
           >
-            العمر
+            {t("age")}
           </label>
           <input
             id="age"
@@ -204,7 +207,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             htmlFor="nationality"
             className="block text-sm text-gray-700 font-medium mb-1"
           >
-            الجنسية
+            {t("nationality")}
           </label>
           {/* "Clickable" field showing selected nationality */}
           <button
@@ -213,7 +216,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             onClick={() => setShowDropdown((prev) => !prev)}
             className="w-full flex justify-between items-center border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
           >
-            {nationality || "اختر الجنسية"}
+            {nationality || t("chooseNationality")}
             <span className="ml-2 text-gray-600">▼</span>
           </button>
 
@@ -223,27 +226,31 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
               {/* Search input at top */}
               <input
                 type="text"
-                placeholder="ابحث هنا..."
+                placeholder={t("search")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2 mb-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
               />
               <ul className="max-h-40 overflow-auto">
                 {filteredNationalities.map((nat) => (
-                  <li key={nat}>
+                  <li key={nat.key}>
                     <button
                       type="button"
-                      onClick={() => handleSelectNationality(nat)}
+                      onClick={() => handleSelectNationality(nat.key)}
                       className={`block w-full text-right px-2 py-1 hover:bg-gray-200 ${
-                        nat === nationality ? "bg-green-500 text-white" : ""
+                        nat.key === nationality
+                          ? "bg-green-500 text-white"
+                          : ""
                       }`}
                     >
-                      {nat}
+                      {nat.value}
                     </button>
                   </li>
                 ))}
                 {filteredNationalities.length === 0 && (
-                  <li className="text-gray-500 px-2 py-1">لا توجد نتائج</li>
+                  <li className="text-gray-500 px-2 py-1">
+                    {t("noResults")}
+                  </li>
                 )}
               </ul>
             </div>
@@ -253,7 +260,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         {/* Gender */}
         <div>
           <label className="block text-gray-700 text-sm font-medium mb-1">
-            الجنس
+            {t("gender")}
           </label>
           <div className="bg-gray-50 p-4 rounded-lg">
             {genders.map((g) => (
@@ -287,7 +294,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             htmlFor="nationalId"
             className="block text-gray-700 text-sm font-medium mb-1"
           >
-            رقم الهوية الوطنية
+            {t("nationalId")}
           </label>
           <input
             id="nationalId"

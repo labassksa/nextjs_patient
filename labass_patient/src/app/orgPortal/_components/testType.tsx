@@ -3,17 +3,14 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { LabtestType } from "../_types/labTestTypes";
-import { OrganizationTypes } from "../_types/organizationTypes"; // Ensure the correct path
-
-// Temporary console log to verify import
-console.log("Imported LabConsultationType:", LabtestType);
-console.log("Imported OrganizationTypes:", OrganizationTypes);
+import { OrganizationTypes } from "../_types/organizationTypes";
 
 interface TestTypeSectionProps {
   orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | "";
-  testType?: LabtestType | ""; // Update type to use enum
-  setTestType: (type: LabtestType) => void; // Update setter to accept enum
+  testType?: LabtestType | "";
+  setTestType: (type: LabtestType) => void;
   pdfFiles: File[];
   setPdfFiles: (files: File[]) => void;
 }
@@ -25,34 +22,30 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
   pdfFiles,
   setPdfFiles,
 }) => {
-  // Define consultation types using the enum
+  const { t } = useTranslation();
   const testTypes: LabtestType[] = [LabtestType.PreTest, LabtestType.PostTest];
 
-  // Handle file addition
   const handleAddPdf = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setPdfFiles([...pdfFiles, ...Array.from(e.target.files)]);
     }
   };
 
-  // Handle file removal
   const handleRemovePdf = (index: number) => {
     setPdfFiles(pdfFiles.filter((_, i) => i !== index));
   };
 
-  // Render only if orgType is Laboratory
   if (orgType !== OrganizationTypes.Laboratory) {
     return null;
   }
 
   return (
-    <div className="mb-4 " dir="rtl">
-      {/* Consultation Type Selection */}
+    <div className="mb-4" dir="rtl">
       <div>
-        <label className="block text-lg font-bold text-black  p-2">
-          نوع الاستشارة
+        <label className="block text-lg font-bold text-black p-2">
+          {t('testType.title')}
         </label>
-        <p className="text-sm text-gray-700 mb-4">اختر نوع الاستشارة </p>
+        <p className="text-sm text-gray-700 mb-4">{t('testType.subtitle')}</p>
         <div className="bg-white p-4 rounded-lg">
           {testTypes.map((type) => (
             <button
@@ -73,8 +66,8 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
                 />
                 <span>
                   {type === LabtestType.PreTest
-                    ? "قبل الاختبار"
-                    : "بعد الاختبار"}
+                    ? t('testType.preTest')
+                    : t('testType.postTest')}
                 </span>
               </div>
             </button>
@@ -82,14 +75,13 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
         </div>
       </div>
 
-      {/* PDF Files Upload */}
       {testType === LabtestType.PostTest && (
         <div className="mt-4">
           <label
             htmlFor="pdfFiles"
             className="block text-sm text-black font-normal p-2"
           >
-            إضافة ملف
+            {t('testType.addFile')}
           </label>
           <input
             id="pdfFiles"
@@ -97,7 +89,7 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
             accept="application/pdf"
             multiple
             onChange={handleAddPdf}
-            className="w-full border p-2 text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green file:mr-2 file:py-1 file:px-4 file:border-0 file:bg-custom-green file:text-white file:rounded-md file:cursor-pointer"
+            className="w-full border text-black border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-custom-green focus:border-custom-green file:mr-2 file:py-1 file:px-4 file:border-0 file:bg-custom-green file:text-white file:rounded-md file:cursor-pointer"
           />
           {pdfFiles.length > 0 && (
             <div className="mt-4 p-4">
@@ -112,7 +104,7 @@ const TestTypeSection: React.FC<TestTypeSectionProps> = ({
                     onClick={() => handleRemovePdf(index)}
                     className="text-red-400 hover:text-red-600"
                   >
-                    إزالة
+                    {t('testType.remove')}
                   </button>
                 </div>
               ))}

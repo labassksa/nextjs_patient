@@ -1,7 +1,8 @@
 "use client";
-
+import { I18nextProvider } from 'react-i18next';
+import * as i18next from '../../utils/i18n';
+import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from "react";
-import Header from "../../components/common/header";
 import LabBottomNavBar from "./_components/bottomNavBar";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
@@ -19,6 +20,17 @@ import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+const LanguageToggle: React.FC<{ currentLang: string; onToggle: () => void }> = ({ currentLang, onToggle }) => {
+  return (
+    <button 
+      onClick={onToggle}
+      className="fixed top-4 right-4 bg-white shadow-md rounded-md px-3 py-1 text-sm font-medium"
+    >
+      {currentLang === 'ar' ? 'English' : 'عربي'}
+    </button>
+  );
+};
+
 interface OrgPatient {
   id: number;
   phoneNumber: string;
@@ -30,6 +42,7 @@ interface OrgPatient {
 }
 
 const OrgPatientsPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const [currentView, setCurrentView] = useState<"patients" | "registration">(
     "registration"
   );
@@ -61,7 +74,7 @@ const OrgPatientsPage: React.FC = () => {
   const [marketerConsultaion, setMarketerConsultaion] = useState<any>(null);
   const [marketers, setMarketers] = useState<string[]>([]);
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
-  const marketerName = orgType === OrganizationTypes.Pharmacy? 'الصيدلي' : 'الموظف';
+  const marketerName = orgType === OrganizationTypes.Pharmacy? t('pharmacist') : t('employee');
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
@@ -100,6 +113,10 @@ const OrgPatientsPage: React.FC = () => {
 
   useEffect(() => {
     fetchOrg();
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('lang') && i18n.language !==  urlParams.get('lang')){
+      i18n.changeLanguage(urlParams.get('lang')|| 'ar');
+    }
   }, []);
 
   useEffect(() =>{
@@ -119,12 +136,20 @@ const OrgPatientsPage: React.FC = () => {
       })()
   }, [fromDate, toDate]);
 
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'ar' ? 'en' : 'ar';
+    const urlParams = new URLSearchParams(window.location.search);
+    i18n.changeLanguage(newLang);
+    urlParams.set('lang', newLang);
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmitError("");
 
     if (!name || !phone || !dateOfBirth || !gender || !nationality) {
-      alert("يرجى ملء جميع الحقول المطلوبة.");
+      alert(t('formValidation'));
       setIsSubmitting(false);
       return;
     }
@@ -153,10 +178,13 @@ const OrgPatientsPage: React.FC = () => {
 
     try {
       const result = await createMagicLink(magicLinkData);
-      alert(`تم إرسال الاستشارة الطبية للعميل بنجاح\nالرابط: ${result.link}\nرمز الخصم: ${result.promoCode}`);
+      alert(`${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`);
     } catch (err: any) {
       console.error("Error from backend:", err);
-      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || "حدث خطأ غير متوقع";
+      const errorMessage = err.response?.data?.error || 
+                          err.response?.data?.message || 
+                          err.message || 
+                          t('unexpectedError');
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -164,221 +192,208 @@ const OrgPatientsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-black">
-      {/* Main Content */}
-      <div
-        className={`max-w-screen-lg mx-auto pt-${dealType ? "40" : "28"} pb-28`}
-      >
-        {orgError && (
+    <I18nextProvider i18n={i18next.default}>
+      <div className="min-h-screen bg-gray-100 text-black">
+        {/* Main Content */}
+        <LanguageToggle
+          currentLang={i18n.language} 
+          onToggle={toggleLanguage}
+        />
+        <div
+          className={`max-w-screen-lg mx-auto pb-28`}
+        >
+          {orgError && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
+                <p className="text-red-500 text-lg mb-4">{orgError}</p>
+                <button
+                  onClick={fetchOrg}
+                  className="bg-custom-green text-white py-2 px-4 rounded-md"
+                  disabled={isLoadingOrg}
+                >
+                  {isLoadingOrg ? (
+                    <div className="spinner"></div>
+                  ) : (t('retryButton'))}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {isLoadingOrg ? (
+            <div className="flex items-center justify-center min-h-[50vh]">
+              <div className="spinner"></div>
+            </div>
+          ) : (
+            /* 2 columns: left for text, right for form/patients */
+            <div className="grid grid-cols-1 gap-6">
+
+              {/* Right column fills remaining space */}
+              {currentView === "patients" ? (
+                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                  <div className="flex flex-wrap gap-4 mb-6 justify-center" dir="rtl">
+                    <div className="flex items-center gap-2">
+                      <label className="text-gray-600">{t('from')}:</label>
+                      <DatePicker
+                        selected={fromDate}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            setSelectedMarketer("");
+                            setFromDate(date);
+                          }
+                        }}
+                        className="border rounded-md p-2 text-right"
+                        dateFormat="yyyy/MM/dd"
+                        maxDate={toDate}
+                        placeholderText={t('chooseDate')}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-gray-600">{t('to')}:</label>
+                      <DatePicker
+                        selected={toDate}
+                        onChange={(date: Date | null) => {
+                          if(date){
+                            setSelectedMarketer("");
+                            setToDate(date);
+                          }
+                        }}
+                        className="border rounded-md p-2 text-right"
+                        dateFormat="yyyy/MM/dd"
+                        minDate={fromDate}
+                        maxDate={new Date()}
+                        placeholderText={t('chooseDate')}
+                      />
+                    </div>
+                    {marketers && (
+                    <div className="flex items-center gap-2">
+                      <label className="text-gray-600">{t('choose')} {marketerName}:</label>
+                      <select 
+                        value={selectedMarketer || ""}
+                        onChange={(e) => setSelectedMarketer(e.target.value)}
+                        className="border rounded-md p-2 text-right"
+                      >
+                        <option value="">{t('all')}</option>
+                        {marketers.map((marketer, index) => (
+                        <option key={index} value={marketer}>
+                          {marketer}
+                        </option>
+                        ))}
+                      </select>
+                    </div>)}
+                  </div>
+                  <h2 dir="rtl" className="text-gray-400 text-xl font-semibold mb-4 text-center">
+                    {selectedMarketer ? `${t('consultaionsFor')} ${selectedMarketer}` : t('allConsultaions')}: 
+                    <span className="mr-4 inline-block bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
+                      {marketerConsultaion.filter((m:any)=>
+                        selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                      ).length}
+                    </span>
+                  </h2>
+                  {marketerConsultaion.filter((m:any)=>
+                        selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                      ).length === 0 ? (
+                    <p className="text-center text-gray-500">
+                      {t('noPatients')}
+                    </p>
+                  ) : (
+                    marketerConsultaion.filter((m:any)=>
+                      selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
+                    ).map((p:any, i:number) => (
+                      <LabPatientCard
+                        key={i}
+                        {...p}
+                        orgType={orgType}
+                        onSelect={() =>
+                          console.log(
+                            `Selected patient: ${p?.phoneNumber} (ID ${p?.id})`
+                          )
+                        }
+                      />
+                    ))
+                  )}
+                </div>
+              ) : (
+                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                  <OrgUserRegistrationForm
+                    orgType={orgType}
+                    name={name}
+                    setName={setName}
+                    phone={phone}
+                    setPhone={setPhone}
+                    age={age}
+                    setAge={setAge}
+                    dateOfBirth={dateOfBirth}
+                    setDateOfBirth={setDateOfBirth}
+                    nationality={nationality}
+                    setNationality={setNationality}
+                    gender={gender}
+                    setGender={setGender}
+                    nationalId={nationalId}
+                    setNationalId={setNationalId}
+                    pdfFiles={pdfFiles}
+                    setPdfFiles={setPdfFiles}
+                  />
+                  <TestTypeSection
+                    orgType={orgType}
+                    testType={testType}
+                    setTestType={settestType}
+                    pdfFiles={pdfFiles}
+                    setPdfFiles={setPdfFiles}
+                  />
+                  {dealType === DealType.REVENUE_SHARE && (
+                    <>
+                      <PaymentMethodSection
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        possiblePaymentMethods={possiblePaymentMethods}
+                        cashPrice={cashPrice}
+                        setCashPrice={setCashPrice}
+                      />
+                      <ConsultationPriceSection
+                        selectedPrice={selectedPrice}
+                        onChange={(price) => setSelectedPrice(price)}
+                        possiblePrices={possiblePrices}
+                      />
+                    </>
+                  )}
+
+                  {/* Bottom Button for Web (not fixed) */}
+                  <button
+                    onClick={handleSubmit}
+                    className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <div className="spinner" />
+                    ) : (
+                    t('sendConsultation')
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {submitError && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
-              <p className="text-red-500 text-lg mb-4">{orgError}</p>
+              <p className="text-red-500 text-lg mb-4">{submitError}</p>
               <button
-                onClick={fetchOrg}
-                className="bg-custom-green text-white py-2 px-4 rounded-md"
-                disabled={isLoadingOrg}
+                onClick={() => setSubmitError("")}
+                className="bg-gray-300 text-black py-2 px-4 rounded-md"
               >
-                {isLoadingOrg ? (
-                  <div className="spinner"></div>
-                ) : (
-                  "إعادة المحاولة"
-                )}
+                {t('ok')}
               </button>
             </div>
           </div>
         )}
-
-        {isLoadingOrg ? (
-          <div className="flex items-center justify-center min-h-[50vh]">
-            <div className="spinner"></div>
-          </div>
-        ) : (
-          /* 2 columns: left for text, right for form/patients */
-          <div className="grid grid-cols-1 gap-6">
-
-            {/* Right column fills remaining space */}
-            {currentView === "patients" ? (
-              <div className="bg-white p-6 rounded-md shadow-sm w-full">
-                <div className="flex flex-wrap gap-4 mb-6 justify-center" dir="rtl">
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-600">من:</label>
-                    <DatePicker
-                      selected={fromDate}
-                      onChange={(date: Date | null) => {
-                        if (date) {
-                          setSelectedMarketer("");
-                          setFromDate(date);
-                        }
-                      }}
-                      className="border rounded-md p-2 text-right"
-                      dateFormat="yyyy/MM/dd"
-                      maxDate={toDate}
-                      placeholderText="اختر التاريخ"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-600">إلى:</label>
-                    <DatePicker
-                      selected={toDate}
-                      onChange={(date: Date | null) => {
-                        if(date){
-                          setSelectedMarketer("");
-                          setToDate(date);
-                        }
-                      }}
-                      className="border rounded-md p-2 text-right"
-                      dateFormat="yyyy/MM/dd"
-                      minDate={fromDate}
-                      maxDate={new Date()}
-                      placeholderText="اختر التاريخ"
-                    />
-                  </div>
-                  {marketers && (
-                  <div className="flex items-center gap-2">
-                    <label className="text-gray-600">{marketerName}:</label>
-                    <select 
-                      value={selectedMarketer || ""}
-                      onChange={(e) => setSelectedMarketer(e.target.value)}
-                      className="border rounded-md p-2 text-right"
-                    >
-                      <option value="">اختر {marketerName}</option>
-                      {marketers.map((marketer, index) => (
-                      <option key={index} value={marketer}>
-                        {marketer}
-                      </option>
-                      ))}
-                    </select>
-                  </div>)}
-                </div>
-                <h2 dir="rtl" className="text-gray-400 text-xl font-semibold mb-4 text-center">
-                  {selectedMarketer ? `استشارات ${selectedMarketer}` : 'الاستشارات'}: 
-                  <span className="mr-4 inline-block bg-green-100 text-green-700 rounded-full px-3 py-1 text-sm font-semibold">
-                    {marketerConsultaion.filter((m:any)=>
-                      selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
-                    ).length}
-                  </span>
-                </h2>
-                {marketerConsultaion.filter((m:any)=>
-                      selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
-                    ).length === 0 ? (
-                  <p className="text-center text-gray-500">
-                    لا يوجد مرضى حاليًا
-                  </p>
-                ) : (
-                  marketerConsultaion.filter((m:any)=>
-                    selectedMarketer ? `${m.marketer.firstName} ${m.marketer.lastName}` === selectedMarketer : true
-                  ).map((p:any, i:number) => (
-                    <LabPatientCard
-                      key={i}
-                      {...p}
-                      orgType={orgType}
-                      onSelect={() =>
-                        console.log(
-                          `Selected patient: ${p?.phoneNumber} (ID ${p?.id})`
-                        )
-                      }
-                    />
-                  ))
-                )}
-              </div>
-            ) : (
-              <div className="bg-white p-6 rounded-md shadow-sm w-full">
-                <OrgUserRegistrationForm
-                  orgType={orgType}
-                  name={name}
-                  setName={setName}
-                  phone={phone}
-                  setPhone={setPhone}
-                  age={age}
-                  setAge={setAge}
-                  dateOfBirth={dateOfBirth}
-                  setDateOfBirth={setDateOfBirth}
-                  nationality={nationality}
-                  setNationality={setNationality}
-                  gender={gender}
-                  setGender={setGender}
-                  nationalId={nationalId}
-                  setNationalId={setNationalId}
-                  pdfFiles={pdfFiles}
-                  setPdfFiles={setPdfFiles}
-                />
-                <TestTypeSection
-                  orgType={orgType}
-                  testType={testType}
-                  setTestType={settestType}
-                  pdfFiles={pdfFiles}
-                  setPdfFiles={setPdfFiles}
-                />
-                {dealType === DealType.REVENUE_SHARE && (
-                  <>
-                    <PaymentMethodSection
-                      paymentMethod={paymentMethod}
-                      setPaymentMethod={setPaymentMethod}
-                      possiblePaymentMethods={possiblePaymentMethods}
-                      cashPrice={cashPrice}
-                      setCashPrice={setCashPrice}
-                    />
-                    <ConsultationPriceSection
-                      selectedPrice={selectedPrice}
-                      onChange={(price) => setSelectedPrice(price)}
-                      possiblePrices={possiblePrices}
-                    />
-                  </>
-                )}
-
-                {/* Bottom Button for Web (not fixed) */}
-                <button
-                  onClick={handleSubmit}
-                  className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <div className="spinner" />
-                  ) : (
-                    "إرسال استشارة طبية"
-                  )}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+          <LabBottomNavBar
+            onToggleView={setCurrentView}
+            currentView={currentView}
+          />
       </div>
-
-      {submitError && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
-            <p className="text-red-500 text-lg mb-4">{submitError}</p>
-            <button
-              onClick={() => setSubmitError("")}
-              className="bg-gray-300 text-black py-2 px-4 rounded-md"
-            >
-              موافق
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Bottom Fixed Button for Mobile Only */}
-      {/* <div className="fixed bottom-16 left-0 w-full px-4 lg:hidden">
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <div className="spinner"></div>
-          ) : (
-            "إرسال استشارة طبية"
-          )}
-        </button>
-      </div> */}
-
-      {/* Mobile Bottom Nav (Hidden on Desktop) */}
-        <LabBottomNavBar
-          onToggleView={setCurrentView}
-          currentView={currentView}
-        />
-    </div>
+    </I18nextProvider>
   );
 };
 

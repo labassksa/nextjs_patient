@@ -2,6 +2,7 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConsultationPriceProps {
   selectedPrice: number | null;
@@ -14,10 +15,16 @@ const ConsultationPriceSection: React.FC<ConsultationPriceProps> = ({
   onChange,
   possiblePrices,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-md mx-auto bg-white p-4 mt-6 mb-2 rounded " dir="rtl">
-      <h3 className="text-lg font-bold mb-2">سعر الاستشارة</h3>
-      <p className="text-sm text-gray-700 mb-2">اختر قيمة سعر الاستشارة:</p>
+      <h3 className="text-lg font-bold mb-2">
+        {t('consultationPrice.title')}
+      </h3>
+      <p className="text-sm text-gray-700 mb-2">
+        {t('consultationPrice.subtitle')}
+      </p>
       <div className="bg-white p-4 rounded-lg">
         {possiblePrices.map((price) => (
           <button
@@ -36,7 +43,7 @@ const ConsultationPriceSection: React.FC<ConsultationPriceProps> = ({
                   selectedPrice === price ? "bg-white" : "bg-gray-400"
                 }`}
               />
-              <span>{price} ريال</span>
+              <span>{price} {t('consultationPrice.currency')}</span>
             </div>
           </button>
         ))}

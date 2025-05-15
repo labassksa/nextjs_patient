@@ -5,6 +5,7 @@ import {
   Assignment as PatientsIcon,
   PersonAdd as RegistrationIcon,
 } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 interface LabBottomNavBarProps {
   onToggleView: React.Dispatch<
@@ -18,6 +19,7 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
   onToggleView,
   currentView,
 }) => {
+  const {t} = useTranslation();
   return (
     <nav className="flex fixed inset-x-0 bottom-0 bg-white shadow-md px-4 py-2 justify-around items-center text-sm text-gray-800 border-t">
       <button
@@ -27,7 +29,7 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
         onClick={() => onToggleView("patients")}
       >
         <PatientsIcon fontSize="small" />
-        <span>المرضى</span>
+        <span>{t('patient')}</span>
       </button>
       <button
         className={`flex flex-col items-center ${
@@ -36,7 +38,7 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
         onClick={() => onToggleView("registration")}
       >
         <RegistrationIcon fontSize="small" />
-        <span>تسجيل</span>
+        <span>{t('registration')}</span>
       </button>
     </nav>
   );

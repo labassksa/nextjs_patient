@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import i18next from "i18next";
 export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => {
   try {
     const token = localStorage.getItem("labass_token");
@@ -31,7 +31,7 @@ export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => 
       message:
         axios.isAxiosError(error) && error.response?.data?.error
           ? error.response.data.error
-          : "حدث خطأ ، حاول مرة أخرى",
+          : i18next.t('unexpectedError'),
     };
   }
 };

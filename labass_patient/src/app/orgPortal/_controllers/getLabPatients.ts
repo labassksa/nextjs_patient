@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import i18next from "i18next";
 export const getLabPatients = async () => {
   try {
     const token = localStorage.getItem("labass_token");
@@ -26,7 +26,7 @@ export const getLabPatients = async () => {
       message:
         axios.isAxiosError(error) && error.response?.data?.error
           ? error.response.data.error
-          : "حدث خطأ ، حاول مرة أخرى",
+          : i18next.t('unexpectedError'),
     };
   }
 };

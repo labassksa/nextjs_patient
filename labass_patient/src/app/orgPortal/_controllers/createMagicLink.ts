@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Gender } from "../_types/genderType";
 import { LabtestType } from "../_types/labTestTypes";
+import i18next from "i18next";
 
 interface CreateMagicLinkData {
   patientInfo: {
@@ -35,7 +36,7 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
 
     // Validate nationalId format
     if (!/^\d{10}$/.test(data.patientInfo.nationalId)) {
-      throw new Error("رقم الهوية يجب أن يكون 10 أرقام");
+      throw new Error(i18next.t("nationalIdMustBe"));
     }
 
     // Create a new FormData object to send the form and files together

@@ -1,0 +1,204 @@
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+
+const resources = {
+  en: {
+    translation: {
+      registration: "Registration",
+      formValidation: "Please fill in all required fields",
+      consultationSuccess: "Medical consultation sent successfully to the client",
+      link: "Link",
+      promoCode: "Promo code",
+      unexpectedError: "Unexpected error occurred",
+      patient: "Patient",
+      noPatients: "No patients currently",
+      sendConsultation: "Send Medical Consultation",
+      ok: "OK",
+      retryButton: "Retry",
+      from: "From",
+      to: "To",
+      chooseDate: "Choose Date",
+      choose: "Choose",
+      all: "All",
+      pharmacist: "Pharmacist",
+      employee: "Employee",
+      consultaionsFor: "Consultations for",
+      allConsultaions: "All Consultations",
+
+
+      // organization registration form
+      formTitle: "Send Medical Consultation",
+      patientName: "Patient Name",
+      phoneNumber: "Mobile Number",
+      age: "Age",
+      nationality: "Nationality",
+      chooseNationality: "Choose Nationality",
+      search: "Search here...",
+      noResults: "No results",
+      gender: "Gender",
+      nationalId: "National ID",
+      nationalIdMustBe: "National ID must be 10 digits",
+      genders: {
+        male: "Male",
+        female: "Female"
+      },
+      nationalities: {
+        saudi: "Saudi",
+        egyptian: "Egyptian",
+        emirati: "Emirati",
+        qatari: "Qatari",
+        kuwaiti: "Kuwaiti",
+        bahraini: "Bahraini",
+        yemeni: "Yemeni",
+        lebanese: "Lebanese",
+        syrian: "Syrian",
+        jordanian: "Jordanian",
+        palestinian: "Palestinian",
+        libyan: "Libyan",
+        sudanese: "Sudanese",
+        other: "Other"
+      },
+      paymentSection: {
+        title: "Patient Payment Method",
+        subtitle: "Choose the appropriate payment method for the patient:",
+        throughLabass: "Online payment through Labass",
+        throughOrganization: "Receive payment from patient (cash)",
+        amountReceived: "Amount Received",
+        amountHelp: "Enter the amount received from the patient (cash or card) to issue an electronic invoice",
+        enterAmount: "Enter amount",
+        errorMinAmount: "Amount cannot be less than 15 SAR",
+      },
+      consultationPrice: {
+        title: "Consultation Price",
+        subtitle: "Choose the consultation price value:",
+        currency: "SAR"
+      },
+      testType: {
+        title: "Consultation Type",
+        subtitle: "Choose the consultation type",
+        preTest: "Before Test",
+        postTest: "After Test",
+        addFile: "Add File",
+        remove: "Remove"
+      },
+      errors: {
+        noToken: "No access token found. Please login to continue.",
+        unexpectedResponse: "Received unexpected response code.",
+        networkError: "⚠️ Network Connection Error: Please check your internet connection and try again.",
+        genericError: "An error occurred, please try again",
+        marketerNotFound: "⚠️ Marketer profile not found for this user. Please login with your marketer account.",
+        organizationNotFound: "⚠️ Organization not found for your profile. Please contact support"
+      }
+    }
+  },
+  ar: {
+    translation: {
+      registration: "التسجيل",
+      formValidation: "يرجى ملء جميع الحقول المطلوبة",
+      consultationSuccess: "تم إرسال الاستشارة الطبية للعميل بنجاح",
+      link: "الرابط",
+      promoCode: "رمز الخصم",
+      unexpectedError: "حدث خطأ غير متوقع",
+      patient: "المريض",
+      noPatients: "لا يوجد مرضى حاليًا",
+      sendConsultation: "إرسال استشارة طبية",
+      ok: "موافق",
+      retryButton: "إعادة المحاولة",
+      from: "من",
+      to: "الى",
+      chooseDate: "اختر التاريخ",
+      choose: "اختر",
+      all: "الكل",
+      pharmacist: "الصيدلي",
+      employee: "الموظف",
+      consultaionsFor: "استشارات",
+      allConsultaions: "جميع الاستشارات",
+
+      // organization registration form
+      formTitle: "إرسال استشارة طبية",
+      patientName: "اسم المريض",
+      phoneNumber: "رقم الجوال",
+      age: "العمر",
+      nationality: "الجنسية",
+      chooseNationality: "اختر الجنسية",
+      search: "ابحث هنا...",
+      noResults: "لا توجد نتائج",
+      gender: "الجنس",
+      nationalId: "رقم الهوية الوطنية",
+      nationalIdMustBe: "رقم الهوية يجب أن يكون 10 أرقام",
+      genders: {
+        male: "ذكر",
+        female: "أنثى"
+      },
+      nationalities: {
+        saudi: "سعودي",
+        egyptian: "مصري",
+        emirati: "إماراتي",
+        qatari: "قطري",
+        kuwaiti: "كويتي",
+        bahraini: "بحريني",
+        yemeni: "يمني",
+        lebanese: "لبناني",
+        syrian: "سوري",
+        jordanian: "أردني",
+        palestinian: "فلسطيني",
+        libyan: "ليبي",
+        sudanese: "سوداني",
+        other: "أخرى"
+      },
+      paymentSection: {
+        title: "طريقة دفع المريض",
+        subtitle: "اختر طريقة الدفع المناسبة للمريض:",
+        throughLabass: "اونلاين عن طريق موقع لاباس",
+        throughOrganization: "استلام المبلغ من المريض (كاش)",
+        amountReceived: "المبلغ المستلم",
+        amountHelp: "أدخل المبلغ المستلم من المريض (كاش او شبكة) لإصدار فاتورة إلكترونية بهذا المبلغ",
+        enterAmount: "أدخل المبلغ",
+        errorMinAmount: "المبلغ لا يمكن أن لا يكون أقل من 15 ريال سعودي.",
+      },
+      consultationPrice: {
+        title: "سعر الاستشارة",
+        subtitle: "اختر قيمة سعر الاستشارة:",
+        currency: "ريال"
+      },
+      testType: {
+        title: "نوع الاستشارة",
+        subtitle: "اختر نوع الاستشارة",
+        preTest: "قبل الاختبار",
+        postTest: "بعد الاختبار",
+        addFile: "إضافة ملف",
+        remove: "إزالة"
+      },
+      errors: {
+        noToken: "لا يوجد رمز دخول. يرجى تسجيل الدخول للمتابعة.",
+        unexpectedResponse: "تم استلام رمز استجابة غير متوقع.",
+        networkError: "⚠️ خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
+        genericError: "حدث خطأ ، حاول مرة أخرى",
+        marketerNotFound: "⚠️ تعذر العثور على الملف التعريفي للمسوق لهذا المستخدم. يرجى تسجيل الدخول باستخدام حساب المسوق الخاص بك.",
+        organizationNotFound: "⚠️ لم يتم العثور على المؤسسة المرتبطة بملفك التعريفي. يرجى الاتصال بالدعم الفني"
+      }
+    }
+  }
+};
+
+i18n
+  .use(initReactI18next)
+  .use(LanguageDetector)
+  .init({
+    resources,
+    lng: 'ar',
+    fallbackLng: 'ar',
+    interpolation: {
+      escapeValue: false
+    },
+    react: {
+      useSuspense: false
+    },
+    detection: {
+      order: ['querystring'],
+      lookupQuerystring: 'lang',
+    }
+  });
+
+export default i18n;

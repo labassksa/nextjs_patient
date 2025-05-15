@@ -2,9 +2,7 @@
 
 import { PaymentMethodEnum } from "../../../types/paymentMethods";
 import React, { useState } from "react";
-
-// // Payment method can be: "online", "cash", "free", or ""
-// export type PaymentMethod = "online" | "cash" | "free" | "";
+import { useTranslation } from "react-i18next";
 
 interface PaymentMethodSectionProps {
   paymentMethod: PaymentMethodEnum;
@@ -21,6 +19,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
   cashPrice,
   setCashPrice,
 }) => {
+  const { t } = useTranslation();
   const [error, setError] = useState<string>("");
 
   const handleCashPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +27,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
     setCashPrice(value);
 
     if (value !== null && value < 15) {
-      setError("المبلغ لا يمكن أن لا يكون أقل من 15 ريال سعودي.");
+      setError(t('paymentSection.errorMinAmount'));
     } else {
       setError("");
     }
@@ -36,12 +35,12 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
 
   return (
     <div
-      className="max-w-md text-black mx-auto bg-white p-4 mt-6 rounded "
+      className="max-w-md text-black mx-auto bg-white p-4 mt-6 rounded"
       dir="rtl"
     >
-      <h3 className="text-lg font-bold mb-2">طريقة دفع المريض</h3>
+      <h3 className="text-lg font-bold mb-2">{t('paymentSection.title')}</h3>
       <p className="text-sm text-gray-700 mb-4">
-        اختر طريقة الدفع المناسبة للمريض:
+        {t('paymentSection.subtitle')}
       </p>
       <div className="flex flex-col gap-2">
         {possiblePaymentMethods
@@ -49,47 +48,8 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
             (method) =>
               method === PaymentMethodEnum.THROUGH_ORGANIZATION ||
               method === PaymentMethodEnum.THROUGH_LABASS
-          ) // Only include cash and online
+          )
           .map((method) => (
-            // method === PaymentMethodEnum.THROUGH_ORGANIZATION &&
-            // paymentMethod === PaymentMethodEnum.THROUGH_ORGANIZATION ?
-            //  (
-            //   <div
-            //     key={method}
-            //     className="border-2 border-custom-green rounded-md p-1 flex flex-col gap-2"
-            //   >
-            //     <button
-            //       type="button"
-            //       onClick={() => setPaymentMethod(method)}
-            //       className="flex items-center justify-between p-2 w-full text-center rounded-md transition-colors duration-200 bg-custom-green text-white"
-            //     >
-            //       <span> استلام المبلغ من المريض (كاش او شبكة) </span>
-            //       <span className="text-white font-bold">✔</span>
-            //     </button>
-            //     <div className="mt-2">
-            //       <label className="font-semibold block mb-1">
-            //         المبلغ المستلم{" "}
-            //       </label>
-            //       <p className="font-normal text-xs text-custom-green block mb-2">
-            //         أدخل المبلغ المستلم من المريض (كاش او شبكة) لإصدار فاتورة
-            //         إلكترونية بهذا المبلغ
-            //       </p>
-            //       <input
-            //         type="numeric"
-            //         min={15}
-            //         className={`border px-2 py-1 w-full rounded ${
-            //           error ? "border-red-500" : "border-gray-300"
-            //         } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            //         value={cashPrice !== null ? cashPrice : ""}
-            //         onChange={handleCashPriceChange}
-            //         placeholder="أدخل المبلغ "
-            //       />
-            //       {error && (
-            //         <p className="text-red-500 text-sm mt-1">{error}</p>
-            //       )}
-            //     </div>
-            //   </div>
-            // ) :
             <button
               key={method}
               type="button"
@@ -102,8 +62,8 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
             >
               <span>
                 {method === PaymentMethodEnum.THROUGH_LABASS
-                  ? " اونلاين عن طريق موقع لاباس"
-                  : "استلام المبلغ من المريض (كاش)"}
+                  ? t('paymentSection.throughLabass')
+                  : t('paymentSection.throughOrganization')}
               </span>
               {paymentMethod === method && (
                 <span className="text-white font-bold">✔</span>
@@ -111,6 +71,31 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
             </button>
           ))}
       </div>
+      
+      {/* Uncomment this section if you want to show the cash price input */}
+      {/* {paymentMethod === PaymentMethodEnum.THROUGH_ORGANIZATION && (
+        <div className="mt-2">
+          <label className="font-semibold block mb-1">
+            {t('paymentSection.amountReceived')}
+          </label>
+          <p className="font-normal text-xs text-custom-green block mb-2">
+            {t('paymentSection.amountHelp')}
+          </p>
+          <input
+            type="numeric"
+            min={15}
+            className={`border px-2 py-1 w-full rounded ${
+              error ? "border-red-500" : "border-gray-300"
+            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            value={cashPrice !== null ? cashPrice : ""}
+            onChange={handleCashPriceChange}
+            placeholder={t('paymentSection.enterAmount')}
+          />
+          {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          )}
+        </div>
+      )} */}
     </div>
   );
 };
