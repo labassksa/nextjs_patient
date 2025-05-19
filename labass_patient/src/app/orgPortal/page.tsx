@@ -24,7 +24,7 @@ const LanguageToggle: React.FC<{ currentLang: string; onToggle: () => void }> = 
   return (
     <button 
       onClick={onToggle}
-      className="fixed top-4 right-4 bg-white shadow-md rounded-md px-3 py-1 text-sm font-medium"
+      className="fixed top-4 right-4 text-white bg-blue-500 shadow-md rounded-md px-3 py-1 text-sm font-medium"
     >
       {currentLang === 'ar' ? 'English' : 'عربي'}
     </button>
@@ -61,7 +61,7 @@ const OrgPatientsPage: React.FC = () => {
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
-  const [nationality, setNationality] = useState("سعودي");
+  const [nationality, setNationality] = useState("");
   const [gender, setGender] = useState(Gender.Male);
   const [nationalId, setNationalId] = useState("");
   const [testType, settestType] = useState<LabtestType | "">("");
