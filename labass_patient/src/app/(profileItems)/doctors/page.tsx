@@ -15,19 +15,20 @@ const DoctorsPage = () => {
           <div className="w-full flex flex-col justify-between" dir="rtl">
             <div className="flex flex-row justify-between mb-2">
               <div className="flex flex-row items-center">
-                {/* <img
-                  src="/images/dr_mohammed.jpg"
-                  alt="د. محمد"
-                  className="w-12 h-12 rounded-full ml-2"
-                /> */}
+                <img
+                  src="/doctor-ahmed.jpg"
+                  alt="Doctor"
+                  className="w-20 h-20 rounded-full object-cover border-2 ml-4"
+                />
                 <div className="flex flex-col jus">
-                  <h3 className="font-bold text-md text-black" dir="rtl">د. احمد عز الدين محمود بغدادي  ه  
+                  <h3 className="font-bold text-md text-black" dir="rtl">
+                    د. احمد عز الدين محمود بغدادي
                   </h3>
                   <h3 className="font-normal text-sm text-black" dir="rtl">
                     الجنسية: سوداني
                   </h3>
                   <h3 className="font-normal text-sm text-black" dir="rtl">
-                    طبيب عام{" "}
+                    طبيب عام
                   </h3>
                   <h3
                     className="font-normal text-sm text-custom-green mt-2"
@@ -39,7 +40,7 @@ const DoctorsPage = () => {
                     className="font-normal text-sm text-custom-green mt-2"
                     dir="rtl"
                   >
-                    الخبرة: 5 سنوات{" "}
+                    الخبرة: 5 سنوات
                   </h3>
                 </div>
               </div>
