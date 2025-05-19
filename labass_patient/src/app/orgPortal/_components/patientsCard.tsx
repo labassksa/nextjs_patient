@@ -5,6 +5,7 @@ import { FaUserMd } from "react-icons/fa";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { MdFileDownload } from "react-icons/md";
 import { OrganizationTypes } from "../_types/organizationTypes";
+import { useTranslation } from "react-i18next";
 
 export interface LabPatientCardProps {
   id: number;
@@ -48,8 +49,10 @@ const LabPatientCard: React.FC<LabPatientCardProps> = ({
   orgType,
   onSelect,
 }) => {
+  const { t } = useTranslation();
+
   const formatDate = (date: string | null) => {
-    if (!date) return "غير متوفر";
+    if (!date) return t("notAvailable");
     return format(new Date(date), "yyyy-MM-dd HH:mm");
   };
 
@@ -61,44 +64,47 @@ const LabPatientCard: React.FC<LabPatientCardProps> = ({
     >
       {/* Header with ID and Status */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
-        <h3 className="font-bold text-lg text-black">{"رقم الاستشارة: " + id}</h3>
+        <h3 className="font-bold text-lg text-black">{`${t("consultationNumber")}: ${id}`}</h3>
         <span className={`px-3 py-1 rounded-full text-sm ${
           status === "Closed" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"
         }`}>
-          {status === "Closed" ? "مكتملة" : "نشط"}
+          {status === "Closed" ? t("completed") : t("active")}
         </span>
       </div>
 
       {/* Patient Information */}
       <div className="mb-4">
-        <h4 className="font-semibold text-700 mb-2">معلومات المريض</h4>
+        <h4 className="font-semibold text-700 mb-2">{t("patientInfo")}</h4>
         <div className="text-sm text-gray-600">
-          <p className="mb-1">{`الاسم: ${patient.firstName} ${patient.lastName}`}</p>
-          <p>رقم الجوال: <span dir="ltr">{patient.phoneNumber}</span></p>
+          <p className="mb-1">{`${t("name")}: ${patient.firstName||''} ${patient.lastName||''}`}</p>
+          <p>{t("phoneNumber")}: <span dir="ltr">{patient.phoneNumber}</span></p>
         </div>
       </div>
 
       {/* Doctor Information */}
       <div className="mb-4">
-        <h4 className="font-semibold text-700 mb-2">معلومات الطبيب</h4>
+        <h4 className="font-semibold text-700 mb-2">{t("doctorInfo")}</h4>
         <div className="text-sm text-gray-600">
-          <p className="mb-1">{`الاسم: ${doctor.firstName} ${doctor.lastName}`}</p>
-          <p>رقم الجوال: <span dir="ltr">{doctor.phoneNumber}</span></p>
-          </div>
+          <p className="mb-1">{`${t("name")}: ${doctor.firstName||''} ${doctor.lastName||''}`}</p>
+          <p>{t("phoneNumber")}: <span dir="ltr">{doctor.phoneNumber}</span></p>
+        </div>
       </div>
 
       {/* Marketer Information */}
       <div className="mb-4">
-        <h4 className="font-semibold text-700 mb-2">معلومات {orgType === OrganizationTypes.Pharmacy?
-        'الصيدلي' : 'موظف المختبر'}</h4>
+        <h4 className="font-semibold text-700 mb-2">
+           {orgType === OrganizationTypes.Pharmacy
+            ? t("pharmacistInfo")
+            : t("labEmployeeInfo")}
+        </h4>
         <div className="text-sm text-gray-600">
-          <p className="mb-1">{`الاسم: ${marketer.firstName} ${marketer.lastName}`}</p>
-            <p>رقم الجوال: <span dir="ltr">{marketer.phoneNumber}</span></p>
+          <p className="mb-1">{`${t("name")}: ${marketer.firstName||''} ${marketer.lastName||''}`}</p>
+          <p>{t("phoneNumber")}: <span dir="ltr">{marketer.phoneNumber}</span></p>
         </div>
       </div>
 
       {/* Prescription PDF Section */}
-      {prescriptionPDFUrl? (
+      {prescriptionPDFUrl ? (
         <div className="mb-4 border-t border-gray-200 pt-3">
           <a
             href={prescriptionPDFUrl}
@@ -108,32 +114,31 @@ const LabPatientCard: React.FC<LabPatientCardProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <MdFileDownload className="text-xl" />
-            <span className="text-sm">تحميل الوصفة الطبية</span>
+            <span className="text-sm">{t("downloadPrescription")}</span>
           </a>
         </div>
-      ):
-      (
+      ) : (
         <div className="mb-4 border-t border-gray-200 pt-3">
           <div className="flex items-center gap-2 text-red-700 px-4 py-2 rounded-lg transition-colors">
-          <span className="text-sm">لم يتم صرف وصفة طبية</span>
+            <span className="text-sm">{t("noPrescription")}</span>
           </div>
-      </div>
+        </div>
       )}
 
       {/* Dates Section */}
       <div className="text-xs text-gray-500 border-t border-gray-200 pt-3">
         <p className="mb-1 flex items-center gap-2">
           <MdMailOutline className="text-gray-600 text-base" />
-          {`وقت ارسال الاستشارة: ${formatDate(createdAt)}`}
+          {`${t("consultationSentAt")}: ${formatDate(createdAt)}`}
         </p>
         <p className="mb-1 flex items-center gap-2">
           <FaUserMd className="text-gray-600 text-base" />
-          {`وقت دخول الطبيب: ${formatDate(doctorJoinedAT)}`}
+          {`${t("doctorJoinedAt")}: ${formatDate(doctorJoinedAT)}`}
         </p>
         {closedAt && (
           <p className="flex items-center gap-2">
             <IoMdCheckmarkCircle className="text-green-600 text-base" />
-            {`وقت اكتمال الاستشارة: ${formatDate(closedAt)}`}
+            {`${t("consultationCompletedAt")}: ${formatDate(closedAt)}`}
           </p>
         )}
       </div>

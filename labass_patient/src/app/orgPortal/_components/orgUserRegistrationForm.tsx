@@ -48,58 +48,59 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const ALL_NATIONALITIES = [
-    { key: "سعودي", value: t("nationalities.saudi") },
-    { key: "مصري", value: t("nationalities.egyptian") },
-    { key: "إماراتي", value: t("nationalities.emirati") },
-    { key: "قطري", value: t("nationalities.qatari") },
-    { key: "كويتي", value: t("nationalities.kuwaiti") },
-    { key: "بحريني", value: t("nationalities.bahraini") },
-    { key: "عماني", value: t("nationalities.omani") },
-    { key: "يمني", value: t("nationalities.yemeni") },
-    { key: "لبناني", value: t("nationalities.lebanese") },
-    { key: "سوري", value: t("nationalities.syrian") },
-    { key: "أردني", value: t("nationalities.jordanian") },
-    { key: "فلسطيني", value: t("nationalities.palestinian") },
-    { key: "عراقي", value: t("nationalities.iraqi") },
-    { key: "ليبي", value: t("nationalities.libyan") },
-    { key: "تونسي", value: t("nationalities.tunisian") },
-    { key: "جزائري", value: t("nationalities.algerian") },
-    { key: "مغربي", value: t("nationalities.moroccan") },
-    { key: "موريتاني", value: t("nationalities.mauritanian") },
-    { key: "سوداني", value: t("nationalities.sudanese") },
-    { key: "صومالي", value: t("nationalities.somali") },
-    { key: "جيبوتي", value: t("nationalities.djiboutian") },
-    { key: "جزر القمر", value: t("nationalities.comorian") },
-    { key: "أفغاني", value: t("nationalities.afghan") },
-    { key: "باكستاني", value: t("nationalities.pakistani") },
-    { key: "بنغلاديشي", value: t("nationalities.bangladeshi") },
-    { key: "هندي", value: t("nationalities.indian") },
-    { key: "سريلانكي", value: t("nationalities.sriLankan") },
-    { key: "نيبالي", value: t("nationalities.nepali") },
-    { key: "فلبيني", value: t("nationalities.filipino") },
-    { key: "إندونيسي", value: t("nationalities.indonesian") },
-    { key: "ماليزي", value: t("nationalities.malaysian") },
-    { key: "تايلندي", value: t("nationalities.thai") },
-    { key: "صيني", value: t("nationalities.chinese") },
-    { key: "ياباني", value: t("nationalities.japanese") },
-    { key: "كوري", value: t("nationalities.korean") },
-    { key: "تركي", value: t("nationalities.turkish") },
-    { key: "إيراني", value: t("nationalities.iranian") },
-    { key: "روسي", value: t("nationalities.russian") },
-    { key: "بريطاني", value: t("nationalities.british") },
-    { key: "فرنسي", value: t("nationalities.french") },
-    { key: "ألماني", value: t("nationalities.german") },
-    { key: "إيطالي", value: t("nationalities.italian") },
-    { key: "إسباني", value: t("nationalities.spanish") },
-    { key: "أمريكي", value: t("nationalities.american") },
-    { key: "كندي", value: t("nationalities.canadian") },
-    { key: "برازيلي", value: t("nationalities.brazilian") },
-    { key: "أسترالي", value: t("nationalities.australian") },
-    { key: "نيجيري", value: t("nationalities.nigerian") },
-    { key: "جنوب أفريقي", value: t("nationalities.southAfrican") },
-    { key: "أخرى", value: t("nationalities.other") }
-  ];
+  // Use Map for ALL_NATIONALITIES
+  const ALL_NATIONALITIES = new Map<string, string>([
+    ["سعودي", t("nationalities.saudi")],
+    ["باكستاني", t("nationalities.pakistani")],
+    ["مصري", t("nationalities.egyptian")],
+    ["إماراتي", t("nationalities.emirati")],
+    ["قطري", t("nationalities.qatari")],
+    ["كويتي", t("nationalities.kuwaiti")],
+    ["بحريني", t("nationalities.bahraini")],
+    ["عماني", t("nationalities.omani")],
+    ["يمني", t("nationalities.yemeni")],
+    ["لبناني", t("nationalities.lebanese")],
+    ["سوري", t("nationalities.syrian")],
+    ["أردني", t("nationalities.jordanian")],
+    ["فلسطيني", t("nationalities.palestinian")],
+    ["عراقي", t("nationalities.iraqi")],
+    ["ليبي", t("nationalities.libyan")],
+    ["تونسي", t("nationalities.tunisian")],
+    ["جزائري", t("nationalities.algerian")],
+    ["مغربي", t("nationalities.moroccan")],
+    ["موريتاني", t("nationalities.mauritanian")],
+    ["سوداني", t("nationalities.sudanese")],
+    ["صومالي", t("nationalities.somali")],
+    ["جيبوتي", t("nationalities.djiboutian")],
+    ["جزر القمر", t("nationalities.comorian")],
+    ["أفغاني", t("nationalities.afghan")],
+    ["بنغلاديشي", t("nationalities.bangladeshi")],
+    ["هندي", t("nationalities.indian")],
+    ["سريلانكي", t("nationalities.sriLankan")],
+    ["نيبالي", t("nationalities.nepali")],
+    ["فلبيني", t("nationalities.filipino")],
+    ["إندونيسي", t("nationalities.indonesian")],
+    ["ماليزي", t("nationalities.malaysian")],
+    ["تايلندي", t("nationalities.thai")],
+    ["صيني", t("nationalities.chinese")],
+    ["ياباني", t("nationalities.japanese")],
+    ["كوري", t("nationalities.korean")],
+    ["تركي", t("nationalities.turkish")],
+    ["إيراني", t("nationalities.iranian")],
+    ["روسي", t("nationalities.russian")],
+    ["بريطاني", t("nationalities.british")],
+    ["فرنسي", t("nationalities.french")],
+    ["ألماني", t("nationalities.german")],
+    ["إيطالي", t("nationalities.italian")],
+    ["إسباني", t("nationalities.spanish")],
+    ["أمريكي", t("nationalities.american")],
+    ["كندي", t("nationalities.canadian")],
+    ["برازيلي", t("nationalities.brazilian")],
+    ["أسترالي", t("nationalities.australian")],
+    ["نيجيري", t("nationalities.nigerian")],
+    ["جنوب أفريقي", t("nationalities.southAfrican")],
+    ["أخرى", t("nationalities.other")],
+  ]);
 
   const genders = [Gender.Male, Gender.Female];
 
@@ -113,8 +114,8 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
 
   // Filter the nationalities based on the search term
-  const filteredNationalities = ALL_NATIONALITIES.filter((nat) =>
-    nat.value.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredNationalities = Array.from(ALL_NATIONALITIES.entries()).filter(
+    ([, value]) => value.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Clicking outside the dropdown to close it:
@@ -252,7 +253,7 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             onClick={() => setShowDropdown((prev) => !prev)}
             className="w-full flex justify-between items-center border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
           >
-            {nationality || t("chooseNationality")}
+            {ALL_NATIONALITIES.get(nationality) || t("chooseNationality")}
             <span className="ml-2 text-gray-600">▼</span>
           </button>
 
@@ -268,18 +269,18 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
                 className="w-full border border-gray-300 rounded-md p-2 mb-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
               />
               <ul className="max-h-40 overflow-auto">
-                {filteredNationalities.map((nat) => (
-                  <li key={nat.key}>
+                {filteredNationalities.map(([key, value]) => (
+                  <li key={key}>
                     <button
                       type="button"
-                      onClick={() => handleSelectNationality(nat.key)}
+                      onClick={() => handleSelectNationality(key)}
                       className={`block w-full text-right px-2 py-1 hover:bg-gray-200 ${
-                        nat.key === nationality
+                        key === nationality
                           ? "bg-green-500 text-white"
                           : ""
                       }`}
                     >
-                      {nat.value}
+                      {value}
                     </button>
                   </li>
                 ))}
