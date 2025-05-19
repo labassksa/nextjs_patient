@@ -4,8 +4,11 @@ export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => 
   try {
     const token = localStorage.getItem("labass_token");
     const userId = localStorage.getItem("labass_userId");
-    if (!token && !userId) {
-      throw new Error("No token found. Please log in to continue.");
+    if (!token || !userId) {
+      return {
+        success: false,
+        message: i18next.t('errors.noToken'),
+      };
     }
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/marketers/consultations/${userId}`,

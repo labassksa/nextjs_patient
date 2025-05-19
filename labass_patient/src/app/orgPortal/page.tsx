@@ -24,7 +24,7 @@ const LanguageToggle: React.FC<{ currentLang: string; onToggle: () => void }> = 
   return (
     <button 
       onClick={onToggle}
-      className="fixed top-4 right-4 text-white bg-blue-500 shadow-md rounded-md px-3 py-1 text-sm font-medium"
+      className="fixed top-4 right-4 text-white bg-blue-500 shadow-md rounded-md px-3 py-1 text-sm font-medium z-10"
     >
       {currentLang === 'ar' ? 'English' : 'عربي'}
     </button>
@@ -127,11 +127,8 @@ const OrgPatientsPage: React.FC = () => {
         const uniqueMarketers: any[] = [...new Set(marketerConsultaion.data.consultations
         .map((p:any) => `${p.marketer.firstName} ${p.marketer.lastName}`))];
         setMarketers(uniqueMarketers);
-        console.log("Marketers: ", uniqueMarketers);
       } else {
-        throw new Error(
-          marketerConsultaion.message || "Unknown error occurred."
-        );
+        setOrgError(marketerConsultaion.message || t('unexpectedError'));
       }
       })()
   }, [fromDate, toDate]);
@@ -203,7 +200,7 @@ const OrgPatientsPage: React.FC = () => {
           className={`max-w-screen-lg mx-auto pb-28`}
         >
           {orgError && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1]">
               <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
                 <p className="text-red-500 text-lg mb-4">{orgError}</p>
                 <button

@@ -5,7 +5,10 @@ export const getOrganization = async () => {
   try {
     const token = localStorage.getItem("labass_token");
     if (!token) {
-      throw new Error(i18next.t('errors.noToken'));
+      return {
+      success: false,
+      message: i18next.t('errors.noToken')
+      };
     }
 
     const response = await axios.get(
