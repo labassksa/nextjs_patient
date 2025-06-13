@@ -151,6 +151,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     const token = localStorage.getItem("labass_token");
     if (!token) {
       router.push("/login");
+      return;
     }
 
     if (loading) return;
