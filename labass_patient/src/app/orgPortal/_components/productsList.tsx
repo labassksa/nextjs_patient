@@ -119,7 +119,7 @@ const ProductsList: React.FC = () => {
           <p className="text-xs text-black-500">SA0305000068203377503000</p>
         </div>
       </div>
-      <div className="mt-24 px-4 md:px-8">
+      <div className="mt-20 pt-20 px-4 md:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
             <ProductCard
