@@ -19,6 +19,7 @@ import TestTypeSection from "./_components/testType";
 import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ProductsList from "./_components/productsList";
 
 const LanguageToggle: React.FC<{ currentLang: string; onToggle: () => void }> = ({ currentLang, onToggle }) => {
   return (
@@ -43,7 +44,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [currentView, setCurrentView] = useState<"patients" | "registration">(
+  const [currentView, setCurrentView] = useState<"patients" | "registration" | "products">(
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
@@ -309,6 +310,8 @@ const OrgPatientsPage: React.FC = () => {
                     ))
                   )}
                 </div>
+              ) : currentView === "products" ? (
+                <ProductsList />
               ) : (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
                   <OrgUserRegistrationForm

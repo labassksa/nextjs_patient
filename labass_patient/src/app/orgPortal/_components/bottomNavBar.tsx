@@ -4,15 +4,16 @@ import {
   Home as HomeIcon,
   Assignment as PatientsIcon,
   PersonAdd as RegistrationIcon,
+  ShoppingCart as ShoppingCartIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 interface LabBottomNavBarProps {
   onToggleView: React.Dispatch<
-    React.SetStateAction<"patients" | "registration">
+    React.SetStateAction<"patients" | "registration" | "products">
   >;
-  currentView: "patients" | "registration";
-  className?: string; // Add this line
+  currentView: "patients" | "registration" | "products";
+  className?: string;
 }
 
 const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
@@ -39,6 +40,15 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
       >
         <RegistrationIcon fontSize="small" />
         <span>{t('registration')}</span>
+      </button>
+      <button
+        className={`flex flex-col items-center ${
+          currentView === "products" ? "text-green-500" : "text-gray-500"
+        }`}
+        onClick={() => onToggleView("products")}
+      >
+        <ShoppingCartIcon fontSize="small" />
+        <span>{t('المنتجات')}</span>
       </button>
     </nav>
   );
