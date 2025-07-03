@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ShoppingCart as ShoppingCartIcon } from "@mui/icons-material";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import ProductCard from "./ProductCard";
 
 interface Product {
@@ -117,6 +118,17 @@ const ProductsList: React.FC = () => {
           <p className="text-xs text-blue-500 mt-2">سيتم تحديث القائمة بشكل دوري واضافة منتجات جديدة</p>
           <p className="text-xs text-black-500 mt-2">رقم الحساب البنكي</p>
           <p className="text-xs text-black-500">SA0305000068203377503000</p>
+          <p className="text-xs text-black-500 mt-2">
+            <a
+              href="https://wa.me/966505117551"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:text-blue-500"
+            >
+              <WhatsAppIcon className="text-green-500" />
+              خدمة العملاء: 0505117551
+            </a>
+          </p>
         </div>
       </div>
       <div className="mt-20 pt-20 px-4 md:px-8">
@@ -126,6 +138,7 @@ const ProductsList: React.FC = () => {
               key={product.id}
               {...product}
               onAddToCart={handleAddToCart}
+              supportPhone="0505117551"
             />
           ))}
         </div>
