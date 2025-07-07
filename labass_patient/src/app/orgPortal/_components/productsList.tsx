@@ -271,41 +271,55 @@ const ProductsList: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-blue-50 p-4 rounded-lg fixed w-full top-0 z-10">
-        <div className="flex justify-between items-start mb-4">
+      {/* Compact Header - Max 10% height on mobile */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 fixed w-full top-0 z-10 shadow-lg max-h-[10vh] md:max-h-none overflow-hidden">
+        <div className="flex justify-between items-center p-2 md:p-3">
+          {/* Cart Icon */}
           <Link href="/orgPortal/cart" className="relative" onClick={handleCartClick}>
-            <div className="bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-shadow">
-              <ShoppingCartIcon className="text-blue-600 w-6 h-6" />
+            <div className="bg-white/10 backdrop-blur-sm p-1.5 md:p-2 rounded-full hover:bg-white/20 transition-all duration-200">
+              <ShoppingCartIcon className="text-white w-5 h-5 md:w-6 md:h-6" />
               {cart.totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold">
                   {cart.totalItems}
                 </span>
               )}
             </div>
           </Link>
-          <div className="text-right">
-            <h2 className="text-xl font-semibold text-black-600">قائمة المنتجات</h2>
+          
+          {/* Title and Subtitle */}
+          <div className="text-right text-white">
+            <h1 className="text-sm md:text-lg font-bold">متجر المنتجات</h1>
+            <p className="text-xs text-blue-100 font-mono">SA0305000068203377503000</p>
+            <p className="text-xs text-blue-100 hidden md:block">منتجات طبية وتجميلية</p>
           </div>
         </div>
-        <div className="flex flex-col items-end text-right">
-          <p className="text-xs text-blue-500 mt-2">سيتم تحديث القائمة بشكل دوري واضافة منتجات جديدة</p>
-          <p className="text-xs text-black-500 mt-2">رقم الحساب البنكي</p>
-          <p className="text-xs text-black-500">SA0305000068203377503000</p>
-          <p className="text-xs text-black-500 mt-2">
+        
+        {/* Quick Info Bar */}
+        <div className="bg-white/10 backdrop-blur-sm px-2 md:px-3 py-0.5 md:py-1 border-t border-white/20">
+          <div className="flex justify-between items-center mb-0.5">
             <a
               href="https://wa.me/966505117551"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 hover:text-blue-500"
+              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
             >
-              <WhatsAppIcon className="text-green-500" />
-              خدمة العملاء: 0505117551
+              <WhatsAppIcon className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="text-xs text-white">دعم العملاء</span>
             </a>
-          </p>
+            <span className="text-blue-100 text-xs">تحديث دوري للمنتجات</span>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-blue-100 leading-none">رقم الحساب البنكي</p>
+            <p className="text-xs text-white font-mono bg-white/10 px-1 py-0.5 rounded leading-none">
+              SA0305000068203377503000
+            </p>
+          </div>
         </div>
       </div>
-      <div className="mt-20 pt-20 px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      {/* Products Grid */}
+      <div className="mt-[10vh] md:mt-28 px-4 md:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {products.map((product) => (
             <ProductCard
               key={product.id}

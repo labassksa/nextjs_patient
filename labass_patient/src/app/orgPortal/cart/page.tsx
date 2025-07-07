@@ -49,7 +49,7 @@ const CartPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-right mb-2">سلة التسوق</h1>
+          <h1 className="text-2xl font-bold text-right mb-2 text-black">سلة التسوق</h1>
           <p className="text-gray-600 text-right">عدد المنتجات: {cart.totalItems}</p>
         </div>
 
@@ -139,23 +139,23 @@ const CartPage: React.FC = () => {
           {/* Cart Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-24">
-              <h2 className="text-xl font-semibold mb-4 text-right">ملخص الطلب</h2>
+              <h2 className="text-xl font-semibold mb-4 text-right text-black">ملخص الطلب</h2>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">المجموع الفرعي:</span>
-                  <span>{cart.subtotal.toFixed(2)} ريال</span>
+                  <span className="text-black">{cart.subtotal.toFixed(2)} ريال</span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600">الضريبة:</span>
-                  <span>{(cart.totalWithTax - cart.subtotal).toFixed(2)} ريال</span>
+                  <span className="text-black">{(cart.totalWithTax - cart.subtotal).toFixed(2)} ريال</span>
                 </div>
                 
                 <div className="border-t pt-3">
                   <div className="flex justify-between font-bold text-lg">
-                    <span>المجموع النهائي:</span>
-                    <span className="text-green-600">{cart.totalWithTax.toFixed(2)} ريال</span>
+                    <span className="text-black">المجموع النهائي:</span>
+                    <span className="text-black">{cart.totalWithTax.toFixed(2)} ريال</span>
                   </div>
                 </div>
               </div>
