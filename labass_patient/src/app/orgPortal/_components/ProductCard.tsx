@@ -15,6 +15,7 @@ interface ProductCardProps {
   originalPrice: number;
   totalWithTax: number;
   image: string;
+  barcode: string;
   minQuantity?: number;
   className?: string;
   onAddToCart?: (productId: number, quantity: number) => void;
@@ -30,6 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   originalPrice,
   totalWithTax,
   image,
+  barcode,
   minQuantity = 1,
   className = "",
   onAddToCart,
@@ -61,6 +63,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="space-y-2">
         <h3 className="text-lg font-semibold text-right" dir="rtl">{name}</h3>
         <p className="text-gray-600 text-right">{description}</p>
+        <div className="text-sm text-gray-500 text-right" dir="rtl">
+          <span className="font-mono bg-gray-100 px-2 py-1 rounded">الباركود: {barcode}</span>
+        </div>
         <div  dir="rtl" className="flex flex-col gap-2">
           <div className="flex justify-between">
             <div className="flex items-center gap-2">
