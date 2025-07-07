@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { ShoppingCart as ShoppingCartIcon } from "@mui/icons-material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import ProductCard from "./ProductCard";
+import { useCart } from "../../../hooks/useCart";
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -244,20 +246,48 @@ const products: Product[] = [
 ];
 
 const ProductsList: React.FC = () => {
-  const [cart, setCart] = useState<{ [key: number]: number }>({});
+  const { cart, refreshCart } = useCart();
 
-  const handleAddToCart = (productId: number, quantity: number) => {
-    setCart(prev => ({
-      ...prev,
-      [productId]: (prev[productId] || 0) + quantity
-    }));
+  // Listen for cart updates from other components
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      refreshCart();
+    };
+
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    // Also refresh when component mounts
+    refreshCart();
+
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, [refreshCart]);
+
+  const handleCartClick = () => {
+    // Refresh cart data from localStorage before navigating
+    refreshCart();
   };
 
   return (
     <div className="space-y-4">
       <div className="bg-blue-50 p-4 rounded-lg fixed w-full top-0 z-10">
+        <div className="flex justify-between items-start mb-4">
+          <Link href="/orgPortal/cart" className="relative" onClick={handleCartClick}>
+            <div className="bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-shadow">
+              <ShoppingCartIcon className="text-blue-600 w-6 h-6" />
+              {cart.totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cart.totalItems}
+                </span>
+              )}
+            </div>
+          </Link>
+          <div className="text-right">
+            <h2 className="text-xl font-semibold text-black-600">قائمة المنتجات</h2>
+          </div>
+        </div>
         <div className="flex flex-col items-end text-right">
-          <h2 className="text-xl font-semibold text-black-600">قائمة المنتجات</h2>
           <p className="text-xs text-blue-500 mt-2">سيتم تحديث القائمة بشكل دوري واضافة منتجات جديدة</p>
           <p className="text-xs text-black-500 mt-2">رقم الحساب البنكي</p>
           <p className="text-xs text-black-500">SA0305000068203377503000</p>
@@ -280,7 +310,6 @@ const ProductsList: React.FC = () => {
             <ProductCard
               key={product.id}
               {...product}
-              onAddToCart={handleAddToCart}
               supportPhone="0505117551"
             />
           ))}

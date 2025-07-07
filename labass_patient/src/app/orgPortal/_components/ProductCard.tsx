@@ -5,6 +5,8 @@ import Image from "next/image";
 import { ShoppingCart as ShoppingCartIcon, ShoppingCartCheckout as AddToCartIcon } from "@mui/icons-material";
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useTranslation } from "react-i18next";
+import QuantitySelector from "../../../components/QuantitySelector";
+import { useCart } from "../../../hooks/useCart";
 
 interface ProductCardProps {
   id: number;
@@ -18,8 +20,8 @@ interface ProductCardProps {
   barcode: string;
   minQuantity?: number;
   className?: string;
-  onAddToCart?: (productId: number, quantity: number) => void;
   supportPhone?: string;
+  expiryDate?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -34,16 +36,26 @@ const ProductCard: React.FC<ProductCardProps> = ({
   barcode,
   minQuantity = 1,
   className = "",
-  onAddToCart,
-  supportPhone
+  supportPhone,
+  expiryDate
 }) => {
   const { t } = useTranslation();
-  const quantity = minQuantity;
+  const { addToCart, getItemQuantity } = useCart();
+  const [selectedQuantity, setSelectedQuantity] = useState(minQuantity);
+  const currentCartQuantity = getItemQuantity(id);
 
   const handleAddToCart = () => {
-    if (onAddToCart) {
-      onAddToCart(id, quantity);
-    }
+    addToCart({
+      id,
+      name,
+      nameAr,
+      price,
+      originalPrice,
+      totalWithTax,
+      image,
+      barcode,
+      minQuantity
+    }, selectedQuantity);
   };
 
   return (
@@ -78,18 +90,30 @@ const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 line-through">
-              {price} ريال
-            </span>
+            <div className="text-xl font-bold text-right">{price} ريال</div>
           </div>
-          <div className="flex justify-between">
-            <div className="text-xl font-bold">{totalWithTax} ريال</div>
+          <div className="text-sm text-red-600 text-right">
+            غير شامل للضريبة
           </div>
-          <div className="text-sm text-green-500 text-right">
-            شامل الضريبة
+          <div className="text-sm text-gray-500 text-right">
+            الضريبة: {(totalWithTax - price).toFixed(2)} ريال
           </div>
         </div>
-        <div className="text-sm text-gray-600 text-right">الحد الأدنى للطلب: {quantity} قطعة</div>
+        <div className="text-sm text-gray-600 text-right">الحد الأدنى للطلب: {minQuantity} قطعة</div>
+        {currentCartQuantity > 0 && (
+          <div className="text-sm text-green-600 text-right font-semibold">
+            في السلة: {currentCartQuantity} قطعة
+          </div>
+        )}
+        <div className="mt-3">
+          <div className="text-sm text-gray-600 text-right mb-2">الكمية:</div>
+          <QuantitySelector
+            quantity={selectedQuantity}
+            onQuantityChange={setSelectedQuantity}
+            minQuantity={minQuantity}
+            className="justify-end"
+          />
+        </div>
         {supportPhone && (
           <div dir="rtl" className="text-sm text-gray-500 text-right">
             <a href={`tel:${supportPhone}`} className="flex items-center gap-2 hover:text-blue-500">

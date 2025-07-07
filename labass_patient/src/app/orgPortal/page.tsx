@@ -118,6 +118,12 @@ const OrgPatientsPage: React.FC = () => {
     if(urlParams.get('lang') && i18n.language !==  urlParams.get('lang')){
       i18n.changeLanguage(urlParams.get('lang')|| 'ar');
     }
+    
+    // Check for view parameter and set current view
+    const viewParam = urlParams.get('view');
+    if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
+      setCurrentView(viewParam);
+    }
   }, []);
 
   useEffect(() =>{
