@@ -242,6 +242,58 @@ const products: Product[] = [
     totalWithTax: 33.62,
     expiryDate: "01-2028",
     minQuantity: 1
+  },
+  {
+    id: 18,
+    name: "CeraVe Moisturizing Cream for Dry to Very Dry Skin",
+    nameAr: "سيرافي كريم ترطيب البشرة الجافة الى الجافة جداً 340 جم",
+    description: "CeraVe Moisturizing Cream for Dry to Very Dry Skin - 340g",
+    price: 48,
+    originalPrice: 55.2,
+    image: "/images/products/سيرافي كريم ترطيب البشرة الجافة الى الجافة جداً 340 جم_3337875597227_48_55.2.png",
+    barcode: "3337875597227",
+    totalWithTax: 55.2,
+    expiryDate: "08-2027",
+    minQuantity: 1
+  },
+  {
+    id: 19,
+    name: "CeraVe Moisturizing Cream for Very Dry Skin",
+    nameAr: "سيرافي كريم مرطب للبشره الجافه جدا 454 جرام",
+    description: "CeraVe Moisturizing Cream for Very Dry Skin - 454g",
+    price: 54,
+    originalPrice: 62.1,
+    image: "/images/products/سيرافي كريم مرطب للبشره الجافه جدا 454 جرام_3337875597388_54_62.1.jpg.png",
+    barcode: "3337875597388",
+    totalWithTax: 62.1,
+    expiryDate: "08-2027",
+    minQuantity: 1
+  },
+  {
+    id: 20,
+    name: "CeraVe Foaming Facial Cleanser",
+    nameAr: "سيرافي منظف رغوي للوجه 473 مل",
+    description: "CeraVe Foaming Facial Cleanser - 473ml",
+    price: 54,
+    originalPrice: 62.1,
+    image: "/images/products/سيرافي منظف رغوي للوجه 473 مل CERAVE_3337875597357_54_62.1.png",
+    barcode: "3337875597357",
+    totalWithTax: 62.1,
+    expiryDate: "08-2027",
+    minQuantity: 1
+  },
+  {
+    id: 21,
+    name: "CeraVe Foaming Cleanser for Oily Skin",
+    nameAr: "سيرافي منظف للبشرة الدهنية 236 مل",
+    description: "CeraVe Foaming Cleanser for Oily Skin - 236ml",
+    price: 37,
+    originalPrice: 42.55,
+    image: "/images/products/سيرافي منظف للبشرة الدهنية CERAVE FOAMING 236 ML_3337875597197_37_42.55.jpg",
+    barcode: "3337875597197",
+    totalWithTax: 42.55,
+    expiryDate: "08-2027",
+    minQuantity: 1
   }
 ];
 
@@ -271,8 +323,8 @@ const ProductsList: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Compact Header - Max 10% height on mobile */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 fixed w-full top-0 z-10 shadow-lg max-h-[10vh] md:max-h-none overflow-hidden">
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 fixed w-full left-0 right-0 top-0 z-10 shadow-lg">
         <div className="flex justify-between items-center p-2 md:p-3">
           {/* Cart Icon */}
           <Link href="/orgPortal/cart" className="relative" onClick={handleCartClick}>
@@ -306,7 +358,7 @@ const ProductsList: React.FC = () => {
               <WhatsAppIcon className="w-3 h-3 md:w-4 md:h-4" />
               <span className="text-xs text-white">دعم العملاء</span>
             </a>
-            <span className="text-blue-100 text-xs">تحديث دوري للمنتجات</span>
+            <span className="text-blue-100 text-xs">سيتم تحديث المنتجات بشكل دوري</span>
           </div>
           <div className="text-center">
             <p className="text-xs text-blue-100 leading-none">رقم الحساب البنكي</p>
@@ -317,16 +369,62 @@ const ProductsList: React.FC = () => {
         </div>
       </div>
       
-      {/* Products Grid */}
-      <div className="mt-[10vh] md:mt-28 px-4 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              {...product}
-              supportPhone="0505117551"
-            />
-          ))}
+      {/* Products List - Responsive Layout */}
+      <div className="pt-32 md:pt-40 lg:pt-48 xl:pt-56 pb-20">
+        {/* Mobile and Small Tablets - Horizontal Scroll */}
+        <div className="block lg:hidden">
+          <div className="relative">
+            {/* Scroll container */}
+            <div 
+              className="flex overflow-x-auto gap-3 md:gap-4 px-4 md:px-8 pb-6 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            >
+              {products.map((product, index) => (
+                <div 
+                  key={product.id} 
+                  className={`flex-shrink-0 w-[65vw] sm:w-[45vw] md:w-[35vw] transform transition-all duration-300 hover:scale-[1.02] ${
+                    index === 0 ? 'ml-0' : ''
+                  } ${index === products.length - 1 ? 'mr-4 md:mr-8' : ''}`}
+                >
+                  <ProductCard
+                    {...product}
+                    supportPhone="0505117551"
+                    className="h-full shadow-md hover:shadow-lg transition-shadow duration-300 compact-horizontal"
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* Gradient fade effects */}
+            <div className="absolute left-0 top-0 bottom-6 w-8 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10"></div>
+            <div className="absolute right-0 top-0 bottom-6 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10"></div>
+          </div>
+          
+          {/* Scroll indicator */}
+          <div className="flex justify-center mt-4">
+            <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              ← اسحب للتصفح →
+            </div>
+          </div>
+        </div>
+
+        {/* Large Screens - Column Layout */}
+        <div className="hidden lg:block">
+          <div className="max-w-7xl mx-auto px-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="transform transition-all duration-300 hover:scale-[1.02]"
+                >
+                  <ProductCard
+                    {...product}
+                    supportPhone="0505117551"
+                    className="shadow-md hover:shadow-lg transition-shadow duration-300"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

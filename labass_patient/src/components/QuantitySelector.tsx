@@ -15,7 +15,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   quantity,
   onQuantityChange,
   minQuantity = 1,
-  maxQuantity = 99,
+  maxQuantity = 999,
   className = ""
 }) => {
   const handleDecrease = () => {
@@ -54,7 +54,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({
           onChange={handleInputChange}
           min={minQuantity}
           max={maxQuantity}
-          className="w-16 h-8 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black bg-white"
+          className="w-20 h-8 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           dir="ltr"
         />
       </div>

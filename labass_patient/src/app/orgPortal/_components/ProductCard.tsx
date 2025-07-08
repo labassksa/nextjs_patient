@@ -58,55 +58,61 @@ const ProductCard: React.FC<ProductCardProps> = ({
     }, selectedQuantity);
   };
 
+  const isCompact = className?.includes('compact-horizontal');
+  
   return (
     <div
-      className={`bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow ${className}`}
+      className={`bg-white rounded-lg shadow-sm ${isCompact ? 'p-2' : 'p-4'} hover:shadow-md transition-shadow ${className}`}
     >
-      <div className="w-full mb-4 relative rounded-lg overflow-hidden">
+      <div className={`w-full ${isCompact ? 'mb-2' : 'mb-4'} relative rounded-lg overflow-hidden`}>
         <Image
           src={image}
           alt={name}
           width={500}
           height={500}
           className="object-contain"
-          style={{ width: '100%', height: 'auto' }}
+          style={{ 
+            width: '100%', 
+            height: isCompact ? '100px' : 'auto',
+            maxHeight: isCompact ? '100px' : 'none'
+          }}
         />
       </div>
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-right" dir="rtl">{name}</h3>
-        <p className="text-gray-600 text-right">{description}</p>
-        <div className="text-sm text-gray-500 text-right" dir="rtl">
-          <span className="font-mono bg-gray-100 px-2 py-1 rounded">الباركود: {barcode}</span>
+      <div className={isCompact ? 'space-y-1' : 'space-y-2'}>
+        <h3 className={`${isCompact ? 'text-xs' : 'text-lg'} font-semibold text-right`} dir="rtl">{name}</h3>
+        {!isCompact && <p className="text-gray-600 text-right">{description}</p>}
+        <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-500 text-right`} dir="rtl">
+          <span className={`font-mono bg-gray-100 ${isCompact ? 'px-1 py-0.5 text-xs' : 'px-2 py-1'} rounded`}>الباركود: {barcode}</span>
         </div>
-        <div  dir="rtl" className="flex flex-col gap-2">
+        <div  dir="rtl" className={`flex flex-col ${isCompact ? 'gap-1' : 'gap-2'}`}>
           <div className="flex justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-gray-500 line-through">
+              <span className={`text-gray-500 line-through ${isCompact ? 'text-xs' : 'text-sm'}`}>
                 {originalPrice} ريال
               </span>
-              <span className="text-sm font-semibold text-red-600">
+              <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-red-600`}>
                 -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
               </span>
             </div>
           </div>
           <div className="flex justify-between">
-            <div className="text-xl font-bold text-right">{price} ريال</div>
+            <div className={`${isCompact ? 'text-sm' : 'text-xl'} font-bold text-right`}>{price} ريال</div>
           </div>
-          <div className="text-sm text-red-600 text-right">
+          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-red-600 text-right`}>
             غير شامل للضريبة
           </div>
-          <div className="text-sm text-gray-500 text-right">
+          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-500 text-right`}>
             الضريبة: {(totalWithTax - price).toFixed(2)} ريال
           </div>
         </div>
-        <div className="text-sm text-gray-600 text-right">الحد الأدنى للطلب: {minQuantity} قطعة</div>
+        {!isCompact && <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600 text-right`}>الحد الأدنى للطلب: {minQuantity} قطعة</div>}
         {currentCartQuantity > 0 && (
-          <div className="text-sm text-green-600 text-right font-semibold">
+          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-green-600 text-right font-semibold`}>
             في السلة: {currentCartQuantity} قطعة
           </div>
         )}
-        <div className="mt-3">
-          <div className="text-sm text-gray-600 text-right mb-2">الكمية:</div>
+        <div className={isCompact ? 'mt-1' : 'mt-3'}>
+          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600 text-right ${isCompact ? 'mb-1' : 'mb-2'}`}>الكمية:</div>
           <QuantitySelector
             quantity={selectedQuantity}
             onQuantityChange={setSelectedQuantity}
@@ -114,7 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className="justify-end"
           />
         </div>
-        {supportPhone && (
+        {!isCompact && supportPhone && (
           <div dir="rtl" className="text-sm text-gray-500 text-right">
             <a href={`tel:${supportPhone}`} className="flex items-center gap-2 hover:text-blue-500">
               <WhatsAppIcon className="text-green-500" />
@@ -123,12 +129,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
       </div>
-      <div className="mt-4">
+      <div className={isCompact ? 'mt-2' : 'mt-4'}>
         <button
           onClick={handleAddToCart}
-          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors flex items-center gap-2 w-full justify-center"
+          className={`bg-green-500 text-white ${isCompact ? 'px-2 py-1.5 text-xs' : 'px-4 py-2'} rounded-md hover:bg-green-600 transition-colors flex items-center gap-2 w-full justify-center`}
         >
-          <AddToCartIcon className="w-5 h-5 inline-block" />
+          <AddToCartIcon className={`${isCompact ? 'w-4 h-4' : 'w-5 h-5'} inline-block`} />
           {t('addToCart')}
         </button>
       </div>
