@@ -325,6 +325,7 @@ const ProductsList: React.FC = () => {
     <div className="space-y-4">
       {/* Compact Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 fixed w-full left-0 right-0 top-0 z-10 shadow-lg">
+        {/* Main Header Row */}
         <div className="flex justify-between items-center p-2 md:p-3">
           {/* Cart Icon */}
           <Link href="/orgPortal/cart" className="relative" onClick={handleCartClick}>
@@ -346,8 +347,29 @@ const ProductsList: React.FC = () => {
           </div>
         </div>
         
-        {/* Quick Info Bar */}
-        <div className="bg-white/10 backdrop-blur-sm px-2 md:px-3 py-1 md:py-2 border-t border-white/20">
+        {/* Mobile Info Bar */}
+        <div className="block md:hidden bg-white/10 backdrop-blur-sm px-2 py-1 border-t border-white/20">
+          <div className="flex justify-center mb-1">
+            <div className="text-xs text-yellow-200 font-bold bg-yellow-500/20 px-2 py-1 rounded-md border border-yellow-400/30">
+              <div className="text-center mb-1">للملاحظات على الأسعار</div>
+              <a
+                href="https://wa.me/966505117551"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1 hover:text-blue-200 transition-colors"
+              >
+                <WhatsAppIcon className="w-3 h-3 text-green-400" />
+                <span className="text-white">دعم العملاء</span>
+              </a>
+            </div>
+          </div>
+          <div className="flex justify-center">
+            <span className="text-xs text-blue-100">سيتم تحديث المنتجات بشكل دوري</span>
+          </div>
+        </div>
+
+        {/* Desktop Info Bar */}
+        <div className="hidden md:block bg-white/10 backdrop-blur-sm px-3 py-2 border-t border-white/20">
           <div className="flex justify-between items-center">
             {/* Bank Account - Left */}
             <div className="text-center">
