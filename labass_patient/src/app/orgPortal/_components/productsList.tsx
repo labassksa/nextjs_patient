@@ -347,24 +347,34 @@ const ProductsList: React.FC = () => {
         </div>
         
         {/* Quick Info Bar */}
-        <div className="bg-white/10 backdrop-blur-sm px-2 md:px-3 py-0.5 md:py-1 border-t border-white/20">
-          <div className="flex justify-between items-center mb-0.5">
-            <a
-              href="https://wa.me/966505117551"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 hover:text-blue-200 transition-colors"
-            >
-              <WhatsAppIcon className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="text-xs text-white">دعم العملاء</span>
-            </a>
-            <span className="text-blue-100 text-xs">سيتم تحديث المنتجات بشكل دوري</span>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-blue-100 leading-none">رقم الحساب البنكي</p>
-            <p className="text-xs text-white font-mono bg-white/10 px-1 py-0.5 rounded leading-none">
-              SA0305000068203377503000
-            </p>
+        <div className="bg-white/10 backdrop-blur-sm px-2 md:px-3 py-1 md:py-2 border-t border-white/20">
+          <div className="flex justify-between items-center">
+            {/* Bank Account - Left */}
+            <div className="text-center">
+              <p className="text-xs text-blue-100 leading-none font-semibold">رقم الحساب البنكي</p>
+              <p className="text-xs text-white font-mono bg-white/20 px-2 py-1 rounded-md leading-none font-bold shadow-sm">
+                SA0305000068203377503000
+              </p>
+            </div>
+
+            {/* Center Info */}
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-sm text-yellow-200 font-bold bg-yellow-500/20 px-2 py-0.5 rounded-md border border-yellow-400/30 shadow-sm">للملاحظات على الأسعار</span>
+              <a
+                href="https://wa.me/966505117551"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-blue-200 transition-colors bg-white/10 px-2 py-1 rounded-md"
+              >
+                <WhatsAppIcon className="w-4 h-4 text-green-400" />
+                <span className="text-xs text-white font-semibold">دعم العملاء</span>
+              </a>
+            </div>
+
+            {/* Updates Info - Right */}
+            <div className="text-center">
+              <span className="text-xs text-blue-100 font-semibold">سيتم تحديث المنتجات بشكل دوري</span>
+            </div>
           </div>
         </div>
       </div>
