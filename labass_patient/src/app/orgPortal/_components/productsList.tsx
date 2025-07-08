@@ -237,7 +237,7 @@ const products: Product[] = [
     description: "Skala Expert Hair Cream with Nourishing Plant Oils - Alternative Version",
     price: 29.24,
     originalPrice: 38.99,
-    image: "/images/products/سكالا اكسبرت ـ كريم بخلاصة العديد من الزيوت النباتية المغذية للشعر رقم 19807+24668_7897042018529_29.24_38.99_33.62_01-2028.jpg",
+    image: "/images/products/سكالا اكسبرت ـ كريم بخلاصة العديد من الزيوت النباتية المغذية للشعر رقم 19807+24668_7897042018529_29.24_38.99_33.62_01-2028.jpeg",
     barcode: "7897042018529",
     totalWithTax: 33.62,
     expiryDate: "01-2028",
