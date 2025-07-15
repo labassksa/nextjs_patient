@@ -22,6 +22,10 @@ interface ProductCardProps {
   className?: string;
   supportPhone?: string;
   expiryDate?: string;
+  brand?: string;
+  brandAr?: string;
+  isImported?: boolean;
+  supplier?: string;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -37,7 +41,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
   minQuantity = 1,
   className = "",
   supportPhone,
-  expiryDate
+  expiryDate,
+  brand,
+  brandAr,
+  isImported,
+  supplier
 }) => {
   const { t } = useTranslation();
   const { addToCart, getItemQuantity } = useCart();
