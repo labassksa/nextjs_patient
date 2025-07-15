@@ -8,22 +8,6 @@ import { useCart } from "../../../hooks/useCart";
 import Link from "next/link";
 import { fetchProducts, searchProducts, Product } from "../../../controllers/productsController";
 
-interface Product {
-  id: number;
-  name: string;
-  nameAr: string;
-  description: string;
-  price: number;
-  originalPrice: number;
-  image: string;
-  barcode: string;
-  totalWithTax: number;
-  expiryDate: string;
-  minQuantity?: number;
-  brand?: string;
-  brandAr?: string;
-}
-
 const products: Product[] = [
   {
     id: 1,
