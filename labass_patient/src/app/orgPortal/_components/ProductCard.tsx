@@ -87,7 +87,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
       </div>
       <div className={isCompact ? 'space-y-1' : 'space-y-2'}>
-        <h3 className={`${isCompact ? 'text-xs' : 'text-lg'} font-semibold text-right`} dir="rtl">{name}</h3>
+        <div className="text-right" dir="rtl">
+          {nameAr && (
+            <h3 className={`${isCompact ? 'text-xs' : 'text-lg'} font-semibold text-gray-800`}>
+              {nameAr}
+            </h3>
+          )}
+          {name && name !== nameAr && (
+            <h4 className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600 mt-1`}>
+              {name}
+            </h4>
+          )}
+        </div>
         {!isCompact && <p className="text-gray-600 text-right">{description}</p>}
         <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-500 text-right`} dir="rtl">
           <span className={`font-mono bg-gray-100 ${isCompact ? 'px-1 py-0.5 text-xs' : 'px-2 py-1'} rounded`}>الباركود: {barcode}</span>

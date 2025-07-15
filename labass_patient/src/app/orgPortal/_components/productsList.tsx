@@ -8,7 +8,32 @@ import { useCart } from "../../../hooks/useCart";
 import Link from "next/link";
 import { fetchProducts, searchProducts, Product } from "../../../controllers/productsController";
 
-const products: Product[] = [
+// Helper function to add missing properties to local products
+const addMissingProperties = (product: any): Product => ({
+  ...product,
+  brand: product.brand || getBrandFromName(product.name),
+  brandAr: product.brandAr || getBrandFromName(product.nameAr),
+  isImported: product.isImported || false,
+  supplier: product.supplier || "alhumazi"
+});
+
+// Extract brand from product name
+const getBrandFromName = (name: string): string => {
+  const brands = [
+    "QV", "Stridex", "Cetaphil", "K18", "La Roche-Posay", "Beauty of Joseon", 
+    "Bioderma", "Skala", "Anua", "Retinol", "Embryolisse", "Eucerin", 
+    "Numbuzin", "CeraVe"
+  ];
+  
+  for (const brand of brands) {
+    if (name.toLowerCase().includes(brand.toLowerCase())) {
+      return brand;
+    }
+  }
+  return "أخرى";
+};
+
+const localProducts = [
   {
     id: 1,
     name: "QV Lip Balm",
@@ -283,6 +308,9 @@ const products: Product[] = [
     minQuantity: 1
   }
 ];
+
+// Convert local products to match the Product type
+const products: Product[] = localProducts.map(addMissingProperties);
 
 const ProductsList: React.FC = () => {
   const { cart, refreshCart } = useCart();
