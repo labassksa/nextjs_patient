@@ -562,10 +562,6 @@ const ProductsList: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    
-                    {/* Gradient fade effects */}
-                    <div className="absolute left-0 top-0 bottom-6 w-8 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10"></div>
-                    <div className="absolute right-0 top-0 bottom-6 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10"></div>
                   </div>
                   
                   {/* Scroll indicator */}
@@ -598,10 +594,6 @@ const ProductsList: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    
-                    {/* Gradient fade effects */}
-                    <div className="absolute left-0 top-0 bottom-6 w-8 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10"></div>
-                    <div className="absolute right-0 top-0 bottom-6 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10"></div>
                   </div>
                 </div>
               </div>
