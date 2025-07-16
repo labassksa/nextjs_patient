@@ -526,7 +526,7 @@ const ProductsList: React.FC = () => {
 
         {/* Products Display - Grouped by Brand */}
         {!loading && !error && displayProducts.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-2">
             {Object.entries(groupedProducts).map(([brand, products]) => (
               <div key={brand} className="brand-section">
                 {/* Brand Header */}
@@ -550,7 +550,7 @@ const ProductsList: React.FC = () => {
                       {products.map((product, index) => (
                         <div 
                           key={product.id} 
-                          className={`flex-shrink-0 w-[65vw] sm:w-[45vw] md:w-[35vw] transform transition-all duration-300 hover:scale-[1.02] ${
+                          className={`flex-shrink-0 w-[70vw] sm:w-[50vw] md:w-[40vw] transform transition-all duration-300 hover:scale-[1.02] ${
                             index === 0 ? 'ml-0' : ''
                           } ${index === products.length - 1 ? 'mr-4 md:mr-8' : ''}`}
                         >
@@ -561,13 +561,6 @@ const ProductsList: React.FC = () => {
                           />
                         </div>
                       ))}
-                    </div>
-                  </div>
-                  
-                  {/* Scroll indicator */}
-                  <div className="flex justify-center mt-4">
-                    <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                      ← اسحب للتصفح →
                     </div>
                   </div>
                 </div>
@@ -582,7 +575,7 @@ const ProductsList: React.FC = () => {
                       {products.map((product, index) => (
                         <div 
                           key={product.id} 
-                          className={`flex-shrink-0 w-80 transform transition-all duration-300 hover:scale-[1.02] ${
+                          className={`flex-shrink-0 w-96 transform transition-all duration-300 hover:scale-[1.02] ${
                             index === 0 ? 'ml-0' : ''
                           } ${index === products.length - 1 ? 'mr-8' : ''}`}
                         >

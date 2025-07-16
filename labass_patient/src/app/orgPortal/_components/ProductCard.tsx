@@ -89,12 +89,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className={isCompact ? 'space-y-1' : 'space-y-2'}>
         <div className="text-right" dir="rtl">
           {nameAr && (
-            <h3 className={`${isCompact ? 'text-xs' : 'text-lg'} font-semibold text-gray-800`}>
+            <h3 className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-gray-800`}>
               {nameAr}
             </h3>
           )}
           {name && name !== nameAr && (
-            <h4 className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-600 mt-1`}>
+            <h4 className={`${isCompact ? 'text-xs' : 'text-xs'} text-gray-600 mt-1`}>
               {name}
             </h4>
           )}
@@ -105,22 +105,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
         <div  dir="rtl" className={`flex flex-col ${isCompact ? 'gap-1' : 'gap-2'}`}>
           <div className="flex justify-between">
-            <div className="flex items-center gap-2">
-              <span className={`text-gray-500 line-through ${isCompact ? 'text-xs' : 'text-sm'}`}>
-                {originalPrice} ريال
-              </span>
-              <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-semibold text-red-600`}>
-                -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
-              </span>
-            </div>
+            <div className={`${isCompact ? 'text-xs' : 'text-sm'} font-bold text-right`}>{price} ريال</div>
           </div>
-          <div className="flex justify-between">
-            <div className={`${isCompact ? 'text-sm' : 'text-xl'} font-bold text-right`}>{price} ريال</div>
-          </div>
-          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-red-600 text-right`}>
+          <div className={`${isCompact ? 'text-xs' : 'text-xs'} text-red-600 text-right`}>
             غير شامل للضريبة
           </div>
-          <div className={`${isCompact ? 'text-xs' : 'text-sm'} text-gray-500 text-right`}>
+          <div className={`${isCompact ? 'text-xs' : 'text-xs'} text-gray-500 text-right`}>
             الضريبة: {(totalWithTax - price).toFixed(2)} ريال
           </div>
         </div>
