@@ -39,3 +39,40 @@ export const fetchConsultations = async () => {
     }
   }
 };
+
+export const requestFollowUp = async (consultationId: number) => {
+  try {
+    const token = localStorage.getItem("labass_token");
+    if (!token) {
+      throw new Error("No token found. Please log in to continue.");
+    }
+
+    const response = await axios.post(
+      "https://api.labass.sa/api_labass/follow-up-magic-link",
+      { consultationId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message ||
+          "Failed to request follow-up consultation."
+      );
+    } else if (error.request) {
+      throw new Error(
+        "No response from server. Please check your network connection."
+      );
+    } else {
+      throw new Error(
+        error.message || "An unexpected error occurred. Please try again."
+      );
+    }
+  }
+};

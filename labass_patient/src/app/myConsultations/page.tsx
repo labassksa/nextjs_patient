@@ -23,7 +23,11 @@ const MyConsultationsPage = () => {
         if (result.length === 0) {
           setError("No consultations found.");
         } else {
-          setConsultations(result);
+          // Sort consultations by createdAt date, newest first
+          const sortedConsultations = result.sort((a: Consultation, b: Consultation) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          });
+          setConsultations(sortedConsultations);
         }
       } catch (error: any) {
         console.error(error);

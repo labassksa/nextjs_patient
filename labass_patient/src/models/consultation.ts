@@ -32,6 +32,8 @@ export class Consultation {
     public doctor?: DoctorProfile | null, // Allowing null here
     public prescription?: Prescription, // Added Prescription object
     public sickLeave?: SickLeave, // Added Prescription object
-    public soap?: SOAP // Added Prescription object
+    public soap?: SOAP, // Added Prescription object
+    public isFollowUp?: boolean, // Added follow-up indicator
+    public canSendFollowUp?: boolean // Added follow-up capability
   ) {}
 }
