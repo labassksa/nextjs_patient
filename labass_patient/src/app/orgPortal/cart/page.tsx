@@ -1,13 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Delete, ShoppingCart, Add, Remove } from "@mui/icons-material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useCart } from "../../../hooks/useCart";
 import QuantitySelector from "../../../components/QuantitySelector";
+import axios from "axios";
 
 const CartPage: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, clearCart, refreshCart } = useCart();
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [orderResponse, setOrderResponse] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Refresh cart when component mounts to ensure we have latest data from localStorage
   React.useEffect(() => {
@@ -20,9 +29,98 @@ const CartPage: React.FC = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
-    // Placeholder for order placement logic
-    alert("سيتم تنفيذ وظيفة الطلب قريباً");
+  const submitOrder = async () => {
+    try {
+      const token = localStorage.getItem("labass_token");
+      console.log("Token found:", !!token);
+      if (!token) {
+        throw new Error("No token found. Please log in to continue.");
+      }
+
+      // Prepare products array from cart
+      const products = cart.items.map(item => ({
+        productId: item.id,
+        quantity: item.quantity
+      }));
+
+      console.log("Products to send:", products);
+      console.log("Request payload:", { products });
+
+      const response = await axios.post(
+        "https://api.labass.sa/api_marketplace/place-order",
+        { products },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log("API response:", response);
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(
+          error.response.data.message ||
+            "Failed to submit order."
+        );
+      } else if (error.request) {
+        throw new Error(
+          "No response from server. Please check your network connection."
+        );
+      } else {
+        throw new Error(
+          error.message || "An unexpected error occurred. Please try again."
+        );
+      }
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    console.log("Place order clicked");
+    console.log("Cart items:", cart.items);
+    
+    if (cart.items.length === 0) {
+      alert("السلة فارغة");
+      return;
+    }
+
+    setOrderLoading(true);
+    try {
+      console.log("Submitting order...");
+      const response = await submitOrder();
+      console.log("Order response:", response);
+      console.log("Setting success modal to true");
+      setOrderResponse(response);
+      setShowSuccessModal(true);
+      console.log("Success modal state:", true);
+      // Don't clear cart immediately - wait for modal close
+    } catch (error: any) {
+      console.error("Error submitting order:", error);
+      setErrorMessage(error.message || "خطأ غير معروف");
+      setShowErrorModal(true);
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    console.log("Closing success modal");
+    setShowSuccessModal(false);
+    setOrderResponse(null);
+    // Clear cart after modal is closed
+    clearCart();
+  };
+
+  const handleErrorModalClose = () => {
+    console.log("Closing error modal");
+    setShowErrorModal(false);
+    setErrorMessage("");
+  };
+
+  const handleContactSupport = () => {
+    window.open("https://wa.me/966505117551", "_blank");
   };
 
   if (cart.items.length === 0) {
@@ -48,9 +146,24 @@ const CartPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-right mb-2 text-black">سلة التسوق</h1>
-          <p className="text-gray-600 text-right">عدد المنتجات: {cart.totalItems}</p>
+        <div className="mb-6 flex justify-between items-start">
+          <a
+            href="/orgPortal?view=products"
+            className="text-blue-500 hover:text-blue-700 transition-colors text-sm"
+          >
+            ← العودة للتسوق
+          </a>
+          <div className="text-right">
+            <h1 className="text-2xl font-bold mb-2 text-black">سلة التسوق</h1>
+            <p className="text-gray-600">عدد المنتجات: {cart.totalItems}</p>
+          </div>
+        </div>
+        
+        {/* Free Consultation Note */}
+        <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-700 text-center font-medium" dir="rtl">
+            🎁 احصل على استشارة طبية مجانية مقابل كل 300 ريال من مشترياتك
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -158,14 +271,28 @@ const CartPage: React.FC = () => {
                     <span className="text-black">{cart.totalWithTax.toFixed(2)} ريال</span>
                   </div>
                 </div>
+                
+                {/* Bonus Consultations */}
+                <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-green-700 font-medium">الاستشارات المجانية:</span>
+                    <span className="text-green-700 font-bold">
+                      {Math.floor(cart.totalWithTax / 300)} استشارة مجانية
+                    </span>
+                  </div>
+                  <p className="text-green-600 text-xs mt-1" dir="rtl">
+                    🎁 استشارة طبية مجانية لكل ٣٠٠ ريال
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-3">
                 <button
                   onClick={handlePlaceOrder}
-                  className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-semibold"
+                  disabled={orderLoading}
+                  className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  إتمام الطلب
+                  {orderLoading ? "جاري إرسال الطلب..." : "إتمام الطلب"}
                 </button>
                 
                 <button
@@ -175,19 +302,70 @@ const CartPage: React.FC = () => {
                   إفراغ السلة
                 </button>
               </div>
-              
-              <div className="mt-6 text-center">
-                <a
-                  href="/orgPortal?view=products"
-                  className="text-blue-500 hover:text-blue-700 transition-colors"
-                >
-                  ← العودة للتسوق
-                </a>
-              </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+            <div className="text-center">
+              <CheckCircleIcon className="text-green-500 w-24 h-24 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-black mb-2">تم الإرسال بنجاح</p>
+              <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                تم ارسال الطلب، سيتم التواصل معك من فريق لاباس
+              </p>
+              
+              <button
+                onClick={handleSuccessModalClose}
+                className="p-3 w-full text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                dir="rtl"
+              >
+                موافق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Error Modal */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+            <div className="text-center">
+              <ErrorIcon className="text-red-500 w-24 h-24 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-black mb-2">حدث خطأ</p>
+              <p className="text-gray-600 text-sm mb-4" dir="rtl">
+                حدث خطأ أثناء إرسال الطلب. يرجى التواصل مع خدمة العملاء للمساعدة.
+              </p>
+              <p className="text-xs text-gray-500 mb-6" dir="rtl">
+                تفاصيل الخطأ: {errorMessage}
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={handleContactSupport}
+                  className="w-full flex items-center justify-center gap-2 p-3 text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  dir="rtl"
+                >
+                  <WhatsAppIcon className="w-5 h-5" />
+                  تواصل مع خدمة العملاء
+                </button>
+                
+                <button
+                  onClick={handleErrorModalClose}
+                  className="w-full p-3 text-sm font-bold bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                  dir="rtl"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

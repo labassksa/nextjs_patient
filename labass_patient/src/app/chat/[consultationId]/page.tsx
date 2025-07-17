@@ -6,8 +6,10 @@ import ChatMainContents from "../../chat/_components/chatMainContent";
 import StickyMessageInput from "../../chat/_components/chatInputarea";
 import useSocket from "../../../socket.io/socket.io.initialization";
 import { getConsultationById } from "../_controllers/getConsultationById";
-import { ConsultationStatus } from "../../../models/consultation";
+import { ConsultationStatus, Consultation } from "../../../models/consultation";
 import { getMagicLink } from "../_controllers/getMAgicLink";
+import { requestFollowUp } from "../../myConsultations/_controllers/myConsultations";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 interface Message {
   id?: string;
@@ -28,6 +30,9 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isConsultationLoaded, setIsConsultationLoaded] = useState(false);
   const [hasValidConsultation, setHasValidConsultation] = useState(false);
+  const [consultation, setConsultation] = useState<Consultation | null>(null);
+  const [followUpLoading, setFollowUpLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const router = useRouter();
   const params = useParams();
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -111,14 +116,18 @@ const ChatPage: React.FC = () => {
       }
 
       console.log("Fetching consultation details for ID:", consultationId);
-      const consultation = await getConsultationById(Number(consultationId));
+      const consultationData = await getConsultationById(Number(consultationId));
 
-      if (consultation && consultation.status) {
-        setStatus(consultation.status);
-        console.log("Consultation status:", consultation.status);
-        if (consultation.doctor && consultation.doctor.user) {
-          setDoctorInfo(consultation.doctor);
-          console.log("Doctor info set:", consultation.doctor);
+      if (consultationData && consultationData.status) {
+        setStatus(consultationData.status);
+        setConsultation(consultationData);
+        console.log("Consultation status:", consultationData.status);
+        console.log("Full consultation data:", consultationData);
+        console.log("canSendFollowUp flag:", consultationData.canSendFollowUp);
+        console.log("isFollowUp flag:", consultationData.isFollowUp);
+        if (consultationData.doctor && consultationData.doctor.user) {
+          setDoctorInfo(consultationData.doctor);
+          console.log("Doctor info set:", consultationData.doctor);
         } else {
           setDoctorInfo(null);
           console.log("No doctor info available.");
@@ -314,6 +323,25 @@ const ChatPage: React.FC = () => {
     }
   };
 
+  const handleFollowUpRequest = async () => {
+    setFollowUpLoading(true);
+    try {
+      await requestFollowUp(consultationId);
+      setShowSuccessModal(true);
+    } catch (error: any) {
+      alert(error.message || "حدث خطأ أثناء إرسال طلب الاستشارة المتابعة.");
+      console.error("Error requesting follow-up:", error);
+    } finally {
+      setFollowUpLoading(false);
+    }
+  };
+
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    // Optionally refresh the consultation
+    window.location.reload();
+  };
+
   if (loading || !hasValidConsultation) {
     console.log("Loading consultation page...");
     return (
@@ -367,6 +395,20 @@ const ChatPage: React.FC = () => {
         <div ref={messageEndRef} />
       </div>
 
+      {/* Follow-up Button */}
+      {consultation?.canSendFollowUp && (
+        <div className="bg-white border-t border-gray-200 p-4">
+          <button
+            className="w-full py-3 text-sm font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none"
+            onClick={handleFollowUpRequest}
+            disabled={followUpLoading}
+          >
+            {followUpLoading ? "جاري الإرسال..." : "طلب استشارة"}
+          </button>
+        </div>
+      )}
+      
+
       <div className="shrink-0 fixed bottom-0 w-full bg-white">
         <StickyMessageInput
           onSendMessage={handleSendMessage}
@@ -377,6 +419,29 @@ const ChatPage: React.FC = () => {
           }
         />
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+            <div className="text-center">
+              <CheckCircleIcon className="text-green-500 w-24 h-24 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-black mb-2">تم الإرسال بنجاح</p>
+              <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                انقر على الرابط المرسل الى رقم جوالك للتواصل مع الطبيب
+              </p>
+              
+              <button
+                onClick={handleSuccessModalClose}
+                className="p-3 w-full text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                dir="rtl"
+              >
+                موافق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
