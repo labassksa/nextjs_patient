@@ -18,6 +18,26 @@ export const fetchConsultations = async () => {
       }
     );
 
+    // Debug logging to check if isFollowUp flag is available
+    console.log("=== Patient Consultations API Response ===");
+    console.log("Full response data:", response.data);
+    
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      console.log("Number of consultations:", response.data.length);
+      response.data.forEach((consultation, index) => {
+        console.log(`Consultation ${index + 1}:`, {
+          id: consultation.id,
+          isFollowUp: consultation.isFollowUp,
+          canSendFollowUp: consultation.canSendFollowUp,
+          status: consultation.status,
+          hasIsFollowUpFlag: 'isFollowUp' in consultation,
+          hasCanSendFollowUpFlag: 'canSendFollowUp' in consultation
+        });
+      });
+    } else {
+      console.log("No consultations found or response is not an array");
+    }
+
     return response.data;
   } catch (error: any) {
     if (error.response) {
