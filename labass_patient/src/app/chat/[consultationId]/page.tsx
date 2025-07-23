@@ -397,7 +397,7 @@ const ChatPage: React.FC = () => {
 
       {/* Follow-up Button */}
       {consultation?.canSendFollowUp && (
-        <div className="bg-white border-t border-gray-200 p-4 mb-4">
+        <div className="bg-white border-t border-gray-200 p-4 mb-12">
           <button
             className="w-full py-3 text-sm font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none"
             onClick={handleFollowUpRequest}
