@@ -387,7 +387,7 @@ const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-grow overflow-y-auto">
+      <div className="flex-grow overflow-y-auto" style={{ paddingBottom: consultation?.canSendFollowUp ? '120px' : '0px' }}>
         <ChatMainContents
           consultationId={Number(consultationId)}
           messages={messages}
@@ -397,7 +397,7 @@ const ChatPage: React.FC = () => {
 
       {/* Follow-up Button */}
       {consultation?.canSendFollowUp && (
-        <div className="bg-white border-t border-gray-200 p-4 mb-12">
+        <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
           <button
             className="w-full py-3 text-sm font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none"
             onClick={handleFollowUpRequest}
