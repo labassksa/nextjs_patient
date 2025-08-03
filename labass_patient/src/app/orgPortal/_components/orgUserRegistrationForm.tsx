@@ -176,9 +176,12 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 
   return (
     <div dir="rtl" className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-8">
-      <h2 className="text-gray-800 text-2xl font-semibold mb-4 text-center">
+      <h2 className="text-gray-800 text-2xl font-semibold mb-2 text-center">
         {t("formTitle")}
       </h2>
+      <p className="text-gray-600 text-sm mb-4 text-center">
+        أدخل معلومات المريض
+      </p>
 
       <form className="space-y-4">
         {/* Patient Name */}

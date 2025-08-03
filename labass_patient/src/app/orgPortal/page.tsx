@@ -7,6 +7,8 @@ import LabBottomNavBar from "./_components/bottomNavBar";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
 import { getOrganization } from "./_controllers/getOrganization";
+import { getUserData } from "./_controllers/getUserData";
+import { updateMarketer } from "./_controllers/updateMarketer";
 import { DealType } from "./_types/dealType";
 import { OrganizationTypes } from "./_types/organizationTypes";
 import OrgUserRegistrationForm from "./_components/orgUserRegistrationForm";
@@ -20,17 +22,9 @@ import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ProductsList from "./_components/productsList";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
 
-const LanguageToggle: React.FC<{ currentLang: string; onToggle: () => void }> = ({ currentLang, onToggle }) => {
-  return (
-    <button 
-      onClick={onToggle}
-      className="fixed top-4 right-4 text-white bg-blue-500 shadow-md rounded-md px-3 py-1 text-sm font-medium z-10"
-    >
-      {currentLang === 'ar' ? 'English' : 'عربي'}
-    </button>
-  );
-};
 
 interface OrgPatient {
   id: number;
@@ -56,6 +50,13 @@ const OrgPatientsPage: React.FC = () => {
   const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
+  const [userData, setUserData] = useState<any>(null);
+  const [showEditNameModal, setShowEditNameModal] = useState(false);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [isUpdatingName, setIsUpdatingName] = useState(false);
+  const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
+  const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
 
   // Form fields
   const [name, setName] = useState("");
@@ -95,13 +96,24 @@ const OrgPatientsPage: React.FC = () => {
     setOrgError("");
     try {
       const orgResponse = await getOrganization();
+      console.log("Organization Response:", orgResponse);
       if (orgResponse.success && orgResponse.data) {
+        console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
 
+      // Fetch user data
+      const userResponse = await getUserData();
+      console.log("User Response:", userResponse);
+      if (userResponse.success && userResponse.data) {
+        console.log("User Data:", userResponse.data);
+        setUserData(userResponse.data); // Use data directly, not as array
+      } else {
+        console.log("User fetch failed:", userResponse.message);
+      }
 
     } catch (err: any) {
       const backendMessage =
@@ -140,12 +152,62 @@ const OrgPatientsPage: React.FC = () => {
       })()
   }, [fromDate, toDate]);
 
+  useEffect(() => {
+    console.log("userData state changed:", userData);
+  }, [userData]);
+
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
     const urlParams = new URLSearchParams(window.location.search);
     i18n.changeLanguage(newLang);
     urlParams.set('lang', newLang);
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+  };
+
+  const handleEditNameClick = () => {
+    setEditFirstName(userData?.firstName || "");
+    setEditLastName(userData?.lastName || "");
+    setShowEditNameModal(true);
+  };
+
+  const handleSaveName = async () => {
+    setIsUpdatingName(true);
+    try {
+      const result = await updateMarketer({
+        firstName: editFirstName,
+        lastName: editLastName
+      });
+      
+      if (result.success) {
+        // Update local state
+        setUserData((prev: any) => ({
+          ...prev,
+          firstName: editFirstName,
+          lastName: editLastName
+        }));
+        
+        setShowEditNameModal(false);
+        setShowNameUpdateSuccessModal(true);
+      } else {
+        setShowEditNameModal(false);
+        setShowNameUpdateErrorModal(true);
+        console.error("Update failed:", result.message);
+      }
+    } catch (error) {
+      console.error("Error updating name:", error);
+      setShowEditNameModal(false);
+      setShowNameUpdateErrorModal(true);
+    } finally {
+      setIsUpdatingName(false);
+    }
+  };
+
+  const handleNameUpdateSuccessModalClose = () => {
+    setShowNameUpdateSuccessModal(false);
+  };
+
+  const handleNameUpdateErrorModalClose = () => {
+    setShowNameUpdateErrorModal(false);
   };
 
   const handleSubmit = async () => {
@@ -197,12 +259,71 @@ const OrgPatientsPage: React.FC = () => {
 
   return (
     <I18nextProvider i18n={i18next.default}>
-      <div className="min-h-screen bg-gray-100 text-black">
-        {/* Main Content */}
-        <LanguageToggle
-          currentLang={i18n.language} 
-          onToggle={toggleLanguage}
-        />
+      <div className="min-h-screen bg-white text-black">
+        {/* User Info Section - Compact Design */}
+        {userData && (
+          <div className="mb-4">
+            <div className="w-full">
+              {/* Compact Header with Language Toggle */}
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2">
+                <div className="flex items-center justify-between">
+                  <button 
+                    onClick={toggleLanguage}
+                    className="text-white bg-blue-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
+                  >
+                    {i18n.language === 'ar' ? 'English' : 'عربي'}
+                  </button>
+                  <h3 className="text-sm font-semibold text-white" dir="rtl">
+                    بياناتي
+                  </h3>
+                  <div className="w-12"></div> {/* Spacer for centering */}
+                </div>
+              </div>
+              
+              {/* Compact Content */}
+              <div className="bg-white p-3">
+                <div className="space-y-2" dir="rtl">
+                  {/* Name Section */}
+                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 text-xs">👤</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">الاسم</p>
+                        <p className="text-sm font-medium text-gray-800">
+                          {userData.firstName || userData.lastName 
+                            ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
+                            : 'غير محدد'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleEditNameClick}
+                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                    >
+                      تعديل
+                    </button>
+                  </div>
+
+                  {/* Phone Section */}
+                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-green-600 text-xs">📱</span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">رقم الجوال</p>
+                      <p className="text-sm font-medium text-gray-800" dir="ltr">
+                        {userData.phoneNumber}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div
           className={`max-w-screen-lg mx-auto pb-28`}
         >
@@ -394,6 +515,108 @@ const OrgPatientsPage: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Edit Name Modal */}
+        {showEditNameModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 mx-4 max-w-md w-full">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center" dir="rtl">
+                تعديل الاسم
+              </h3>
+              
+              <div className="space-y-4" dir="rtl">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    الاسم الأول
+                  </label>
+                  <input
+                    type="text"
+                    value={editFirstName}
+                    onChange={(e) => setEditFirstName(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-right"
+                    placeholder="أدخل الاسم الأول"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    الاسم الأخير
+                  </label>
+                  <input
+                    type="text"
+                    value={editLastName}
+                    onChange={(e) => setEditLastName(e.target.value)}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-right"
+                    placeholder="أدخل الاسم الأخير"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6" dir="rtl">
+                <button
+                  onClick={handleSaveName}
+                  disabled={isUpdatingName}
+                  className="flex-1 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 disabled:opacity-50"
+                >
+                  {isUpdatingName ? "جاري الحفظ..." : "حفظ"}
+                </button>
+                <button
+                  onClick={() => setShowEditNameModal(false)}
+                  className="flex-1 bg-gray-300 text-black py-2 px-4 rounded-md hover:bg-gray-400"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Name Update Success Modal */}
+        {showNameUpdateSuccessModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+              <div className="text-center">
+                <CheckCircleIcon className="text-green-500 w-24 h-24 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-black mb-2">تم تحديث الاسم بنجاح</p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  تم تحديث الاسم بنجاح في النظام
+                </p>
+                
+                <button
+                  onClick={handleNameUpdateSuccessModalClose}
+                  className="p-3 w-full text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  dir="rtl"
+                >
+                  موافق
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Name Update Error Modal */}
+        {showNameUpdateErrorModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+              <div className="text-center">
+                <ErrorIcon className="text-red-500 w-24 h-24 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-black mb-2">لم نتمكن من تحديث الاسم</p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  حدث خطأ أثناء تحديث الاسم، يرجى المحاولة مرة أخرى
+                </p>
+                
+                <button
+                  onClick={handleNameUpdateErrorModalClose}
+                  className="p-3 w-full text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600"
+                  dir="rtl"
+                >
+                  حسناً
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
           <LabBottomNavBar
             onToggleView={setCurrentView}
             currentView={currentView}
