@@ -24,6 +24,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import ProductsList from "./_components/productsList";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import DoctorTypeSection from "./_components/DoctorTypeSection";
+import { DoctorType } from "./_types/doctorTypes";
 
 
 interface OrgPatient {
@@ -76,6 +78,7 @@ const OrgPatientsPage: React.FC = () => {
   const [marketerConsultaion, setMarketerConsultaion] = useState<any>(null);
   const [marketers, setMarketers] = useState<string[]>([]);
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
+  const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
   const marketerName = orgType === OrganizationTypes.Pharmacy? t('pharmacist') : t('employee');
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -459,6 +462,10 @@ const OrgPatientsPage: React.FC = () => {
                     setNationalId={setNationalId}
                     pdfFiles={pdfFiles}
                     setPdfFiles={setPdfFiles}
+                  />
+                  <DoctorTypeSection
+                    doctorType={doctorType}
+                    setDoctorType={setDoctorType}
                   />
                   <TestTypeSection
                     orgType={orgType}
