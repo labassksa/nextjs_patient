@@ -26,6 +26,7 @@ const PaymentClient: React.FC = () => {
   const searchParams = useSearchParams();
   const tokenUUIDFromQuery = searchParams.get("tokenUUID");
   const promoCodeFromQuery = searchParams.get("promoCode");
+  const consultationType = searchParams.get("consultationType");
 
   useEffect(() => {
     const applyMagicLinkPromo = async () => {
@@ -89,6 +90,7 @@ const PaymentClient: React.FC = () => {
           method={paymentMethod}
           discountedPrice={discountedPrice}
           promoCode={promoCode}
+          consultationType={consultationType}
         />
       </div>
 

@@ -9,6 +9,7 @@ interface PaymentButtonProps {
   method: string;
   discountedPrice: number;
   promoCode: string;
+  consultationType: string | null;
 }
 
 interface ApplePayConfig {
@@ -32,6 +33,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   method,
   discountedPrice,
   promoCode,
+  consultationType,
 }) => {
   const router = useRouter();
 
@@ -52,7 +54,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
-      script.src = "https://sa.myfatoorah.com/applepay/v3/applepay.js";
+      script.src = "https://demo.myfatoorah.com/applepay/v3/applepay.js";
       script.async = true;
       document.body.appendChild(script);
 
@@ -171,7 +173,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         // If method is Card, go to the card details page
         if (method === PaymentMethodEnum.Card) {
           router.push(
-            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}`
+            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}${consultationType ? "&consultationType=" + consultationType : ""}`
           );
         }
         // If method is ApplePay, we do the same ApplePay init logic
@@ -244,6 +246,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           PromoCode: promoCode,
           CallBackUrl: "https://labass.sa/success",
           ErrorUrl: "https://labass.sa/error",
+          consultationType: consultationType,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
