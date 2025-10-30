@@ -10,6 +10,7 @@ import { ConsultationStatus, Consultation } from "../../../models/consultation";
 import { getMagicLink } from "../_controllers/getMAgicLink";
 import { requestFollowUp } from "../../myConsultations/_controllers/myConsultations";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import VideoCallButton from "../../../components/VideoCallButton";
 
 interface Message {
   id?: string;
@@ -378,6 +379,16 @@ const ChatPage: React.FC = () => {
               <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
               <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
               <p className="text-xs text-gray-600">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
+
+              {/* Video Call Button - only show when consultation is open */}
+              {status === ConsultationStatus.Open && (
+                <VideoCallButton
+                  consultationId={Number(consultationId)}
+                  userId={userId || ''}
+                  socket={socket}
+                  isConsultationOpen={status === ConsultationStatus.Open}
+                />
+              )}
             </div>
           ) : (
             <div className="p-0 text-gray-500 text-right text-sm mb-0">
