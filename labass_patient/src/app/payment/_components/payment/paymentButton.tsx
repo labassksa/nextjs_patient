@@ -52,7 +52,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
-      script.src = "https://sa.myfatoorah.com/applepay/v3/applepay.js";
+      script.src = process.env.NEXT_PUBLIC_MYFATOORAH_APPLEPAY_URL || "";
       script.async = true;
       document.body.appendChild(script);
 
@@ -278,14 +278,24 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     console.log("Apple Pay session canceled");
   };
 
-  // 1. Adjusted handleGoToChat to check for promoCode source
+  // 1. Adjusted handleGoToChat to check for promoCode source and obesity consultation
   // ----------------------------------------------------------------
   const handleGoToChat = () => {
     if (consultationId) {
+      // Check if it's an obesity consultation
+      const consultationType = localStorage.getItem("consultationType");
+
+      if (consultationType === "obesity") {
+        // Redirect to obesity survey with consultationId
+        localStorage.setItem("obesityConsultationId", consultationId.toString());
+        router.push(`/obesitySurvey?consultationId=${consultationId}`);
+        return;
+      }
+
       // Check if the promoCode came from the URL by looking at current URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const urlPromoCode = urlParams.get('promoCode');
-      
+
       // If promoCode exists AND it came from the URL, go to chat
       if (promoCode && promoCode.trim() !== "" && urlPromoCode === promoCode) {
         router.push(`/chat/${consultationId}`);

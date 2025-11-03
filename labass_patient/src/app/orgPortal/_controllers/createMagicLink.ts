@@ -20,6 +20,7 @@ interface CreateMagicLinkData {
   dealType: string;
   consultationPrice: number | null;
   testType: LabtestType | "";
+  consultationType: string;
   pdfFiles?: File[];
 }
 
@@ -53,6 +54,9 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
     );
     if (data.testType != "") {
       formData.append("testType", data.testType);
+    }
+    if (data.consultationType) {
+      formData.append("consultationType", data.consultationType);
     }
 
     // Append the files if the testType is PostTest

@@ -223,6 +223,19 @@ const OrgPatientsPage: React.FC = () => {
       return;
     }
 
+    // Map DoctorType to ConsultationType for backend
+    const getConsultationType = (doctorType: DoctorType) => {
+      switch (doctorType) {
+        case DoctorType.Obesity:
+          return "obesity";
+        case DoctorType.Psychiatrist:
+          return "psychiatric";
+        case DoctorType.General:
+        default:
+          return "quick";
+      }
+    };
+
     const magicLinkData = {
       patientInfo: {
         firstName: name.trim(),
@@ -242,6 +255,7 @@ const OrgPatientsPage: React.FC = () => {
       dealType,
       consultationPrice: selectedPrice || cashPrice,
       testType,
+      consultationType: getConsultationType(doctorType),
       pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
     };
 
