@@ -26,6 +26,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import DoctorTypeSection from "./_components/DoctorTypeSection";
 import { DoctorType } from "./_types/doctorTypes";
+import BundleSection from "./_components/BundleSection";
+import { getMySubscription } from "./_controllers/getMySubscription";
+import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 
 
 interface OrgPatient {
@@ -79,6 +82,8 @@ const OrgPatientsPage: React.FC = () => {
   const [marketers, setMarketers] = useState<string[]>([]);
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
+  const [subscription, setSubscription] = useState<any>(null);
+  const [useBundle, setUseBundle] = useState<boolean>(true);
   const marketerName = orgType === OrganizationTypes.Pharmacy? t('pharmacist') : t('employee');
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -127,13 +132,35 @@ const OrgPatientsPage: React.FC = () => {
     }
   };
 
+  const fetchSubscription = async () => {
+    try {
+      const subscriptionResponse = await getMySubscription();
+      console.log("Subscription Response:", subscriptionResponse);
+      if (subscriptionResponse.success && subscriptionResponse.data) {
+        console.log("Subscription Data:", subscriptionResponse.data);
+        setSubscription(subscriptionResponse.data);
+        // Auto-disable bundle if no remaining consultations
+        if (subscriptionResponse.data.remainingConsultations === 0) {
+          setUseBundle(false);
+        }
+      } else if (subscriptionResponse.noSubscription) {
+        console.log("No active subscription found");
+        setSubscription(null);
+      }
+    } catch (err: any) {
+      console.error("Error fetching subscription:", err);
+      setSubscription(null);
+    }
+  };
+
   useEffect(() => {
     fetchOrg();
+    fetchSubscription();
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.get('lang') && i18n.language !==  urlParams.get('lang')){
       i18n.changeLanguage(urlParams.get('lang')|| 'ar');
     }
-    
+
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
     if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
@@ -260,14 +287,43 @@ const OrgPatientsPage: React.FC = () => {
     };
 
     try {
-      const result = await createMagicLink(magicLinkData);
-      alert(`${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`);
+      // Check if we should use bundle or magic link
+      if (subscription && useBundle && subscription.remainingConsultations > 0) {
+        // Use bundle consultation endpoint
+        const bundleData = {
+          patientInfo: magicLinkData.patientInfo,
+          consultationType: magicLinkData.consultationType,
+          labConsultationType: testType || undefined,
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+        };
+
+        const result = await createBundleConsultation(bundleData);
+
+        // Update local subscription state
+        if (result.success && result.data) {
+          setSubscription((prev: any) => ({
+            ...prev,
+            remainingConsultations: result.data.remainingConsultations,
+          }));
+        }
+
+        alert(
+          `${t('consultationSuccess')}\n${t('link')}: ${result.data.magicLink}\nالاستشارات المتبقية: ${result.data.remainingConsultations}`
+        );
+      } else {
+        // Use regular magic link flow
+        const result = await createMagicLink(magicLinkData);
+        alert(
+          `${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`
+        );
+      }
     } catch (err: any) {
       console.error("Error from backend:", err);
-      const errorMessage = err.response?.data?.error || 
-                          err.response?.data?.message || 
-                          err.message || 
-                          t('unexpectedError');
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        t("unexpectedError");
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -480,6 +536,11 @@ const OrgPatientsPage: React.FC = () => {
                   <DoctorTypeSection
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
+                  />
+                  <BundleSection
+                    subscription={subscription}
+                    useBundle={useBundle}
+                    setUseBundle={setUseBundle}
                   />
                   <TestTypeSection
                     orgType={orgType}
