@@ -13,7 +13,8 @@ import BottomNavBar from "../components/common/BottomNavBar";
 import TopBanner from "./_components/homePage/TopHomePageBanner";
 import BottomBanner from "./_components/homePage/BottomHomePageBanner";
 import ConsultationButton from "./_components/homePage/QuickConsultationButton";
-import LinkInsurance from "./_components/homePage/LinkInsuranceButton";
+import HealthFacilitiesButton from "./_components/homePage/HealthFacilitiesButton";
+import SchoolsButton from "./_components/homePage/SchoolsButton";
 import React from "react";
 import "./globals.css";
 
@@ -23,7 +24,8 @@ const Home = () => {
       <TopBanner />
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">
-        <LinkInsurance />
+        <HealthFacilitiesButton />
+        <SchoolsButton />
         <ConsultationButton />
       </div>
       <BottomNavBar currentPath="/" />

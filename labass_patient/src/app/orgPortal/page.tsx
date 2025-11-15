@@ -55,6 +55,7 @@ const OrgPatientsPage: React.FC = () => {
   const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
+  const [orgName, setOrgName] = useState<string>("");
   const [userData, setUserData] = useState<any>(null);
   const [showEditNameModal, setShowEditNameModal] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
@@ -62,6 +63,11 @@ const OrgPatientsPage: React.FC = () => {
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
   const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
+
+  // Confirmation modals for consultations
+  const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
+  const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
+  const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
 
   // Form fields
   const [name, setName] = useState("");
@@ -84,7 +90,11 @@ const OrgPatientsPage: React.FC = () => {
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
   const [subscription, setSubscription] = useState<any>(null);
   const [useBundle, setUseBundle] = useState<boolean>(true);
-  const marketerName = orgType === OrganizationTypes.Pharmacy? t('pharmacist') : t('employee');
+  const marketerName = orgType === OrganizationTypes.Pharmacy
+    ? t('pharmacist')
+    : orgType === OrganizationTypes.School
+    ? "الموظف"
+    : t('employee');
   const possiblePrices = [80, 70, 50, 35, 25, 15];
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
@@ -109,6 +119,7 @@ const OrgPatientsPage: React.FC = () => {
         console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
+        setOrgName(orgResponse.data.name || "");
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
@@ -240,7 +251,19 @@ const OrgPatientsPage: React.FC = () => {
     setShowNameUpdateErrorModal(false);
   };
 
-  const handleSubmit = async () => {
+  // Show confirmation modal for send consultation
+  const handleSendConsultationClick = () => {
+    setShowSendConsultationConfirm(true);
+  };
+
+  // Show confirmation modal for open consultation
+  const handleOpenConsultationClick = () => {
+    setShowOpenConsultationConfirm(true);
+  };
+
+  // Actual send consultation logic (after confirmation)
+  const handleSendConsultation = async () => {
+    setShowSendConsultationConfirm(false);
     setIsSubmitting(true);
     setSubmitError("");
 
@@ -270,7 +293,7 @@ const OrgPatientsPage: React.FC = () => {
         phoneNumber: phone.startsWith("0")
           ? `+966${phone.slice(1)}`
           : `+966${phone}`,
-        role: ["patient"],
+        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
         gender,
         nationality,
         nationalId: nationalId.trim() || "",
@@ -327,6 +350,96 @@ const OrgPatientsPage: React.FC = () => {
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Open consultation logic (creates magic link and opens it immediately)
+  const handleOpenConsultation = async () => {
+    setShowOpenConsultationConfirm(false);
+    setIsOpeningConsultation(true);
+    setSubmitError("");
+
+    if (!name || !phone || !dateOfBirth || !gender || !nationality) {
+      alert(t('formValidation'));
+      setIsOpeningConsultation(false);
+      return;
+    }
+
+    // Map DoctorType to ConsultationType for backend
+    const getConsultationType = (doctorType: DoctorType) => {
+      switch (doctorType) {
+        case DoctorType.Obesity:
+          return "obesity";
+        case DoctorType.Psychiatrist:
+          return "psychiatric";
+        case DoctorType.General:
+        default:
+          return "quick";
+      }
+    };
+
+    const magicLinkData = {
+      patientInfo: {
+        firstName: name.trim(),
+        lastName: "",
+        phoneNumber: phone.startsWith("0")
+          ? `+966${phone.slice(1)}`
+          : `+966${phone}`,
+        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
+        gender,
+        nationality,
+        nationalId: nationalId.trim() || "",
+        dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+        email: ""
+      },
+      paymentMethod,
+      orgType,
+      dealType,
+      consultationPrice: selectedPrice || cashPrice,
+      testType,
+      consultationType: getConsultationType(doctorType),
+      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
+    };
+
+    try {
+      // Check if we should use bundle or magic link
+      if (subscription && useBundle && subscription.remainingConsultations > 0) {
+        // Use bundle consultation endpoint
+        const bundleData = {
+          patientInfo: magicLinkData.patientInfo,
+          consultationType: magicLinkData.consultationType,
+          labConsultationType: testType || undefined,
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+        };
+
+        const result = await createBundleConsultation(bundleData);
+
+        // Update local subscription state
+        if (result.success && result.data) {
+          setSubscription((prev: any) => ({
+            ...prev,
+            remainingConsultations: result.data.remainingConsultations,
+          }));
+
+          // Open the magic link in the same window
+          window.location.href = result.data.magicLink;
+        }
+      } else {
+        // Use regular magic link flow
+        const result = await createMagicLink(magicLinkData);
+
+        // Open the magic link in the same window
+        window.location.href = result.link;
+      }
+    } catch (err: any) {
+      console.error("Error from backend:", err);
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        t("unexpectedError");
+      setSubmitError(errorMessage);
+      setIsOpeningConsultation(false);
     }
   };
 
@@ -391,6 +504,23 @@ const OrgPatientsPage: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Organization Name Section */}
+                  {orgName && (
+                    <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg">
+                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                        <span className="text-purple-600 text-xs">🏢</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">
+                          {orgType === OrganizationTypes.School ? "اسم المدرسة" : "اسم المنشأة"}
+                        </p>
+                        <p className="text-sm font-medium text-gray-800">
+                          {orgName}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -566,18 +696,34 @@ const OrgPatientsPage: React.FC = () => {
                     </>
                   )}
 
-                  {/* Bottom Button for Web (not fixed) */}
-                  <button
-                    onClick={handleSubmit}
-                    className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <div className="spinner" />
-                    ) : (
-                    t('sendConsultation')
-                    )}
-                  </button>
+                  {/* Bottom Buttons for Web (not fixed) */}
+                  <div className="flex gap-3 mt-4" dir="rtl">
+                    {/* Send Consultation Button (Green) */}
+                    <button
+                      onClick={handleSendConsultationClick}
+                      className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                      disabled={isSubmitting || isOpeningConsultation}
+                    >
+                      {isSubmitting ? (
+                        <div className="spinner" />
+                      ) : (
+                        t('sendConsultation')
+                      )}
+                    </button>
+
+                    {/* Open Consultation Button (Blue) */}
+                    <button
+                      onClick={handleOpenConsultationClick}
+                      className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
+                      disabled={isSubmitting || isOpeningConsultation}
+                    >
+                      {isOpeningConsultation ? (
+                        <div className="spinner" />
+                      ) : (
+                        orgType === OrganizationTypes.School ? "فتح الاستشارة" : "فتح الاستشارة"
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -686,7 +832,7 @@ const OrgPatientsPage: React.FC = () => {
                 <p className="text-gray-600 text-sm mb-6" dir="rtl">
                   حدث خطأ أثناء تحديث الاسم، يرجى المحاولة مرة أخرى
                 </p>
-                
+
                 <button
                   onClick={handleNameUpdateErrorModalClose}
                   className="p-3 w-full text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600"
@@ -694,6 +840,77 @@ const OrgPatientsPage: React.FC = () => {
                 >
                   حسناً
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Send Consultation Confirmation Modal */}
+        {showSendConsultationConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📱</span>
+                </div>
+                <p className="text-lg font-semibold text-black mb-3" dir="rtl">
+                  {orgType === OrganizationTypes.School ? "إرسال رابط الاستشارة للطالب" : "إرسال رابط الاستشارة للمريض"}
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  {orgType === OrganizationTypes.School
+                    ? `سيتم إرسال رابط الاستشارة إلى رقم جوال الطالب ${phone}. هل أنت متأكد؟`
+                    : `سيتم إرسال رابط الاستشارة إلى رقم جوال المريض ${phone}. هل أنت متأكد؟`
+                  }
+                </p>
+
+                <div className="flex gap-3" dir="rtl">
+                  <button
+                    onClick={handleSendConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600"
+                  >
+                    نعم، إرسال
+                  </button>
+                  <button
+                    onClick={() => setShowSendConsultationConfirm(false)}
+                    className="flex-1 p-3 text-sm font-bold bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Open Consultation Confirmation Modal */}
+        {showOpenConsultationConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🔗</span>
+                </div>
+                <p className="text-lg font-semibold text-black mb-3" dir="rtl">
+                  فتح الاستشارة مباشرة
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  سيتم فتح الاستشارة مباشرة الآن على هذا الجهاز. هل أنت متأكد؟
+                </p>
+
+                <div className="flex gap-3" dir="rtl">
+                  <button
+                    onClick={handleOpenConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    نعم، فتح الآن
+                  </button>
+                  <button
+                    onClick={() => setShowOpenConsultationConfirm(false)}
+                    className="flex-1 p-3 text-sm font-bold bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                  >
+                    إلغاء
+                  </button>
+                </div>
               </div>
             </div>
           </div>
