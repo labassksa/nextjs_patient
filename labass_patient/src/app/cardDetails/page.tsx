@@ -21,6 +21,14 @@ const CardDetailsContent: React.FC = () => {
   const countryCode = searchParams.get("countryCode") || "SAU";
   const discountedPrice = searchParams.get("discountedPrice") || "0";
   const promoCode = searchParams.get("promoCode") || "";
+  const consultationType = searchParams.get("consultationType");
+
+  // Store consultationType in localStorage if it exists
+  useEffect(() => {
+    if (consultationType) {
+      localStorage.setItem("consultationType", consultationType);
+    }
+  }, [consultationType]);
 
   // 1) Listen for 3D-Secure postMessage event from MyFatoorah's 3DS page
   useEffect(() => {

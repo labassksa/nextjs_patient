@@ -697,12 +697,41 @@ const OrgPatientsPage: React.FC = () => {
                   )}
 
                   {/* Bottom Buttons for Web (not fixed) */}
-                  <div className="flex gap-3 mt-4" dir="rtl">
-                    {/* Send Consultation Button (Green) */}
+                  {orgType === OrganizationTypes.School ? (
+                    /* School: Two buttons with confirmations */
+                    <div className="flex gap-3 mt-4" dir="rtl">
+                      {/* Send Consultation Button (Green) */}
+                      <button
+                        onClick={handleSendConsultationClick}
+                        className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                        disabled={isSubmitting || isOpeningConsultation}
+                      >
+                        {isSubmitting ? (
+                          <div className="spinner" />
+                        ) : (
+                          t('sendConsultation')
+                        )}
+                      </button>
+
+                      {/* Open Consultation Button (Blue) - Only for schools */}
+                      <button
+                        onClick={handleOpenConsultationClick}
+                        className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
+                        disabled={isSubmitting || isOpeningConsultation}
+                      >
+                        {isOpeningConsultation ? (
+                          <div className="spinner" />
+                        ) : (
+                          "فتح الاستشارة"
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    /* Pharmacy/Lab: Single button without confirmation */
                     <button
-                      onClick={handleSendConsultationClick}
-                      className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
-                      disabled={isSubmitting || isOpeningConsultation}
+                      onClick={handleSendConsultation}
+                      className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                      disabled={isSubmitting}
                     >
                       {isSubmitting ? (
                         <div className="spinner" />
@@ -710,20 +739,7 @@ const OrgPatientsPage: React.FC = () => {
                         t('sendConsultation')
                       )}
                     </button>
-
-                    {/* Open Consultation Button (Blue) */}
-                    <button
-                      onClick={handleOpenConsultationClick}
-                      className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
-                      disabled={isSubmitting || isOpeningConsultation}
-                    >
-                      {isOpeningConsultation ? (
-                        <div className="spinner" />
-                      ) : (
-                        orgType === OrganizationTypes.School ? "فتح الاستشارة" : "فتح الاستشارة"
-                      )}
-                    </button>
-                  </div>
+                  )}
                 </div>
               )}
             </div>
@@ -845,8 +861,8 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Send Consultation Confirmation Modal */}
-        {showSendConsultationConfirm && (
+        {/* Send Consultation Confirmation Modal - Only for Schools */}
+        {showSendConsultationConfirm && orgType === OrganizationTypes.School && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
               <div className="text-center">
@@ -854,13 +870,10 @@ const OrgPatientsPage: React.FC = () => {
                   <span className="text-3xl">📱</span>
                 </div>
                 <p className="text-lg font-semibold text-black mb-3" dir="rtl">
-                  {orgType === OrganizationTypes.School ? "إرسال رابط الاستشارة للطالب" : "إرسال رابط الاستشارة للمريض"}
+                  إرسال رابط الاستشارة للطالب
                 </p>
                 <p className="text-gray-600 text-sm mb-6" dir="rtl">
-                  {orgType === OrganizationTypes.School
-                    ? `سيتم إرسال رابط الاستشارة إلى رقم جوال الطالب ${phone}. هل أنت متأكد؟`
-                    : `سيتم إرسال رابط الاستشارة إلى رقم جوال المريض ${phone}. هل أنت متأكد؟`
-                  }
+                  سيتم إرسال رابط الاستشارة إلى رقم جوال الطالب {phone}. هل أنت متأكد؟
                 </p>
 
                 <div className="flex gap-3" dir="rtl">
@@ -882,8 +895,8 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
-        {/* Open Consultation Confirmation Modal */}
-        {showOpenConsultationConfirm && (
+        {/* Open Consultation Confirmation Modal - Only for Schools */}
+        {showOpenConsultationConfirm && orgType === OrganizationTypes.School && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
               <div className="text-center">

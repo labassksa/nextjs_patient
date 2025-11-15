@@ -47,6 +47,16 @@ const StatusSection = () => {
       return;
     }
 
+    // Check if it's an obesity consultation
+    const consultationType = localStorage.getItem("consultationType");
+
+    if (consultationType === "obesity") {
+      // Redirect to obesity survey with consultationId
+      localStorage.setItem("obesityConsultationId", consultationId);
+      router.push(`/obesitySurvey?consultationId=${consultationId}`);
+      return;
+    }
+
     if (isPromoFromUrl) {
       // If promo code came from URL, go directly to chat
       router.push(`/chat/${consultationId}`);
