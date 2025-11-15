@@ -170,8 +170,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
         // If method is Card, go to the card details page
         if (method === PaymentMethodEnum.Card) {
+          // Get consultationType from localStorage to pass it along
+          const consultationType = localStorage.getItem("consultationType");
+          const consultationTypeParam = consultationType ? `&consultationType=${consultationType}` : '';
+
           router.push(
-            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}`
+            `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}${consultationTypeParam}`
           );
         }
         // If method is ApplePay, we do the same ApplePay init logic

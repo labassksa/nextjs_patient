@@ -136,6 +136,17 @@ const PromoCode: React.FC<{
 
   const handleGoToFillPersonalInfo = () => {
     if (consultationId) {
+      // Check if it's an obesity consultation
+      const consultationType = localStorage.getItem("consultationType");
+
+      if (consultationType === "obesity") {
+        // Redirect to obesity survey
+        localStorage.setItem("obesityConsultationId", consultationId.toString());
+        router.push(`/obesitySurvey?consultationId=${consultationId}`);
+        return;
+      }
+
+      // Otherwise, go to patient selection
       router.push(`/patientSelection?consultationId=${consultationId}`);
     } else {
       console.error("Consultation ID is missing.");

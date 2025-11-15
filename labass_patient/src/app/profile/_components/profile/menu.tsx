@@ -26,8 +26,10 @@ const Menu: React.FC = () => {
       <div className="mt-4">
         {menuItems.slice(4).map((item, index) => (
           <Link href={item.href} key={index}>
-            <div className="menu-item flex justify-between items-center bg-white p-4 mb-8 rounded-lg shadow-sm cursor-pointer">
-              <ArrowBackIos className="text-gray-400" />
+            <div className={`menu-item flex justify-between items-center p-4 mb-8 rounded-lg shadow-sm cursor-pointer ${
+              item.title === "ربط التأمين" ? "bg-blue-500 text-white" : "bg-white"
+            }`}>
+              <ArrowBackIos className={item.title === "ربط التأمين" ? "text-white" : "text-gray-400"} />
               <span>{item.title}</span>
             </div>
           </Link>
