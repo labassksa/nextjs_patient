@@ -324,15 +324,16 @@ const OrgPatientsPage: React.FC = () => {
 
         // Update local subscription state
         if (result.success && result.data) {
+          const resultData = result.data;
           setSubscription((prev: any) => ({
             ...prev,
-            remainingConsultations: result.data.remainingConsultations,
+            remainingConsultations: resultData.remainingConsultations,
           }));
-        }
 
-        alert(
-          `${t('consultationSuccess')}\n${t('link')}: ${result.data.magicLink}\nالاستشارات المتبقية: ${result.data.remainingConsultations}`
-        );
+          alert(
+            `${t('consultationSuccess')}\n${t('link')}: ${resultData.magicLink}\nالاستشارات المتبقية: ${resultData.remainingConsultations}`
+          );
+        }
       } else {
         // Use regular magic link flow
         const result = await createMagicLink(magicLinkData);
@@ -416,13 +417,14 @@ const OrgPatientsPage: React.FC = () => {
 
         // Update local subscription state
         if (result.success && result.data) {
+          const resultData = result.data;
           setSubscription((prev: any) => ({
             ...prev,
-            remainingConsultations: result.data.remainingConsultations,
+            remainingConsultations: resultData.remainingConsultations,
           }));
 
           // Open the magic link in the same window
-          window.location.href = result.data.magicLink;
+          window.location.href = resultData.magicLink;
         }
       } else {
         // Use regular magic link flow
