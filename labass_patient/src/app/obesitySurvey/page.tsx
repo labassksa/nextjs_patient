@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ interface SurveyData {
   goals: string[];
 }
 
-const ObesitySurveyPage: React.FC = () => {
+const ObesitySurveyContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState(0);
@@ -535,5 +535,11 @@ const ObesitySurveyPage: React.FC = () => {
     </div>
   );
 };
+
+const ObesitySurveyPage: React.FC = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ObesitySurveyContent />
+  </Suspense>
+);
 
 export default ObesitySurveyPage;
