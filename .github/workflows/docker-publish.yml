@@ -30,7 +30,7 @@ jobs:
       - name: Build & Push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./labass_patient
           file: ./labass_patient/dockerfile
           push: true
           tags: |
