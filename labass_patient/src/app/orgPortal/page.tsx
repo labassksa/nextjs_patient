@@ -95,13 +95,19 @@ const OrgPatientsPage: React.FC = () => {
     : orgType === OrganizationTypes.School
     ? "الموظف"
     : t('employee');
-  const possiblePrices = [80, 70, 50, 35, 25, 15];
+  const possiblePrices =
+    dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+      ? [50]
+      : [80, 70, 50, 35, 25, 15];
+
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
       ? [
           PaymentMethodEnum.THROUGH_LABASS,
           PaymentMethodEnum.THROUGH_ORGANIZATION,
         ]
+      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+      ? [PaymentMethodEnum.THROUGH_LABASS]
       : dealType === DealType.REVENUE_SHARE
       ? [
           PaymentMethodEnum.THROUGH_LABASS,
@@ -196,6 +202,16 @@ const OrgPatientsPage: React.FC = () => {
   useEffect(() => {
     console.log("userData state changed:", userData);
   }, [userData]);
+
+  // Auto-select payment method and price when obesity is selected with revenue share
+  useEffect(() => {
+    if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
+      // Auto-select online payment method
+      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      // Auto-select price of 50
+      setSelectedPrice(50);
+    }
+  }, [doctorType, dealType]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
