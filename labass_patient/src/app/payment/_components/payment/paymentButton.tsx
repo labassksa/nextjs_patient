@@ -52,7 +52,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
   useEffect(() => {
     const loadApplePayScript = () => {
       const script = document.createElement("script");
-      script.src = process.env.NEXT_PUBLIC_MYFATOORAH_APPLEPAY_URL || "";
+      script.src = process.env.NEXT_PUBLIC_MYFATOORAH_APPLEPAY_URL || "https://sa.myfatoorah.com/applepay/v3/applepay.js";
       script.async = true;
       document.body.appendChild(script);
 

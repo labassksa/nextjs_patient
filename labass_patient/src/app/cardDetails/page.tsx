@@ -271,7 +271,7 @@ const CardDetailsContent: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center text-black">بوابة الدفع</h1>
         {/* MyFatoorah CardView script */}
         <Script
-          src={process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL}
+          src={process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL|| "https://sa.myfatoorah.com/cardview/v2/session.js"}
           onLoad={() => {
             console.log("[Script] MyFatoorah script loaded successfully");
             setIsScriptLoaded(true);
@@ -281,7 +281,7 @@ const CardDetailsContent: React.FC = () => {
             setTimeout(() => {
               console.log("[Script] Attempting to reload MyFatoorah script...");
               const script = document.createElement("script");
-              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "";
+              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://sa.myfatoorah.com/cardview/v2/session.js";
               script.onload = () => {
                 console.log("[Script] MyFatoorah script reloaded successfully");
                 setIsScriptLoaded(true);
