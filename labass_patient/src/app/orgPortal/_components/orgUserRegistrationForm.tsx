@@ -8,7 +8,7 @@ import { OrganizationTypes } from "../_types/organizationTypes";
 
 // Define the props interface
 interface OrgUserRegistrationFormProps {
-  orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | "";
+  orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | OrganizationTypes.School | "";
   name: string;
   setName: React.Dispatch<React.SetStateAction<string>>;
   phone: string;
@@ -174,23 +174,27 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
     setShowDropdown(false);
   };
 
+  // Determine the entity type label based on organization type
+  const entityLabel = orgType === OrganizationTypes.School ? "الطالب" : "المريض";
+  const entityLabelGenitive = orgType === OrganizationTypes.School ? "الطالب" : "المريض";
+
   return (
     <div dir="rtl" className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-8">
       <h2 className="text-gray-800 text-2xl font-semibold mb-2 text-center">
         {t("formTitle")}
       </h2>
       <p className="text-gray-600 text-sm mb-4 text-center">
-        أدخل معلومات المريض
+        {orgType === OrganizationTypes.School ? "أدخل معلومات الطالب" : "أدخل معلومات المريض"}
       </p>
 
       <form className="space-y-4">
-        {/* Patient Name */}
+        {/* Patient/Student Name */}
         <div>
           <label
             htmlFor="name"
             className="block text-sm text-gray-700 font-medium mb-1"
           >
-            {t("patientName")}
+            {orgType === OrganizationTypes.School ? "اسم الطالب" : t("patientName")}
           </label>
           <input
             id="name"

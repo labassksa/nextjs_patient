@@ -72,9 +72,11 @@ const LabPatientCard: React.FC<LabPatientCardProps> = ({
         </span>
       </div>
 
-      {/* Patient Information */}
+      {/* Patient/Student Information */}
       <div className="mb-4">
-        <h4 className="font-semibold text-700 mb-2">{t("patientInfo")}</h4>
+        <h4 className="font-semibold text-700 mb-2">
+          {orgType === OrganizationTypes.School ? "معلومات الطالب" : t("patientInfo")}
+        </h4>
         <div className="text-sm text-gray-600">
           <p className="mb-1">{`${t("name")}: ${patient.firstName||''} ${patient.lastName||''}`}</p>
           <p>{t("phoneNumber")}: <span dir="ltr">{patient.phoneNumber}</span></p>
@@ -95,6 +97,8 @@ const LabPatientCard: React.FC<LabPatientCardProps> = ({
         <h4 className="font-semibold text-700 mb-2">
            {orgType === OrganizationTypes.Pharmacy
             ? t("pharmacistInfo")
+            : orgType === OrganizationTypes.School
+            ? "معلومات الموظف"
             : t("labEmployeeInfo")}
         </h4>
         <div className="text-sm text-gray-600">

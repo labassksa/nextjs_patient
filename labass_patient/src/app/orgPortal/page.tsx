@@ -26,6 +26,9 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import DoctorTypeSection from "./_components/DoctorTypeSection";
 import { DoctorType } from "./_types/doctorTypes";
+import BundleSection from "./_components/BundleSection";
+import { getMySubscription } from "./_controllers/getMySubscription";
+import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 
 
 interface OrgPatient {
@@ -52,6 +55,7 @@ const OrgPatientsPage: React.FC = () => {
   const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType | "">("");
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
+  const [orgName, setOrgName] = useState<string>("");
   const [userData, setUserData] = useState<any>(null);
   const [showEditNameModal, setShowEditNameModal] = useState(false);
   const [editFirstName, setEditFirstName] = useState("");
@@ -59,6 +63,11 @@ const OrgPatientsPage: React.FC = () => {
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
   const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
+
+  // Confirmation modals for consultations
+  const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
+  const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
+  const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
 
   // Form fields
   const [name, setName] = useState("");
@@ -79,14 +88,26 @@ const OrgPatientsPage: React.FC = () => {
   const [marketers, setMarketers] = useState<string[]>([]);
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
-  const marketerName = orgType === OrganizationTypes.Pharmacy? t('pharmacist') : t('employee');
-  const possiblePrices = [80, 70, 50, 35, 25, 15];
+  const [subscription, setSubscription] = useState<any>(null);
+  const [useBundle, setUseBundle] = useState<boolean>(true);
+  const marketerName = orgType === OrganizationTypes.Pharmacy
+    ? t('pharmacist')
+    : orgType === OrganizationTypes.School
+    ? "الموظف"
+    : t('employee');
+  const possiblePrices =
+    dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+      ? [50]
+      : [80, 70, 50, 35, 25, 15];
+
   const possiblePaymentMethods: PaymentMethodEnum[] =
     dealType === DealType.SUBSCRIPTION
       ? [
           PaymentMethodEnum.THROUGH_LABASS,
           PaymentMethodEnum.THROUGH_ORGANIZATION,
         ]
+      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+      ? [PaymentMethodEnum.THROUGH_LABASS]
       : dealType === DealType.REVENUE_SHARE
       ? [
           PaymentMethodEnum.THROUGH_LABASS,
@@ -104,6 +125,7 @@ const OrgPatientsPage: React.FC = () => {
         console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
         setOrgType(orgResponse.data.type);
+        setOrgName(orgResponse.data.name || "");
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
@@ -127,13 +149,35 @@ const OrgPatientsPage: React.FC = () => {
     }
   };
 
+  const fetchSubscription = async () => {
+    try {
+      const subscriptionResponse = await getMySubscription();
+      console.log("Subscription Response:", subscriptionResponse);
+      if (subscriptionResponse.success && subscriptionResponse.data) {
+        console.log("Subscription Data:", subscriptionResponse.data);
+        setSubscription(subscriptionResponse.data);
+        // Auto-disable bundle if no remaining consultations
+        if (subscriptionResponse.data.remainingConsultations === 0) {
+          setUseBundle(false);
+        }
+      } else if (subscriptionResponse.noSubscription) {
+        console.log("No active subscription found");
+        setSubscription(null);
+      }
+    } catch (err: any) {
+      console.error("Error fetching subscription:", err);
+      setSubscription(null);
+    }
+  };
+
   useEffect(() => {
     fetchOrg();
+    fetchSubscription();
     const urlParams = new URLSearchParams(window.location.search);
     if(urlParams.get('lang') && i18n.language !==  urlParams.get('lang')){
       i18n.changeLanguage(urlParams.get('lang')|| 'ar');
     }
-    
+
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
     if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
@@ -158,6 +202,16 @@ const OrgPatientsPage: React.FC = () => {
   useEffect(() => {
     console.log("userData state changed:", userData);
   }, [userData]);
+
+  // Auto-select payment method and price when obesity is selected with revenue share
+  useEffect(() => {
+    if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
+      // Auto-select online payment method
+      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      // Auto-select price of 50
+      setSelectedPrice(50);
+    }
+  }, [doctorType, dealType]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
@@ -213,7 +267,19 @@ const OrgPatientsPage: React.FC = () => {
     setShowNameUpdateErrorModal(false);
   };
 
-  const handleSubmit = async () => {
+  // Show confirmation modal for send consultation
+  const handleSendConsultationClick = () => {
+    setShowSendConsultationConfirm(true);
+  };
+
+  // Show confirmation modal for open consultation
+  const handleOpenConsultationClick = () => {
+    setShowOpenConsultationConfirm(true);
+  };
+
+  // Actual send consultation logic (after confirmation)
+  const handleSendConsultation = async () => {
+    setShowSendConsultationConfirm(false);
     setIsSubmitting(true);
     setSubmitError("");
 
@@ -223,6 +289,19 @@ const OrgPatientsPage: React.FC = () => {
       return;
     }
 
+    // Map DoctorType to ConsultationType for backend
+    const getConsultationType = (doctorType: DoctorType) => {
+      switch (doctorType) {
+        case DoctorType.Obesity:
+          return "obesity";
+        case DoctorType.Psychiatrist:
+          return "psychiatric";
+        case DoctorType.General:
+        default:
+          return "quick";
+      }
+    };
+
     const magicLinkData = {
       patientInfo: {
         firstName: name.trim(),
@@ -230,7 +309,7 @@ const OrgPatientsPage: React.FC = () => {
         phoneNumber: phone.startsWith("0")
           ? `+966${phone.slice(1)}`
           : `+966${phone}`,
-        role: ["patient"],
+        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
         gender,
         nationality,
         nationalId: nationalId.trim() || "",
@@ -242,21 +321,143 @@ const OrgPatientsPage: React.FC = () => {
       dealType,
       consultationPrice: selectedPrice || cashPrice,
       testType,
+      consultationType: getConsultationType(doctorType),
       pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
     };
 
     try {
-      const result = await createMagicLink(magicLinkData);
-      alert(`${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`);
+      // Check if we should use bundle or magic link
+      if (subscription && useBundle && subscription.remainingConsultations > 0) {
+        // Use bundle consultation endpoint
+        const bundleData = {
+          patientInfo: magicLinkData.patientInfo,
+          consultationType: magicLinkData.consultationType,
+          labConsultationType: testType || undefined,
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+        };
+
+        const result = await createBundleConsultation(bundleData);
+
+        // Update local subscription state
+        if (result.success && result.data) {
+          const resultData = result.data;
+          setSubscription((prev: any) => ({
+            ...prev,
+            remainingConsultations: resultData.remainingConsultations,
+          }));
+
+          alert(
+            `${t('consultationSuccess')}\n${t('link')}: ${resultData.magicLink}\nالاستشارات المتبقية: ${resultData.remainingConsultations}`
+          );
+        }
+      } else {
+        // Use regular magic link flow
+        const result = await createMagicLink(magicLinkData);
+        alert(
+          `${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`
+        );
+      }
     } catch (err: any) {
       console.error("Error from backend:", err);
-      const errorMessage = err.response?.data?.error || 
-                          err.response?.data?.message || 
-                          err.message || 
-                          t('unexpectedError');
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        t("unexpectedError");
       setSubmitError(errorMessage);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Open consultation logic (creates magic link and opens it immediately)
+  const handleOpenConsultation = async () => {
+    setShowOpenConsultationConfirm(false);
+    setIsOpeningConsultation(true);
+    setSubmitError("");
+
+    if (!name || !phone || !dateOfBirth || !gender || !nationality) {
+      alert(t('formValidation'));
+      setIsOpeningConsultation(false);
+      return;
+    }
+
+    // Map DoctorType to ConsultationType for backend
+    const getConsultationType = (doctorType: DoctorType) => {
+      switch (doctorType) {
+        case DoctorType.Obesity:
+          return "obesity";
+        case DoctorType.Psychiatrist:
+          return "psychiatric";
+        case DoctorType.General:
+        default:
+          return "quick";
+      }
+    };
+
+    const magicLinkData = {
+      patientInfo: {
+        firstName: name.trim(),
+        lastName: "",
+        phoneNumber: phone.startsWith("0")
+          ? `+966${phone.slice(1)}`
+          : `+966${phone}`,
+        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
+        gender,
+        nationality,
+        nationalId: nationalId.trim() || "",
+        dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+        email: ""
+      },
+      paymentMethod,
+      orgType,
+      dealType,
+      consultationPrice: selectedPrice || cashPrice,
+      testType,
+      consultationType: getConsultationType(doctorType),
+      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
+    };
+
+    try {
+      // Check if we should use bundle or magic link
+      if (subscription && useBundle && subscription.remainingConsultations > 0) {
+        // Use bundle consultation endpoint
+        const bundleData = {
+          patientInfo: magicLinkData.patientInfo,
+          consultationType: magicLinkData.consultationType,
+          labConsultationType: testType || undefined,
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+        };
+
+        const result = await createBundleConsultation(bundleData);
+
+        // Update local subscription state
+        if (result.success && result.data) {
+          const resultData = result.data;
+          setSubscription((prev: any) => ({
+            ...prev,
+            remainingConsultations: resultData.remainingConsultations,
+          }));
+
+          // Open the magic link in the same window
+          window.location.href = resultData.magicLink;
+        }
+      } else {
+        // Use regular magic link flow
+        const result = await createMagicLink(magicLinkData);
+
+        // Open the magic link in the same window
+        window.location.href = result.link;
+      }
+    } catch (err: any) {
+      console.error("Error from backend:", err);
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        t("unexpectedError");
+      setSubmitError(errorMessage);
+      setIsOpeningConsultation(false);
     }
   };
 
@@ -321,6 +522,23 @@ const OrgPatientsPage: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Organization Name Section */}
+                  {orgName && (
+                    <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg">
+                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                        <span className="text-purple-600 text-xs">🏢</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">
+                          {orgType === OrganizationTypes.School ? "اسم المدرسة" : "اسم المنشأة"}
+                        </p>
+                        <p className="text-sm font-medium text-gray-800">
+                          {orgName}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -467,6 +685,11 @@ const OrgPatientsPage: React.FC = () => {
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
                   />
+                  <BundleSection
+                    subscription={subscription}
+                    useBundle={useBundle}
+                    setUseBundle={setUseBundle}
+                  />
                   <TestTypeSection
                     orgType={orgType}
                     testType={testType}
@@ -491,18 +714,50 @@ const OrgPatientsPage: React.FC = () => {
                     </>
                   )}
 
-                  {/* Bottom Button for Web (not fixed) */}
-                  <button
-                    onClick={handleSubmit}
-                    className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <div className="spinner" />
-                    ) : (
-                    t('sendConsultation')
-                    )}
-                  </button>
+                  {/* Bottom Buttons for Web (not fixed) */}
+                  {orgType === OrganizationTypes.School ? (
+                    /* School: Two buttons with confirmations */
+                    <div className="flex gap-3 mt-4" dir="rtl">
+                      {/* Send Consultation Button (Green) */}
+                      <button
+                        onClick={handleSendConsultationClick}
+                        className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                        disabled={isSubmitting || isOpeningConsultation}
+                      >
+                        {isSubmitting ? (
+                          <div className="spinner" />
+                        ) : (
+                          t('sendConsultation')
+                        )}
+                      </button>
+
+                      {/* Open Consultation Button (Blue) - Only for schools */}
+                      <button
+                        onClick={handleOpenConsultationClick}
+                        className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
+                        disabled={isSubmitting || isOpeningConsultation}
+                      >
+                        {isOpeningConsultation ? (
+                          <div className="spinner" />
+                        ) : (
+                          "فتح الاستشارة"
+                        )}
+                      </button>
+                    </div>
+                  ) : (
+                    /* Pharmacy/Lab: Single button without confirmation */
+                    <button
+                      onClick={handleSendConsultation}
+                      className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <div className="spinner" />
+                      ) : (
+                        t('sendConsultation')
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -611,7 +866,7 @@ const OrgPatientsPage: React.FC = () => {
                 <p className="text-gray-600 text-sm mb-6" dir="rtl">
                   حدث خطأ أثناء تحديث الاسم، يرجى المحاولة مرة أخرى
                 </p>
-                
+
                 <button
                   onClick={handleNameUpdateErrorModalClose}
                   className="p-3 w-full text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600"
@@ -619,6 +874,74 @@ const OrgPatientsPage: React.FC = () => {
                 >
                   حسناً
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Send Consultation Confirmation Modal - Only for Schools */}
+        {showSendConsultationConfirm && orgType === OrganizationTypes.School && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📱</span>
+                </div>
+                <p className="text-lg font-semibold text-black mb-3" dir="rtl">
+                  إرسال رابط الاستشارة للطالب
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  سيتم إرسال رابط الاستشارة إلى رقم جوال الطالب {phone}. هل أنت متأكد؟
+                </p>
+
+                <div className="flex gap-3" dir="rtl">
+                  <button
+                    onClick={handleSendConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600"
+                  >
+                    نعم، إرسال
+                  </button>
+                  <button
+                    onClick={() => setShowSendConsultationConfirm(false)}
+                    className="flex-1 p-3 text-sm font-bold bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Open Consultation Confirmation Modal - Only for Schools */}
+        {showOpenConsultationConfirm && orgType === OrganizationTypes.School && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🔗</span>
+                </div>
+                <p className="text-lg font-semibold text-black mb-3" dir="rtl">
+                  فتح الاستشارة مباشرة
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  سيتم فتح الاستشارة مباشرة الآن على هذا الجهاز. هل أنت متأكد؟
+                </p>
+
+                <div className="flex gap-3" dir="rtl">
+                  <button
+                    onClick={handleOpenConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    نعم، فتح الآن
+                  </button>
+                  <button
+                    onClick={() => setShowOpenConsultationConfirm(false)}
+                    className="flex-1 p-3 text-sm font-bold bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                  >
+                    إلغاء
+                  </button>
+                </div>
               </div>
             </div>
           </div>

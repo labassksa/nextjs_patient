@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import PaymentIntro from "./_components/payment/paymentIntro";
 import PaymentMethod from "./_components/payment/paymentMethod";
@@ -14,6 +14,8 @@ import { PaymentMethodEnum } from "../../types/paymentMethods";
 import { getMagicLink } from "./_controllers/getMagicLink";
 
 const PaymentClient: React.FC = () => {
+  const router = useRouter();
+
   // Client-side states
   const [paymentMethod, setPaymentMethod] = useState(
     PaymentMethodEnum.ApplePay
@@ -21,11 +23,20 @@ const PaymentClient: React.FC = () => {
   const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Read query parameters in the client
   const searchParams = useSearchParams();
   const tokenUUIDFromQuery = searchParams.get("tokenUUID");
   const promoCodeFromQuery = searchParams.get("promoCode");
+  const consultationType = searchParams.get("consultationType");
+
+  // Store consultationType in localStorage for later use after payment
+  useEffect(() => {
+    if (consultationType) {
+      localStorage.setItem("consultationType", consultationType);
+    }
+  }, [consultationType]);
 
   useEffect(() => {
     const applyMagicLinkPromo = async () => {

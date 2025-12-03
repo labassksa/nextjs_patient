@@ -21,13 +21,21 @@ const CardDetailsContent: React.FC = () => {
   const countryCode = searchParams.get("countryCode") || "SAU";
   const discountedPrice = searchParams.get("discountedPrice") || "0";
   const promoCode = searchParams.get("promoCode") || "";
+  const consultationType = searchParams.get("consultationType");
+
+  // Store consultationType in localStorage if it exists
+  useEffect(() => {
+    if (consultationType) {
+      localStorage.setItem("consultationType", consultationType);
+    }
+  }, [consultationType]);
 
   // 1) Listen for 3D-Secure postMessage event from MyFatoorah's 3DS page
   useEffect(() => {
     const handle3DSMessage = async (event: MessageEvent) => {
       if (!event.data) return;
       try {
-        const message = JSON.parse(event.data);
+        const message = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
         console.log("[3DSecure] Received message:", message);
         
         // Handle 3D-Secure completion
@@ -263,7 +271,7 @@ const CardDetailsContent: React.FC = () => {
         <h1 className="text-2xl font-bold mb-4 text-center text-black">بوابة الدفع</h1>
         {/* MyFatoorah CardView script */}
         <Script
-          src="https://sa.myfatoorah.com/cardview/v2/session.js"
+          src={process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL|| "https://sa.myfatoorah.com/cardview/v2/session.js"}
           onLoad={() => {
             console.log("[Script] MyFatoorah script loaded successfully");
             setIsScriptLoaded(true);
@@ -273,7 +281,7 @@ const CardDetailsContent: React.FC = () => {
             setTimeout(() => {
               console.log("[Script] Attempting to reload MyFatoorah script...");
               const script = document.createElement("script");
-              script.src = "https://sa.myfatoorah.com/cardview/v2/session.js";
+              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://sa.myfatoorah.com/cardview/v2/session.js";
               script.onload = () => {
                 console.log("[Script] MyFatoorah script reloaded successfully");
                 setIsScriptLoaded(true);

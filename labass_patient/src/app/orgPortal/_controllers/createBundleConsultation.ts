@@ -3,7 +3,7 @@ import { Gender } from "../_types/genderType";
 import { LabtestType } from "../_types/labTestTypes";
 import i18next from "i18next";
 
-interface CreateMagicLinkData {
+interface CreateBundleConsultationData {
   patientInfo: {
     phoneNumber: string;
     role: string[];
@@ -15,25 +15,26 @@ interface CreateMagicLinkData {
     dateOfBirth: string;
     email?: string;
   };
-  paymentMethod: string;
-  orgType: string;
-  dealType: string;
-  consultationPrice: number | null;
-  testType: LabtestType | "";
   consultationType: string;
+  labConsultationType?: LabtestType;
   pdfFiles?: File[];
 }
 
-interface CreateMagicLinkResponse {
+interface CreateBundleConsultationResponse {
+  success: boolean;
   message: string;
-  link: string;
-  discountPrice: number;
-  promoCode: string;
+  data?: {
+    consultation: any;
+    magicLink: string;
+    remainingConsultations: number;
+  };
 }
 
-export const createMagicLink = async (data: CreateMagicLinkData): Promise<CreateMagicLinkResponse> => {
+export const createBundleConsultation = async (
+  data: CreateBundleConsultationData
+): Promise<CreateBundleConsultationResponse> => {
   try {
-    console.log("Preparing data for createMagicLink API call.");
+    console.log("Preparing data for createBundleConsultation API call.");
 
     // Validate nationalId format
     if (!/^\d{10}$/.test(data.patientInfo.nationalId)) {
@@ -45,22 +46,18 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
 
     // Append patient info and other data to formData
     formData.append("patientInfo", JSON.stringify(data.patientInfo));
-    formData.append("paymentMethod", data.paymentMethod);
-    formData.append("orgType", data.orgType);
-    formData.append("dealType", data.dealType);
-    formData.append(
-      "consultationPrice",
-      data.consultationPrice?.toString() || ""
-    );
-    if (data.testType != "") {
-      formData.append("testType", data.testType);
-    }
-    if (data.consultationType) {
-      formData.append("consultationType", data.consultationType);
+    formData.append("consultationType", data.consultationType);
+
+    if (data.labConsultationType) {
+      formData.append("labConsultationType", data.labConsultationType);
     }
 
     // Append the files if the testType is PostTest
-    if (data.testType === LabtestType.PostTest && data.pdfFiles) {
+    if (
+      data.labConsultationType === LabtestType.PostTest &&
+      data.pdfFiles &&
+      data.pdfFiles.length > 0
+    ) {
       data.pdfFiles.forEach((file) => {
         formData.append("pdfFiles", file);
       });
@@ -73,11 +70,13 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
       throw new Error("No token found. Please log in to continue.");
     }
 
-    console.log("Sending POST request to /magic-link endpoint.");
+    console.log(
+      "Sending POST request to /consultations/create-from-bundle endpoint."
+    );
 
     // Send the request with the FormData object
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/magic-link`,
+      `${process.env.NEXT_PUBLIC_API_URL}/consultations/create-from-bundle`,
       formData,
       {
         headers: {
@@ -87,10 +86,13 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
       }
     );
 
-    console.log("Received response from /magic-link:", response);
+    console.log(
+      "Received response from /consultations/create-from-bundle:",
+      response
+    );
     return response.data;
   } catch (error: any) {
-    console.error("Error in createMagicLink:", error);
+    console.error("Error in createBundleConsultation:", error);
     throw error;
   }
 };
