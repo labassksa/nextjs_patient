@@ -75,6 +75,8 @@ html {
   -webkit-text-size-adjust: 100%; /* Ensure consistent text size on iOS */
   -moz-text-size-adjust: 100%; /* Ensure consistent text size on Firefox */
   text-size-adjust: 100%; /* Standard syntax for other browsers */
+  height: 100%;
+  overflow: hidden;
 }
 
 :root {
@@ -99,6 +101,10 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 @layer utilities {

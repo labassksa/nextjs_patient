@@ -23,7 +23,7 @@ const Home = () => {
     <div className="bg-custom-background h-screen flex flex-col overflow-hidden">
       <TopBanner />
       <BottomBanner />
-      <div className="pt-[24vh] pb-16 px-4 flex-1 flex flex-col justify-start gap-3 overflow-hidden">
+      <div className="pt-[20vh] pb-[4.5rem] px-4 flex flex-col justify-center gap-2 overflow-hidden" style={{ flex: '1 1 0%' }}>
         <HealthFacilitiesButton />
         <SchoolsButton />
         <ConsultationButton />
