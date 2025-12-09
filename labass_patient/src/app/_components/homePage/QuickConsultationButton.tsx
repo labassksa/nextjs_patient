@@ -20,7 +20,7 @@ const ConsultationButton: React.FC = () => {
   return (
     <div
       onClick={navigateToPayment}
-      className="relative bg-custom-green p-2 rounded-lg text-right text-white mx-1 overflow-hidden"
+      className="relative bg-custom-green p-2 rounded-lg text-right text-white mx-1 overflow-hidden mt-4"
       style={{ position: "relative", overflow: "hidden" }} // Ensure overflow is hidden
     >
       <div className="flex flex-col justify-between h-full">

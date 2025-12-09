@@ -19,7 +19,7 @@ const SchoolsButton: React.FC = () => {
   return (
     <button
       onClick={navigateToOrgPortal}
-      className="border border-dashed border-blue-500 bg-white text-blue-500 text-xs sm:text-sm px-4 font-bold py-3 rounded hover:bg-blue-500 hover:text-white transition-colors duration-300 w-full flex items-center justify-center gap-2"
+      className="border border-dashed border-blue-500 bg-white text-blue-500 text-xs sm:text-sm px-4 font-bold py-3 rounded hover:bg-blue-500 hover:text-white transition-colors duration-300 w-full flex items-center justify-center gap-2 mb-4"
     >
       <ArrowRightOnRectangleIcon className="h-5 w-5" />
       <span>دخول المدارس</span>
