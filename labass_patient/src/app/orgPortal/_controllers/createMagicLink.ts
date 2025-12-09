@@ -22,6 +22,7 @@ interface CreateMagicLinkData {
   testType: LabtestType | "";
   consultationType: string;
   pdfFiles?: File[];
+  sendSMS?: boolean;
 }
 
 interface CreateMagicLinkResponse {
@@ -58,6 +59,9 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
     if (data.consultationType) {
       formData.append("consultationType", data.consultationType);
     }
+
+    // Append sendSMS flag (defaults to true if not specified)
+    formData.append("sendSMS", String(data.sendSMS ?? true));
 
     // Append the files if the testType is PostTest
     if (data.testType === LabtestType.PostTest && data.pdfFiles) {

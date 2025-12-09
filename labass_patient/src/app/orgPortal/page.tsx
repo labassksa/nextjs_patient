@@ -427,6 +427,7 @@ const OrgPatientsPage: React.FC = () => {
           consultationType: magicLinkData.consultationType,
           labConsultationType: testType || undefined,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+          sendSMS: false, // Don't send SMS when opening consultation directly
         };
 
         const result = await createBundleConsultation(bundleData);
@@ -444,7 +445,10 @@ const OrgPatientsPage: React.FC = () => {
         }
       } else {
         // Use regular magic link flow
-        const result = await createMagicLink(magicLinkData);
+        const result = await createMagicLink({
+          ...magicLinkData,
+          sendSMS: false, // Don't send SMS when opening consultation directly
+        });
 
         // Open the magic link in the same window
         window.location.href = result.link;
