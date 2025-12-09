@@ -20,7 +20,7 @@ import "./globals.css";
 
 const Home = () => {
   return (
-    <div className="bg-custom-background min-h-screen justify-center items-center">
+    <div className="bg-custom-background h-screen overflow-hidden justify-center items-center">
       <TopBanner />
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow">
