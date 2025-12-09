@@ -20,15 +20,13 @@ import "./globals.css";
 
 const Home = () => {
   return (
-    <div className="bg-custom-background h-screen w-full flex flex-col overflow-hidden relative touch-none">
+    <div className="bg-custom-background min-h-screen justify-center items-center">
       <TopBanner />
       <BottomBanner />
-      <div className="absolute inset-0 flex flex-col justify-center gap-2 px-4 pb-20 overflow-hidden">
-        <div className="touch-auto flex flex-col gap-2">
-          <HealthFacilitiesButton />
-          <SchoolsButton />
-          <ConsultationButton />
-        </div>
+      <div className="pt-[28vh] overflow-auto px-4 flex-grow">
+        <HealthFacilitiesButton />
+        <SchoolsButton />
+        <ConsultationButton />
       </div>
       <BottomNavBar currentPath="/" />
     </div>
