@@ -124,7 +124,7 @@ const OrgPatientsPage: React.FC = () => {
       if (orgResponse.success && orgResponse.data) {
         console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
-        setOrgType(orgResponse.data.type);
+        setOrgType(orgResponse.data.type?.toLowerCase() as OrganizationTypes);
         setOrgName(orgResponse.data.name || "");
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
