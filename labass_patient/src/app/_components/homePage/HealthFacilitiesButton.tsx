@@ -19,7 +19,7 @@ const HealthFacilitiesButton: React.FC = () => {
   return (
     <button
       onClick={navigateToOrgPortal}
-      className="border border-dashed border-red-500 bg-red-500 text-white text-xs sm:text-sm px-4 font-bold py-3 rounded hover:bg-red-600 hover:border-red-600 transition-colors duration-300 w-full flex items-center justify-center gap-2 mb-4"
+      className="border border-dashed border-custom-green bg-white text-custom-green text-xs sm:text-sm px-4 font-bold py-3 rounded hover:bg-custom-green hover:text-white transition-colors duration-300 w-full flex items-center justify-center gap-2 mb-4"
     >
       <ArrowRightOnRectangleIcon className="h-5 w-5" />
       <span>دخول المنشآت الصحية</span>

@@ -55,13 +55,14 @@ const ConsultationButton: React.FC = () => {
             />
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 m-0 overflow-hidden">
+        <div className="absolute bottom-0 left-0 m-0">
           <Image
             src="/icons/quick_consultation_Button.svg"
             alt="Quick Consultation Image"
-            width={180}
-            height={180}
+            width={220}
+            height={220}
             className=""
+            style={{ marginBottom: "-40px", marginLeft: "-40px" }} // Adjust this value to control the overflow amount
           />
         </div>
       </div>
