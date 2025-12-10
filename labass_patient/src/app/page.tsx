@@ -20,10 +20,10 @@ import "./globals.css";
 
 const Home = () => {
   return (
-    <div className="bg-custom-background h-screen overflow-hidden flex flex-col">
+    <div className="bg-custom-background h-screen max-h-screen overflow-hidden">
       <TopBanner />
       <BottomBanner />
-      <div className="pt-[28vh] px-4 flex-1 overflow-hidden">
+      <div className="pt-[22vh] pb-16 px-4 h-full overflow-hidden">
         <HealthFacilitiesButton />
         <SchoolsButton />
         <ConsultationButton />
