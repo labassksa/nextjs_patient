@@ -1,0 +1,9 @@
+{
+  "webcredentials": {
+    "apps": ["web.sa.labass.patient"]
+  },
+  "applinks": {
+    "apps": [],
+    "details": []
+  }
+}
