@@ -64,12 +64,12 @@
 3. Copy the Firebase configuration:
    ```javascript
    const firebaseConfig = {
-     apiKey: "AIzaSy...",
-     authDomain: "labass-notifications.firebaseapp.com",
-     projectId: "labass-notifications",
-     storageBucket: "labass-notifications.appspot.com",
-     messagingSenderId: "123456789",
-     appId: "1:123456789:web:abc123"
+     apiKey: "your-api-key-here",
+     authDomain: "your-project.firebaseapp.com",
+     projectId: "your-project-id",
+     storageBucket: "your-project.appspot.com",
+     messagingSenderId: "your-sender-id",
+     appId: "your-app-id"
    };
    ```
 4. **Save these values** - you'll need them in the next steps
@@ -113,12 +113,12 @@ const firebaseConfig = {
 **Example:**
 ```javascript
 const firebaseConfig = {
-  apiKey: "AIzaSyC123456789abcdefghijklmnopqrstuvw",
-  authDomain: "labass-notifications.firebaseapp.com",
-  projectId: "labass-notifications",
-  storageBucket: "labass-notifications.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abc123def456"
+  apiKey: "your-firebase-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id"
 };
 ```
 
@@ -139,15 +139,15 @@ const firebaseConfig = {
 
    ```env
    # Firebase Configuration (from Step 2 above)
-   NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyC123456789abcdefghijklmnopqrstuvw
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=labass-notifications.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=labass-notifications
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=labass-notifications.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789012
-   NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789012:web:abc123def456
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 
    # VAPID Key (from Step 3 above)
-   NEXT_PUBLIC_FIREBASE_VAPID_KEY=BCa1b2c3d4e5f6g7h8i9j0...
+   NEXT_PUBLIC_FIREBASE_VAPID_KEY=your-vapid-key
 
    # Safari Web Push ID (leave as default for now)
    NEXT_PUBLIC_SAFARI_WEB_PUSH_ID=web.sa.labass.patient
