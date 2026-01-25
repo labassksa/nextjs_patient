@@ -80,6 +80,14 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
             initiatedBy: "patient",
             timestamp: new Date(),
           });
+
+          // Notify backend that this user joined the call
+          // This prevents false MISSED_CALL notifications
+          socket.emit("videoCallJoined", {
+            room: `${consultationId}`,
+            userId: userId,
+            timestamp: new Date(),
+          });
         }
       });
 
