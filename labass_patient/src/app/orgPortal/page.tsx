@@ -27,6 +27,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import DoctorTypeSection from "./_components/DoctorTypeSection";
 import { DoctorType } from "./_types/doctorTypes";
 import BundleSection from "./_components/BundleSection";
+import AvailableBundlesSection from "./_components/AvailableBundlesSection";
 import { getMySubscription } from "./_controllers/getMySubscription";
 import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 
@@ -689,11 +690,22 @@ const OrgPatientsPage: React.FC = () => {
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
                   />
-                  <BundleSection
-                    subscription={subscription}
-                    useBundle={useBundle}
-                    setUseBundle={setUseBundle}
-                  />
+                  {/* Show active subscription or available bundles */}
+                  {subscription ? (
+                    <BundleSection
+                      subscription={subscription}
+                      useBundle={useBundle}
+                      setUseBundle={setUseBundle}
+                    />
+                  ) : (
+                    <AvailableBundlesSection
+                      onSubscribe={(bundleId) => {
+                        // TODO: Connect to backend subscription flow
+                        // This will be implemented by another developer
+                        console.log("Subscribe to bundle:", bundleId);
+                      }}
+                    />
+                  )}
                   <TestTypeSection
                     orgType={orgType}
                     testType={testType}
