@@ -21,26 +21,33 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 // Only initialize once to avoid duplicate app errors
-let app: FirebaseApp;
+let app: FirebaseApp | null = null;
 
 if (typeof window !== 'undefined') {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-} else {
-  // Server-side: Create a dummy app (won't be used)
-  app = {} as FirebaseApp;
+  try {
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  } catch (error) {
+    console.error('[Firebase] Error initializing app:', error);
+    app = null;
+  }
 }
 
 // Initialize Firebase Cloud Messaging
 // Only available on client-side and in supported browsers
 let messaging: Messaging | null = null;
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && app) {
   // Check if messaging is supported before initializing
   isSupported()
     .then((supported) => {
-      if (supported) {
-        messaging = getMessaging(app);
-        console.log('[Firebase] Messaging initialized successfully');
+      if (supported && app) {
+        try {
+          messaging = getMessaging(app);
+          console.log('[Firebase] Messaging initialized successfully');
+        } catch (error) {
+          console.error('[Firebase] Error initializing messaging:', error);
+          messaging = null;
+        }
       } else {
         console.warn('[Firebase] Messaging is not supported in this browser');
       }

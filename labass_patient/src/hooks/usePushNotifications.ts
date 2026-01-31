@@ -6,11 +6,25 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { getToken, onMessage, Messaging } from 'firebase/messaging';
 import { getMessagingInstance, isMessagingReady } from '@/config/firebase.config';
 import { detectBrowser, getPushProvider } from '@/utils/browserDetection';
 import { savePushToken } from '@/controllers/pushNotificationController';
+
+/**
+ * Safely get notification permission without throwing
+ */
+function getSafeNotificationPermission(): NotificationPermission {
+  try {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission;
+    }
+  } catch (error) {
+    console.warn('[usePushNotifications] Error accessing Notification.permission:', error);
+  }
+  return 'default';
+}
 
 export interface PushNotificationState {
   /** Is push notification supported in this browser? */
@@ -39,24 +53,51 @@ export interface PushNotificationHookReturn extends PushNotificationState {
 export function usePushNotifications(): PushNotificationHookReturn {
   const [state, setState] = useState<PushNotificationState>({
     supported: false,
-    permission: typeof window !== 'undefined' ? Notification.permission : 'default',
+    permission: 'default',
     token: null,
     error: null,
     loading: true,
   });
 
-  const browserInfo = detectBrowser();
-  const provider = getPushProvider();
+  // Memoize browser detection to avoid repeated calls
+  const browserInfo = useMemo(() => {
+    try {
+      return detectBrowser();
+    } catch (error) {
+      console.warn('[usePushNotifications] Error detecting browser:', error);
+      return {
+        name: 'Unknown',
+        version: 'Unknown',
+        isSafari: false,
+        isIOS: false,
+        platform: 'Unknown',
+        supportsPush: false,
+        pushProvider: 'none' as const,
+      };
+    }
+  }, []);
+
+  const provider = browserInfo.pushProvider;
 
   // Check initial support on mount
   useEffect(() => {
     const checkSupport = async () => {
-      setState((prev) => ({
-        ...prev,
-        supported: browserInfo.supportsPush,
-        permission: 'Notification' in window ? Notification.permission : 'denied',
-        loading: false,
-      }));
+      try {
+        setState((prev) => ({
+          ...prev,
+          supported: browserInfo.supportsPush,
+          permission: getSafeNotificationPermission(),
+          loading: false,
+        }));
+      } catch (error) {
+        console.warn('[usePushNotifications] Error checking support:', error);
+        setState((prev) => ({
+          ...prev,
+          supported: false,
+          permission: 'denied',
+          loading: false,
+        }));
+      }
     };
 
     checkSupport();
