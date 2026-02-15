@@ -64,6 +64,7 @@ const OrgPatientsPage: React.FC = () => {
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
   const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
+  const [showBundlePaymentSuccessModal, setShowBundlePaymentSuccessModal] = useState(false);
 
   // Confirmation modals for consultations
   const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
@@ -183,6 +184,19 @@ const OrgPatientsPage: React.FC = () => {
     const viewParam = urlParams.get('view');
     if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
       setCurrentView(viewParam);
+    }
+
+    // Check for bundle payment success
+    if (urlParams.get('bundlePaymentSuccess') === 'true') {
+      setShowBundlePaymentSuccessModal(true);
+      // Refresh subscription data to show the newly activated subscription
+      fetchSubscription();
+      // Clean up URL
+      urlParams.delete('bundlePaymentSuccess');
+      const newUrl = urlParams.toString()
+        ? `${window.location.pathname}?${urlParams.toString()}`
+        : window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     }
   }, []);
 
@@ -889,6 +903,31 @@ const OrgPatientsPage: React.FC = () => {
                   dir="rtl"
                 >
                   حسناً
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bundle Payment Success Modal */}
+        {showBundlePaymentSuccessModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+              <div className="text-center">
+                <CheckCircleIcon className="text-green-500 w-24 h-24 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-black mb-2" dir="rtl">
+                  تم الاشتراك بنجاح!
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  تم تفعيل الباقة بنجاح. يمكنك الآن إنشاء استشارات من رصيد الباقة.
+                </p>
+
+                <button
+                  onClick={() => setShowBundlePaymentSuccessModal(false)}
+                  className="p-3 w-full text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  dir="rtl"
+                >
+                  موافق
                 </button>
               </div>
             </div>

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { getBundles, Bundle } from "../_controllers/getBundles";
+import { initiatePaymentSession } from "../_controllers/initiatePaymentSession";
+import { useRouter } from "next/navigation";
 
 interface AvailableBundlesSectionProps {
   onSubscribe?: (bundleId: number) => void;
@@ -10,9 +12,13 @@ interface AvailableBundlesSectionProps {
 const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   onSubscribe,
 }) => {
+  const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [isInitiatingPayment, setIsInitiatingPayment] = useState(false);
 
   useEffect(() => {
     const fetchBundles = async () => {
@@ -36,6 +42,37 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
     fetchBundles();
   }, []);
+
+  const handleSubscribeClick = (bundle: Bundle) => {
+    setSelectedBundle(bundle);
+    setShowModal(true);
+  };
+
+  const handleOneTimePayment = async () => {
+    if (!selectedBundle) return;
+
+    setIsInitiatingPayment(true);
+    try {
+      const result = await initiatePaymentSession(selectedBundle.price);
+      if (result.success && result.sessionId) {
+        // Redirect to card details with bundle info
+        const params = new URLSearchParams({
+          sessionId: result.sessionId,
+          countryCode: result.countryCode || "SAU",
+          discountedPrice: String(selectedBundle.price),
+          bundleId: String(selectedBundle.id),
+        });
+        router.push(`/cardDetails?${params.toString()}`);
+      } else {
+        alert(result.message || "حدث خطأ أثناء بدء جلسة الدفع");
+      }
+    } catch (err) {
+      alert("حدث خطأ أثناء بدء جلسة الدفع");
+    } finally {
+      setIsInitiatingPayment(false);
+      setShowModal(false);
+    }
+  };
 
   const getRecurringTypeLabel = (recurringType: string) => {
     switch (recurringType) {
@@ -121,86 +158,153 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   }
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
-      <h3 className="text-gray-800 text-lg font-semibold mb-2">
-        باقات الاشتراك المتاحة
-      </h3>
-      <p className="text-gray-600 text-sm mb-4">
-        اختر الباقة المناسبة لك للاستفادة من خدمات الاستشارات
-      </p>
+    <>
+      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+        <h3 className="text-gray-800 text-lg font-semibold mb-2">
+          باقات الاشتراك المتاحة
+        </h3>
+        <p className="text-gray-600 text-sm mb-4">
+          اختر الباقة المناسبة لك للاستفادة من خدمات الاستشارات
+        </p>
 
-      {/* Bundles Grid */}
-      <div className="space-y-3">
-        {bundles.map((bundle) => (
-          <div
-            key={bundle.id}
-            className="border border-gray-200 rounded-lg p-4 hover:border-custom-green hover:shadow-md transition-all"
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h4 className="text-lg font-bold text-gray-800">
-                  {getBundleNameLabel(bundle.name)}
-                </h4>
-                <p className="text-sm text-gray-500 mt-1">
-                  {getBundleTypeLabel(bundle.type)}
-                </p>
-                <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mt-1">
-                  {getRecurringTypeLabel(bundle.recurringType)}
-                </span>
-              </div>
-              <div className="text-left">
-                <p className="text-2xl font-bold text-custom-green">
-                  {Number(bundle.price).toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500">{bundle.currency || "ريال"}</p>
-              </div>
-            </div>
-
-            {/* Consultations Count */}
-            <div className="bg-custom-background rounded-lg p-3 mb-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-custom-green bg-opacity-20 rounded-full flex items-center justify-center">
-                    <span className="text-custom-green text-sm">📋</span>
-                  </div>
-                  <span className="text-gray-700 text-sm">عدد الاستشارات</span>
-                </div>
-                <span className="text-xl font-bold text-custom-green">
-                  {bundle.consultationCount}
-                </span>
-              </div>
-            </div>
-
-            {bundle.description && (
-              <p className="text-gray-500 text-xs mb-3">{bundle.description}</p>
-            )}
-
-            {/* Subscribe Button - TODO: Connect to backend */}
-            <button
-              onClick={() => {
-                // TODO: Implement subscription flow
-                // This will be connected to the backend by another developer
-                if (onSubscribe) {
-                  onSubscribe(bundle.id);
-                } else {
-                  alert("سيتم ربط هذه الخاصية بالخادم قريباً");
-                }
-              }}
-              className="w-full bg-custom-green text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
+        {/* Bundles Grid */}
+        <div className="space-y-3">
+          {bundles.map((bundle) => (
+            <div
+              key={bundle.id}
+              className="border border-gray-200 rounded-lg p-4 hover:border-custom-green hover:shadow-md transition-all"
             >
-              اشترك الآن
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h4 className="text-lg font-bold text-gray-800">
+                    {getBundleNameLabel(bundle.name)}
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {getBundleTypeLabel(bundle.type)}
+                  </p>
+                  <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded mt-1">
+                    {getRecurringTypeLabel(bundle.recurringType)}
+                  </span>
+                </div>
+                <div className="text-left">
+                  <p className="text-2xl font-bold text-custom-green">
+                    {Number(bundle.price).toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500">{bundle.currency || "ريال"}</p>
+                </div>
+              </div>
+
+              {/* Consultations Count */}
+              <div className="bg-custom-background rounded-lg p-3 mb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-custom-green bg-opacity-20 rounded-full flex items-center justify-center">
+                      <span className="text-custom-green text-sm">📋</span>
+                    </div>
+                    <span className="text-gray-700 text-sm">عدد الاستشارات</span>
+                  </div>
+                  <span className="text-xl font-bold text-custom-green">
+                    {bundle.consultationCount}
+                  </span>
+                </div>
+              </div>
+
+              {bundle.description && (
+                <p className="text-gray-500 text-xs mb-3">{bundle.description}</p>
+              )}
+
+              {/* Subscribe Button */}
+              <button
+                onClick={() => handleSubscribeClick(bundle)}
+                className="w-full bg-custom-green text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
+              >
+                اشترك الآن
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Info Note */}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+          <p className="text-sm text-blue-700">
+            💡 الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل
+          </p>
+        </div>
+      </div>
+
+      {/* Payment Type Selection Modal (Bottom Sheet) */}
+      {showModal && selectedBundle && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end justify-center"
+          onClick={() => !isInitiatingPayment && setShowModal(false)}
+        >
+          <div
+            className="bg-white w-full max-w-lg rounded-t-2xl p-6 animate-slide-up"
+            dir="rtl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar */}
+            <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4" />
+
+            <h3 className="text-lg font-bold text-gray-800 mb-2">
+              اختر طريقة الدفع
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">
+              {getBundleNameLabel(selectedBundle.name)} - {Number(selectedBundle.price).toFixed(2)} {selectedBundle.currency || "ريال"}
+            </p>
+
+            <div className="space-y-3">
+              {/* One-time payment option */}
+              <button
+                onClick={handleOneTimePayment}
+                disabled={isInitiatingPayment}
+                className="w-full flex items-center justify-between p-4 border-2 border-custom-green bg-green-50 rounded-xl hover:bg-green-100 transition-colors disabled:opacity-70"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-custom-green bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span className="text-lg">💳</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-800">دفع لمرة واحدة</p>
+                    <p className="text-xs text-gray-500">ادفع مرة واحدة بدون تجديد تلقائي</p>
+                  </div>
+                </div>
+                {isInitiatingPayment ? (
+                  <div className="w-5 h-5 border-2 border-custom-green border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <span className="text-custom-green text-lg">←</span>
+                )}
+              </button>
+
+              {/* Recurring payment option (coming soon) */}
+              <div className="w-full flex items-center justify-between p-4 border-2 border-gray-200 bg-gray-50 rounded-xl opacity-60 cursor-not-allowed">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-lg">🔄</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-500">اشتراك متكرر</p>
+                    <p className="text-xs text-gray-400">تجديد تلقائي كل فترة</p>
+                  </div>
+                </div>
+                <span className="bg-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">
+                  قريباً
+                </span>
+              </div>
+            </div>
+
+            {/* Cancel button */}
+            <button
+              onClick={() => setShowModal(false)}
+              disabled={isInitiatingPayment}
+              className="w-full mt-4 py-3 text-gray-500 font-medium hover:text-gray-700 transition-colors disabled:opacity-50"
+            >
+              إلغاء
             </button>
           </div>
-        ))}
-      </div>
-
-      {/* Info Note */}
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-        <p className="text-sm text-blue-700">
-          💡 الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل مع تجديد تلقائي
-        </p>
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
