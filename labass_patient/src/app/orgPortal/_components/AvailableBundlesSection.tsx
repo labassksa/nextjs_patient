@@ -58,6 +58,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
         // Redirect to card details with bundle info
         const params = new URLSearchParams({
           sessionId: result.sessionId,
+          countryCode: result.countryCode || "SAU",
           discountedPrice: String(selectedBundle.price),
           bundleId: String(selectedBundle.id),
         });
