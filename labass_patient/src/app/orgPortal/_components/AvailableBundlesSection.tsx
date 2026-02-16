@@ -160,6 +160,13 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   return (
     <>
       <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+        {/* Info Note - At Top */}
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <p className="text-lg font-semibold text-blue-700 text-center">
+            💡 الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل
+          </p>
+        </div>
+
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
           باقات الاشتراك المتاحة
         </h3>
@@ -222,13 +229,6 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
               </button>
             </div>
           ))}
-        </div>
-
-        {/* Info Note */}
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-          <p className="text-sm text-blue-700">
-            💡 الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل
-          </p>
         </div>
       </div>
 

@@ -483,14 +483,14 @@ const OrgPatientsPage: React.FC = () => {
   return (
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
-        {/* User Info Section - Compact Design */}
-        {userData && (
+        {/* User Info Section - Compact Design (hidden on subscription view) */}
+        {userData && currentView !== "subscription" && (
           <div className="mb-4">
             <div className="w-full">
               {/* Compact Header with Language Toggle */}
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2">
                 <div className="flex items-center justify-between">
-                  <button 
+                  <button
                     onClick={toggleLanguage}
                     className="text-white bg-blue-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
                   >
@@ -502,7 +502,7 @@ const OrgPatientsPage: React.FC = () => {
                   <div className="w-12"></div> {/* Spacer for centering */}
                 </div>
               </div>
-              
+
               {/* Compact Content */}
               <div className="bg-white p-3">
                 <div className="space-y-2" dir="rtl">
@@ -515,7 +515,7 @@ const OrgPatientsPage: React.FC = () => {
                       <div>
                         <p className="text-xs text-gray-500">الاسم</p>
                         <p className="text-sm font-medium text-gray-800">
-                          {userData.firstName || userData.lastName 
+                          {userData.firstName || userData.lastName
                             ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
                             : 'غير محدد'}
                         </p>
@@ -558,6 +558,28 @@ const OrgPatientsPage: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Subscription Page Header (only shown on subscription view) */}
+        {currentView === "subscription" && (
+          <div className="mb-4">
+            <div className="w-full">
+              <div className="bg-gradient-to-r from-custom-green to-green-600 p-4">
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={toggleLanguage}
+                    className="text-white bg-green-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
+                  >
+                    {i18n.language === 'ar' ? 'English' : 'عربي'}
+                  </button>
+                  <h3 className="text-lg font-bold text-white" dir="rtl">
+                    باقات الاستشارات الطبية
+                  </h3>
+                  <div className="w-12"></div>
                 </div>
               </div>
             </div>
