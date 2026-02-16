@@ -44,7 +44,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [currentView, setCurrentView] = useState<"patients" | "registration" | "products">(
+  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription">(
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
@@ -182,7 +182,7 @@ const OrgPatientsPage: React.FC = () => {
 
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
-    if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
+    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration') {
       setCurrentView(viewParam);
     }
 
@@ -677,8 +677,24 @@ const OrgPatientsPage: React.FC = () => {
                     ))
                   )}
                 </div>
-              ) : currentView === "products" ? (
-                <ProductsList />
+              ) : currentView === "subscription" ? (
+                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                  {/* Show active subscription or available bundles */}
+                  {subscription ? (
+                    <BundleSection
+                      subscription={subscription}
+                      useBundle={useBundle}
+                      setUseBundle={setUseBundle}
+                    />
+                  ) : (
+                    <AvailableBundlesSection
+                      onSubscribe={(bundleId) => {
+                        // TODO: Connect to backend subscription flow
+                        console.log("Subscribe to bundle:", bundleId);
+                      }}
+                    />
+                  )}
+                </div>
               ) : (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
                   <OrgUserRegistrationForm
@@ -704,20 +720,12 @@ const OrgPatientsPage: React.FC = () => {
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
                   />
-                  {/* Show active subscription or available bundles */}
-                  {subscription ? (
+                  {/* Show active subscription if available */}
+                  {subscription && (
                     <BundleSection
                       subscription={subscription}
                       useBundle={useBundle}
                       setUseBundle={setUseBundle}
-                    />
-                  ) : (
-                    <AvailableBundlesSection
-                      onSubscribe={(bundleId) => {
-                        // TODO: Connect to backend subscription flow
-                        // This will be implemented by another developer
-                        console.log("Subscribe to bundle:", bundleId);
-                      }}
                     />
                   )}
                   <TestTypeSection
