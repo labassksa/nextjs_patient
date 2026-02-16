@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getBundles, Bundle } from "../_controllers/getBundles";
 import { initiatePaymentSession } from "../_controllers/initiatePaymentSession";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ interface AvailableBundlesSectionProps {
 const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   onSubscribe,
 }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,10 +33,10 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
           const activeBundles = response.data.filter((bundle) => bundle.isActive);
           setBundles(activeBundles);
         } else {
-          setError(response.message || "حدث خطأ أثناء تحميل الباقات");
+          setError(response.message || t('subscription.errorLoadingBundles'));
         }
       } catch (err) {
-        setError("حدث خطأ أثناء تحميل الباقات");
+        setError(t('subscription.errorLoadingBundles'));
       } finally {
         setIsLoading(false);
       }
@@ -77,13 +79,13 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   const getRecurringTypeLabel = (recurringType: string) => {
     switch (recurringType) {
       case "Monthly":
-        return "شهري";
+        return t('subscription.recurringTypes.monthly');
       case "Weekly":
-        return "أسبوعي";
+        return t('subscription.recurringTypes.weekly');
       case "Daily":
-        return "يومي";
+        return t('subscription.recurringTypes.daily');
       case "Yearly":
-        return "سنوي";
+        return t('subscription.recurringTypes.yearly');
       default:
         return recurringType;
     }
@@ -92,11 +94,11 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   const getBundleNameLabel = (name: string) => {
     switch (name.toLowerCase()) {
       case "basic":
-        return "الباقة الأساسية";
+        return t('subscription.bundleNames.basic');
       case "standard":
-        return "الباقة المتوسطة";
+        return t('subscription.bundleNames.standard');
       case "premium":
-        return "الباقة المميزة";
+        return t('subscription.bundleNames.premium');
       default:
         return name;
     }
@@ -105,9 +107,9 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   const getBundleTypeLabel = (type: string) => {
     switch (type) {
       case "GP Consultations":
-        return "استشارات طبيب عام";
+        return t('subscription.bundleTypes.gpConsultations');
       case "Specialist Consultations":
-        return "استشارات أخصائي";
+        return t('subscription.bundleTypes.specialistConsultations');
       default:
         return type;
     }
@@ -127,14 +129,14 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
     return (
       <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
-          الاشتراكات
+          {t('subscription.availableBundles')}
         </h3>
         <div className="text-center py-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">⚠️</span>
           </div>
           <p className="text-red-500 text-sm mb-2">{error}</p>
-          <p className="text-gray-400 text-xs">تعذر تحميل الباقات المتاحة</p>
+          <p className="text-gray-400 text-xs">{t('subscription.couldNotLoadBundles')}</p>
         </div>
       </div>
     );
@@ -144,14 +146,14 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
     return (
       <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
-          الاشتراكات
+          {t('subscription.availableBundles')}
         </h3>
         <div className="text-center py-6">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">📦</span>
           </div>
-          <p className="text-gray-500 text-sm">لا توجد باقات متاحة حالياً</p>
-          <p className="text-gray-400 text-xs mt-2">يرجى التواصل مع الإدارة</p>
+          <p className="text-gray-500 text-sm">{t('subscription.noBundlesAvailable')}</p>
+          <p className="text-gray-400 text-xs mt-2">{t('subscription.contactAdmin')}</p>
         </div>
       </div>
     );
@@ -163,15 +165,15 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
         {/* Info Note - At Top */}
         <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
           <p className="text-lg font-semibold text-blue-700 text-center">
-            💡 الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل
+            💡 {t('subscription.infoNote')}
           </p>
         </div>
 
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
-          باقات الاشتراك المتاحة
+          {t('subscription.availableBundles')}
         </h3>
         <p className="text-gray-600 text-sm mb-4">
-          اختر الباقة المناسبة لك للاستفادة من خدمات الاستشارات
+          {t('subscription.chooseBundleSubtitle')}
         </p>
 
         {/* Bundles Grid */}
@@ -208,7 +210,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                     <div className="w-8 h-8 bg-custom-green bg-opacity-20 rounded-full flex items-center justify-center">
                       <span className="text-custom-green text-sm">📋</span>
                     </div>
-                    <span className="text-gray-700 text-sm">عدد الاستشارات</span>
+                    <span className="text-gray-700 text-sm">{t('subscription.consultationsCount')}</span>
                   </div>
                   <span className="text-xl font-bold text-custom-green">
                     {bundle.consultationCount}
@@ -225,7 +227,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                 onClick={() => handleSubscribeClick(bundle)}
                 className="w-full bg-custom-green text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
               >
-                اشترك الآن
+                {t('subscription.subscribeNow')}
               </button>
             </div>
           ))}
@@ -247,10 +249,10 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
             <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4" />
 
             <h3 className="text-lg font-bold text-gray-800 mb-2">
-              اختر طريقة الدفع
+              {t('subscription.choosePaymentMethod')}
             </h3>
             <p className="text-sm text-gray-500 mb-4">
-              {getBundleNameLabel(selectedBundle.name)} - {Number(selectedBundle.price).toFixed(2)} {selectedBundle.currency || "ريال"}
+              {getBundleNameLabel(selectedBundle.name)} - {Number(selectedBundle.price).toFixed(2)} {selectedBundle.currency || t('consultationPrice.currency')}
             </p>
 
             <div className="space-y-3">
@@ -265,8 +267,8 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                     <span className="text-lg">💳</span>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-800">دفع لمرة واحدة</p>
-                    <p className="text-xs text-gray-500">ادفع مرة واحدة بدون تجديد تلقائي</p>
+                    <p className="font-semibold text-gray-800">{t('subscription.oneTimePayment')}</p>
+                    <p className="text-xs text-gray-500">{t('subscription.oneTimePaymentDesc')}</p>
                   </div>
                 </div>
                 {isInitiatingPayment ? (
@@ -283,12 +285,12 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                     <span className="text-lg">🔄</span>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-500">اشتراك متكرر</p>
-                    <p className="text-xs text-gray-400">تجديد تلقائي كل فترة</p>
+                    <p className="font-semibold text-gray-500">{t('subscription.recurringPayment')}</p>
+                    <p className="text-xs text-gray-400">{t('subscription.recurringPaymentDesc')}</p>
                   </div>
                 </div>
                 <span className="bg-gray-200 text-gray-500 text-xs px-2 py-1 rounded-full font-medium">
-                  قريباً
+                  {t('subscription.comingSoon')}
                 </span>
               </div>
             </div>
@@ -299,7 +301,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
               disabled={isInitiatingPayment}
               className="w-full mt-4 py-3 text-gray-500 font-medium hover:text-gray-700 transition-colors disabled:opacity-50"
             >
-              إلغاء
+              {t('subscription.cancel')}
             </button>
           </div>
         </div>

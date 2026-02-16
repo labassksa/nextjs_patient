@@ -48,7 +48,7 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
         onClick={() => onToggleView("subscription")}
       >
         <SubscriptionIcon fontSize="small" />
-        <span>الاشتراك</span>
+        <span>{t('subscription.tabLabel')}</span>
       </button>
     </nav>
   );

@@ -577,7 +577,7 @@ const OrgPatientsPage: React.FC = () => {
                     {i18n.language === 'ar' ? 'English' : 'عربي'}
                   </button>
                   <h3 className="text-lg font-bold text-white" dir="rtl">
-                    باقات الاستشارات الطبية
+                    {t('subscription.pageTitle')}
                   </h3>
                   <div className="w-12"></div>
                 </div>
