@@ -569,14 +569,14 @@ const OrgPatientsPage: React.FC = () => {
           <div className="mb-4">
             <div className="w-full">
               <div className="bg-gradient-to-r from-custom-green to-green-600 p-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
                   <button
                     onClick={toggleLanguage}
                     className="text-white bg-green-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
                   >
                     {i18n.language === 'ar' ? 'English' : 'عربي'}
                   </button>
-                  <h3 className="text-lg font-bold text-white" dir="rtl">
+                  <h3 className="text-lg font-bold text-white">
                     {t('subscription.pageTitle')}
                   </h3>
                   <div className="w-12"></div>

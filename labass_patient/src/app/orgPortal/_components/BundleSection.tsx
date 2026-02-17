@@ -28,7 +28,8 @@ const BundleSection: React.FC<BundleSectionProps> = ({
   useBundle,
   setUseBundle,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
 
   if (!subscription) {
     return null;
@@ -63,7 +64,7 @@ const BundleSection: React.FC<BundleSectionProps> = ({
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+    <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
       <h3 className="text-gray-800 text-lg font-semibold mb-2">
         {t('subscription.currentSubscription')}
       </h3>
@@ -123,7 +124,7 @@ const BundleSection: React.FC<BundleSectionProps> = ({
         >
           <div className="flex items-center">
             <div
-              className={`w-4 h-4 rounded-full ml-2 ${
+              className={`w-4 h-4 rounded-full ${isRTL ? 'ml-2' : 'mr-2'} ${
                 useBundle ? "bg-white" : "bg-gray-400"
               }`}
             />
@@ -150,7 +151,7 @@ const BundleSection: React.FC<BundleSectionProps> = ({
         >
           <div className="flex items-center">
             <div
-              className={`w-4 h-4 rounded-full ml-2 ${
+              className={`w-4 h-4 rounded-full ${isRTL ? 'ml-2' : 'mr-2'} ${
                 !useBundle ? "bg-white" : "bg-gray-400"
               }`}
             />

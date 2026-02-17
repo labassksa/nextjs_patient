@@ -137,7 +137,8 @@ const resources = {
         networkError: "⚠️ Network Connection Error: Please check your internet connection and try again.",
         genericError: "An error occurred, please try again",
         marketerNotFound: "⚠️ Marketer profile not found for this user. Please login with your marketer account.",
-        organizationNotFound: "⚠️ Organization not found for your profile. Please contact support"
+        organizationNotFound: "⚠️ Organization not found for your profile. Please contact support",
+        paymentSessionError: "An error occurred while initiating payment session"
       },
       subscription: {
         tabLabel: "Subscription",
@@ -323,7 +324,8 @@ const resources = {
         networkError: "⚠️ خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
         genericError: "حدث خطأ ، حاول مرة أخرى",
         marketerNotFound: "⚠️ تعذر العثور على الملف التعريفي للمسوق لهذا المستخدم. يرجى تسجيل الدخول باستخدام حساب المسوق الخاص بك.",
-        organizationNotFound: "⚠️ لم يتم العثور على المؤسسة المرتبطة بملفك التعريفي. يرجى الاتصال بالدعم الفني"
+        organizationNotFound: "⚠️ لم يتم العثور على المؤسسة المرتبطة بملفك التعريفي. يرجى الاتصال بالدعم الفني",
+        paymentSessionError: "حدث خطأ أثناء بدء جلسة الدفع"
       },
       subscription: {
         tabLabel: "الاشتراك",

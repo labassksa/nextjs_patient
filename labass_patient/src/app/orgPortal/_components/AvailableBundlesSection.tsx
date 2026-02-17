@@ -13,7 +13,8 @@ interface AvailableBundlesSectionProps {
 const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   onSubscribe,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const router = useRouter();
   const [bundles, setBundles] = useState<Bundle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,10 +67,10 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
         });
         router.push(`/cardDetails?${params.toString()}`);
       } else {
-        alert(result.message || "حدث خطأ أثناء بدء جلسة الدفع");
+        alert(result.message || t('errors.paymentSessionError'));
       }
     } catch (err) {
-      alert("حدث خطأ أثناء بدء جلسة الدفع");
+      alert(t('errors.paymentSessionError'));
     } finally {
       setIsInitiatingPayment(false);
       setShowModal(false);
@@ -117,7 +118,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
   if (isLoading) {
     return (
-      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
         <div className="flex items-center justify-center py-8">
           <div className="spinner"></div>
         </div>
@@ -127,7 +128,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
   if (error) {
     return (
-      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
           {t('subscription.availableBundles')}
         </h3>
@@ -144,7 +145,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
   if (bundles.length === 0) {
     return (
-      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
           {t('subscription.availableBundles')}
         </h3>
@@ -161,7 +162,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
   return (
     <>
-      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir="rtl">
+      <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
         {/* Info Note - At Top */}
         <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-lg">
           <p className="text-lg font-semibold text-blue-700 text-center">
@@ -195,11 +196,11 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                     {getRecurringTypeLabel(bundle.recurringType)}
                   </span>
                 </div>
-                <div className="text-left">
+                <div className={isRTL ? "text-left" : "text-right"}>
                   <p className="text-2xl font-bold text-custom-green">
                     {Number(bundle.price).toFixed(2)}
                   </p>
-                  <p className="text-xs text-gray-500">{bundle.currency || "ريال"}</p>
+                  <p className="text-xs text-gray-500">{bundle.currency || t('consultationPrice.currency')}</p>
                 </div>
               </div>
 
@@ -242,7 +243,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
         >
           <div
             className="bg-white w-full max-w-lg rounded-t-2xl p-6 animate-slide-up"
-            dir="rtl"
+            dir={isRTL ? "rtl" : "ltr"}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Handle bar */}
@@ -266,7 +267,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                   <div className="w-10 h-10 bg-custom-green bg-opacity-20 rounded-full flex items-center justify-center">
                     <span className="text-lg">💳</span>
                   </div>
-                  <div className="text-right">
+                  <div className={isRTL ? "text-right" : "text-left"}>
                     <p className="font-semibold text-gray-800">{t('subscription.oneTimePayment')}</p>
                     <p className="text-xs text-gray-500">{t('subscription.oneTimePaymentDesc')}</p>
                   </div>
@@ -274,7 +275,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                 {isInitiatingPayment ? (
                   <div className="w-5 h-5 border-2 border-custom-green border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <span className="text-custom-green text-lg">←</span>
+                  <span className="text-custom-green text-lg">{isRTL ? '←' : '→'}</span>
                 )}
               </button>
 
@@ -284,7 +285,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
                   <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-lg">🔄</span>
                   </div>
-                  <div className="text-right">
+                  <div className={isRTL ? "text-right" : "text-left"}>
                     <p className="font-semibold text-gray-500">{t('subscription.recurringPayment')}</p>
                     <p className="text-xs text-gray-400">{t('subscription.recurringPaymentDesc')}</p>
                   </div>
