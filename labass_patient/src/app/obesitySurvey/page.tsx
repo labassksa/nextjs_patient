@@ -333,13 +333,21 @@ const ObesitySurveyContent: React.FC = () => {
               )}
             </div>
 
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
-            >
-              التالي
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
           </div>
         )}
 
@@ -374,13 +382,21 @@ const ObesitySurveyContent: React.FC = () => {
               })}
             </div>
 
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
-            >
-              التالي
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
           </div>
         )}
 
@@ -426,13 +442,21 @@ const ObesitySurveyContent: React.FC = () => {
               )}
             </div>
 
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
-            >
-              التالي
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
           </div>
         )}
 
@@ -477,13 +501,21 @@ const ObesitySurveyContent: React.FC = () => {
               </button>
             </div>
 
-            <button
-              onClick={handleNext}
-              disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
-            >
-              التالي
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
           </div>
         )}
 
@@ -516,19 +548,28 @@ const ObesitySurveyContent: React.FC = () => {
               })}
             </div>
 
-            <button
-              onClick={handleSubmit}
-              disabled={!canProceed() || isSubmitting}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
-            >
-              {isSubmitting ? (
-                <div className="flex items-center justify-center">
-                  <div className="spinner" />
-                </div>
-              ) : (
-                "التالي"
-              )}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                disabled={isSubmitting}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!canProceed() || isSubmitting}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="spinner" />
+                  </div>
+                ) : (
+                  "التالي"
+                )}
+              </button>
+            </div>
           </div>
         )}
       </div>
