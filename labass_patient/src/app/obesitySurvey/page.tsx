@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 
 interface SurveyData {
   weight: string;
@@ -97,7 +98,7 @@ const ObesitySurveyContent: React.FC = () => {
     "مدري، بس قاعد أستكشف",
   ];
 
-  const toggleSelection = (list: string[], item: string, field: keyof SurveyData) => {
+  const toggleSelection = (_list: string[], item: string, field: keyof SurveyData) => {
     const currentList = surveyData[field] as string[];
 
     // Handle "لا شيء مما سبق" / "لا، لا أتناول أي أدوية أو فيتامينات" exclusivity
@@ -217,39 +218,37 @@ const ObesitySurveyContent: React.FC = () => {
     }
   };
 
-  const renderProgressBar = () => {
-    const totalSteps = 6;
-    const progress = ((currentStep + 1) / totalSteps) * 100;
-
-    return (
-      <div className="w-full bg-gray-200 h-1 mb-4">
-        <div
-          className="bg-red-500 h-1 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
+  const renderHeader = () => (
+    <div className="sticky top-0 z-10 bg-white border-b border-gray-100 shadow-sm">
+      <div className="flex items-center justify-between px-5 pt-4 pb-2">
+        <div className="w-9" />
+        <span className="text-sm font-semibold text-gray-500">
+          {currentStep + 1} من 6
+        </span>
+        <button
+          onClick={handleBack}
+          className={currentStep === 0 ? "opacity-0 pointer-events-none" : ""}
+          aria-label="رجوع"
+        >
+          <ChevronLeftIcon className="h-5 w-5 text-black" aria-hidden="true" />
+        </button>
       </div>
-    );
-  };
+      <div className="flex gap-1.5 px-5 pb-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+              i <= currentStep ? "bg-custom-green" : "bg-gray-200"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
-      {/* Progress Bar */}
-      {renderProgressBar()}
-
-      {/* Header with back arrow */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button
-          onClick={handleBack}
-          className={`text-2xl ${currentStep === 0 ? "invisible" : ""}`}
-        >
-          ←
-        </button>
-        <div className="flex items-center gap-2">
-          <span className="text-red-500 text-sm font-semibold">
-            {currentStep + 1}/{6}
-          </span>
-        </div>
-      </div>
+      {renderHeader()}
 
       {/* Content */}
       <div className="p-6 max-w-2xl mx-auto">
@@ -261,7 +260,7 @@ const ObesitySurveyContent: React.FC = () => {
                 نحتاج نعرفك أول..
               </h1>
               <p className="text-gray-600">
-                ونصمم لك الخطة المناسبة تالي
+                ونصمم لك الخطة المناسبة
               </p>
               <p className="text-sm text-gray-500 mt-4">
                 إجاباتك الدقيقة = خطة تناسبك أكثر
@@ -269,7 +268,7 @@ const ObesitySurveyContent: React.FC = () => {
             </div>
             <button
               onClick={handleNext}
-              className="w-full bg-blue-500 text-white py-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+              className="w-full bg-custom-green text-white py-4 rounded-lg font-semibold hover:bg-custom-green/90 transition-colors"
             >
               لنبدأ الآن
             </button>
@@ -281,7 +280,7 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
-                ← مؤشر كتلة الجسم
+                مؤشر كتلة الجسم
               </h2>
             </div>
 
@@ -336,7 +335,7 @@ const ObesitySurveyContent: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-custom-green enabled:hover:bg-custom-green/90 transition-colors"
             >
               التالي
             </button>
@@ -348,7 +347,7 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
-                ← هل لديك هذه الحالات؟
+                هل لديك هذه الحالات؟
               </h2>
             </div>
 
@@ -363,8 +362,8 @@ const ObesitySurveyContent: React.FC = () => {
                     }
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+                        ? "bg-custom-green text-white border-custom-green"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
                     }`}
                   >
                     {condition}
@@ -377,7 +376,7 @@ const ObesitySurveyContent: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-custom-green enabled:hover:bg-custom-green/90 transition-colors"
             >
               التالي
             </button>
@@ -389,7 +388,7 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
-                ← هل تتناول حاليًا أي من:
+                هل تتناول حاليًا أي من:
               </h2>
             </div>
 
@@ -404,8 +403,8 @@ const ObesitySurveyContent: React.FC = () => {
                     }
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+                        ? "bg-custom-green text-white border-custom-green"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
                     }`}
                   >
                     {medication}
@@ -429,7 +428,7 @@ const ObesitySurveyContent: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-custom-green enabled:hover:bg-custom-green/90 transition-colors"
             >
               التالي
             </button>
@@ -441,7 +440,7 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
-                ← سؤال لك
+                سؤال لك
               </h2>
               <p className="text-gray-600">
                 كيف تفضل/ي برنامج فقدان الوزن؟<br />
@@ -456,8 +455,8 @@ const ObesitySurveyContent: React.FC = () => {
                 }
                 className={`w-full p-4 rounded-lg border text-right transition-colors ${
                   surveyData.medicationPreference === "with_medication"
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+                    ? "bg-custom-green text-white border-custom-green"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
                 }`}
               >
                 أريد أدوية مع البرنامج
@@ -469,8 +468,8 @@ const ObesitySurveyContent: React.FC = () => {
                 }
                 className={`w-full p-4 rounded-lg border text-right transition-colors ${
                   surveyData.medicationPreference === "without_medication"
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+                    ? "bg-custom-green text-white border-custom-green"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
                 }`}
               >
                 لا أريد الأدوية.. فقط البرنامج
@@ -480,7 +479,7 @@ const ObesitySurveyContent: React.FC = () => {
             <button
               onClick={handleNext}
               disabled={!canProceed()}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-custom-green enabled:hover:bg-custom-green/90 transition-colors"
             >
               التالي
             </button>
@@ -492,7 +491,7 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
-                ← ويش اللي تدور عليه؟
+                ويش اللي تدور عليه؟
               </h2>
             </div>
 
@@ -505,8 +504,8 @@ const ObesitySurveyContent: React.FC = () => {
                     onClick={() => toggleSelection(goalsList, goal, "goals")}
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
-                        ? "bg-blue-500 text-white border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+                        ? "bg-custom-green text-white border-custom-green"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
                     }`}
                   >
                     {goal}
@@ -519,7 +518,7 @@ const ObesitySurveyContent: React.FC = () => {
             <button
               onClick={handleSubmit}
               disabled={!canProceed() || isSubmitting}
-              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              className="w-full bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-custom-green enabled:hover:bg-custom-green/90 transition-colors"
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center">
