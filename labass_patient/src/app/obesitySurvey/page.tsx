@@ -139,24 +139,6 @@ const ObesitySurveyContent: React.FC = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Get consultationId from URL params or localStorage
-      const consultationId = searchParams.get("consultationId") || localStorage.getItem("obesityConsultationId");
-
-      if (!consultationId) {
-        console.error("No consultation ID found");
-        alert("حدث خطأ: لم يتم العثور على رقم الاستشارة");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Get token for authorization
-      const token = localStorage.getItem("labass_token");
-      if (!token) {
-        alert("يرجى تسجيل الدخول أولاً");
-        setIsSubmitting(false);
-        return;
-      }
-
       // Format survey data for backend
       const surveyPayload = {
         survey: [
@@ -171,23 +153,37 @@ const ObesitySurveyContent: React.FC = () => {
         ]
       };
 
-      // Send survey data to backend
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
-        surveyPayload,
-        {
-          headers: { Authorization: `Bearer ${token}` }
+      // Get consultationId from URL params or localStorage (old marketer flow)
+      const consultationId = searchParams.get("consultationId") || localStorage.getItem("obesityConsultationId");
+
+      if (consultationId) {
+        // OLD FLOW (marketer magic link): consultationId already exists → POST survey → go to chat
+        const token = localStorage.getItem("labass_token");
+        if (!token) {
+          alert("يرجى تسجيل الدخول أولاً");
+          setIsSubmitting(false);
+          return;
         }
-      );
 
-      if (response.data) {
-        // Clear localStorage after successful save
-        localStorage.removeItem("consultationType");
-        localStorage.removeItem("obesityConsultationId");
-        localStorage.removeItem("obesitySurveyData");
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
+          surveyPayload,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
 
-        // Redirect to chat with consultationId
-        router.push(`/chat/${consultationId}`);
+        if (response.data) {
+          localStorage.removeItem("consultationType");
+          localStorage.removeItem("obesityConsultationId");
+          localStorage.removeItem("obesitySurveyData");
+          router.push(`/chat/${consultationId}`);
+        }
+      } else {
+        // NEW FLOW (button → survey → payment): no consultationId yet
+        // Store completed survey and navigate to payment
+        localStorage.setItem("obesitySurveyData", JSON.stringify(surveyPayload));
+        router.push("/payment?consultationType=obesity");
       }
     } catch (error: any) {
       console.error("Error submitting survey:", error);

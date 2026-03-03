@@ -13,6 +13,7 @@ import BottomNavBar from "../components/common/BottomNavBar";
 import TopBanner from "./_components/homePage/TopHomePageBanner";
 import BottomBanner from "./_components/homePage/BottomHomePageBanner";
 import ConsultationButton from "./_components/homePage/QuickConsultationButton";
+import ObesityConsultationButton from "./_components/homePage/ObesityConsultationButton";
 import HealthFacilitiesButton from "./_components/homePage/HealthFacilitiesButton";
 import SchoolsButton from "./_components/homePage/SchoolsButton";
 import React from "react";
@@ -27,6 +28,7 @@ const Home = () => {
         <HealthFacilitiesButton />
         <SchoolsButton />
         <ConsultationButton />
+        <ObesityConsultationButton />
       </div>
       <BottomNavBar currentPath="/" />
     </div>
