@@ -134,19 +134,39 @@ const PromoCode: React.FC<{
     setCashAmount(convertedValue); // Set the converted value directly
   };
 
-  const handleGoToFillPersonalInfo = () => {
+  const handleGoToFillPersonalInfo = async () => {
     if (consultationId) {
-      // Check if it's an obesity consultation
       const consultationType = localStorage.getItem("consultationType");
 
       if (consultationType === "obesity") {
-        // Redirect to obesity survey
-        localStorage.setItem("obesityConsultationId", consultationId.toString());
-        router.push(`/obesitySurvey?consultationId=${consultationId}`);
+        const storedSurveyData = localStorage.getItem("obesitySurveyData");
+
+        if (storedSurveyData) {
+          // NEW FLOW (button → survey → payment): POST stored survey then go to patientSelection
+          const token = localStorage.getItem("labass_token");
+          if (token) {
+            try {
+              await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
+                JSON.parse(storedSurveyData),
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+            } catch (err) {
+              console.error("Error submitting stored obesity survey:", err);
+            }
+          }
+          localStorage.removeItem("obesitySurveyData");
+          localStorage.removeItem("consultationType");
+          router.push(`/patientSelection?consultationId=${consultationId}`);
+        } else {
+          // OLD FLOW (marketer magic link): no pre-stored survey → go fill it now
+          localStorage.setItem("obesityConsultationId", consultationId.toString());
+          router.push(`/obesitySurvey?consultationId=${consultationId}`);
+        }
         return;
       }
 
-      // Otherwise, go to patient selection
+      // Normal flow
       router.push(`/patientSelection?consultationId=${consultationId}`);
     } else {
       console.error("Consultation ID is missing.");
