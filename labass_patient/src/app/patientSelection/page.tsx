@@ -5,103 +5,124 @@ import axios from "axios";
 import PatientCard from "./_components/patientSelection/patientCard";
 import Header from "../../components/common/header";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import Spinner from "./_components/patientSelection/spinner"; // Import the Spinner component
+import Spinner from "./_components/patientSelection/spinner";
 
 const PatientSelection: React.FC = () => {
   const router = useRouter();
   const [patients, setPatients] = useState<any[]>([]);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
-  );
-  const [selectedDependentId, setSelectedDependentId] = useState<number | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedDependentId, setSelectedDependentId] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selfPatientProfileId, setSelfPatientProfileId] = useState<number | null>(null);
+  const [isSelfInfoComplete, setIsSelfInfoComplete] = useState(false);
   const searchParams = useSearchParams();
   const consultationId = searchParams?.get("consultationId");
 
-  // Fetch dependents from the API
   useEffect(() => {
-    const fetchPatients = async () => {
-      setIsLoading(true); // Start loading
+    const fetchData = async () => {
+      setIsLoading(true);
+      const token = localStorage.getItem("labass_token");
+      const headers = { Authorization: `Bearer ${token}` };
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
       try {
-        const token = localStorage.getItem("labass_token");
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/Dependents`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        // Fetch user info, patient profile, and dependents in parallel
+        const [userRes, patientRes, dependentsRes] = await Promise.allSettled([
+          axios.get(`${apiUrl}/user`, { headers }),
+          axios.get(`${apiUrl}/getPatient`, { headers }),
+          axios.get(`${apiUrl}/Dependents`, { headers }),
+        ]);
+
+        // Check if self info is complete
+        if (userRes.status === "fulfilled") {
+          const u = userRes.value.data;
+          if (u.firstName && u.lastName && u.nationalId && u.dateOfBirth && u.gender) {
+            setIsSelfInfoComplete(true);
           }
-        );
-
-        if (response.status === 200) {
-          const fetchedPatients = response.data.map((dependent: any) => ({
-            ...dependent.user, // Extract user information
-            guardianId: dependent.guardianId,
-            patientId: dependent.id, // This is the key for selecting the dependent
-          }));
-
-          // Add the default "أنا" (myself) patient at the beginning of the list
-          const defaultPatient = {
-            id: 0,
-            firstName: "أنا",
-            lastName: "",
-            nationalId: "123456789", // Default nationalId for "أنا"
-            dateOfBirth: "1990-01-01", // Default DOB for "أنا"
-            gender: "male", // Default gender for "أنا"
-            phoneNumber: "0000000000", // Default phone number
-            patientId: null, // No patientId for "أنا"
-          };
-
-          // Reverse fetchedPatients to show the most recent ones first
-          setPatients([defaultPatient, ...fetchedPatients.reverse()]);
-          setSelectedPatientId(defaultPatient.nationalId); // Select "أنا" by default
         }
+
+        // Store own patientProfile id if it exists
+        if (patientRes.status === "fulfilled" && patientRes.value.data?.exists) {
+          setSelfPatientProfileId(patientRes.value.data.profile.id);
+        }
+
+        // Build patient list
+        const defaultPatient = {
+          id: 0,
+          firstName: "أنا",
+          lastName: "",
+          nationalId: "123456789",
+          dateOfBirth: "1990-01-01",
+          gender: "male",
+          phoneNumber: "0000000000",
+          patientId: null,
+        };
+
+        if (dependentsRes.status === "fulfilled" && dependentsRes.value.status === 200) {
+          const fetchedPatients = dependentsRes.value.data.map((dependent: any) => ({
+            ...dependent.user,
+            guardianId: dependent.guardianId,
+            patientId: dependent.id,
+          }));
+          setPatients([defaultPatient, ...fetchedPatients.reverse()]);
+        } else {
+          setPatients([defaultPatient]);
+        }
+
+        setSelectedPatientId("123456789");
       } catch (error) {
-        console.error("Error fetching dependents:", error);
+        console.error("Error fetching patient data:", error);
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false);
       }
     };
 
-    fetchPatients();
+    fetchData();
   }, []);
 
-  // Handle patient selection
-  const handleSelectPatient = (
-    nationalId: string,
-    patientId: number | null
-  ) => {
+  const handleSelectPatient = (nationalId: string, patientId: number | null) => {
     setSelectedPatientId(nationalId);
-    setSelectedDependentId(patientId); // Store patientId to use in POST request
+    setSelectedDependentId(patientId);
   };
 
-  // Handle the "next" button click
   const handleNextClick = async () => {
-    setIsLoading(true); // Start loading when the button is clicked
+    setIsLoading(true);
+    const token = localStorage.getItem("labass_token");
+    const headers = { Authorization: `Bearer ${token}` };
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
     if (selectedPatientId === "123456789") {
-      // If "أنا" is selected, navigate to fillPersonalInfo page
-      router.push(`/completeInfo/?consultationId=${consultationId}`);
+      // "أنا" selected
+      if (isSelfInfoComplete && selfPatientProfileId && consultationId) {
+        // Info already in DB — skip completeInfo, link profile and go to chat
+        try {
+          await axios.post(
+            `${apiUrl}/select-patient/${consultationId}`,
+            { patientId: selfPatientProfileId },
+            { headers }
+          );
+          router.push(`/chat/${consultationId}`);
+        } catch (error) {
+          console.error("Error linking patient to consultation:", error);
+          setIsLoading(false);
+        }
+      } else {
+        // Info missing — go to completeInfo to fill it in
+        router.push(`/completeInfo/?consultationId=${consultationId}`);
+      }
     } else if (selectedDependentId && consultationId) {
-      // If another patient is selected, make a POST request to attach the patient to the consultation
-      const token = localStorage.getItem("labass_token");
+      // Dependent selected — link and go to chat
       try {
         await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/select-patient/${consultationId}`,
+          `${apiUrl}/select-patient/${consultationId}`,
           { patientId: selectedDependentId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers }
         );
-        // Redirect to the next page after successful attachment
         router.push(`/chat/${consultationId}`);
       } catch (error) {
         console.error("Error attaching patient to consultation:", error);
       } finally {
-        setIsLoading(false); // End loading after navigation or error
+        setIsLoading(false);
       }
     }
   };
@@ -112,7 +133,7 @@ const PatientSelection: React.FC = () => {
 
       {isLoading ? (
         <div className="flex-grow flex justify-center items-center">
-          <Spinner /> {/* Loading spinner while fetching */}
+          <Spinner />
         </div>
       ) : (
         <>
@@ -146,10 +167,9 @@ const PatientSelection: React.FC = () => {
           <button
             className="w-full py-3 bg-custom-green text-white rounded-3xl shadow sticky bottom-12 flex justify-center items-center"
             onClick={handleNextClick}
-            disabled={isLoading} // Disable the button while loading
+            disabled={isLoading}
           >
-            {isLoading ? <Spinner /> : "التالي"}{" "}
-            {/* Show spinner when loading */}
+            {isLoading ? <Spinner /> : "التالي"}
           </button>
         </>
       )}
@@ -157,7 +177,6 @@ const PatientSelection: React.FC = () => {
   );
 };
 
-// Wrap in Suspense to handle useSearchParams
 export default function SuspenseWrapper() {
   return (
     <Suspense fallback={<Spinner />}>

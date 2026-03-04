@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Use useSearchParams to extract query params
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish"; // Adjust the path as needed
+import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 
 const PersonalInfoForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -10,65 +10,86 @@ const PersonalInfoForm: React.FC = () => {
     lastName: "",
     idNumber: "",
     dob: "",
-    gender: "male", // Default value set to "male"
+    gender: "male",
   });
 
   const [idError, setIdError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Success message state
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message state
-  const [showModal, setShowModal] = useState(false); // State for modal visibility
-  const router = useRouter(); // Initialize useRouter for routing
-  const searchParams = useSearchParams(); // Get search parameters
-
-  //In Next.js 13 and later, when using useSearchParams or useParams in a client component,
-  //you must wrap that component with <Suspense> to prevent hydration mismatches.
-  // Retrieve consultationId from the query parameters
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const consultationId = searchParams?.get("consultationId");
 
-  // Function to handle form input changes
+  // Pre-fill form with existing user data from DB
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("labass_token");
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200) {
+          const u = response.data;
+          setFormData({
+            firstName: u.firstName || "",
+            lastName: u.lastName || "",
+            idNumber: u.nationalId || "",
+            dob: u.dateOfBirth ? u.dateOfBirth.split("T")[0] : "",
+            gender: u.gender || "male",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-
     if (name === "idNumber") {
-      // Convert Arabic numbers to English before updating the state
       const convertedId = convertArabicToEnglishNumbers(value);
       setFormData({ ...formData, idNumber: convertedId });
-      setIdError(null); // Clear the error if ID is updated
+      setIdError(null);
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  // Function to handle success confirmation and navigate to the chat page
   const handleSuccessConfirmation = () => {
     if (consultationId) {
-      router.push(`/chat/${consultationId}`); // Navigate to the chat page with the consultationId
+      router.push(`/chat/${consultationId}`);
     }
   };
 
-  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Reset messages
     setSuccessMessage(null);
     setErrorMessage(null);
 
-    // Validate National ID (must be exactly 10 digits)
-    const idPattern = /^[0-9]{10}$/; // Regex to check for exactly 10 digits
+    const idPattern = /^[0-9]{10}$/;
     if (!idPattern.test(formData.idNumber)) {
       setIdError("رقم الهوية يجب أن يتكون من 10 أرقام");
-      return; // Prevent form submission if validation fails
+      return;
     }
 
-    // Proceed with form submission
-    setIsLoading(true); // Set loading to true when submitting
+    setIsLoading(true);
 
     try {
-      const token = localStorage.getItem("labass_token"); // Replace this with actual token logic
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/CompleteUserProfile`,
+      const token = localStorage.getItem("labass_token");
+      const headers = { Authorization: `Bearer ${token}` };
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+      // 1. Update user info
+      await axios.post(
+        `${apiUrl}/CompleteUserProfile`,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -76,38 +97,49 @@ const PersonalInfoForm: React.FC = () => {
           nationalId: formData.idNumber,
           dateOfBirth: formData.dob,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers }
       );
 
-      if (response.status === 200) {
-        // Display success message only when the response is successful
-        setSuccessMessage("تم إرسال المعلومات بنجاح");
-        setErrorMessage(null); // Clear any previous error
+      // 2. Ensure patientProfile exists
+      let patientProfileId: number | null = null;
+      const patientRes = await axios.get(`${apiUrl}/getPatient`, { headers });
+
+      if (patientRes.data?.exists) {
+        patientProfileId = patientRes.data.profile.id;
       } else {
-        // If response status is not 200, treat it as an error
-        setErrorMessage(
-          "حدث خطأ أثناء إرسال المعلومات. يرجى المحاولة مرة أخرى."
-        );
-        setSuccessMessage(null);
+        // Create patientProfile if it doesn't exist
+        const createRes = await axios.post(`${apiUrl}/createPatient`, {}, { headers });
+        patientProfileId = createRes.data.id;
       }
+
+      // 3. Link patientProfile to consultation
+      if (patientProfileId && consultationId) {
+        await axios.post(
+          `${apiUrl}/select-patient/${consultationId}`,
+          { patientId: patientProfileId },
+          { headers }
+        );
+      }
+
+      setSuccessMessage("تم إرسال المعلومات بنجاح");
     } catch (error) {
       console.error("Error submitting form:", error);
       setErrorMessage("حدث خطأ أثناء إرسال المعلومات. يرجى المحاولة مرة أخرى.");
-      setSuccessMessage(null); // Clear any previous success message
     } finally {
-      setIsLoading(false); // Set loading to false after request is done
-      setShowModal(true); // Show modal after submission
+      setIsLoading(false);
+      setShowModal(true);
     }
   };
 
-  // Function to close the modal
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const closeModal = () => setShowModal(false);
+
+  if (isFetching) {
+    return (
+      <div className="pt-16 flex justify-center items-center min-h-screen">
+        <div className="spinner" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -116,7 +148,7 @@ const PersonalInfoForm: React.FC = () => {
         className="pt-16 flex flex-col min-h-screen m-1 bg-white"
       >
         <div className="space-y-4 p-2 flex-grow text-black">
-          {/* Gender Selection Section */}
+          {/* Gender Selection */}
           <div className="flex flex-col justify-between text-xs" dir="rtl">
             <div className=""> هل أنت</div>
             <label>
@@ -141,7 +173,6 @@ const PersonalInfoForm: React.FC = () => {
             </label>
           </div>
 
-          {/* Input Fields */}
           <input
             type="text"
             name="firstName"
@@ -171,9 +202,7 @@ const PersonalInfoForm: React.FC = () => {
               required
             />
             {idError && (
-              <div className="text-red-500 mt-2 text-right text-xs">
-                {idError}
-              </div>
+              <div className="text-red-500 mt-2 text-right text-xs">{idError}</div>
             )}
           </div>
           <div>
@@ -191,29 +220,23 @@ const PersonalInfoForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="fixed left-1/2 transform -translate-x-1/2 bottom-0 w-3/4 bg-custom-green p-2 text-white rounded-2xl text-xs"
-          style={{ bottom: "10px" }} // Adjust the bottom position as needed
-          disabled={isLoading} // Disable button while loading
+          style={{ bottom: "10px" }}
+          disabled={isLoading}
         >
           {isLoading ? "جارٍ الإرسال..." : "إرسال"}
         </button>
       </form>
 
-      {/* Modal for Success/Error Messages */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-4 rounded-lg shadow-lg w-80">
             {successMessage ? (
-              <div className="text-green-600 text-center mb-4">
-                {successMessage}
-              </div>
+              <div className="text-green-600 text-center mb-4">{successMessage}</div>
             ) : (
-              <div className="text-red-600 text-center mb-4">
-                {errorMessage}
-              </div>
+              <div className="text-red-600 text-center mb-4">{errorMessage}</div>
             )}
             <button
               onClick={successMessage ? handleSuccessConfirmation : closeModal}
