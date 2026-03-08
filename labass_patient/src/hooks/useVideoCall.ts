@@ -80,8 +80,6 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
             initiatedBy: "patient",
             timestamp: new Date(),
           });
-<<<<<<< HEAD
-=======
 
           // Notify backend that this user joined the call
           // This prevents false MISSED_CALL notifications
@@ -90,7 +88,6 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
             userId: userId,
             timestamp: new Date(),
           });
->>>>>>> develop
         }
       });
 
