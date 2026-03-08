@@ -71,11 +71,6 @@ const OrgPatientsPage: React.FC = () => {
   const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
   const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
 
-  // Confirmation modals for consultations
-  const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
-  const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
-  const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
-
   // Form fields
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
