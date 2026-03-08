@@ -290,11 +290,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       const consultationType = localStorage.getItem("consultationType");
 
       if (consultationType === "obesity") {
-<<<<<<< HEAD
-        // Redirect to obesity survey with consultationId
-        localStorage.setItem("obesityConsultationId", consultationId.toString());
-        router.push(`/obesitySurvey?consultationId=${consultationId}`);
-=======
         const storedSurveyData = localStorage.getItem("obesitySurveyData");
 
         if (storedSurveyData) {
@@ -320,7 +315,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           localStorage.setItem("obesityConsultationId", consultationId.toString());
           router.push(`/obesitySurvey?consultationId=${consultationId}`);
         }
->>>>>>> develop
         return;
       }
 

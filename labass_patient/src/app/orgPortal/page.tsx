@@ -27,10 +27,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import DoctorTypeSection from "./_components/DoctorTypeSection";
 import { DoctorType } from "./_types/doctorTypes";
 import BundleSection from "./_components/BundleSection";
-<<<<<<< HEAD
-=======
 import AvailableBundlesSection from "./_components/AvailableBundlesSection";
->>>>>>> develop
 import { getMySubscription } from "./_controllers/getMySubscription";
 import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 
@@ -134,11 +131,7 @@ const OrgPatientsPage: React.FC = () => {
       if (orgResponse.success && orgResponse.data) {
         console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
-<<<<<<< HEAD
-        setOrgType(orgResponse.data.type?.toLowerCase() as OrganizationTypes);
-=======
         setOrgType(orgResponse.data.type);
->>>>>>> develop
         setOrgName(orgResponse.data.name || "");
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
@@ -454,10 +447,7 @@ const OrgPatientsPage: React.FC = () => {
           consultationType: magicLinkData.consultationType,
           labConsultationType: testType || undefined,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
-<<<<<<< HEAD
-=======
           sendSMS: false, // Don't send SMS when opening consultation directly
->>>>>>> develop
         };
 
         const result = await createBundleConsultation(bundleData);
@@ -475,14 +465,10 @@ const OrgPatientsPage: React.FC = () => {
         }
       } else {
         // Use regular magic link flow
-<<<<<<< HEAD
-        const result = await createMagicLink(magicLinkData);
-=======
         const result = await createMagicLink({
           ...magicLinkData,
           sendSMS: false, // Don't send SMS when opening consultation directly
         });
->>>>>>> develop
 
         // Open the magic link in the same window
         window.location.href = result.link;
@@ -577,8 +563,6 @@ const OrgPatientsPage: React.FC = () => {
                       </div>
                     </div>
                   )}
-<<<<<<< HEAD
-=======
                 </div>
               </div>
             </div>
@@ -601,7 +585,6 @@ const OrgPatientsPage: React.FC = () => {
                     {t('subscription.pageTitle')}
                   </h3>
                   <div className="w-12"></div>
->>>>>>> develop
                 </div>
               </div>
             </div>
@@ -764,13 +747,6 @@ const OrgPatientsPage: React.FC = () => {
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
                   />
-<<<<<<< HEAD
-                  <BundleSection
-                    subscription={subscription}
-                    useBundle={useBundle}
-                    setUseBundle={setUseBundle}
-                  />
-=======
                   {/* Show active subscription if available */}
                   {subscription && (
                     <BundleSection
@@ -779,7 +755,6 @@ const OrgPatientsPage: React.FC = () => {
                       setUseBundle={setUseBundle}
                     />
                   )}
->>>>>>> develop
                   <TestTypeSection
                     orgType={orgType}
                     testType={testType}
@@ -969,8 +944,6 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
-<<<<<<< HEAD
-=======
         {/* Bundle Payment Success Modal */}
         {showBundlePaymentSuccessModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -996,7 +969,6 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
->>>>>>> develop
         {/* Send Consultation Confirmation Modal - Only for Schools */}
         {showSendConsultationConfirm && orgType === OrganizationTypes.School && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
