@@ -3,7 +3,10 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
+<<<<<<< HEAD
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
+=======
+>>>>>>> develop
 
 interface SurveyData {
   weight: string;
@@ -98,7 +101,11 @@ const ObesitySurveyContent: React.FC = () => {
     "مدري، بس قاعد أستكشف",
   ];
 
+<<<<<<< HEAD
   const toggleSelection = (_list: string[], item: string, field: keyof SurveyData) => {
+=======
+  const toggleSelection = (list: string[], item: string, field: keyof SurveyData) => {
+>>>>>>> develop
     const currentList = surveyData[field] as string[];
 
     // Handle "لا شيء مما سبق" / "لا، لا أتناول أي أدوية أو فيتامينات" exclusivity
@@ -140,6 +147,7 @@ const ObesitySurveyContent: React.FC = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+<<<<<<< HEAD
       // Get consultationId from URL params or localStorage
       const consultationId = searchParams.get("consultationId") || localStorage.getItem("obesityConsultationId");
 
@@ -158,6 +166,8 @@ const ObesitySurveyContent: React.FC = () => {
         return;
       }
 
+=======
+>>>>>>> develop
       // Format survey data for backend
       const surveyPayload = {
         survey: [
@@ -172,6 +182,7 @@ const ObesitySurveyContent: React.FC = () => {
         ]
       };
 
+<<<<<<< HEAD
       // Send survey data to backend
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
@@ -189,6 +200,39 @@ const ObesitySurveyContent: React.FC = () => {
 
         // Redirect to chat with consultationId
         router.push(`/chat/${consultationId}`);
+=======
+      // Get consultationId from URL params or localStorage (old marketer flow)
+      const consultationId = searchParams.get("consultationId") || localStorage.getItem("obesityConsultationId");
+
+      if (consultationId) {
+        // OLD FLOW (marketer magic link): consultationId already exists → POST survey → go to chat
+        const token = localStorage.getItem("labass_token");
+        if (!token) {
+          alert("يرجى تسجيل الدخول أولاً");
+          setIsSubmitting(false);
+          return;
+        }
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
+          surveyPayload,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        if (response.data) {
+          localStorage.removeItem("consultationType");
+          localStorage.removeItem("obesityConsultationId");
+          localStorage.removeItem("obesitySurveyData");
+          router.push(`/chat/${consultationId}`);
+        }
+      } else {
+        // NEW FLOW (button → survey → payment): no consultationId yet
+        // Store completed survey and navigate to payment
+        localStorage.setItem("obesitySurveyData", JSON.stringify(surveyPayload));
+        router.push("/payment?consultationType=obesity");
+>>>>>>> develop
       }
     } catch (error: any) {
       console.error("Error submitting survey:", error);
@@ -218,6 +262,7 @@ const ObesitySurveyContent: React.FC = () => {
     }
   };
 
+<<<<<<< HEAD
   const renderHeader = () => (
     <div className="sticky top-0 z-10 bg-white border-b border-gray-100 shadow-sm">
       <div className="flex items-center justify-between px-5 pt-4 pb-2">
@@ -249,6 +294,41 @@ const ObesitySurveyContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       {renderHeader()}
+=======
+  const renderProgressBar = () => {
+    const totalSteps = 6;
+    const progress = ((currentStep + 1) / totalSteps) * 100;
+
+    return (
+      <div className="w-full bg-gray-200 h-1 mb-4">
+        <div
+          className="bg-red-500 h-1 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-white" dir="rtl">
+      {/* Progress Bar */}
+      {renderProgressBar()}
+
+      {/* Header with back arrow */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <button
+          onClick={handleBack}
+          className={`text-2xl ${currentStep === 0 ? "invisible" : ""}`}
+        >
+          ←
+        </button>
+        <div className="flex items-center gap-2">
+          <span className="text-red-500 text-sm font-semibold">
+            {currentStep + 1}/{6}
+          </span>
+        </div>
+      </div>
+>>>>>>> develop
 
       {/* Content */}
       <div className="p-6 max-w-2xl mx-auto">
@@ -260,7 +340,11 @@ const ObesitySurveyContent: React.FC = () => {
                 نحتاج نعرفك أول..
               </h1>
               <p className="text-gray-600">
+<<<<<<< HEAD
                 ونصمم لك الخطة المناسبة
+=======
+                ونصمم لك الخطة المناسبة تالي
+>>>>>>> develop
               </p>
               <p className="text-sm text-gray-500 mt-4">
                 إجاباتك الدقيقة = خطة تناسبك أكثر
@@ -268,7 +352,11 @@ const ObesitySurveyContent: React.FC = () => {
             </div>
             <button
               onClick={handleNext}
+<<<<<<< HEAD
               className="w-full bg-custom-green text-white py-4 rounded-lg font-semibold hover:bg-custom-green/90 transition-colors"
+=======
+              className="w-full bg-blue-500 text-white py-4 rounded-lg font-semibold hover:bg-blue-600 transition-colors"
+>>>>>>> develop
             >
               لنبدأ الآن
             </button>
@@ -280,7 +368,11 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
+<<<<<<< HEAD
                 مؤشر كتلة الجسم
+=======
+                ← مؤشر كتلة الجسم
+>>>>>>> develop
               </h2>
             </div>
 
@@ -332,6 +424,7 @@ const ObesitySurveyContent: React.FC = () => {
               )}
             </div>
 
+<<<<<<< HEAD
             <button
               onClick={handleNext}
               disabled={!canProceed()}
@@ -339,6 +432,23 @@ const ObesitySurveyContent: React.FC = () => {
             >
               التالي
             </button>
+=======
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
+>>>>>>> develop
           </div>
         )}
 
@@ -347,7 +457,11 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
+<<<<<<< HEAD
                 هل لديك هذه الحالات؟
+=======
+                ← هل لديك هذه الحالات؟
+>>>>>>> develop
               </h2>
             </div>
 
@@ -362,8 +476,13 @@ const ObesitySurveyContent: React.FC = () => {
                     }
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
+<<<<<<< HEAD
                         ? "bg-custom-green text-white border-custom-green"
                         : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
+=======
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+>>>>>>> develop
                     }`}
                   >
                     {condition}
@@ -373,6 +492,7 @@ const ObesitySurveyContent: React.FC = () => {
               })}
             </div>
 
+<<<<<<< HEAD
             <button
               onClick={handleNext}
               disabled={!canProceed()}
@@ -380,6 +500,23 @@ const ObesitySurveyContent: React.FC = () => {
             >
               التالي
             </button>
+=======
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
+>>>>>>> develop
           </div>
         )}
 
@@ -388,7 +525,11 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
+<<<<<<< HEAD
                 هل تتناول حاليًا أي من:
+=======
+                ← هل تتناول حاليًا أي من:
+>>>>>>> develop
               </h2>
             </div>
 
@@ -403,8 +544,13 @@ const ObesitySurveyContent: React.FC = () => {
                     }
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
+<<<<<<< HEAD
                         ? "bg-custom-green text-white border-custom-green"
                         : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
+=======
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+>>>>>>> develop
                     }`}
                   >
                     {medication}
@@ -425,6 +571,7 @@ const ObesitySurveyContent: React.FC = () => {
               )}
             </div>
 
+<<<<<<< HEAD
             <button
               onClick={handleNext}
               disabled={!canProceed()}
@@ -432,6 +579,23 @@ const ObesitySurveyContent: React.FC = () => {
             >
               التالي
             </button>
+=======
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
+>>>>>>> develop
           </div>
         )}
 
@@ -440,7 +604,11 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
+<<<<<<< HEAD
                 سؤال لك
+=======
+                ← سؤال لك
+>>>>>>> develop
               </h2>
               <p className="text-gray-600">
                 كيف تفضل/ي برنامج فقدان الوزن؟<br />
@@ -455,8 +623,13 @@ const ObesitySurveyContent: React.FC = () => {
                 }
                 className={`w-full p-4 rounded-lg border text-right transition-colors ${
                   surveyData.medicationPreference === "with_medication"
+<<<<<<< HEAD
                     ? "bg-custom-green text-white border-custom-green"
                     : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
+=======
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+>>>>>>> develop
                 }`}
               >
                 أريد أدوية مع البرنامج
@@ -468,14 +641,20 @@ const ObesitySurveyContent: React.FC = () => {
                 }
                 className={`w-full p-4 rounded-lg border text-right transition-colors ${
                   surveyData.medicationPreference === "without_medication"
+<<<<<<< HEAD
                     ? "bg-custom-green text-white border-custom-green"
                     : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
+=======
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+>>>>>>> develop
                 }`}
               >
                 لا أريد الأدوية.. فقط البرنامج
               </button>
             </div>
 
+<<<<<<< HEAD
             <button
               onClick={handleNext}
               disabled={!canProceed()}
@@ -483,6 +662,23 @@ const ObesitySurveyContent: React.FC = () => {
             >
               التالي
             </button>
+=======
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                التالي
+              </button>
+            </div>
+>>>>>>> develop
           </div>
         )}
 
@@ -491,7 +687,11 @@ const ObesitySurveyContent: React.FC = () => {
           <div className="space-y-6">
             <div className="text-right">
               <h2 className="text-xl font-bold text-gray-800 mb-2">
+<<<<<<< HEAD
                 ويش اللي تدور عليه؟
+=======
+                ← ويش اللي تدور عليه؟
+>>>>>>> develop
               </h2>
             </div>
 
@@ -504,8 +704,13 @@ const ObesitySurveyContent: React.FC = () => {
                     onClick={() => toggleSelection(goalsList, goal, "goals")}
                     className={`w-full p-4 rounded-lg border text-right transition-colors ${
                       isSelected
+<<<<<<< HEAD
                         ? "bg-custom-green text-white border-custom-green"
                         : "bg-white text-gray-700 border-gray-300 hover:border-custom-green"
+=======
+                        ? "bg-blue-500 text-white border-blue-500"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-300"
+>>>>>>> develop
                     }`}
                   >
                     {goal}
@@ -515,6 +720,7 @@ const ObesitySurveyContent: React.FC = () => {
               })}
             </div>
 
+<<<<<<< HEAD
             <button
               onClick={handleSubmit}
               disabled={!canProceed() || isSubmitting}
@@ -528,6 +734,30 @@ const ObesitySurveyContent: React.FC = () => {
                 "التالي"
               )}
             </button>
+=======
+            <div className="flex gap-3">
+              <button
+                onClick={handleBack}
+                disabled={isSubmitting}
+                className="flex-1 bg-white text-gray-600 py-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                السابق
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!canProceed() || isSubmitting}
+                className="flex-1 bg-gray-300 text-white py-4 rounded-lg font-semibold disabled:opacity-50 enabled:bg-blue-500 enabled:hover:bg-blue-600 transition-colors"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="spinner" />
+                  </div>
+                ) : (
+                  "التالي"
+                )}
+              </button>
+            </div>
+>>>>>>> develop
           </div>
         )}
       </div>

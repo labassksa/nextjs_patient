@@ -284,15 +284,43 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
 
   // 1. Adjusted handleGoToChat to check for promoCode source and obesity consultation
   // ----------------------------------------------------------------
-  const handleGoToChat = () => {
+  const handleGoToChat = async () => {
     if (consultationId) {
       // Check if it's an obesity consultation
       const consultationType = localStorage.getItem("consultationType");
 
       if (consultationType === "obesity") {
+<<<<<<< HEAD
         // Redirect to obesity survey with consultationId
         localStorage.setItem("obesityConsultationId", consultationId.toString());
         router.push(`/obesitySurvey?consultationId=${consultationId}`);
+=======
+        const storedSurveyData = localStorage.getItem("obesitySurveyData");
+
+        if (storedSurveyData) {
+          // NEW FLOW (button → survey → payment): survey already completed before payment
+          // POST the stored survey data, then proceed with the normal consultation flow
+          const token = localStorage.getItem("labass_token");
+          if (token) {
+            try {
+              await axios.post(
+                `${apiUrl}/consultations/${consultationId}/obesity-survey`,
+                JSON.parse(storedSurveyData),
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+            } catch (err) {
+              console.error("Error submitting stored obesity survey:", err);
+            }
+          }
+          localStorage.removeItem("obesitySurveyData");
+          localStorage.removeItem("consultationType");
+          router.push(`/patientSelection?consultationId=${consultationId}`);
+        } else {
+          // OLD FLOW (marketer magic link): no pre-stored survey → go fill it now
+          localStorage.setItem("obesityConsultationId", consultationId.toString());
+          router.push(`/obesitySurvey?consultationId=${consultationId}`);
+        }
+>>>>>>> develop
         return;
       }
 

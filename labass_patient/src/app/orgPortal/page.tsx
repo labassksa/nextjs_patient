@@ -27,6 +27,10 @@ import ErrorIcon from "@mui/icons-material/Error";
 import DoctorTypeSection from "./_components/DoctorTypeSection";
 import { DoctorType } from "./_types/doctorTypes";
 import BundleSection from "./_components/BundleSection";
+<<<<<<< HEAD
+=======
+import AvailableBundlesSection from "./_components/AvailableBundlesSection";
+>>>>>>> develop
 import { getMySubscription } from "./_controllers/getMySubscription";
 import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 
@@ -43,7 +47,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [currentView, setCurrentView] = useState<"patients" | "registration" | "products">(
+  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription">(
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
@@ -63,6 +67,12 @@ const OrgPatientsPage: React.FC = () => {
   const [isUpdatingName, setIsUpdatingName] = useState(false);
   const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
   const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
+  const [showBundlePaymentSuccessModal, setShowBundlePaymentSuccessModal] = useState(false);
+
+  // Confirmation modals for consultations
+  const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
+  const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
+  const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
 
   // Confirmation modals for consultations
   const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
@@ -124,7 +134,11 @@ const OrgPatientsPage: React.FC = () => {
       if (orgResponse.success && orgResponse.data) {
         console.log("Organization Data:", orgResponse.data);
         setDealType(orgResponse.data.dealType);
+<<<<<<< HEAD
         setOrgType(orgResponse.data.type?.toLowerCase() as OrganizationTypes);
+=======
+        setOrgType(orgResponse.data.type);
+>>>>>>> develop
         setOrgName(orgResponse.data.name || "");
       } else {
         throw new Error(orgResponse.message || "Unknown error occurred.");
@@ -180,8 +194,21 @@ const OrgPatientsPage: React.FC = () => {
 
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
-    if (viewParam === 'products' || viewParam === 'patients' || viewParam === 'registration') {
+    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration') {
       setCurrentView(viewParam);
+    }
+
+    // Check for bundle payment success
+    if (urlParams.get('bundlePaymentSuccess') === 'true') {
+      setShowBundlePaymentSuccessModal(true);
+      // Refresh subscription data to show the newly activated subscription
+      fetchSubscription();
+      // Clean up URL
+      urlParams.delete('bundlePaymentSuccess');
+      const newUrl = urlParams.toString()
+        ? `${window.location.pathname}?${urlParams.toString()}`
+        : window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
     }
   }, []);
 
@@ -427,6 +454,10 @@ const OrgPatientsPage: React.FC = () => {
           consultationType: magicLinkData.consultationType,
           labConsultationType: testType || undefined,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+<<<<<<< HEAD
+=======
+          sendSMS: false, // Don't send SMS when opening consultation directly
+>>>>>>> develop
         };
 
         const result = await createBundleConsultation(bundleData);
@@ -444,7 +475,14 @@ const OrgPatientsPage: React.FC = () => {
         }
       } else {
         // Use regular magic link flow
+<<<<<<< HEAD
         const result = await createMagicLink(magicLinkData);
+=======
+        const result = await createMagicLink({
+          ...magicLinkData,
+          sendSMS: false, // Don't send SMS when opening consultation directly
+        });
+>>>>>>> develop
 
         // Open the magic link in the same window
         window.location.href = result.link;
@@ -464,14 +502,14 @@ const OrgPatientsPage: React.FC = () => {
   return (
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
-        {/* User Info Section - Compact Design */}
-        {userData && (
+        {/* User Info Section - Compact Design (hidden on subscription view) */}
+        {userData && currentView !== "subscription" && (
           <div className="mb-4">
             <div className="w-full">
               {/* Compact Header with Language Toggle */}
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2">
                 <div className="flex items-center justify-between">
-                  <button 
+                  <button
                     onClick={toggleLanguage}
                     className="text-white bg-blue-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
                   >
@@ -483,7 +521,7 @@ const OrgPatientsPage: React.FC = () => {
                   <div className="w-12"></div> {/* Spacer for centering */}
                 </div>
               </div>
-              
+
               {/* Compact Content */}
               <div className="bg-white p-3">
                 <div className="space-y-2" dir="rtl">
@@ -496,7 +534,7 @@ const OrgPatientsPage: React.FC = () => {
                       <div>
                         <p className="text-xs text-gray-500">الاسم</p>
                         <p className="text-sm font-medium text-gray-800">
-                          {userData.firstName || userData.lastName 
+                          {userData.firstName || userData.lastName
                             ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
                             : 'غير محدد'}
                         </p>
@@ -539,6 +577,31 @@ const OrgPatientsPage: React.FC = () => {
                       </div>
                     </div>
                   )}
+<<<<<<< HEAD
+=======
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Subscription Page Header (only shown on subscription view) */}
+        {currentView === "subscription" && (
+          <div className="mb-4">
+            <div className="w-full">
+              <div className="bg-gradient-to-r from-custom-green to-green-600 p-4">
+                <div className="flex items-center justify-between" dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+                  <button
+                    onClick={toggleLanguage}
+                    className="text-white bg-green-700 bg-opacity-50 rounded px-2 py-1 text-xs font-medium hover:bg-opacity-70"
+                  >
+                    {i18n.language === 'ar' ? 'English' : 'عربي'}
+                  </button>
+                  <h3 className="text-lg font-bold text-white">
+                    {t('subscription.pageTitle')}
+                  </h3>
+                  <div className="w-12"></div>
+>>>>>>> develop
                 </div>
               </div>
             </div>
@@ -658,8 +721,24 @@ const OrgPatientsPage: React.FC = () => {
                     ))
                   )}
                 </div>
-              ) : currentView === "products" ? (
-                <ProductsList />
+              ) : currentView === "subscription" ? (
+                <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                  {/* Show active subscription or available bundles */}
+                  {subscription ? (
+                    <BundleSection
+                      subscription={subscription}
+                      useBundle={useBundle}
+                      setUseBundle={setUseBundle}
+                    />
+                  ) : (
+                    <AvailableBundlesSection
+                      onSubscribe={(bundleId) => {
+                        // TODO: Connect to backend subscription flow
+                        console.log("Subscribe to bundle:", bundleId);
+                      }}
+                    />
+                  )}
+                </div>
               ) : (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
                   <OrgUserRegistrationForm
@@ -685,11 +764,22 @@ const OrgPatientsPage: React.FC = () => {
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
                   />
+<<<<<<< HEAD
                   <BundleSection
                     subscription={subscription}
                     useBundle={useBundle}
                     setUseBundle={setUseBundle}
                   />
+=======
+                  {/* Show active subscription if available */}
+                  {subscription && (
+                    <BundleSection
+                      subscription={subscription}
+                      useBundle={useBundle}
+                      setUseBundle={setUseBundle}
+                    />
+                  )}
+>>>>>>> develop
                   <TestTypeSection
                     orgType={orgType}
                     testType={testType}
@@ -879,6 +969,34 @@ const OrgPatientsPage: React.FC = () => {
           </div>
         )}
 
+<<<<<<< HEAD
+=======
+        {/* Bundle Payment Success Modal */}
+        {showBundlePaymentSuccessModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-sm w-full">
+              <div className="text-center">
+                <CheckCircleIcon className="text-green-500 w-24 h-24 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-black mb-2" dir="rtl">
+                  تم الاشتراك بنجاح!
+                </p>
+                <p className="text-gray-600 text-sm mb-6" dir="rtl">
+                  تم تفعيل الباقة بنجاح. يمكنك الآن إنشاء استشارات من رصيد الباقة.
+                </p>
+
+                <button
+                  onClick={() => setShowBundlePaymentSuccessModal(false)}
+                  className="p-3 w-full text-sm font-bold bg-green-500 text-white rounded-lg hover:bg-green-600"
+                  dir="rtl"
+                >
+                  موافق
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+>>>>>>> develop
         {/* Send Consultation Confirmation Modal - Only for Schools */}
         {showSendConsultationConfirm && orgType === OrganizationTypes.School && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

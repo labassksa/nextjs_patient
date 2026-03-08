@@ -18,7 +18,11 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
   const doctorTypes = [
     { type: DoctorType.General, label: "عام", disabled: false },
     { type: DoctorType.Psychiatrist, label: "نفسي", disabled: true },
+<<<<<<< HEAD
     { type: DoctorType.Obesity, label: " سمنة", disabled: true },
+=======
+    { type: DoctorType.Obesity, label: " سمنة", disabled: false },
+>>>>>>> develop
   ];
 
   return (

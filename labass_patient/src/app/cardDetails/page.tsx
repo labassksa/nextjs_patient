@@ -22,6 +22,7 @@ const CardDetailsContent: React.FC = () => {
   const discountedPrice = searchParams.get("discountedPrice") || "0";
   const promoCode = searchParams.get("promoCode") || "";
   const consultationType = searchParams.get("consultationType");
+  const bundleId = searchParams.get("bundleId");
 
   // Store consultationType in localStorage if it exists
   useEffect(() => {
@@ -49,10 +50,18 @@ const CardDetailsContent: React.FC = () => {
 
           // Check success or error
           if (finalUrl.includes("/success")) {
-            const consultationId = localStorage.getItem('temp_consultation_id');
-            const promoFromUrl = localStorage.getItem('temp_promo_from_url');
-            router.push(`/cardDetails/success?consultationId=${consultationId}&promoFromUrl=${promoFromUrl}`);
+            const tempBundleId = localStorage.getItem('temp_bundle_id');
+            if (tempBundleId) {
+              // Bundle payment - redirect to orgPortal
+              localStorage.removeItem('temp_bundle_id');
+              router.push("/orgPortal?bundlePaymentSuccess=true");
+            } else {
+              const consultationId = localStorage.getItem('temp_consultation_id');
+              const promoFromUrl = localStorage.getItem('temp_promo_from_url');
+              router.push(`/cardDetails/success?consultationId=${consultationId}&promoFromUrl=${promoFromUrl}`);
+            }
           } else {
+            localStorage.removeItem('temp_bundle_id');
             router.push("/cardDetails/error");
           }
           return;
@@ -92,40 +101,76 @@ const CardDetailsContent: React.FC = () => {
               }
 
               console.log("[Payment] Executing payment with sessionId:", newSessionId);
-              const { data } = await axios.post(
-                `${apiUrl}/execute-payment`,
-                {
-                  SessionId: newSessionId,
-                  DisplayCurrencyIso: "SAR",
-                  InvoiceValue: parseFloat(discountedPrice).toFixed(2),
-                  PromoCode: promoCode,
-                  CallBackUrl: "https://labass.sa/cardDetails/success",
-                  ErrorUrl: "https://labass.sa/cardDetails/error",
-                },
-                {
-                  headers: { Authorization: `Bearer ${token}` },
+
+              // Check if this is a bundle payment
+              if (bundleId) {
+                console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
+                const { data } = await axios.post(
+                  `${apiUrl}/execute-onetime-bundle-payment`,
+                  {
+                    bundleId: Number(bundleId),
+                    sessionId: newSessionId,
+                    callBackUrl: "https://labass.sa/cardDetails/success",
+                    errorUrl: "https://labass.sa/cardDetails/error",
+                  },
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                console.log("[Payment] Bundle payment response:", data);
+                if (data.success && data.data?.paymentURL) {
+                  const paymentUrl = data.data.paymentURL;
+                  console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
+
+                  // Store bundle info before showing 3D-Secure iframe
+                  localStorage.setItem("temp_bundle_id", bundleId);
+
+                  // Show 3D-Secure iframe
+                  setIframeSrc(paymentUrl);
+                  setShowIframe(true);
+                } else {
+                  console.error("[Payment] Bundle payment failed:", data);
+                  setIsSubmitting(false);
+                  router.push("/cardDetails/error");
                 }
-              );
-
-              console.log("[Payment] Execute payment response:", data);
-              if (data.IsSuccess && data.Data.PaymentURL) {
-                const paymentUrl = data.Data.PaymentURL;
-                const consultationId = data.consultation;
-                console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
-                
-                // Store information before showing 3D-Secure iframe
-                localStorage.setItem("temp_consultation_id", consultationId);
-                localStorage.setItem("temp_promo_code", promoCode);
-                const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
-                localStorage.setItem("temp_promo_from_url", isPromoFromUrl ? "true" : "false");
-
-                // Show 3D-Secure iframe
-                setIframeSrc(paymentUrl);
-                setShowIframe(true);
               } else {
-                console.error("[Payment] Execute payment failed:", data);
-                setIsSubmitting(false);
-                router.push("/cardDetails/error");
+                // Regular consultation payment
+                const { data } = await axios.post(
+                  `${apiUrl}/execute-payment`,
+                  {
+                    SessionId: newSessionId,
+                    DisplayCurrencyIso: "SAR",
+                    InvoiceValue: parseFloat(discountedPrice).toFixed(2),
+                    PromoCode: promoCode,
+                    CallBackUrl: "https://labass.sa/cardDetails/success",
+                    ErrorUrl: "https://labass.sa/cardDetails/error",
+                  },
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                console.log("[Payment] Execute payment response:", data);
+                if (data.IsSuccess && data.Data.PaymentURL) {
+                  const paymentUrl = data.Data.PaymentURL;
+                  const consultationId = data.consultation;
+                  console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
+
+                  // Store information before showing 3D-Secure iframe
+                  localStorage.setItem("temp_consultation_id", consultationId);
+                  localStorage.setItem("temp_promo_code", promoCode);
+                  const isPromoFromUrl = searchParams.get("promoCode") === promoCode && promoCode !== "";
+                  localStorage.setItem("temp_promo_from_url", isPromoFromUrl ? "true" : "false");
+
+                  // Show 3D-Secure iframe
+                  setIframeSrc(paymentUrl);
+                  setShowIframe(true);
+                } else {
+                  console.error("[Payment] Execute payment failed:", data);
+                  setIsSubmitting(false);
+                  router.push("/cardDetails/error");
+                }
               }
             } catch (error) {
               console.error("[Payment] Execute payment error:", error);
@@ -147,7 +192,7 @@ const CardDetailsContent: React.FC = () => {
 
     window.addEventListener("message", handle3DSMessage);
     return () => window.removeEventListener("message", handle3DSMessage);
-  }, [router, discountedPrice, promoCode, searchParams]);
+  }, [router, discountedPrice, promoCode, searchParams, bundleId]);
 
   // 2) Load and initialize MyFatoorah script after it's loaded
   useEffect(() => {

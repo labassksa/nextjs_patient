@@ -137,7 +137,56 @@ const resources = {
         networkError: "⚠️ Network Connection Error: Please check your internet connection and try again.",
         genericError: "An error occurred, please try again",
         marketerNotFound: "⚠️ Marketer profile not found for this user. Please login with your marketer account.",
-        organizationNotFound: "⚠️ Organization not found for your profile. Please contact support"
+        organizationNotFound: "⚠️ Organization not found for your profile. Please contact support",
+        paymentSessionError: "An error occurred while initiating payment session"
+      },
+      subscription: {
+        tabLabel: "Subscription",
+        pageTitle: "Medical Consultation Packages",
+        infoNote: "Subscription allows you to create consultations at a lower cost",
+        availableBundles: "Available Subscription Packages",
+        chooseBundleSubtitle: "Choose the package that suits your organization to benefit from consultation services",
+        currentSubscription: "Your Current Subscription",
+        useSubscription: "You have an active subscription, you can use it to create consultations",
+        remainingConsultations: "Remaining Consultations",
+        totalConsultations: "Total Consultations",
+        nextRenewal: "Next Renewal",
+        price: "Price",
+        useBundle: "Use Subscription (Free)",
+        paySeperately: "Pay Separately (Outside Subscription)",
+        selected: "Selected",
+        subscribeNow: "Subscribe Now",
+        currentBundle: "Your Current Package",
+        consultationsCount: "Number of Consultations",
+        noBundlesAvailable: "No packages available currently",
+        contactAdmin: "Please contact administration",
+        errorLoadingBundles: "Error loading packages",
+        couldNotLoadBundles: "Could not load available packages",
+        choosePaymentMethod: "Choose Payment Method",
+        oneTimePayment: "One-time Payment",
+        oneTimePaymentDesc: "Pay once without auto-renewal",
+        recurringPayment: "Recurring Subscription",
+        recurringPaymentDesc: "Auto-renewal every period",
+        comingSoon: "Coming Soon",
+        cancel: "Cancel",
+        active: "Active",
+        bundleNames: {
+          basic: "Basic Package",
+          standard: "Standard Package",
+          premium: "Premium Package"
+        },
+        bundleTypes: {
+          gpConsultations: "GP Consultations",
+          specialistConsultations: "Specialist Consultations"
+        },
+        recurringTypes: {
+          monthly: "Monthly",
+          weekly: "Weekly",
+          daily: "Daily",
+          yearly: "Yearly"
+        },
+        lowConsultationsWarning: "Warning: Remaining consultations are low",
+        noConsultationsError: "No remaining consultations in subscription. Separate payment method will be used."
       }
     }
   },
@@ -275,7 +324,56 @@ const resources = {
         networkError: "⚠️ خطأ في الاتصال بالشبكة: يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
         genericError: "حدث خطأ ، حاول مرة أخرى",
         marketerNotFound: "⚠️ تعذر العثور على الملف التعريفي للمسوق لهذا المستخدم. يرجى تسجيل الدخول باستخدام حساب المسوق الخاص بك.",
-        organizationNotFound: "⚠️ لم يتم العثور على المؤسسة المرتبطة بملفك التعريفي. يرجى الاتصال بالدعم الفني"
+        organizationNotFound: "⚠️ لم يتم العثور على المؤسسة المرتبطة بملفك التعريفي. يرجى الاتصال بالدعم الفني",
+        paymentSessionError: "حدث خطأ أثناء بدء جلسة الدفع"
+      },
+      subscription: {
+        tabLabel: "الاشتراك",
+        pageTitle: "باقات الاستشارات الطبية",
+        infoNote: "الاشتراك يتيح لك إنشاء استشارات بتكلفة أقل",
+        availableBundles: "باقات الاشتراك المتاحة",
+        chooseBundleSubtitle: "اختر الباقة المناسبة لمنشأتك للاستفادة من خدمات الاستشارات",
+        currentSubscription: "اشتراكك الحالي",
+        useSubscription: "لديك اشتراك فعّال، يمكنك استخدامه لإنشاء الاستشارة",
+        remainingConsultations: "الاستشارات المتبقية",
+        totalConsultations: "إجمالي الاستشارات",
+        nextRenewal: "التجديد القادم",
+        price: "السعر",
+        useBundle: "استخدام الاشتراك (مجاناً)",
+        paySeperately: "الدفع بشكل منفصل (خارج الاشتراك)",
+        selected: "محدد",
+        subscribeNow: "اشترك الآن",
+        currentBundle: "باقتك الحالية",
+        consultationsCount: "عدد الاستشارات",
+        noBundlesAvailable: "لا توجد باقات متاحة حالياً",
+        contactAdmin: "يرجى التواصل مع الإدارة",
+        errorLoadingBundles: "حدث خطأ أثناء تحميل الباقات",
+        couldNotLoadBundles: "تعذر تحميل الباقات المتاحة",
+        choosePaymentMethod: "اختر طريقة الدفع",
+        oneTimePayment: "دفع لمرة واحدة",
+        oneTimePaymentDesc: "ادفع مرة واحدة بدون تجديد تلقائي",
+        recurringPayment: "اشتراك متكرر",
+        recurringPaymentDesc: "تجديد تلقائي كل فترة",
+        comingSoon: "قريباً",
+        cancel: "إلغاء",
+        active: "فعّال",
+        bundleNames: {
+          basic: "الباقة الأساسية",
+          standard: "الباقة المتوسطة",
+          premium: "الباقة المميزة"
+        },
+        bundleTypes: {
+          gpConsultations: "استشارات طبيب عام",
+          specialistConsultations: "استشارات أخصائي"
+        },
+        recurringTypes: {
+          monthly: "شهري",
+          weekly: "أسبوعي",
+          daily: "يومي",
+          yearly: "سنوي"
+        },
+        lowConsultationsWarning: "تنبيه: عدد الاستشارات المتبقية منخفض",
+        noConsultationsError: "لا توجد استشارات متبقية في الاشتراك. سيتم استخدام طريقة الدفع المنفصلة."
       }
     }
   }

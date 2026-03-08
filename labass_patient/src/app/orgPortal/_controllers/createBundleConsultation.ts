@@ -18,6 +18,10 @@ interface CreateBundleConsultationData {
   consultationType: string;
   labConsultationType?: LabtestType;
   pdfFiles?: File[];
+<<<<<<< HEAD
+=======
+  sendSMS?: boolean;
+>>>>>>> develop
 }
 
 interface CreateBundleConsultationResponse {
@@ -52,6 +56,12 @@ export const createBundleConsultation = async (
       formData.append("labConsultationType", data.labConsultationType);
     }
 
+<<<<<<< HEAD
+=======
+    // Append sendSMS flag (defaults to true if not specified)
+    formData.append("sendSMS", String(data.sendSMS ?? true));
+
+>>>>>>> develop
     // Append the files if the testType is PostTest
     if (
       data.labConsultationType === LabtestType.PostTest &&
