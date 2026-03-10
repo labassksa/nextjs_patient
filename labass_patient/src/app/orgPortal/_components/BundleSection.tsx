@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 interface Subscription {
   id: number;
@@ -23,168 +22,13 @@ interface BundleSectionProps {
   setUseBundle: (value: boolean) => void;
 }
 
-const BundleSection: React.FC<BundleSectionProps> = ({
-  subscription,
-  useBundle,
-  setUseBundle,
-}) => {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
-
-  if (!subscription) {
-    return null;
-  }
-
-  const getRecurringTypeLabel = (recurringType: string) => {
-    switch (recurringType) {
-      case "Monthly":
-        return t('subscription.recurringTypes.monthly');
-      case "Weekly":
-        return t('subscription.recurringTypes.weekly');
-      case "Daily":
-        return t('subscription.recurringTypes.daily');
-      case "Yearly":
-        return t('subscription.recurringTypes.yearly');
-      default:
-        return recurringType;
-    }
-  };
-
-  const getBundleNameLabel = (name: string) => {
-    switch (name.toLowerCase()) {
-      case "basic":
-        return t('subscription.bundleNames.basic');
-      case "standard":
-        return t('subscription.bundleNames.standard');
-      case "premium":
-        return t('subscription.bundleNames.premium');
-      default:
-        return name;
-    }
-  };
+const BundleSection: React.FC<BundleSectionProps> = ({ subscription }) => {
+  if (!subscription) return null;
 
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
-      <h3 className="text-gray-800 text-lg font-semibold mb-2">
-        {t('subscription.currentSubscription')}
-      </h3>
-      <p className="text-gray-600 text-sm mb-4">
-        {t('subscription.useSubscription')}
-      </p>
-
-      {/* Subscription Details Card */}
-      <div className="bg-gradient-to-r from-custom-green to-green-600 rounded-lg p-4 mb-4 text-white shadow-md">
-        <div className="flex justify-between items-center mb-3">
-          <div>
-            <h4 className="text-lg font-bold">{getBundleNameLabel(subscription.bundle.name)}</h4>
-            <p className="text-sm opacity-90">
-              {getRecurringTypeLabel(subscription.bundle.recurringType)}
-            </p>
-          </div>
-          <div className="text-left">
-            <p className="text-2xl font-bold">
-              {Number(subscription.bundle.price).toFixed(2)} {t('consultationPrice.currency')}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white bg-opacity-20 rounded p-3">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm">{t('subscription.remainingConsultations')}</span>
-            <span className="text-xl font-bold">
-              {subscription.remainingConsultations}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm">{t('subscription.totalConsultations')}</span>
-            <span className="text-lg font-semibold">
-              {subscription.totalConsultations}
-            </span>
-          </div>
-        </div>
-
-        {subscription.nextBillingDate && (
-          <p className="text-xs opacity-80 mt-3">
-            {t('subscription.nextRenewal')}: {new Date(subscription.nextBillingDate).toLocaleDateString("en-GB")}
-          </p>
-        )}
-      </div>
-
-      {/* Choice Buttons */}
-      <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-        <button
-          type="button"
-          onClick={() => setUseBundle(true)}
-          className={`flex items-center justify-between p-3 w-full rounded-md transition-colors ${
-            useBundle
-              ? "bg-custom-green text-white"
-              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-          }`}
-          aria-pressed={useBundle}
-        >
-          <div className="flex items-center">
-            <div
-              className={`w-4 h-4 rounded-full ${isRTL ? 'ml-2' : 'mr-2'} ${
-                useBundle ? "bg-white" : "bg-gray-400"
-              }`}
-            />
-            <span className="text-sm font-medium">
-              {t('subscription.useBundle')}
-            </span>
-          </div>
-          {useBundle && (
-            <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
-              {t('subscription.selected')}
-            </span>
-          )}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setUseBundle(false)}
-          className={`flex items-center justify-between p-3 w-full rounded-md transition-colors ${
-            !useBundle
-              ? "bg-custom-green text-white"
-              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-          }`}
-          aria-pressed={!useBundle}
-        >
-          <div className="flex items-center">
-            <div
-              className={`w-4 h-4 rounded-full ${isRTL ? 'ml-2' : 'mr-2'} ${
-                !useBundle ? "bg-white" : "bg-gray-400"
-              }`}
-            />
-            <span className="text-sm font-medium">
-              {t('subscription.paySeperately')}
-            </span>
-          </div>
-          {!useBundle && (
-            <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
-              {t('subscription.selected')}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Warning if low consultations */}
-      {subscription.remainingConsultations <= 5 &&
-        subscription.remainingConsultations > 0 && (
-          <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              ⚠️ {t('subscription.lowConsultationsWarning')}
-            </p>
-          </div>
-        )}
-
-      {/* Error if no consultations */}
-      {subscription.remainingConsultations === 0 && (
-        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">
-            ❌ {t('subscription.noConsultationsError')}
-          </p>
-        </div>
-      )}
+    <div className="bg-custom-green text-white rounded-lg px-4 py-3 flex items-center justify-between" dir="rtl">
+      <span className="text-sm font-medium">الاستشارات المتبقية</span>
+      <span className="text-2xl font-bold">{subscription.remainingConsultations}</span>
     </div>
   );
 };
