@@ -483,17 +483,6 @@ const OrgPatientsPage: React.FC = () => {
   return (
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
-        {/* Bundle remaining consultations - always at top */}
-        {subscription && (
-          <div className="px-4 pt-4">
-            <BundleSection
-              subscription={subscription}
-              useBundle={useBundle}
-              setUseBundle={setUseBundle}
-            />
-          </div>
-        )}
-
         {/* User Info Section - Compact Design (hidden on subscription view) */}
         {userData && currentView !== "subscription" && (
           <div className="mb-4">
@@ -571,6 +560,16 @@ const OrgPatientsPage: React.FC = () => {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bundle remaining consultations - shown under personal info */}
+        {subscription && currentView !== "subscription" && (
+          <div className="px-4 pb-2 flex justify-end" dir="rtl">
+            <div className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
+              <span className="text-xs font-medium opacity-90">الاستشارات المتبقية</span>
+              <span className="text-xl font-bold">{subscription.remainingConsultations}</span>
             </div>
           </div>
         )}
