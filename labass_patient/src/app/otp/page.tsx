@@ -116,7 +116,7 @@ const OTPPage = () => {
         {countryCode && localPhoneNumber ? (
           <OTPTopText phoneNumber={`${countryCode}${localPhoneNumber}`} />
         ) : null}
-        <div className="flex mt-10 justify-center">
+        <div className="flex mt-10 justify-center" dir="ltr">
           {otp.map((value, index) => (
             <OTPInput
               key={index}

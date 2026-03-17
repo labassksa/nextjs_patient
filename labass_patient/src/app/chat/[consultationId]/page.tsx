@@ -34,6 +34,7 @@ const ChatPage: React.FC = () => {
   const [consultation, setConsultation] = useState<Consultation | null>(null);
   const [followUpLoading, setFollowUpLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [socketToken, setSocketToken] = useState<string>("");
   const router = useRouter();
   const params = useParams();
   const messageEndRef = useRef<HTMLDivElement>(null);
@@ -76,6 +77,9 @@ const ChatPage: React.FC = () => {
           localStorage.setItem("labass_token", tokenJWT);
           localStorage.setItem("labass_userId", consultation.patient.user.id);
 
+          // Use JWT for socket auth
+          setSocketToken(tokenJWT);
+
           // Set consultation status and doctor info
           setStatus(consultation.status);
           setDoctorInfo(consultation.doctor || null);
@@ -102,6 +106,7 @@ const ChatPage: React.FC = () => {
         console.log(
           "Token found in localStorage. Proceeding with normal flow."
         );
+        setSocketToken(tokenJWT);
         setIsConsultationLoaded(true);
       }
     };
@@ -152,7 +157,7 @@ const ChatPage: React.FC = () => {
 
   console.log("WebSocket URL:", websocketURL);
 
-  const { socket, isConnected } = useSocket(websocketURL, tokenUUID || "");
+  const { socket, isConnected } = useSocket(websocketURL, socketToken);
 
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
