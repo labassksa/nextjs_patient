@@ -1,83 +1,36 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { type ColumnDef } from "@tanstack/react-table";
-import { useConsultations, useSendFollowUp } from "@/features/dashboard/hooks/use-consultations";
-import type { Consultation } from "@/features/dashboard/types/consultation.types";
-import { DataTable } from "@/features/dashboard/components/shared/data-table";
+import { useState } from "react";
+import { useConsultationsReport } from "@/features/dashboard/hooks/use-consultations";
+import { useSendFollowUp } from "@/features/dashboard/hooks/use-consultations";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
-import { SearchInput } from "@/features/dashboard/components/shared/search-input";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Send } from "lucide-react";
 
-const columns: ColumnDef<Consultation>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => (
-      <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>
-    ),
-  },
-  {
-    accessorKey: "patientName",
-    header: "Patient",
-    cell: ({ row }) => <span className="font-medium">{row.original.patientName}</span>,
-  },
-  {
-    accessorKey: "doctorName",
-    header: "Doctor",
-    cell: ({ row }) => <span className="font-medium">{row.original.doctorName}</span>,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="font-normal capitalize">{row.original.type}</Badge>
-    ),
-  },
-  {
-    accessorKey: "paymentMethod",
-    header: "Payment",
-    cell: ({ row }) => (
-      <span className="text-sm">{row.original.paymentMethod || "—"}</span>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Date",
-    cell: ({ row }) => {
-      const date = row.getValue("createdAt") as string;
-      return date ? (
-        <span className="text-sm text-muted-foreground">{new Date(date).toLocaleDateString()}</span>
-      ) : (
-        <span className="text-muted-foreground">—</span>
-      );
-    },
-  },
-];
-
 export default function ConsultationsPage() {
-  const { data, isLoading, error, refetch } = useConsultations();
+  const today = new Date();
+  const weekAgo = new Date(today);
+  weekAgo.setDate(today.getDate() - 7);
+
+  const [fromDate, setFromDate] = useState(weekAgo.toISOString().split("T")[0]);
+  const [toDate, setToDate] = useState(today.toISOString().split("T")[0]);
+
+  const { data: reportData, isLoading, error, refetch } = useConsultationsReport(fromDate, toDate);
   const sendFollowUp = useSendFollowUp();
-  const [search, setSearch] = useState("");
+
   const [followUpDialog, setFollowUpDialog] = useState<{ open: boolean; consultationId: string }>({
     open: false,
     consultationId: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("Through Labass Platform");
-
-  const handleSearch = useCallback((value: string) => setSearch(value), []);
 
   const handleSendFollowUp = async () => {
     await sendFollowUp.mutateAsync({
@@ -87,49 +40,81 @@ export default function ConsultationsPage() {
     setFollowUpDialog({ open: false, consultationId: "" });
   };
 
-  const columnsWithActions: ColumnDef<Consultation>[] = [
-    ...columns,
-    {
-      id: "actions",
-      header: "",
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={() =>
-            setFollowUpDialog({ open: true, consultationId: String(row.original.id) })
-          }
-        >
-          <Send className="h-4 w-4 mr-1" /> Follow Up
-        </Button>
-      ),
-    },
-  ];
-
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
-  const consultations = Array.isArray(data) ? data : [];
+  const consultationsList = reportData?.consultations ?? [];
 
   return (
     <div>
       <PageHeader title="Consultations" description="View and manage all consultations" />
 
-      <div className="mb-4">
-        <SearchInput
-          placeholder="Search by patient or doctor..."
-          onChange={handleSearch}
-          className="max-w-sm"
-        />
-      </div>
-
-      <DataTable
-        columns={columnsWithActions}
-        data={consultations}
-        isLoading={isLoading}
-        searchKey="patientName"
-        searchValue={search}
-      />
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle>
+            Consultations{" "}
+            <Badge variant="secondary" className="ml-2 font-mono">{reportData?.total ?? consultationsList.length}</Badge>
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+              <Input type="date" lang="en" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" max={toDate} />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+              <Input type="date" lang="en" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" min={fromDate} max={today.toISOString().split("T")[0]} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
+          ) : consultationsList.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Marketer</TableHead>
+                    <TableHead>Doctor</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Closed</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {consultationsList.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
+                      <TableCell><StatusBadge status={c.status} /></TableCell>
+                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
+                      <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>
+                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-muted-foreground hover:text-foreground"
+                          onClick={() => setFollowUpDialog({ open: true, consultationId: String(c.id) })}
+                        >
+                          <Send className="h-4 w-4 mr-1" /> Follow Up
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No consultations found for this date range.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={followUpDialog.open} onOpenChange={(open) => setFollowUpDialog({ ...followUpDialog, open })}>
         <DialogContent>

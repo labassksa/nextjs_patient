@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useOrganizations, useUpdateOrganization, useOrganizationConsultations } from "@/features/dashboard/hooks/use-organizations";
+import { useOrganizations, useUpdateOrganization, useOrgConsultationsReport } from "@/features/dashboard/hooks/use-organizations";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -32,7 +32,12 @@ export default function OrganizationDetailPage() {
   const orgId = Number(params.id);
   const { data: orgs, isLoading, error, refetch } = useOrganizations();
   const updateOrg = useUpdateOrganization();
-  const { data: consultations, isLoading: consultationsLoading } = useOrganizationConsultations(orgId);
+  const today = new Date();
+  const weekAgo = new Date(today);
+  weekAgo.setDate(today.getDate() - 7);
+  const [fromDate, setFromDate] = useState(weekAgo.toISOString().split("T")[0]);
+  const [toDate, setToDate] = useState(today.toISOString().split("T")[0]);
+  const { data: reportData, isLoading: consultationsLoading } = useOrgConsultationsReport(orgId, fromDate, toDate);
 
   const org = Array.isArray(orgs) ? orgs.find((o) => o.id === orgId) : undefined;
 
@@ -47,6 +52,7 @@ export default function OrganizationDetailPage() {
     organizationManagerName: "",
   });
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     if (org) {
@@ -77,8 +83,9 @@ export default function OrganizationDetailPage() {
     if (!formData.numberOfBranches || formData.numberOfBranches < 1) errors.numberOfBranches = "Must have at least 1 branch";
     if (formData.iban && !/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/.test(formData.iban)) errors.iban = "Invalid IBAN format (e.g. SA...)";
     if (formData.phoneNumber && !/^\+\d{1,3}\d{7,14}$/.test(formData.phoneNumber)) errors.phoneNumber = "Invalid phone (e.g. +966XXXXXXXXX)";
-    if (Object.keys(errors).length > 0) { setEditErrors(errors); return; }
+    if (Object.keys(errors).length > 0) { setEditErrors(errors); setSaveSuccess(false); return; }
     setEditErrors({});
+    setSaveSuccess(false);
     await updateOrg.mutateAsync({
       organizationId: orgId,
       name: formData.name,
@@ -90,6 +97,8 @@ export default function OrganizationDetailPage() {
       phoneNumber: formData.phoneNumber,
       organizationManagerName: formData.organizationManagerName,
     });
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
     refetch();
   };
 
@@ -97,7 +106,7 @@ export default function OrganizationDetailPage() {
   if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!org) return <ErrorState title="Not found" message="Organization not found" />;
 
-  const consultationsList = Array.isArray(consultations) ? consultations : [];
+  const consultationsList = reportData?.consultations ?? [];
 
   return (
     <div className="space-y-6">
@@ -277,11 +286,13 @@ export default function OrganizationDetailPage() {
             {editErrors.iban && <p className="text-sm text-destructive">{editErrors.iban}</p>}
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex items-center gap-3 pt-2">
             <Button onClick={handleSave} disabled={updateOrg.isPending}>
               {updateOrg.isPending ? "Saving..." : "Save Changes"}
             </Button>
             <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
+            {saveSuccess && <p className="text-sm text-green-600 font-medium">Changes saved successfully.</p>}
+            {updateOrg.isError && <p className="text-sm text-destructive font-medium">Failed to save changes. Please try again.</p>}
           </div>
         </CardContent>
       </Card>
@@ -345,42 +356,57 @@ export default function OrganizationDetailPage() {
 
       {/* Consultations */}
       <Card>
-        <CardHeader>
-          <CardTitle>Consultations ({consultationsList.length})</CardTitle>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle>
+            Consultations{" "}
+            <Badge variant="secondary" className="ml-2 font-mono">{reportData?.total ?? consultationsList.length}</Badge>
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+              <Input type="date" lang="en" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" max={toDate} />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+              <Input type="date" lang="en" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" min={fromDate} max={today.toISOString().split("T")[0]} />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {consultationsLoading ? (
             <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
           ) : consultationsList.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Patient</TableHead>
-                  <TableHead>Doctor</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {consultationsList.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell>{c.id}</TableCell>
-                    <TableCell>{c.patientName}</TableCell>
-                    <TableCell>{c.doctorName}</TableCell>
-                    <TableCell>{c.type}</TableCell>
-                    <TableCell><StatusBadge status={c.status} /></TableCell>
-                    <TableCell>{c.paymentMethod}</TableCell>
-                    <TableCell>{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Marketer</TableHead>
+                    <TableHead>Doctor</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Closed</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {consultationsList.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
+                      <TableCell><StatusBadge status={c.status} /></TableCell>
+                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
+                      <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>
+                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-6">
-              No consultations found for this organization.
+              No consultations found for this date range.
             </p>
           )}
         </CardContent>

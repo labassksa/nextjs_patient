@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { useMarketers, useUpdateMarketer, useSendMessageToMarketer, useSendPromoCodesToMarketer } from "@/features/dashboard/hooks/use-marketers";
+import { useMarketers, useUpdateMarketer, useSendMessageToMarketer, useSendPromoCodesToMarketer, useMarketerConsultations } from "@/features/dashboard/hooks/use-marketers";
 import { useGeneratePromoCode, useTogglePromoCode, useResetMarketerPromoUsage } from "@/features/dashboard/hooks/use-promo-codes";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
@@ -17,6 +17,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe } from "lucide-react";
 import Link from "next/link";
 
@@ -48,7 +49,14 @@ export default function MarketerDetailPage() {
   const [generateDialog, setGenerateDialog] = useState(false);
   const [promoConfig, setPromoConfig] = useState({ discountPercentage: 10, marketerPercentage: 10, numberOfCodes: 5 });
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
+
+  const todayDate = new Date();
+  const weekAgoDate = new Date(todayDate);
+  weekAgoDate.setDate(todayDate.getDate() - 7);
+  const [consultFromDate, setConsultFromDate] = useState(weekAgoDate.toISOString().split("T")[0]);
+  const [consultToDate, setConsultToDate] = useState(todayDate.toISOString().split("T")[0]);
 
   useEffect(() => {
     if (marketer) {
@@ -70,6 +78,10 @@ export default function MarketerDetailPage() {
     setEditErrors({});
   };
 
+  const marketerUserId = marketer?.userId ?? 0;
+  const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
+  const consultationsList = consultData?.consultations ?? [];
+
   if (isLoading) return <FormSkeleton fields={4} />;
   if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!marketer) return <ErrorState title="Not found" message="Marketer not found" />;
@@ -79,8 +91,9 @@ export default function MarketerDetailPage() {
     if (!formData.firstName.trim()) errors.firstName = "First name is required";
     if (formData.iban && !/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/.test(formData.iban)) errors.iban = "Invalid IBAN format";
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email format";
-    if (Object.keys(errors).length > 0) { setEditErrors(errors); return; }
+    if (Object.keys(errors).length > 0) { setEditErrors(errors); setSaveSuccess(false); return; }
     setEditErrors({});
+    setSaveSuccess(false);
     await updateMarketer.mutateAsync({
       marketerId,
       marketerData: {
@@ -96,6 +109,8 @@ export default function MarketerDetailPage() {
         dateOfBirth: formData.dateOfBirth,
       },
     });
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   const handleSendMessage = async () => {
@@ -293,9 +308,13 @@ export default function MarketerDetailPage() {
             </div>
           </div>
 
-          <Button onClick={handleUpdateMarketer} disabled={updateMarketer.isPending}>
-            {updateMarketer.isPending ? "Saving..." : "Save Changes"}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button onClick={handleUpdateMarketer} disabled={updateMarketer.isPending}>
+              {updateMarketer.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+            {saveSuccess && <p className="text-sm text-green-600 font-medium">Changes saved successfully.</p>}
+            {updateMarketer.isError && <p className="text-sm text-destructive font-medium">Failed to save changes. Please try again.</p>}
+          </div>
         </CardContent>
       </Card>
 
@@ -344,6 +363,62 @@ export default function MarketerDetailPage() {
             </Table>
           ) : (
             <p className="text-sm text-muted-foreground py-4 text-center">No promo codes yet</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Consultations */}
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle>
+            Consultations{" "}
+            <Badge variant="secondary" className="ml-2 font-mono">{consultData?.total ?? consultationsList.length}</Badge>
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+              <Input type="date" lang="en" value={consultFromDate} onChange={(e) => setConsultFromDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" max={consultToDate} />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+              <Input type="date" lang="en" value={consultToDate} onChange={(e) => setConsultToDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" min={consultFromDate} max={todayDate.toISOString().split("T")[0]} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {consultLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
+          ) : consultationsList.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Doctor</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Closed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {consultationsList.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
+                      <TableCell><StatusBadge status={c.status} /></TableCell>
+                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
+                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No consultations found for this date range.
+            </p>
           )}
         </CardContent>
       </Card>

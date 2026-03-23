@@ -23,6 +23,25 @@ export interface CreateOrganizationPayload {
   dealType: string;
 }
 
+export interface OrgReportConsultation {
+  id: number;
+  status: string;
+  createdAt: string;
+  doctorJoinedAT: string | null;
+  patientJoinedAT: string | null;
+  paidAT: string | null;
+  closedAt: string | null;
+  prescriptionPDFUrl?: string;
+  marketer: { phoneNumber?: string; firstName: string | null; lastName: string | null; orgName?: string };
+  patient: { id?: number; phoneNumber?: string; firstName?: string; lastName?: string };
+  doctor: { phoneNumber?: string; firstName?: string; lastName?: string };
+}
+
+export interface OrgReportResponse {
+  consultations: OrgReportConsultation[];
+  total: number;
+}
+
 export interface UpdateOrganizationPayload {
   organizationId: number;
   name?: string;

@@ -4,7 +4,7 @@ import {
   getOrganizations,
   createOrganization,
   updateOrganization,
-  getOrganizationConsultations,
+  getOrgConsultationsReport,
 } from "../api/organizations.api";
 import type { CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization.types";
 
@@ -15,11 +15,11 @@ export function useOrganizations() {
   });
 }
 
-export function useOrganizationConsultations(orgId: number) {
+export function useOrgConsultationsReport(orgId: number, fromDate: string, toDate: string) {
   return useQuery({
-    queryKey: queryKeys.organizations.consultations(orgId),
-    queryFn: () => getOrganizationConsultations(orgId),
-    enabled: !!orgId,
+    queryKey: queryKeys.organizations.report(orgId, fromDate, toDate),
+    queryFn: () => getOrgConsultationsReport(orgId, fromDate, toDate),
+    enabled: !!orgId && !!fromDate && !!toDate,
   });
 }
 

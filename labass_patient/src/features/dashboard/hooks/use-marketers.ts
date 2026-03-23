@@ -6,6 +6,7 @@ import {
   updateMarketer,
   sendMessageToMarketer,
   sendPromoCodesToMarketer,
+  getMarketerConsultations,
 } from "../api/marketers.api";
 import type { CreateMarketerPayload, UpdateMarketerPayload } from "../types/marketer.types";
 
@@ -46,5 +47,13 @@ export function useSendMessageToMarketer() {
 export function useSendPromoCodesToMarketer() {
   return useMutation({
     mutationFn: (marketerId: number) => sendPromoCodesToMarketer(marketerId),
+  });
+}
+
+export function useMarketerConsultations(userId: number, fromDate: string, toDate: string) {
+  return useQuery({
+    queryKey: queryKeys.marketers.consultations(userId, fromDate, toDate),
+    queryFn: () => getMarketerConsultations(userId, fromDate, toDate),
+    enabled: !!userId && !!fromDate && !!toDate,
   });
 }

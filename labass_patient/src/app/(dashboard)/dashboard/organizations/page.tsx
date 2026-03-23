@@ -53,6 +53,18 @@ export default function OrganizationsPage() {
       cell: ({ row }) => <StatusBadge status={row.original.dealType} />,
     },
     {
+      accessorKey: "organizationManagerName",
+      header: "Manager",
+      cell: ({ row }) => row.original.organizationManagerName || "—",
+    },
+    {
+      accessorKey: "phoneNumber",
+      header: "Manager Phone",
+      cell: ({ row }) => row.original.phoneNumber ? (
+        <span className="font-mono text-sm" dir="ltr">{row.original.phoneNumber}</span>
+      ) : "—",
+    },
+    {
       accessorKey: "marketers",
       header: "Marketers",
       cell: ({ row }) => {

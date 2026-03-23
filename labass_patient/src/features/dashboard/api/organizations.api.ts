@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import type { Organization, CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization.types";
-import type { Consultation } from "../types/consultation.types";
+import type { Organization, CreateOrganizationPayload, UpdateOrganizationPayload, OrgReportResponse } from "../types/organization.types";
 
 export async function getOrganizations(): Promise<Organization[]> {
   const { data } = await apiClient.get("/organizations/with-marketers");
@@ -17,9 +16,7 @@ export async function updateOrganization(payload: UpdateOrganizationPayload) {
   return data;
 }
 
-export async function getOrganizationConsultations(orgId: number): Promise<Consultation[]> {
-  const { data } = await apiClient.get("/consultations/get-by-org", {
-    params: { orgId },
-  });
+export async function getOrgConsultationsReport(orgId: number, fromDate: string, toDate: string): Promise<OrgReportResponse> {
+  const { data } = await apiClient.post("/marketers/consultations/report", { orgId, fromDate, toDate });
   return data;
 }

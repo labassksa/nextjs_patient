@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import type { Marketer, CreateMarketerPayload, UpdateMarketerPayload } from "../types/marketer.types";
+import type { Marketer, CreateMarketerPayload, UpdateMarketerPayload, MarketerConsultationsResponse } from "../types/marketer.types";
 
 export async function getMarketers(): Promise<Marketer[]> {
   const { data } = await apiClient.get("/marketers");
@@ -23,5 +23,12 @@ export async function sendMessageToMarketer(marketerId: number, message: string)
 
 export async function sendPromoCodesToMarketer(marketerId: number) {
   const { data } = await apiClient.post("/send-promoCodes-to-marketer", { marketerId });
+  return data;
+}
+
+export async function getMarketerConsultations(userId: number, fromDate: string, toDate: string): Promise<MarketerConsultationsResponse> {
+  const { data } = await apiClient.get(`/marketers/consultations/${userId}`, {
+    params: { fromDate, toDate },
+  });
   return data;
 }

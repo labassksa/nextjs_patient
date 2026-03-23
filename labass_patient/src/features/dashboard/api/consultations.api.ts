@@ -1,8 +1,14 @@
 import { apiClient } from "@/lib/api/client";
 import type { Consultation, SendFollowUpPayload } from "../types/consultation.types";
+import type { OrgReportResponse } from "../types/organization.types";
 
 export async function getConsultations(): Promise<Consultation[]> {
   const { data } = await apiClient.get("/all-consultations");
+  return data;
+}
+
+export async function getConsultationsReport(fromDate: string, toDate: string): Promise<OrgReportResponse> {
+  const { data } = await apiClient.post("/marketers/consultations/report", { fromDate, toDate });
   return data;
 }
 

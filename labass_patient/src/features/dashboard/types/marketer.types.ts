@@ -85,3 +85,22 @@ export interface UpdatePromoCodePayload {
   codeId: number;
   isActive?: string;
 }
+
+export interface MarketerConsultation {
+  id: number;
+  status: string;
+  createdAt: string;
+  doctorJoinedAT: string | null;
+  patientJoinedAT: string | null;
+  paidAT: string | null;
+  closedAt: string | null;
+  prescriptionPDFUrl?: string;
+  marketer: { phoneNumber?: string; firstName: string | null; lastName: string | null };
+  patient: { id?: number; phoneNumber?: string; firstName?: string; lastName?: string };
+  doctor: { phoneNumber?: string; firstName?: string; lastName?: string };
+}
+
+export interface MarketerConsultationsResponse {
+  consultations: MarketerConsultation[];
+  total: number;
+}
