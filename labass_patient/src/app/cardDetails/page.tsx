@@ -110,8 +110,8 @@ const CardDetailsContent: React.FC = () => {
                   {
                     bundleId: Number(bundleId),
                     sessionId: newSessionId,
-                    callBackUrl: "https://labass.sa/cardDetails/success",
-                    errorUrl: "https://labass.sa/cardDetails/error",
+                    CallBackUrl: "https://labass.sa/cardDetails/success",
+                    ErrorUrl: "https://labass.sa/cardDetails/error",
                   },
                   {
                     headers: { Authorization: `Bearer ${token}` },
@@ -119,8 +119,11 @@ const CardDetailsContent: React.FC = () => {
                 );
 
                 console.log("[Payment] Bundle payment response:", data);
-                if (data.success && data.data?.paymentURL) {
-                  const paymentUrl = data.data.paymentURL;
+                // Support both MyFatoorah format (IsSuccess/Data.PaymentURL) and wrapped format (success/data.paymentURL)
+                const bundleSuccess = data.IsSuccess ?? data.success;
+                const bundlePaymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL;
+                if (bundleSuccess && bundlePaymentUrl) {
+                  const paymentUrl = bundlePaymentUrl;
                   console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
 
                   // Store bundle info before showing 3D-Secure iframe

@@ -53,8 +53,10 @@ export const createBundleConsultation = async (
       formData.append("labConsultationType", data.labConsultationType);
     }
 
+
     // Append sendSMS flag (defaults to true if not specified)
     formData.append("sendSMS", String(data.sendSMS ?? true));
+
 
     // Append the files if the testType is PostTest
     if (
