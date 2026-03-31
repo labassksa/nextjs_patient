@@ -2,13 +2,17 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 import { Gender } from "../_types/genderType";
 import { OrganizationTypes } from "../_types/organizationTypes";
+import { DoctorType } from "../_types/doctorTypes";
 
 // Define the props interface
 interface OrgUserRegistrationFormProps {
   orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | OrganizationTypes.School | "";
+  doctorType: DoctorType;
   name: string;
   setName: React.Dispatch<React.SetStateAction<string>>;
   phone: string;
@@ -29,6 +33,7 @@ interface OrgUserRegistrationFormProps {
 
 const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
   orgType,
+  doctorType,
   name,
   setName,
   phone,
@@ -226,24 +231,43 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
           />
         </div>
 
-        {/* Age */}
-        <div>
-          <label
-            htmlFor="age"
-            className="block text-sm text-gray-700 font-medium mb-1"
-          >
-            {t("age")}
-          </label>
-          <input
-            id="age"
-            type="text"
-            inputMode="numeric"
-            value={age}
-            onChange={handleAgeChange}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
-            required
-          />
-        </div>
+        {/* Age (hidden for SickLeave) or DateOfBirth picker (SickLeave only) */}
+        {doctorType === DoctorType.SickLeave ? (
+          <div>
+            <label className="block text-sm text-gray-700 font-medium mb-1">
+              تاريخ الميلاد
+            </label>
+            <DatePicker
+              selected={dateOfBirth}
+              onChange={(date: Date | null) => setDateOfBirth(date)}
+              dateFormat="yyyy/MM/dd"
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
+              maxDate={new Date()}
+              placeholderText="اختر تاريخ الميلاد"
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
+            />
+          </div>
+        ) : (
+          <div>
+            <label
+              htmlFor="age"
+              className="block text-sm text-gray-700 font-medium mb-1"
+            >
+              {t("age")}
+            </label>
+            <input
+              id="age"
+              type="text"
+              inputMode="numeric"
+              value={age}
+              onChange={handleAgeChange}
+              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
+              required
+            />
+          </div>
+        )}
 
         {/* Nationality - Custom Combo Box with search inside dropdown */}
         <div className="relative" ref={dropdownRef}>

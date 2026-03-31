@@ -4,12 +4,18 @@ import { PaymentMethodEnum } from "../../../types/paymentMethods";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+interface Subscription {
+  remainingConsultations: number;
+  [key: string]: any;
+}
+
 interface PaymentMethodSectionProps {
   paymentMethod: PaymentMethodEnum;
   setPaymentMethod: React.Dispatch<React.SetStateAction<PaymentMethodEnum>>;
   possiblePaymentMethods: PaymentMethodEnum[];
   cashPrice: number | null;
   setCashPrice: React.Dispatch<React.SetStateAction<number | null>>;
+  subscription?: Subscription | null;
 }
 
 const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
@@ -18,6 +24,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
   possiblePaymentMethods,
   cashPrice,
   setCashPrice,
+  subscription,
 }) => {
   const { t } = useTranslation();
   const [error, setError] = useState<string>("");
@@ -43,6 +50,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
         {t('paymentSection.subtitle')}
       </p>
       <div className="flex flex-col gap-2">
+        {/* Revenue share payment buttons */}
         {possiblePaymentMethods
           .filter(
             (method) =>
@@ -70,32 +78,30 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
               )}
             </button>
           ))}
+
+        {/* Use Subscription button — only shown when subscription exists */}
+        {subscription && (
+          <button
+            type="button"
+            onClick={() => setPaymentMethod(PaymentMethodEnum.USE_SUBSCRIPTION)}
+            className={`flex items-center justify-between p-3 w-full rounded-md transition-colors duration-200 border-2 ${
+              paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION
+                ? "bg-blue-600 border-blue-600 text-white"
+                : "bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-800"
+            }`}
+          >
+            <div className="flex flex-col items-start">
+              <span className="font-semibold text-sm">استخدم اشتراكك</span>
+              <span className={`text-xs mt-0.5 ${paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION ? "text-blue-100" : "text-blue-500"}`}>
+                {subscription.remainingConsultations} استشارة متبقية
+              </span>
+            </div>
+            {paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION && (
+              <span className="text-white font-bold">✔</span>
+            )}
+          </button>
+        )}
       </div>
-      
-      {/* Uncomment this section if you want to show the cash price input */}
-      {/* {paymentMethod === PaymentMethodEnum.THROUGH_ORGANIZATION && (
-        <div className="mt-2">
-          <label className="font-semibold block mb-1">
-            {t('paymentSection.amountReceived')}
-          </label>
-          <p className="font-normal text-xs text-custom-green block mb-2">
-            {t('paymentSection.amountHelp')}
-          </p>
-          <input
-            type="numeric"
-            min={15}
-            className={`border px-2 py-1 w-full rounded ${
-              error ? "border-red-500" : "border-gray-300"
-            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-            value={cashPrice !== null ? cashPrice : ""}
-            onChange={handleCashPriceChange}
-            placeholder={t('paymentSection.enterAmount')}
-          />
-          {error && (
-            <p className="text-red-500 text-sm mt-1">{error}</p>
-          )}
-        </div>
-      )} */}
     </div>
   );
 };

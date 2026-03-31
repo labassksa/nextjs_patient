@@ -4,4 +4,5 @@ export enum PaymentMethodEnum {
   Cash = "cash",
   THROUGH_LABASS = "Through Labass Platform",
   THROUGH_ORGANIZATION = "Through Organization Payment System",
+  USE_SUBSCRIPTION = "use_subscription",
 }

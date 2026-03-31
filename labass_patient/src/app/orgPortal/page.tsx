@@ -91,31 +91,27 @@ const OrgPatientsPage: React.FC = () => {
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
   const [subscription, setSubscription] = useState<any>(null);
-  const [useBundle, setUseBundle] = useState<boolean>(true);
   const marketerName = orgType === OrganizationTypes.Pharmacy
     ? t('pharmacist')
     : orgType === OrganizationTypes.School
     ? "الموظف"
     : t('employee');
   const possiblePrices =
-    dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+    doctorType === DoctorType.SickLeave
+      ? [89]
+      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
       ? [50]
       : [80, 70, 50, 35, 25, 15];
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
-    dealType === DealType.SUBSCRIPTION
-      ? [
-          PaymentMethodEnum.THROUGH_LABASS,
-          PaymentMethodEnum.THROUGH_ORGANIZATION,
-        ]
+    doctorType === DoctorType.SickLeave
+      ? [PaymentMethodEnum.THROUGH_LABASS]
       : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
       ? [PaymentMethodEnum.THROUGH_LABASS]
-      : dealType === DealType.REVENUE_SHARE
-      ? [
+      : [
           PaymentMethodEnum.THROUGH_LABASS,
           PaymentMethodEnum.THROUGH_ORGANIZATION,
-        ]
-      : [];
+        ];
 
   const fetchOrg = async () => {
     setIsLoadingOrg(true);
@@ -158,10 +154,6 @@ const OrgPatientsPage: React.FC = () => {
       if (subscriptionResponse.success && subscriptionResponse.data) {
         console.log("Subscription Data:", subscriptionResponse.data);
         setSubscription(subscriptionResponse.data);
-        // Auto-disable bundle if no remaining consultations
-        if (subscriptionResponse.data.remainingConsultations === 0) {
-          setUseBundle(false);
-        }
       } else if (subscriptionResponse.noSubscription) {
         console.log("No active subscription found");
         setSubscription(null);
@@ -218,13 +210,17 @@ const OrgPatientsPage: React.FC = () => {
     console.log("userData state changed:", userData);
   }, [userData]);
 
-  // Auto-select payment method and price when obesity is selected with revenue share
+  // Auto-select payment method and price based on consultation type
   useEffect(() => {
-    if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
-      // Auto-select online payment method
+    if (doctorType === DoctorType.SickLeave) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
-      // Auto-select price of 50
+      setSelectedPrice(89);
+    } else if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
+      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(50);
+    } else {
+      // Reset price when switching away from auto-selected types
+      setSelectedPrice(null);
     }
   }, [doctorType, dealType]);
 
@@ -292,6 +288,21 @@ const OrgPatientsPage: React.FC = () => {
     setShowOpenConsultationConfirm(true);
   };
 
+  // Map DoctorType to ConsultationType for backend
+  const getConsultationType = (type: DoctorType) => {
+    switch (type) {
+      case DoctorType.Obesity:
+        return "obesity";
+      case DoctorType.Psychiatrist:
+        return "psychiatric";
+      case DoctorType.SickLeave:
+        return "sickLeave";
+      case DoctorType.General:
+      default:
+        return "quick";
+    }
+  };
+
   // Actual send consultation logic (after confirmation)
   const handleSendConsultation = async () => {
     setShowSendConsultationConfirm(false);
@@ -304,70 +315,58 @@ const OrgPatientsPage: React.FC = () => {
       return;
     }
 
-    // Map DoctorType to ConsultationType for backend
-    const getConsultationType = (doctorType: DoctorType) => {
-      switch (doctorType) {
-        case DoctorType.Obesity:
-          return "obesity";
-        case DoctorType.Psychiatrist:
-          return "psychiatric";
-        case DoctorType.General:
-        default:
-          return "quick";
-      }
-    };
-
-    const magicLinkData = {
-      patientInfo: {
-        firstName: name.trim(),
-        lastName: "",
-        phoneNumber: phone.startsWith("0")
-          ? `+966${phone.slice(1)}`
-          : `+966${phone}`,
-        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
-        gender,
-        nationality,
-        nationalId: nationalId.trim() || "",
-        dateOfBirth: dateOfBirth.toISOString().split("T")[0],
-        email: ""
-      },
-      paymentMethod,
-      orgType,
-      dealType,
-      consultationPrice: selectedPrice || cashPrice,
-      testType,
-      consultationType: getConsultationType(doctorType),
-      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
+    const patientInfo = {
+      firstName: name.trim(),
+      lastName: "",
+      phoneNumber: phone.startsWith("0")
+        ? `+966${phone.slice(1)}`
+        : `+966${phone}`,
+      role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
+      gender,
+      nationality,
+      nationalId: nationalId.trim() || "",
+      dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+      email: ""
     };
 
     try {
-      // Check if we should use bundle or magic link
-      if (subscription && useBundle && subscription.remainingConsultations > 0) {
-        // Use bundle consultation endpoint
+      if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
+        // Subscription (bundle) flow
+        if (!subscription || subscription.remainingConsultations === 0) {
+          setSubmitError("ليس لديك استشارات متبقية، قم بتجديد اشتراكك");
+          setIsSubmitting(false);
+          return;
+        }
+
         const bundleData = {
-          patientInfo: magicLinkData.patientInfo,
-          consultationType: magicLinkData.consultationType,
+          patientInfo,
+          consultationType: getConsultationType(doctorType),
           labConsultationType: testType || undefined,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
         };
 
         const result = await createBundleConsultation(bundleData);
 
-        // Update local subscription state
         if (result.success && result.data) {
           const resultData = result.data;
           setSubscription((prev: any) => ({
             ...prev,
             remainingConsultations: resultData.remainingConsultations,
           }));
-
-          alert(
-            `${t('consultationSuccess')}\n${t('link')}: ${resultData.magicLink}\nالاستشارات المتبقية: ${resultData.remainingConsultations}`
-          );
+          alert(`تم إرسال الاستشارة وتبقى لديك ${resultData.remainingConsultations} استشارة`);
         }
       } else {
-        // Use regular magic link flow
-        const result = await createMagicLink(magicLinkData);
+        // Revenue share (magic link) flow
+        const result = await createMagicLink({
+          patientInfo,
+          paymentMethod,
+          orgType,
+          dealType,
+          consultationPrice: selectedPrice || cashPrice,
+          testType,
+          consultationType: getConsultationType(doctorType),
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+        });
         alert(
           `${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`
         );
@@ -397,75 +396,60 @@ const OrgPatientsPage: React.FC = () => {
       return;
     }
 
-    // Map DoctorType to ConsultationType for backend
-    const getConsultationType = (doctorType: DoctorType) => {
-      switch (doctorType) {
-        case DoctorType.Obesity:
-          return "obesity";
-        case DoctorType.Psychiatrist:
-          return "psychiatric";
-        case DoctorType.General:
-        default:
-          return "quick";
-      }
-    };
-
-    const magicLinkData = {
-      patientInfo: {
-        firstName: name.trim(),
-        lastName: "",
-        phoneNumber: phone.startsWith("0")
-          ? `+966${phone.slice(1)}`
-          : `+966${phone}`,
-        role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
-        gender,
-        nationality,
-        nationalId: nationalId.trim() || "",
-        dateOfBirth: dateOfBirth.toISOString().split("T")[0],
-        email: ""
-      },
-      paymentMethod,
-      orgType,
-      dealType,
-      consultationPrice: selectedPrice || cashPrice,
-      testType,
-      consultationType: getConsultationType(doctorType),
-      pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined
+    const patientInfo = {
+      firstName: name.trim(),
+      lastName: "",
+      phoneNumber: phone.startsWith("0")
+        ? `+966${phone.slice(1)}`
+        : `+966${phone}`,
+      role: orgType === OrganizationTypes.School ? ["student"] : ["patient"],
+      gender,
+      nationality,
+      nationalId: nationalId.trim() || "",
+      dateOfBirth: dateOfBirth.toISOString().split("T")[0],
+      email: ""
     };
 
     try {
-      // Check if we should use bundle or magic link
-      if (subscription && useBundle && subscription.remainingConsultations > 0) {
-        // Use bundle consultation endpoint
+      if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
+        // Subscription (bundle) flow
+        if (!subscription || subscription.remainingConsultations === 0) {
+          setSubmitError("ليس لديك استشارات متبقية، قم بتجديد اشتراكك");
+          setIsOpeningConsultation(false);
+          return;
+        }
+
         const bundleData = {
-          patientInfo: magicLinkData.patientInfo,
-          consultationType: magicLinkData.consultationType,
+          patientInfo,
+          consultationType: getConsultationType(doctorType),
           labConsultationType: testType || undefined,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
-          sendSMS: false, // Don't send SMS when opening consultation directly
+          sendSMS: false,
         };
 
         const result = await createBundleConsultation(bundleData);
 
-        // Update local subscription state
         if (result.success && result.data) {
           const resultData = result.data;
           setSubscription((prev: any) => ({
             ...prev,
             remainingConsultations: resultData.remainingConsultations,
           }));
-
-          // Open the magic link in the same window
           window.location.href = resultData.magicLink;
         }
       } else {
-        // Use regular magic link flow
+        // Revenue share (magic link) flow
         const result = await createMagicLink({
-          ...magicLinkData,
-          sendSMS: false, // Don't send SMS when opening consultation directly
+          patientInfo,
+          paymentMethod,
+          orgType,
+          dealType,
+          consultationPrice: selectedPrice || cashPrice,
+          testType,
+          consultationType: getConsultationType(doctorType),
+          pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
+          sendSMS: false,
         });
-
-        // Open the magic link in the same window
         window.location.href = result.link;
       }
     } catch (err: any) {
@@ -715,8 +699,8 @@ const OrgPatientsPage: React.FC = () => {
                   {subscription ? (
                     <BundleSection
                       subscription={subscription}
-                      useBundle={useBundle}
-                      setUseBundle={setUseBundle}
+                      useBundle={false}
+                      setUseBundle={() => {}}
                     />
                   ) : (
                     <AvailableBundlesSection
@@ -729,8 +713,14 @@ const OrgPatientsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
+                  {/* Consultation type selector at the TOP */}
+                  <DoctorTypeSection
+                    doctorType={doctorType}
+                    setDoctorType={setDoctorType}
+                  />
                   <OrgUserRegistrationForm
                     orgType={orgType}
+                    doctorType={doctorType}
                     name={name}
                     setName={setName}
                     phone={phone}
@@ -748,18 +738,6 @@ const OrgPatientsPage: React.FC = () => {
                     pdfFiles={pdfFiles}
                     setPdfFiles={setPdfFiles}
                   />
-                  <DoctorTypeSection
-                    doctorType={doctorType}
-                    setDoctorType={setDoctorType}
-                  />
-                  {/* Show active subscription if available */}
-                  {subscription && (
-                    <BundleSection
-                      subscription={subscription}
-                      useBundle={useBundle}
-                      setUseBundle={setUseBundle}
-                    />
-                  )}
                   <TestTypeSection
                     orgType={orgType}
                     testType={testType}
@@ -767,7 +745,8 @@ const OrgPatientsPage: React.FC = () => {
                     pdfFiles={pdfFiles}
                     setPdfFiles={setPdfFiles}
                   />
-                  {dealType === DealType.REVENUE_SHARE && (
+                  {/* Payment method section — shown for revenue share orgs or when subscription exists, hidden for SickLeave */}
+                  {(dealType === DealType.REVENUE_SHARE || subscription) && doctorType !== DoctorType.SickLeave && (
                     <>
                       <PaymentMethodSection
                         paymentMethod={paymentMethod}
@@ -775,12 +754,15 @@ const OrgPatientsPage: React.FC = () => {
                         possiblePaymentMethods={possiblePaymentMethods}
                         cashPrice={cashPrice}
                         setCashPrice={setCashPrice}
+                        subscription={subscription}
                       />
-                      <ConsultationPriceSection
-                        selectedPrice={selectedPrice}
-                        onChange={(price) => setSelectedPrice(price)}
-                        possiblePrices={possiblePrices}
-                      />
+                      {dealType === DealType.REVENUE_SHARE && paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && (
+                        <ConsultationPriceSection
+                          selectedPrice={selectedPrice}
+                          onChange={(price) => setSelectedPrice(price)}
+                          possiblePrices={possiblePrices}
+                        />
+                      )}
                     </>
                   )}
 
