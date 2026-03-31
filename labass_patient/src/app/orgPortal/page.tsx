@@ -472,8 +472,8 @@ const OrgPatientsPage: React.FC = () => {
           <div className="px-4 pt-4">
             <BundleSection
               subscription={subscription}
-              useBundle={useBundle}
-              setUseBundle={setUseBundle}
+              useBundle={false}
+              setUseBundle={() => {}}
             />
           </div>
         )}
