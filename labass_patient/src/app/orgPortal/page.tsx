@@ -467,17 +467,6 @@ const OrgPatientsPage: React.FC = () => {
   return (
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
-        {/* Bundle remaining consultations - always at top */}
-        {subscription && (
-          <div className="px-4 pt-4">
-            <BundleSection
-              subscription={subscription}
-              useBundle={false}
-              setUseBundle={() => {}}
-            />
-          </div>
-        )}
-
         {/* User Info Section - Compact Design (hidden on subscription view) */}
         {userData && currentView !== "subscription" && (
           <div className="mb-4">

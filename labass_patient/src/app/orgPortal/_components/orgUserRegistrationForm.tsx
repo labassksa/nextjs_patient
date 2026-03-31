@@ -2,8 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { convertArabicToEnglishNumbers } from "../../../utils/arabicToenglish";
 import { Gender } from "../_types/genderType";
 import { OrganizationTypes } from "../_types/organizationTypes";
@@ -234,20 +232,58 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
         {/* Age (hidden for SickLeave) or DateOfBirth picker (SickLeave only) */}
         {doctorType === DoctorType.SickLeave ? (
           <div>
-            <label className="block text-sm text-gray-700 font-medium mb-1">
+            <label className="block text-sm text-gray-700 font-medium mb-2">
               تاريخ الميلاد
             </label>
-            <DatePicker
-              selected={dateOfBirth}
-              onChange={(date: Date | null) => setDateOfBirth(date)}
-              dateFormat="yyyy/MM/dd"
-              showYearDropdown
-              showMonthDropdown
-              dropdownMode="select"
-              maxDate={new Date()}
-              placeholderText="اختر تاريخ الميلاد"
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-200 focus:outline-none"
-            />
+            <div className="grid grid-cols-3 gap-2">
+              {/* Day */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getDate() : ""}
+                onChange={(e) => {
+                  const day = Number(e.target.value);
+                  const base = dateOfBirth || new Date(2000, 0, 1);
+                  setDateOfBirth(new Date(base.getFullYear(), base.getMonth(), day));
+                }}
+                className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
+              >
+                <option value="">يوم</option>
+                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+
+              {/* Month */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getMonth() : ""}
+                onChange={(e) => {
+                  const month = Number(e.target.value);
+                  const base = dateOfBirth || new Date(2000, 0, 1);
+                  setDateOfBirth(new Date(base.getFullYear(), month, base.getDate()));
+                }}
+                className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
+              >
+                <option value="">شهر</option>
+                {["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"].map((m, i) => (
+                  <option key={i} value={i}>{m}</option>
+                ))}
+              </select>
+
+              {/* Year */}
+              <select
+                value={dateOfBirth ? dateOfBirth.getFullYear() : ""}
+                onChange={(e) => {
+                  const year = Number(e.target.value);
+                  const base = dateOfBirth || new Date(2000, 0, 1);
+                  setDateOfBirth(new Date(year, base.getMonth(), base.getDate()));
+                }}
+                className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
+              >
+                <option value="">سنة</option>
+                {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
           </div>
         ) : (
           <div>
