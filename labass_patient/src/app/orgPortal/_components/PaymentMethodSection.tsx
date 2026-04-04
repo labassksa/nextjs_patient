@@ -81,6 +81,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
 
         {/* Use Subscription button — only shown when subscription exists */}
         {subscription && (
+          <div className="border-t border-gray-200 mt-3 pt-3">
           <button
             type="button"
             onClick={() => setPaymentMethod(PaymentMethodEnum.USE_SUBSCRIPTION)}
@@ -91,7 +92,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
             }`}
           >
             <div className="flex flex-col items-start">
-              <span className="font-semibold text-sm">استخدم اشتراكك</span>
+              <span className="font-semibold text-sm">ارسال رابط استشارة باستخدام الباقة</span>
               <span className={`text-xs mt-0.5 ${paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION ? "text-blue-100" : "text-blue-500"}`}>
                 {subscription.remainingConsultations} استشارة متبقية
               </span>
@@ -100,6 +101,7 @@ const PaymentMethodSection: React.FC<PaymentMethodSectionProps> = ({
               <span className="text-white font-bold">✔</span>
             )}
           </button>
+          </div>
         )}
       </div>
     </div>

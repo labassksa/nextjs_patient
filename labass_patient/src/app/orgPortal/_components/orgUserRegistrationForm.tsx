@@ -112,6 +112,19 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
     [Gender.Female]: t("genders.female"),
   };
 
+  // Separate state for the 3 DOB selects (only combine into dateOfBirth when all 3 are chosen)
+  const [dobDay, setDobDay] = useState<number | "">("");
+  const [dobMonth, setDobMonth] = useState<number | "">("");
+  const [dobYear, setDobYear] = useState<number | "">("");
+
+  const handleDobChange = (day: number | "", month: number | "", year: number | "") => {
+    if (day !== "" && month !== "" && year !== "") {
+      setDateOfBirth(new Date(year, month, day));
+    } else {
+      setDateOfBirth(null);
+    }
+  };
+
   // State for custom dropdown
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -238,11 +251,11 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
             <div className="grid grid-cols-3 gap-2">
               {/* Day */}
               <select
-                value={dateOfBirth ? dateOfBirth.getDate() : ""}
+                value={dobDay}
                 onChange={(e) => {
-                  const day = Number(e.target.value);
-                  const base = dateOfBirth || new Date(2000, 0, 1);
-                  setDateOfBirth(new Date(base.getFullYear(), base.getMonth(), day));
+                  const val = e.target.value === "" ? "" : Number(e.target.value);
+                  setDobDay(val);
+                  handleDobChange(val, dobMonth, dobYear);
                 }}
                 className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
               >
@@ -254,11 +267,11 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 
               {/* Month */}
               <select
-                value={dateOfBirth ? dateOfBirth.getMonth() : ""}
+                value={dobMonth}
                 onChange={(e) => {
-                  const month = Number(e.target.value);
-                  const base = dateOfBirth || new Date(2000, 0, 1);
-                  setDateOfBirth(new Date(base.getFullYear(), month, base.getDate()));
+                  const val = e.target.value === "" ? "" : Number(e.target.value);
+                  setDobMonth(val);
+                  handleDobChange(dobDay, val, dobYear);
                 }}
                 className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
               >
@@ -270,11 +283,11 @@ const OrgUserRegistrationForm: React.FC<OrgUserRegistrationFormProps> = ({
 
               {/* Year */}
               <select
-                value={dateOfBirth ? dateOfBirth.getFullYear() : ""}
+                value={dobYear}
                 onChange={(e) => {
-                  const year = Number(e.target.value);
-                  const base = dateOfBirth || new Date(2000, 0, 1);
-                  setDateOfBirth(new Date(year, base.getMonth(), base.getDate()));
+                  const val = e.target.value === "" ? "" : Number(e.target.value);
+                  setDobYear(val);
+                  handleDobChange(dobDay, dobMonth, val);
                 }}
                 className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-green-200 focus:border-green-400 focus:outline-none appearance-none text-center"
               >

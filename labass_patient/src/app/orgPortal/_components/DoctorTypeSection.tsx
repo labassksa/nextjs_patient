@@ -46,7 +46,7 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
             >
               <div className="flex items-center">
                 <div
-                  className={`w-4 h-4 rounded-full ml-2 ${
+                  className={`w-4 h-4 rounded-full ml-2 flex-shrink-0 ${
                     doctorType === doc.type
                       ? "bg-white"
                       : doc.disabled
@@ -54,12 +54,16 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
                       : "bg-gray-400"
                   }`}
                 />
-                <span className="text-sm font-medium">{doc.label}</span>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-medium">{doc.label}</span>
+                  {doc.note && (
+                    <span className={`text-xs font-bold mt-0.5 ${doctorType === doc.type ? "text-white" : "text-gray-500"}`}>
+                      {doc.note}
+                    </span>
+                  )}
+                </div>
               </div>
             </button>
-            {doc.note && doctorType === doc.type && (
-              <p className="text-xs text-gray-500 mt-1 pr-3">{doc.note}</p>
-            )}
           </div>
         ))}
       </div>
