@@ -98,7 +98,7 @@ const OrgPatientsPage: React.FC = () => {
     : t('employee');
   const possiblePrices =
     doctorType === DoctorType.SickLeave
-      ? [89]
+      ? [49]
       : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
       ? [50]
       : [80, 70, 50, 35, 25, 15];
@@ -214,7 +214,7 @@ const OrgPatientsPage: React.FC = () => {
   useEffect(() => {
     if (doctorType === DoctorType.SickLeave) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
-      setSelectedPrice(89);
+      setSelectedPrice(49);
     } else if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(50);

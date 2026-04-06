@@ -19,8 +19,8 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
       type: DoctorType.SickLeave,
       label: "عام (تشمل اجازة مرضية)",
       disabled: false,
-      note: "سيتم إرسال رابط دفع 89 ريال للمريض",
-      badge: "نشطة الان",
+      note: "سيتم إرسال رابط دفع 49 ريال للمريض",
+      badge: "خصم | نشطة الان",
     },
   ];
 
