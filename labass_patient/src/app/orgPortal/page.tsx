@@ -219,8 +219,9 @@ const OrgPatientsPage: React.FC = () => {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(50);
     } else {
-      // Reset price when switching away from auto-selected types
+      // Reset both price and payment method when switching away from auto-selected types
       setSelectedPrice(null);
+      setPaymentMethod(PaymentMethodEnum.THROUGH_ORGANIZATION);
     }
   }, [doctorType, dealType]);
 
@@ -756,7 +757,7 @@ const OrgPatientsPage: React.FC = () => {
                         setCashPrice={setCashPrice}
                         subscription={subscription}
                       />
-                      {dealType === DealType.REVENUE_SHARE && paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && (
+                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && (
                         <ConsultationPriceSection
                           selectedPrice={selectedPrice}
                           onChange={(price) => setSelectedPrice(price)}
