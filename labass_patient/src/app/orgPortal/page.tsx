@@ -99,8 +99,6 @@ const OrgPatientsPage: React.FC = () => {
   const possiblePrices =
     doctorType === DoctorType.SickLeave
       ? [49]
-      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
-      ? [50]
       : [80, 70, 50, 35, 25, 15];
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -215,9 +213,9 @@ const OrgPatientsPage: React.FC = () => {
     if (doctorType === DoctorType.SickLeave) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(49);
-    } else if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
+    } else if (doctorType === DoctorType.Obesity) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
-      setSelectedPrice(50);
+      setSelectedPrice(null);
     } else {
       // Reset both price and payment method when switching away from auto-selected types
       setSelectedPrice(null);
@@ -757,7 +755,7 @@ const OrgPatientsPage: React.FC = () => {
                         setCashPrice={setCashPrice}
                         subscription={subscription}
                       />
-                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && (
+                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && (
                         <ConsultationPriceSection
                           selectedPrice={selectedPrice}
                           onChange={(price) => setSelectedPrice(price)}

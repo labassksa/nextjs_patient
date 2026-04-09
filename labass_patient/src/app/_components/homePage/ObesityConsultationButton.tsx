@@ -18,7 +18,8 @@ const ObesityConsultationButton: React.FC = () => {
 
   return (
     <div
-      className="relative bg-custom-green p-2 rounded-lg text-right text-white mx-1 overflow-hidden mt-4 opacity-50 cursor-not-allowed"
+      onClick={navigateToSurvey}
+      className="relative bg-custom-green p-2 rounded-lg text-right text-white mx-1 overflow-hidden mt-4 cursor-pointer"
       style={{ position: "relative", overflow: "hidden" }}
     >
       <div className="flex flex-col justify-between h-full">
