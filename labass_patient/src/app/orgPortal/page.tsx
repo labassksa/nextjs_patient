@@ -102,9 +102,7 @@ const OrgPatientsPage: React.FC = () => {
       : [80, 70, 50, 35, 25, 15];
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
-    doctorType === DoctorType.SickLeave
-      ? [PaymentMethodEnum.THROUGH_LABASS]
-      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+    doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity
       ? [PaymentMethodEnum.THROUGH_LABASS]
       : [
           PaymentMethodEnum.THROUGH_LABASS,
