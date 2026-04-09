@@ -14,13 +14,20 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
 }) => {
   const doctorTypes = [
     { type: DoctorType.General, label: "عام", disabled: false, note: null, badge: null },
-    { type: DoctorType.Obesity, label: "سمنة", disabled: true, note: null, badge: "قريباً" },
+    { type: DoctorType.Obesity, label: "سمنة", disabled: false, note: null, badge: null },
     {
       type: DoctorType.SickLeave,
       label: "عام (تشمل اجازة مرضية)",
       disabled: false,
       note: "سيتم إرسال رابط دفع 49 ريال للمريض",
       badge: "خصم | نشطة الان",
+    },
+    {
+      type: DoctorType.PsychiatricRefill,
+      label: "اعادة صرف الادوية النفسية",
+      disabled: true,
+      note: null,
+      badge: "قريباً",
     },
   ];
 
