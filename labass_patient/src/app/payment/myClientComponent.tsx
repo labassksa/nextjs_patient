@@ -32,9 +32,12 @@ const PaymentClient: React.FC = () => {
   const consultationType = searchParams.get("consultationType");
 
   // Store consultationType in localStorage for later use after payment
+  // Always update (or clear) to avoid stale values from previous consultations
   useEffect(() => {
     if (consultationType) {
       localStorage.setItem("consultationType", consultationType);
+    } else {
+      localStorage.removeItem("consultationType");
     }
   }, [consultationType]);
 
