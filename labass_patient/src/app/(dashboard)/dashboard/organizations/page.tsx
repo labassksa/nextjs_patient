@@ -77,6 +77,15 @@ export default function OrganizationsPage() {
       },
     },
     {
+      accessorKey: "consultationCountLast30Days",
+      header: "Consultations (30d)",
+      cell: ({ row }) => (
+        <Badge variant="secondary" className="font-mono">
+          {row.original.consultationCountLast30Days ?? 0}
+        </Badge>
+      ),
+    },
+    {
       id: "actions",
       header: "",
       cell: ({ row }) => (
@@ -118,6 +127,7 @@ export default function OrganizationsPage() {
         isLoading={isLoading}
         searchKey="name"
         searchValue={search}
+        exportFilename="organizations"
       />
     </div>
   );

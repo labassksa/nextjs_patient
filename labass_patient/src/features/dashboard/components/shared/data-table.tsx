@@ -24,7 +24,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from "lucide-react";
 import { TableSkeleton } from "./loading-skeleton";
 import { EmptyState } from "./empty-state";
 
@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   searchValue?: string;
   emptyMessage?: string;
   pageSize?: number;
+  exportFilename?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,6 +53,7 @@ export function DataTable<TData, TValue>({
   searchValue,
   emptyMessage = "No results found.",
   pageSize = 10,
+  exportFilename,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -85,6 +87,38 @@ export function DataTable<TData, TValue>({
     }
   }, [searchKey, searchValue, table]);
 
+  const handleExport = async () => {
+    const XLSX = await import("xlsx");
+    const filteredRows = table.getFilteredRowModel().rows;
+    const headerLabels = table.getHeaderGroups()[0]?.headers
+      .map((h) => getHeaderLabel(h))
+      .filter((label) => label && label !== "actions" && label !== "toggle") ?? [];
+
+    const rows = filteredRows.map((row) =>
+      Object.fromEntries(
+        row.getVisibleCells()
+          .filter((cell) => {
+            const label = getHeaderLabel(
+              table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
+            );
+            return label && label !== "actions" && label !== "toggle";
+          })
+          .map((cell) => {
+            const label = getHeaderLabel(
+              table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
+            );
+            const value = cell.getValue();
+            return [label, value ?? ""];
+          })
+      )
+    );
+
+    const worksheet = XLSX.utils.json_to_sheet(rows, { header: headerLabels });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${exportFilename ?? "export"}.xlsx`);
+  };
+
   if (isLoading) {
     return <TableSkeleton rows={pageSize} columns={columns.length} />;
   }
@@ -98,6 +132,16 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      {/* Export button */}
+      {exportFilename && (
+        <div className="flex justify-end mb-3">
+          <Button variant="outline" size="sm" onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Export to Excel
+          </Button>
+        </div>
+      )}
+
       {/* Desktop: Table view */}
       <Card className="overflow-hidden hidden md:block">
         <div className="overflow-x-auto">

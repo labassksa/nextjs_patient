@@ -131,6 +131,7 @@ export default function PromoCodesPage() {
         isLoading={isLoading}
         searchKey="code"
         searchValue={search}
+        exportFilename="promo-codes"
       />
     </div>
   );

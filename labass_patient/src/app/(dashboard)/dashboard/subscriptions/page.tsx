@@ -149,7 +149,7 @@ export default function SubscriptionsPage() {
         <SearchInput placeholder="Search subscriptions..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={subscriptions} isLoading={isLoading} searchKey="organizationName" searchValue={search} />
+      <DataTable columns={columns} data={subscriptions} isLoading={isLoading} searchKey="organizationName" searchValue={search} exportFilename="subscriptions" />
 
       <Dialog open={createDialog} onOpenChange={setCreateDialog}>
         <DialogContent>

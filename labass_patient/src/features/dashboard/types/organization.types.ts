@@ -12,6 +12,7 @@ export interface Organization {
   organizationManagerName?: string;
   marketers: Marketer[];
   createdAt: string;
+  consultationCountLast30Days?: number;
 }
 
 export interface CreateOrganizationPayload {

@@ -124,6 +124,7 @@ export default function MarketersPage() {
         data={marketers}
         isLoading={isLoading}
         searchValue={search}
+        exportFilename="marketers"
       />
     </div>
   );

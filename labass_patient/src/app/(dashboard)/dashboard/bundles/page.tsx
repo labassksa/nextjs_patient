@@ -157,7 +157,7 @@ export default function BundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} />
+      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="bundles" />
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
