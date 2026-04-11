@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
-import { Plus, Eye, Building2, MapPin, GitBranch, Banknote, Calendar, Phone, User, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Eye, Building2, MapPin, GitBranch, Banknote, Calendar, Phone, User, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 const ORG_TYPES = ["pharmacy", "laboratory", "home care", "school"] as const;
 const DEAL_TYPES = ["SUBSCRIPTION", "REVENUE_SHARE"] as const;
@@ -38,7 +38,7 @@ export default function OrganizationDetailPage() {
   const [fromDate, setFromDate] = useState(weekAgo.toISOString().split("T")[0]);
   const [toDate, setToDate] = useState(today.toISOString().split("T")[0]);
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const [limit, setLimit] = useState(10);
   const { data: reportData, isLoading: consultationsLoading } = useOrgConsultationsReport(orgId, fromDate, toDate, page, limit);
 
   const handleExportConsultations = async () => {
@@ -381,9 +381,6 @@ export default function OrganizationDetailPage() {
             <Badge variant="secondary" className="ml-2 font-mono">{reportData?.total ?? consultationsList.length}</Badge>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportConsultations} disabled={consultationsList.length === 0}>
-              <Download className="h-4 w-4 mr-2" /> Export to Excel
-            </Button>
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
               <Input type="date" lang="en" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={toDate} />
@@ -395,6 +392,11 @@ export default function OrganizationDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-end mb-3">
+            <Button variant="outline" size="sm" onClick={handleExportConsultations} disabled={consultationsList.length === 0 || consultationsLoading}>
+              <Download className="h-4 w-4 mr-2" /> Export to Excel
+            </Button>
+          </div>
           {consultationsLoading ? (
             <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
           ) : consultationsList.length > 0 ? (
@@ -433,18 +435,47 @@ export default function OrganizationDetailPage() {
           )}
 
           {/* Pagination */}
-          {(reportData?.total ?? 0) > limit && (
-            <div className="flex items-center justify-between mt-4 pt-4 border-t">
-              <p className="text-sm text-muted-foreground">
-                Page <span className="font-medium">{page}</span> of <span className="font-medium">{Math.ceil((reportData?.total ?? 0) / limit)}</span>
-                {" "}— <span className="font-medium">{reportData?.total}</span> total
-              </p>
+          {consultationsList.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1 py-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <p className="text-sm text-muted-foreground">
+                  Showing{" "}
+                  <span className="font-medium text-foreground">{(page - 1) * limit + 1}</span>
+                  {" "}to{" "}
+                  <span className="font-medium text-foreground">{Math.min(page * limit, reportData?.total ?? consultationsList.length)}</span>
+                  {" "}of{" "}
+                  <span className="font-medium text-foreground">{reportData?.total ?? consultationsList.length}</span>
+                  {" "}results
+                </p>
+                <div className="hidden sm:flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Rows per page</span>
+                  <Select value={String(limit)} onValueChange={(val) => { setLimit(Number(val)); setPage(1); }}>
+                    <SelectTrigger className="h-8 w-[70px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[10, 20, 30, 50].map((size) => (
+                        <SelectItem key={size} value={String(size)}>{size}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground mr-2">
+                  Page {page} of {Math.ceil((reportData?.total ?? consultationsList.length) / limit) || 1}
+                </span>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(1)} disabled={page === 1}>
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => p + 1)} disabled={page >= Math.ceil((reportData?.total ?? 0) / limit)}>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => p + 1)} disabled={page >= Math.ceil((reportData?.total ?? consultationsList.length) / limit)}>
                   <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(Math.ceil((reportData?.total ?? consultationsList.length) / limit))} disabled={page >= Math.ceil((reportData?.total ?? consultationsList.length) / limit)}>
+                  <ChevronsRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
