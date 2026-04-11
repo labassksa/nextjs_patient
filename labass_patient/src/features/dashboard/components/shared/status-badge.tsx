@@ -39,6 +39,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
+  if (!status || typeof status !== "string") return <span className="text-muted-foreground text-xs">—</span>;
   const normalizedStatus = status.toLowerCase();
   const style = statusStyles[normalizedStatus] || "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-50";
 
