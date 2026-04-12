@@ -3,7 +3,7 @@ import type { Bundle, CreateBundlePayload, UpdateBundlePayload } from "../types/
 
 export async function getBundles(): Promise<Bundle[]> {
   const { data } = await apiClient.get("/bundles");
-  return data;
+  return data?.data ?? data;
 }
 
 export async function createBundle(payload: CreateBundlePayload) {
