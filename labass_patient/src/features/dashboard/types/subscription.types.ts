@@ -1,14 +1,14 @@
 export interface Subscription {
   id: number;
-  organizationId: number;
-  organizationName: string;
-  bundleId: number;
-  bundleName: string;
+  organization: { id: number; name: string; type?: string; city?: string };
+  bundle: { id: number; name: string; type?: string; consultationCount?: number };
   status: string;
   remainingConsultations: number;
   totalConsultations: number;
   price: number;
-  nextBillingDate: string;
+  currency?: string;
+  nextBillingDate: string | null;
+  recurringType?: string;
   createdAt: string;
 }
 
