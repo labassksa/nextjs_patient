@@ -22,7 +22,7 @@ import { Plus, Trash2 } from "lucide-react";
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
 const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations"] as const;
-const BUNDLE_NAMES = ["BASIC", "STANDARD", "PREMIUM"] as const;
+const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function BundlesPage() {
   const { data, isLoading, error, refetch } = useBundles();
@@ -33,7 +33,7 @@ export default function BundlesPage() {
   const [createDialog, setCreateDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
-    name: "BASIC", type: "GP Consultations", price: 0, consultationCount: 0,
+    name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
     currency: "SAR", recurringType: "Monthly", description: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -59,7 +59,7 @@ export default function BundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync(newBundle);
     setCreateDialog(false);
-    setNewBundle({ name: "BASIC", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "" });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "" });
     setFormErrors({});
   };
 
