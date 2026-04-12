@@ -10,10 +10,10 @@ export function useConsultations() {
   });
 }
 
-export function useConsultationsReport(fromDate: string, toDate: string) {
+export function useConsultationsReport(fromDate: string, toDate: string, page: number = 1, limit: number = 10) {
   return useQuery({
-    queryKey: queryKeys.consultations.report(fromDate, toDate),
-    queryFn: () => getConsultationsReport(fromDate, toDate),
+    queryKey: [...queryKeys.consultations.report(fromDate, toDate), page, limit],
+    queryFn: () => getConsultationsReport(fromDate, toDate, page, limit),
     enabled: !!fromDate && !!toDate,
   });
 }
