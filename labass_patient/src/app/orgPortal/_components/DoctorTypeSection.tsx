@@ -23,11 +23,11 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
       badge: "خصم | نشطة الان",
     },
     {
-      type: DoctorType.PsychiatricRefill,
+      type: DoctorType.Psychiatrist,
       label: "اعادة صرف الادوية النفسية",
-      disabled: true,
+      disabled: false,
       note: null,
-      badge: "قريباً",
+      badge: null,
     },
   ];
 
