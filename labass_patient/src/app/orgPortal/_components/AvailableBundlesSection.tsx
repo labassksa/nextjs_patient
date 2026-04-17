@@ -22,6 +22,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   const [selectedBundle, setSelectedBundle] = useState<Bundle | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [isInitiatingPayment, setIsInitiatingPayment] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => {
     const fetchBundles = async () => {
@@ -177,6 +178,45 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
           {t('subscription.chooseBundleSubtitle')}
         </p>
 
+        {/* Terms and Conditions Checkbox */}
+        <label className="flex items-start gap-3 mb-4 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            className="mt-0.5 w-4 h-4 accent-custom-green flex-shrink-0 cursor-pointer"
+          />
+          <span className="text-sm text-gray-600">
+            {isRTL ? (
+              <>
+                أوافق على{" "}
+                <a
+                  href="/termsandConditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-custom-green underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  الشروط والأحكام
+                </a>
+              </>
+            ) : (
+              <>
+                I agree to the{" "}
+                <a
+                  href="/termsandConditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-custom-green underline font-medium"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Terms and Conditions
+                </a>
+              </>
+            )}
+          </span>
+        </label>
+
         {/* Bundles Grid */}
         <div className="space-y-3">
           {bundles.map((bundle) => (
@@ -226,7 +266,8 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
               {/* Subscribe Button */}
               <button
                 onClick={() => handleSubscribeClick(bundle)}
-                className="w-full bg-custom-green text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors"
+                disabled={!termsAccepted}
+                className="w-full bg-custom-green text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t('subscription.subscribeNow')}
               </button>
