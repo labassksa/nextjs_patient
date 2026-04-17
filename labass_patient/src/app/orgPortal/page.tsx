@@ -714,6 +714,7 @@ const OrgPatientsPage: React.FC = () => {
                   <DoctorTypeSection
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
+                    hasSubscription={!!subscription}
                   />
                   <OrgUserRegistrationForm
                     orgType={orgType}
