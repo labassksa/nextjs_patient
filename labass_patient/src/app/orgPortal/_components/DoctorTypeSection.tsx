@@ -6,21 +6,30 @@ import { DoctorType } from "../_types/doctorTypes";
 interface DoctorTypeSectionProps {
   doctorType: DoctorType;
   setDoctorType: (type: DoctorType) => void;
+  hasSubscription?: boolean;
 }
 
 const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
   doctorType,
   setDoctorType,
+  hasSubscription = false,
 }) => {
   const doctorTypes = [
     { type: DoctorType.General, label: "عام", disabled: false, note: null, badge: null },
-    { type: DoctorType.Obesity, label: "سمنة", disabled: true, note: null, badge: "قريباً" },
+    { type: DoctorType.Obesity, label: "سمنة", disabled: false, note: null, badge: "نشطة الان" },
+    {
+      type: DoctorType.Psychiatrist,
+      label: "اعادة صرف الادوية النفسية",
+      disabled: false,
+      note: null,
+      badge: "نشطة الان",
+    },
     {
       type: DoctorType.SickLeave,
-      label: "عام (تشمل اجازة مرضية)",
+      label: "اخصائي طب اسرة (تشمل اصدار الاجازة المرضية)",
       disabled: false,
       note: "سيتم إرسال رابط دفع 49 ريال للمريض",
-      badge: "خصم | نشطة الان",
+      badge: "نشطة الان",
     },
   ];
 
@@ -58,7 +67,7 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
               />
               <div className="flex flex-col items-start">
                 <span className="text-sm font-medium">{doc.label}</span>
-                {doc.note && (
+                {doc.note && !hasSubscription && (
                   <span
                     className={`text-xs font-bold mt-0.5 ${
                       doctorType === doc.type ? "text-white" : "text-gray-500"

@@ -104,7 +104,7 @@ const SimpleLoginForm = () => {
       <div className="p-6 mb-60">
         <div className="text-xs text-right">
           مع الاستمرار بتسجيل الدخول، أنت توافق على{" "}
-          <a href="/terms" className="underline text-custom-green">
+          <a href="/termsandConditions" className="underline text-custom-green">
             الشروط والأحكام
           </a>
         </div>

@@ -15,10 +15,10 @@ export function useOrganizations() {
   });
 }
 
-export function useOrgConsultationsReport(orgId: number, fromDate: string, toDate: string) {
+export function useOrgConsultationsReport(orgId: number, fromDate: string, toDate: string, page: number = 1, limit: number = 10) {
   return useQuery({
-    queryKey: queryKeys.organizations.report(orgId, fromDate, toDate),
-    queryFn: () => getOrgConsultationsReport(orgId, fromDate, toDate),
+    queryKey: [...queryKeys.organizations.report(orgId, fromDate, toDate), page, limit],
+    queryFn: () => getOrgConsultationsReport(orgId, fromDate, toDate, page, limit),
     enabled: !!orgId && !!fromDate && !!toDate,
   });
 }

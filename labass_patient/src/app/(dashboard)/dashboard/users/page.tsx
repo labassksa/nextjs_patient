@@ -110,7 +110,7 @@ export default function UsersPage() {
         <SearchInput placeholder="Search users..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={users} isLoading={isLoading} searchKey="firstName" searchValue={search} />
+      <DataTable columns={columns} data={users} isLoading={isLoading} searchKey="firstName" searchValue={search} exportFilename="users" />
 
       <Dialog open={createDialog} onOpenChange={setCreateDialog}>
         <DialogContent>

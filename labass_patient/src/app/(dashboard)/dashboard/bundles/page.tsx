@@ -21,6 +21,8 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations"] as const;
+const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function BundlesPage() {
   const { data, isLoading, error, refetch } = useBundles();
@@ -31,7 +33,7 @@ export default function BundlesPage() {
   const [createDialog, setCreateDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
-    name: "", type: "consultation", price: 0, consultationCount: 0,
+    name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
     currency: "SAR", recurringType: "Monthly", description: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -40,8 +42,8 @@ export default function BundlesPage() {
 
   const validateBundle = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!newBundle.name || newBundle.name.length < 3 || newBundle.name.length > 100) {
-      errors.name = "Name must be 3-100 characters";
+    if (!newBundle.name) {
+      errors.name = "Please select a name";
     }
     if (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount)) {
       errors.consultationCount = "Must be a positive integer";
@@ -57,7 +59,7 @@ export default function BundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync(newBundle);
     setCreateDialog(false);
-    setNewBundle({ name: "", type: "consultation", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "" });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "" });
     setFormErrors({});
   };
 
@@ -157,7 +159,7 @@ export default function BundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} />
+      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="bundles" />
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
@@ -165,9 +167,23 @@ export default function BundlesPage() {
           <DialogHeader><DialogTitle>Create Bundle</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Name (3-100 chars)</Label>
-              <Input value={newBundle.name} onChange={(e) => setNewBundle({ ...newBundle, name: e.target.value })} />
+              <Label>Name</Label>
+              <Select value={newBundle.name} onValueChange={(val) => setNewBundle({ ...newBundle, name: val })}>
+                <SelectTrigger><SelectValue placeholder="Select name" /></SelectTrigger>
+                <SelectContent>
+                  {BUNDLE_NAMES.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                </SelectContent>
+              </Select>
               {formErrors.name && <p className="text-sm text-destructive">{formErrors.name}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={newBundle.type} onValueChange={(val) => setNewBundle({ ...newBundle, type: val })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

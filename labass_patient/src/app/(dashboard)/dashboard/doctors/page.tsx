@@ -109,6 +109,7 @@ export default function DoctorsPage() {
         isLoading={isLoading}
         searchKey="firstName"
         searchValue={search}
+        exportFilename="doctors"
       />
     </div>
   );

@@ -99,14 +99,10 @@ const OrgPatientsPage: React.FC = () => {
   const possiblePrices =
     doctorType === DoctorType.SickLeave
       ? [49]
-      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
-      ? [50]
       : [80, 70, 50, 35, 25, 15];
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
-    doctorType === DoctorType.SickLeave
-      ? [PaymentMethodEnum.THROUGH_LABASS]
-      : dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity
+    doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity || doctorType === DoctorType.Psychiatrist
       ? [PaymentMethodEnum.THROUGH_LABASS]
       : [
           PaymentMethodEnum.THROUGH_LABASS,
@@ -212,12 +208,12 @@ const OrgPatientsPage: React.FC = () => {
 
   // Auto-select payment method and price based on consultation type
   useEffect(() => {
-    if (doctorType === DoctorType.SickLeave) {
+    if (doctorType === DoctorType.SickLeave || doctorType === DoctorType.Psychiatrist) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(49);
-    } else if (dealType === DealType.REVENUE_SHARE && doctorType === DoctorType.Obesity) {
+    } else if (doctorType === DoctorType.Obesity) {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
-      setSelectedPrice(50);
+      setSelectedPrice(89);
     } else {
       // Reset both price and payment method when switching away from auto-selected types
       setSelectedPrice(null);
@@ -718,6 +714,7 @@ const OrgPatientsPage: React.FC = () => {
                   <DoctorTypeSection
                     doctorType={doctorType}
                     setDoctorType={setDoctorType}
+                    hasSubscription={!!subscription}
                   />
                   <OrgUserRegistrationForm
                     orgType={orgType}
@@ -746,8 +743,9 @@ const OrgPatientsPage: React.FC = () => {
                     pdfFiles={pdfFiles}
                     setPdfFiles={setPdfFiles}
                   />
-                  {/* Payment method section — shown for revenue share orgs or when subscription exists, hidden for SickLeave */}
-                  {(dealType === DealType.REVENUE_SHARE || subscription) && doctorType !== DoctorType.SickLeave && (
+
+                  {/* Payment method section — shown for revenue share orgs or when subscription exists */}
+                  {(dealType === DealType.REVENUE_SHARE || subscription) && (
                     <>
                       <PaymentMethodSection
                         paymentMethod={paymentMethod}
@@ -757,7 +755,7 @@ const OrgPatientsPage: React.FC = () => {
                         setCashPrice={setCashPrice}
                         subscription={subscription}
                       />
-                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && (
+                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
                         <ConsultationPriceSection
                           selectedPrice={selectedPrice}
                           onChange={(price) => setSelectedPrice(price)}

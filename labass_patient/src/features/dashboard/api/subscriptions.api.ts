@@ -3,7 +3,7 @@ import type { CreateSubscriptionPayload, UpdateSubscriptionPayload } from "../ty
 
 export async function getSubscriptions() {
   const { data } = await apiClient.get("/admin/subscriptions");
-  return data;
+  return data?.data ?? data;
 }
 
 export async function createSubscription(payload: CreateSubscriptionPayload) {

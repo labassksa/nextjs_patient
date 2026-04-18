@@ -2,5 +2,6 @@ export enum DoctorType {
   General = "general",
   Psychiatrist = "psychiatrist",
   Obesity = "obesity",
-  SickLeave = "sickLeave"
+  SickLeave = "sickLeave",
+  PsychiatricRefill = "psychiatricRefill"
 }

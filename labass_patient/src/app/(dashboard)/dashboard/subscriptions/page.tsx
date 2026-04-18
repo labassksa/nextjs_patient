@@ -58,15 +58,15 @@ export default function SubscriptionsPage() {
       ),
     },
     {
-      accessorKey: "organizationName",
+      accessorKey: "organization",
       header: "Organization",
-      cell: ({ row }) => <span className="font-medium">{row.original.organizationName}</span>,
+      cell: ({ row }) => <span className="font-medium">{row.original.organization?.name}</span>,
     },
     {
-      accessorKey: "bundleName",
+      accessorKey: "bundle",
       header: "Bundle",
       cell: ({ row }) => (
-        <Badge variant="outline" className="font-normal">{row.original.bundleName}</Badge>
+        <Badge variant="outline" className="font-normal capitalize">{row.original.bundle?.name}</Badge>
       ),
     },
     {
@@ -149,7 +149,7 @@ export default function SubscriptionsPage() {
         <SearchInput placeholder="Search subscriptions..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={subscriptions} isLoading={isLoading} searchKey="organizationName" searchValue={search} />
+      <DataTable columns={columns} data={subscriptions} isLoading={isLoading} searchKey="organization" searchValue={search} exportFilename="subscriptions" />
 
       <Dialog open={createDialog} onOpenChange={setCreateDialog}>
         <DialogContent>

@@ -7,8 +7,8 @@ export async function getConsultations(): Promise<Consultation[]> {
   return data;
 }
 
-export async function getConsultationsReport(fromDate: string, toDate: string): Promise<OrgReportResponse> {
-  const { data } = await apiClient.post("/marketers/consultations/report", { fromDate, toDate });
+export async function getConsultationsReport(fromDate: string, toDate: string, page: number = 1, limit: number = 10): Promise<OrgReportResponse> {
+  const { data } = await apiClient.post("/marketers/consultations/report", { fromDate, toDate, page, limit });
   return data;
 }
 
