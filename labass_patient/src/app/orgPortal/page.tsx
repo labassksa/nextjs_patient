@@ -744,25 +744,20 @@ const OrgPatientsPage: React.FC = () => {
                     setPdfFiles={setPdfFiles}
                   />
 
-                  {/* Payment method section — shown for revenue share orgs or when subscription exists */}
-                  {(dealType === DealType.REVENUE_SHARE || subscription) && (
-                    <>
-                      <PaymentMethodSection
-                        paymentMethod={paymentMethod}
-                        setPaymentMethod={setPaymentMethod}
-                        possiblePaymentMethods={possiblePaymentMethods}
-                        cashPrice={cashPrice}
-                        setCashPrice={setCashPrice}
-                        subscription={subscription}
-                      />
-                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
-                        <ConsultationPriceSection
-                          selectedPrice={selectedPrice}
-                          onChange={(price) => setSelectedPrice(price)}
-                          possiblePrices={possiblePrices}
-                        />
-                      )}
-                    </>
+                  <PaymentMethodSection
+                    paymentMethod={paymentMethod}
+                    setPaymentMethod={setPaymentMethod}
+                    possiblePaymentMethods={possiblePaymentMethods}
+                    cashPrice={cashPrice}
+                    setCashPrice={setCashPrice}
+                    subscription={subscription}
+                  />
+                  {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
+                    <ConsultationPriceSection
+                      selectedPrice={selectedPrice}
+                      onChange={(price) => setSelectedPrice(price)}
+                      possiblePrices={possiblePrices}
+                    />
                   )}
 
                   {/* Bottom Buttons for Web (not fixed) */}
