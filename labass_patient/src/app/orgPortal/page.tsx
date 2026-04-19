@@ -358,7 +358,7 @@ const OrgPatientsPage: React.FC = () => {
           patientInfo,
           paymentMethod,
           orgType,
-          dealType,
+          dealType: DealType.REVENUE_SHARE,
           consultationPrice: selectedPrice || cashPrice,
           testType,
           consultationType: getConsultationType(doctorType),
