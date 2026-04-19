@@ -3,6 +3,7 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const StatusSection = () => {
   const router = useRouter();
@@ -41,27 +42,47 @@ const StatusSection = () => {
     }
   }, [searchParams]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!consultationId) {
       console.error("Consultation ID is missing.");
       return;
     }
 
-    // Check if it's an obesity consultation
     const consultationType = localStorage.getItem("consultationType");
 
     if (consultationType === "obesity") {
-      // Redirect to obesity survey with consultationId
-      localStorage.setItem("obesityConsultationId", consultationId);
-      router.push(`/obesitySurvey?consultationId=${consultationId}`);
+      const storedSurveyData = localStorage.getItem("obesitySurveyData");
+
+      if (storedSurveyData) {
+        // HOME FLOW: survey was completed before payment → POST it now
+        const token = localStorage.getItem("labass_token");
+        if (!token) {
+          alert("يرجى تسجيل الدخول أولاً");
+          return;
+        }
+        try {
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/consultations/${consultationId}/obesity-survey`,
+            JSON.parse(storedSurveyData),
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error) {
+          console.error("Error posting obesity survey:", error);
+        }
+        localStorage.removeItem("consultationType");
+        localStorage.removeItem("obesitySurveyData");
+        router.push(`/patientSelection?consultationId=${consultationId}`);
+      } else {
+        // ORGPORTAL FLOW: no survey yet → send to survey page
+        localStorage.setItem("obesityConsultationId", consultationId);
+        router.push(`/obesitySurvey?consultationId=${consultationId}`);
+      }
       return;
     }
 
     if (isPromoFromUrl) {
-      // If promo code came from URL, go directly to chat
       router.push(`/chat/${consultationId}`);
     } else {
-      // Otherwise, go to patient selection
       router.push(`/patientSelection?consultationId=${consultationId}`);
     }
   };
