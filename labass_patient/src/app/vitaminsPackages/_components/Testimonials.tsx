@@ -1,12 +1,6 @@
 import React from "react";
 import s from "./Testimonials.module.css";
 
-const partners = [
-  { logo: "/icons/partners/smart-lab.svg", name: "المختبر الذكي", sub: "SMART LAB" },
-  { logo: "/icons/partners/sihha-plus.svg", name: "صحّة+", sub: "SIHHA PLUS" },
-  { logo: "/icons/partners/precision.svg", name: "الطبّ الدقيق", sub: "PRECISION" },
-  { logo: "/icons/partners/riayah.svg", name: "رعاية", sub: "RI'AYAH" },
-];
 
 const testimonials = [
   {
@@ -182,20 +176,6 @@ const Testimonials: React.FC = () => {
         ))}
       </div>
 
-      <div className={s.partnersWrap}>
-        <div className={s.partnersLbl}>بالشراكة مع جهات معتمدة</div>
-        <div className={s.logos}>
-          {partners.map((p, i) => (
-            <div key={i} className={s.logo}>
-              <img src={p.logo} alt={p.name} className={s.logoMark} />
-              <div>
-                <div className={s.logoTxt}>{p.name}</div>
-                <div className={s.logoSub}>{p.sub}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 };
