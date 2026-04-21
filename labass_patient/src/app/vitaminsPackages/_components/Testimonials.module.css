@@ -75,8 +75,8 @@
   border: 0.5px solid rgba(23,52,4,0.1);
   transition: transform 0.35s cubic-bezier(0.37,0,0.63,1), box-shadow 0.35s;
   flex-shrink: 0;
-  width: 80vw;
-  scroll-snap-align: center;
+  width: 65vw;
+  scroll-snap-align: start;
 }
 .card:hover {
   transform: translateY(-4px);
@@ -221,6 +221,40 @@
   line-height: 1.4;
   font-weight: 400;
 }
+
+/* Partners */
+.partnersWrap {
+  border-top: 0.5px solid rgba(23,52,4,0.12);
+  padding-top: 22px;
+  margin-top: 28px;
+}
+.partnersLbl {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(23,52,4,0.55);
+  margin-bottom: 14px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+.logos {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.55;
+  transition: opacity 0.3s;
+  color: #173404;
+}
+.logo:hover { opacity: 0.9; }
+.logoMark { width: 18px; height: 18px; flex-shrink: 0; }
+.logoTxt { font-size: 13px; font-weight: 800; letter-spacing: -0.3px; white-space: nowrap; }
+.logoSub { font-size: 9px; color: rgba(23,52,4,0.5); margin-right: 2px; font-weight: 500; }
 
 /* Desktop */
 @media (min-width: 768px) {
