@@ -30,7 +30,7 @@ const features = [
 
 const WhatsIncluded: React.FC = () => {
   return (
-    <section className="py-8 md:py-10 px-4 bg-gradient-to-l from-custom-green to-white">
+    <section className="py-8 md:py-10 px-4">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-xl md:text-2xl font-bold text-black text-center mb-6 md:mb-8">
           ماذا يشمل الاشتراك؟

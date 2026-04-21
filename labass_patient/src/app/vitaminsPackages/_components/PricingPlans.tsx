@@ -56,15 +56,15 @@ const PricingPlans: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                تحليل متقدم للنتائج
+                طبيب يحلل نتائجك
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                فيتامينات مخصصة لك
+                فيتامينات مخصصة لك توصلك لبيتك
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                استشارة مع طبيب عام
+                استشر طبيبك في أي وقت
               </li>
             </ul>
             <button
@@ -110,15 +110,15 @@ const PricingPlans: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                تحليل متقدم للنتائج
+                طبيب يحلل نتائجك
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                فيتامينات مخصصة لك
+                فيتامينات مخصصة لك توصلك لبيتك
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                استشارة مع طبيب عام
+                استشر طبيبك في أي وقت
               </li>
             </ul>
             <button

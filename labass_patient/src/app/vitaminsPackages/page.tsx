@@ -13,8 +13,10 @@ const VitaminsPackagesPage = () => {
     <div dir="rtl" className="relative bg-white">
       <HeroSection />
       <HowItWorks />
-      <WhatsIncluded />
-      <PricingPlans />
+      <div className="bg-gradient-to-l from-custom-green to-white">
+        <WhatsIncluded />
+        <PricingPlans />
+      </div>
       <FAQ />
       <FooterCTA />
     </div>
