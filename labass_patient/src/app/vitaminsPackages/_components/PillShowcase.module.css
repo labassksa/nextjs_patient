@@ -1,0 +1,156 @@
+.stage {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 420px;
+  background: #7ED957;
+  position: relative;
+  overflow: hidden;
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+  isolation: isolate;
+}
+
+.groundTint {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 55%;
+  background: radial-gradient(ellipse 70% 100% at 50% 100%, rgba(52, 98, 28, 0.28) 0%, rgba(52, 98, 28, 0) 70%);
+  pointer-events: none;
+}
+
+.shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 92px;
+  width: 190px;
+  height: 34px;
+  margin-left: -95px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(32, 58, 14, 0.58) 0%, rgba(32, 58, 14, 0.22) 45%, rgba(32, 58, 14, 0) 75%);
+  filter: blur(8px);
+  transform-origin: 50% 50%;
+  animation: shadow 5200ms cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  will-change: transform, opacity, filter;
+}
+
+.lift {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  animation: lift 5200ms cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.tilt {
+  position: relative;
+  animation: tilt 7200ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.pill {
+  position: absolute;
+  left: -110px;
+  top: -110px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 75% 75% at 32% 26%, #ffffff 0%, #f7f5f1 32%, #e3e0d8 62%, #c4c0b6 88%, #a9a59a 100%);
+  box-shadow:
+    inset -14px -18px 32px rgba(90, 86, 78, 0.35),
+    inset 10px 14px 22px rgba(255, 255, 255, 0.9),
+    inset 0 0 2px rgba(255, 255, 255, 1);
+  transform-style: preserve-3d;
+}
+
+.pill::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 55% 40% at 35% 24%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 55%);
+  pointer-events: none;
+  animation: spec 7200ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 85% 85% at 70% 85%, rgba(120, 115, 105, 0.22) 0%, rgba(120, 115, 105, 0) 55%);
+  pointer-events: none;
+}
+
+.text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 58px;
+  font-weight: 400;
+  letter-spacing: -3px;
+  color: #dcd8cf;
+  text-shadow:
+    -1px -1.5px 0.5px rgba(90, 85, 76, 0.55),
+    1px 1.5px 0.8px rgba(255, 255, 255, 0.9);
+  transform: rotate(-9deg) translate(-2px, -4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -1.5px 1px rgba(80, 76, 68, 0.25);
+  pointer-events: none;
+}
+
+@keyframes lift {
+  0%   { transform: translate3d(0, 8px, 0); }
+  50%  { transform: translate3d(0, -36px, 0); }
+  100% { transform: translate3d(0, 8px, 0); }
+}
+
+@keyframes tilt {
+  0%   { transform: rotateZ(-1.5deg) rotateY(-7deg) rotateX(3deg); }
+  25%  { transform: rotateZ(0.5deg)  rotateY(2deg)  rotateX(-1deg); }
+  50%  { transform: rotateZ(1.8deg)  rotateY(7deg)  rotateX(-3deg); }
+  75%  { transform: rotateZ(0.2deg)  rotateY(-1deg) rotateX(1deg); }
+  100% { transform: rotateZ(-1.5deg) rotateY(-7deg) rotateX(3deg); }
+}
+
+@keyframes spec {
+  0%, 100% { transform: translate(0, 0); opacity: 0.95; }
+  50%      { transform: translate(18px, 6px); opacity: 0.75; }
+}
+
+@keyframes shadow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1, 1);
+    opacity: 0.85;
+    filter: blur(8px);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) scale(0.68, 0.78);
+    opacity: 0.32;
+    filter: blur(13px);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1, 1);
+    opacity: 0.85;
+    filter: blur(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift, .tilt, .shadow, .pill::before { animation: none; }
+}

@@ -1,0 +1,499 @@
+.hero {
+  width: 100%;
+  background: #7ED957;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Tajawal', 'IBM Plex Sans Arabic', 'Segoe UI', system-ui, sans-serif;
+  direction: rtl;
+  isolation: isolate;
+}
+
+.blob1 {
+  position: absolute;
+  top: -140px;
+  left: -120px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
+}
+
+.blob2 {
+  position: absolute;
+  bottom: -180px;
+  right: -140px;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(23, 52, 4, 0.12) 0%, rgba(23, 52, 4, 0) 65%);
+  pointer-events: none;
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(23, 52, 4, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 32px 20px 36px;
+  align-items: center;
+  z-index: 2;
+}
+
+@media (min-width: 768px) {
+  .content {
+    grid-template-columns: 1fr 0.85fr;
+    gap: 24px;
+    padding: 40px 44px 48px;
+  }
+}
+
+.copy {
+  position: relative;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 14px;
+  background: rgba(23, 52, 4, 0.08);
+  border: 0.5px solid rgba(23, 52, 4, 0.18);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #173404;
+  margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+  .eyebrow {
+    gap: 10px;
+    padding: 7px 14px 7px 16px;
+    font-size: 12.5px;
+    margin-bottom: 22px;
+  }
+}
+
+.eyeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #173404;
+}
+
+.headline {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.6px;
+  color: #0d2002;
+  margin: 0 0 14px;
+}
+
+@media (min-width: 768px) {
+  .headline {
+    font-size: 54px;
+    line-height: 1.08;
+    letter-spacing: -1.2px;
+    margin: 0 0 18px;
+  }
+}
+
+.dim {
+  color: #27500A;
+}
+
+.sub {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: #27500A;
+  margin: 0 0 10px;
+  max-width: 400px;
+}
+
+@media (min-width: 768px) {
+  .sub {
+    font-size: 18px;
+    margin: 0 0 14px;
+  }
+}
+
+.desc {
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: rgba(23, 52, 4, 0.78);
+  margin: 0 0 22px;
+  max-width: 380px;
+}
+
+@media (min-width: 768px) {
+  .desc {
+    font-size: 14.5px;
+    line-height: 1.75;
+    margin: 0 0 28px;
+  }
+}
+
+.ctas {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .ctas {
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #173404;
+  color: #EAF3DE;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border: none;
+}
+
+@media (min-width: 768px) {
+  .btnPrimary {
+    gap: 10px;
+    padding: 14px 26px;
+    font-size: 15px;
+  }
+}
+
+.btnPrimary:hover {
+  transform: translateY(-1px);
+}
+
+.arrow {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7ED957;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: #173404;
+  font-weight: 800;
+}
+
+.btnGhost {
+  padding: 12px 18px;
+  color: #173404;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 0.5px solid rgba(23, 52, 4, 0.5);
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+@media (min-width: 768px) {
+  .btnGhost {
+    padding: 14px 22px;
+    font-size: 14px;
+  }
+}
+
+.trust {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .trust {
+    gap: 22px;
+  }
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: rgba(23, 52, 4, 0.75);
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .trustItem {
+    gap: 8px;
+    font-size: 12.5px;
+  }
+}
+
+.check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #173404;
+  color: #7ED957;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* Visual / pill side */
+.visual {
+  position: relative;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  direction: ltr;
+}
+
+@media (min-width: 768px) {
+  .visual {
+    height: 440px;
+  }
+}
+
+.ring1 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 0.5px dashed rgba(23, 52, 4, 0.25);
+  animation: spin 60s linear infinite;
+}
+
+@media (min-width: 768px) {
+  .ring1 {
+    width: 400px;
+    height: 400px;
+  }
+}
+
+.ring2 {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(23, 52, 4, 0.18);
+}
+
+@media (min-width: 768px) {
+  .ring2 {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+.chip {
+  position: absolute;
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 12px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #173404;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 6px 18px rgba(23, 52, 4, 0.18), 0 1px 2px rgba(23, 52, 4, 0.08);
+  direction: rtl;
+}
+
+@media (min-width: 768px) {
+  .chip {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 12.5px;
+    gap: 8px;
+  }
+}
+
+.chipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #639922;
+  flex-shrink: 0;
+}
+
+.chipVit {
+  top: 10px;
+  right: 10px;
+  animation: floatA 5s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+@media (min-width: 768px) {
+  .chipVit {
+    top: 40px;
+  }
+}
+
+.chipLab {
+  bottom: 40px;
+  left: 5px;
+  animation: floatB 6.4s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+@media (min-width: 768px) {
+  .chipLab {
+    bottom: 90px;
+    left: -10px;
+  }
+}
+
+.chipDoc {
+  top: 100px;
+  left: 0px;
+  animation: floatA 5.6s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  animation-delay: -1.5s;
+}
+
+@media (min-width: 768px) {
+  .chipDoc {
+    top: 140px;
+    left: -20px;
+  }
+}
+
+.pillWrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  animation: lift 5200ms cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+@media (min-width: 768px) {
+  .pillWrap {
+    width: 230px;
+    height: 230px;
+  }
+}
+
+.pillTilt {
+  width: 100%;
+  height: 100%;
+  animation: tilt 7200ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-style: preserve-3d;
+}
+
+.pill {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 75% 75% at 32% 26%, #ffffff 0%, #f7f5f1 32%, #e3e0d8 62%, #c4c0b6 88%, #a9a59a 100%);
+  box-shadow:
+    inset -14px -18px 32px rgba(90, 86, 78, 0.35),
+    inset 10px 14px 22px rgba(255, 255, 255, 0.9),
+    inset 0 0 2px rgba(255, 255, 255, 1);
+  display: grid;
+  place-items: center;
+}
+
+.pillSpec {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 55% 40% at 35% 24%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 55%);
+  pointer-events: none;
+}
+
+.pillText {
+  position: relative;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #dcd8cf;
+  letter-spacing: -1.5px;
+  text-shadow:
+    -1px -1.3px 0.5px rgba(90, 85, 76, 0.55),
+    1px 1.3px 0.8px rgba(255, 255, 255, 0.9);
+  transform: rotate(-8deg) translate(-2px, -3px);
+}
+
+@media (min-width: 768px) {
+  .pillText {
+    font-size: 44px;
+    letter-spacing: -2px;
+  }
+}
+
+.pillShadow {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  width: 140px;
+  height: 22px;
+  margin-left: -70px;
+  background: radial-gradient(ellipse at 50% 50%, rgba(32, 58, 14, 0.55) 0%, rgba(32, 58, 14, 0.18) 45%, rgba(32, 58, 14, 0) 75%);
+  filter: blur(10px);
+  animation: shadow 5200ms cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+@media (min-width: 768px) {
+  .pillShadow {
+    bottom: 40px;
+    width: 200px;
+    height: 28px;
+    margin-left: -100px;
+  }
+}
+
+@keyframes lift {
+  0%, 100% { transform: translateY(6px); }
+  50% { transform: translateY(-28px); }
+}
+
+@keyframes tilt {
+  0% { transform: rotateZ(-1.5deg) rotateY(-7deg) rotateX(3deg); }
+  50% { transform: rotateZ(1.8deg) rotateY(7deg) rotateX(-3deg); }
+  100% { transform: rotateZ(-1.5deg) rotateY(-7deg) rotateX(3deg); }
+}
+
+@keyframes shadow {
+  0%, 100% { transform: scale(1, 1); opacity: 0.75; filter: blur(10px); }
+  50% { transform: scale(0.72, 0.8); opacity: 0.3; filter: blur(14px); }
+}
+
+@keyframes floatA {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pillWrap, .pillTilt, .pillShadow, .chip, .ring1 { animation: none; }
+}

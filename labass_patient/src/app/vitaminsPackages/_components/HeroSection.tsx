@@ -1,23 +1,72 @@
 import React from "react";
+import styles from "./HeroSection.module.css";
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="bg-gradient-to-l from-custom-green to-white min-h-[60vh] md:min-h-[80vh] flex items-center">
-      <div className="w-full max-w-5xl mx-auto px-5 md:px-16 py-10 md:py-24 flex flex-col justify-center">
-        <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-black mb-3 md:mb-5 leading-tight">
-          صحتك بيدك… وبياناتك هي الدليل
-        </h1>
-        <h2 className="text-base sm:text-lg md:text-2xl text-gray-800 mb-4 md:mb-6 leading-relaxed">
-          فحص دم منزلي + فيتامينات مخصصة
-        </h2>
-        <p className="text-sm md:text-lg text-gray-600 mb-6 md:mb-10 leading-relaxed max-w-lg">
-          طبيب يقرأ تحاليلك ويختار لك الفيتامينات المناسبة.
-          <br />
-          فحص دم في منزلك، مكملات مخصصة، واستشر الطبيب في أي وقت
-        </p>
-        <button className="bg-custom-green text-white font-bold py-3 px-8 md:py-4 md:px-12 rounded-full text-base md:text-lg shadow-lg hover:opacity-90 transition-opacity w-fit">
-          اشترك الآن
-        </button>
+    <section className={styles.hero}>
+      <div className={styles.blob1} />
+      <div className={styles.blob2} />
+      <div className={styles.grain} />
+
+      <div className={styles.content}>
+        <div className={styles.copy}>
+          <div className={styles.eyebrow}>
+            شركة مرخصة من وزارة الصحة
+          </div>
+
+          <h1 className={styles.headline}>
+            صحتك بيدك<span className={styles.dim}>…</span>
+            <br />
+            وبياناتك هي الدليل
+          </h1>
+
+          <p className={styles.sub}>فيتامينات مخصصة لاحتياجك الشخصي</p>
+          <p className={styles.desc}>
+            ممرض يزورك للتحليل، طبيب يقرأ تحاليلك ويختار لك الفيتامينات المناسبة. فحص دم في
+            منزلك، مكمّلات مصمَّمة لك، واستشر طبيبك في أي وقت.
+          </p>
+
+          <div className={styles.ctas}>
+            <button className={styles.btnPrimary}>
+              اشترك الآن
+              <span className={styles.arrow}>←</span>
+            </button>
+          </div>
+
+          <div className={styles.trust}>
+            <div className={styles.trustItem}>
+              <div className={styles.check}>✓</div> طبيب مرخّص
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.visual}>
+          <div className={styles.ring1} />
+          <div className={styles.ring2} />
+
+          <div className={styles.pillShadow} />
+          <div className={styles.pillWrap}>
+            <div className={styles.pillTilt}>
+              <div className={styles.pill}>
+                <div className={styles.pillSpec} />
+                <div className={styles.pillText}>labass</div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`${styles.chip} ${styles.chipVit}`}>
+            <div className={styles.chipDot} />
+            فيتامين D — منخفض
+          </div>
+          <div className={`${styles.chip} ${styles.chipLab}`}>
+            <div className={styles.chipDot} style={{ background: "#BA7517" }} />
+            الحديد — ضمن المعدل
+          </div>
+          <div className={`${styles.chip} ${styles.chipDoc}`}>
+            <div className={styles.chipDot} style={{ background: "#1D9E75" }} />
+            د. سارة تقدم لك استشارة
+          </div>
+        </div>
       </div>
     </section>
   );

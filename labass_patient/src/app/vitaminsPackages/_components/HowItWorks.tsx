@@ -21,7 +21,7 @@ const steps = [
     title: "تجيك فيتاميناتك لبيتك",
     description:
       "بناءً على تفسير الطبيب لنتائجك، نصمم لك مكملات غذائية مخصصة.",
-    pill: "/images/pill5.png",
+    pill: null,
   },
 ];
 

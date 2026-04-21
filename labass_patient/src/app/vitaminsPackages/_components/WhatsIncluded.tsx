@@ -6,7 +6,7 @@ const features = [
     title: "طبيب يتابع حالتك",
     description:
       "طبيب مرخّص يقرأ نتائج تحاليلك ويفسّرها لك ويحدد الفيتامينات اللي تحتاجها بالضبط.",
-    icon: "",
+    icon: "/icons/widgets/icon-doctor.svg",
   },
   {
     title: "فحص دم شامل في المنزل",

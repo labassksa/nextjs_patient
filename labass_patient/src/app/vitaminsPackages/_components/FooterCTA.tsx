@@ -14,15 +14,15 @@ const FooterCTA: React.FC = () => {
         اشترك الآن
       </button>
       <div className="flex items-center justify-center gap-4 md:gap-6 text-xs md:text-sm opacity-80">
-        <a href="mailto:hello@jdar.sa" className="underline">
-          hello@jdar.sa
+        <a href="mailto:hello@labass.sa" className="underline">
+          hello@labass.sa
         </a>
         <a
-          href="https://wa.me/966115001303"
+          href="https://wa.me/966505117551"
           className="underline"
           dir="ltr"
         >
-          +966 11 500 1303
+          0505117551
         </a>
       </div>
     </section>
