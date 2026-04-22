@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import styles from "./HeroSection.module.css";
 
 const HeroSection: React.FC = () => {
@@ -27,10 +28,10 @@ const HeroSection: React.FC = () => {
           </p>
 
           <div className={styles.ctas}>
-            <button className={styles.btnPrimary}>
+            <Link href="/vitaminsPackages/subscribe" className={styles.btnPrimary}>
               اشترك الآن
               <span className={styles.arrow}>←</span>
-            </button>
+            </Link>
           </div>
 
           <div className={styles.trust}>

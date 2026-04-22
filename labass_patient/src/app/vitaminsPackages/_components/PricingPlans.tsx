@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const plans = [
   {
@@ -67,15 +68,16 @@ const PricingPlans: React.FC = () => {
                 استشر طبيبك في أي وقت
               </li>
             </ul>
-            <button
-              className={`w-full py-2.5 rounded-full font-bold text-xs transition-opacity hover:opacity-90 ${
+            <Link
+              href="/vitaminsPackages/subscribe"
+              className={`block w-full py-2.5 rounded-full font-bold text-xs text-center transition-opacity hover:opacity-90 ${
                 plan.highlight
                   ? "bg-custom-green text-white"
                   : "bg-white text-custom-green border-2 border-custom-green"
               }`}
             >
               اشترك الآن
-            </button>
+            </Link>
           </div>
         ))}
       </div>
@@ -121,15 +123,16 @@ const PricingPlans: React.FC = () => {
                 استشر طبيبك في أي وقت
               </li>
             </ul>
-            <button
-              className={`w-full py-3 rounded-full font-bold text-sm transition-opacity hover:opacity-90 ${
+            <Link
+              href="/vitaminsPackages/subscribe"
+              className={`block w-full py-3 rounded-full font-bold text-sm text-center transition-opacity hover:opacity-90 ${
                 plan.highlight
                   ? "bg-custom-green text-white"
                   : "bg-white text-custom-green border-2 border-custom-green"
               }`}
             >
               اشترك الآن
-            </button>
+            </Link>
           </div>
         ))}
       </div>

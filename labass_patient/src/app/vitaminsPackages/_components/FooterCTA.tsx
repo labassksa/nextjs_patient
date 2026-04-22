@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const FooterCTA: React.FC = () => {
   return (
@@ -10,9 +11,9 @@ const FooterCTA: React.FC = () => {
         فحص دم شامل في منزلك، تحليل متقدم، ومكملات غذائية مصممة خصيصاً لك كل
         شهر
       </p>
-      <button className="bg-white text-custom-green font-bold py-3 px-8 md:px-10 rounded-full text-base md:text-lg shadow-lg hover:opacity-90 transition-opacity mb-6 md:mb-8">
+      <Link href="/vitaminsPackages/subscribe" className="inline-block bg-white text-custom-green font-bold py-3 px-8 md:px-10 rounded-full text-base md:text-lg shadow-lg hover:opacity-90 transition-opacity mb-6 md:mb-8">
         اشترك الآن
-      </button>
+      </Link>
       <div className="flex items-center justify-center gap-4 md:gap-6 text-xs md:text-sm opacity-80">
         <a href="mailto:hello@labass.sa" className="underline">
           hello@labass.sa
