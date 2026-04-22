@@ -23,6 +23,7 @@ const CardDetailsContent: React.FC = () => {
   const promoCode = searchParams.get("promoCode") || "";
   const consultationType = searchParams.get("consultationType");
   const bundleId = searchParams.get("bundleId");
+  const vitaminBundleId = searchParams.get("vitaminBundleId");
 
   // Store consultationType in localStorage if it exists
   useEffect(() => {
@@ -50,8 +51,14 @@ const CardDetailsContent: React.FC = () => {
 
           // Check success or error
           if (finalUrl.includes("/success")) {
+            const tempVitaminBundleId = localStorage.getItem('temp_vitamin_bundle_id');
             const tempBundleId = localStorage.getItem('temp_bundle_id');
-            if (tempBundleId) {
+            if (tempVitaminBundleId) {
+              localStorage.removeItem('temp_vitamin_bundle_id');
+              localStorage.removeItem('vitamin_survey_answers');
+              localStorage.removeItem('vitamin_bundle_id');
+              router.push("/vitaminsPackages/subscribe/success");
+            } else if (tempBundleId) {
               // Bundle payment - redirect to orgPortal
               localStorage.removeItem('temp_bundle_id');
               router.push("/orgPortal?bundlePaymentSuccess=true");
@@ -62,6 +69,7 @@ const CardDetailsContent: React.FC = () => {
             }
           } else {
             localStorage.removeItem('temp_bundle_id');
+            localStorage.removeItem('temp_vitamin_bundle_id');
             router.push("/cardDetails/error");
           }
           return;
@@ -102,8 +110,37 @@ const CardDetailsContent: React.FC = () => {
 
               console.log("[Payment] Executing payment with sessionId:", newSessionId);
 
-              // Check if this is a bundle payment
-              if (bundleId) {
+              // Check if this is a vitamins bundle payment
+              if (vitaminBundleId) {
+                console.log("[Payment] Vitamins payment detected, vitaminBundleId:", vitaminBundleId);
+                const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
+                const surveyAnswers = surveyAnswersRaw ? JSON.parse(surveyAnswersRaw) : {};
+                const { data } = await axios.post(
+                  `${apiUrl}/vitamins/subscribe`,
+                  {
+                    bundleId: Number(vitaminBundleId),
+                    sessionId: newSessionId,
+                    surveyAnswers,
+                    callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
+                    errorUrl: "https://labass.sa/cardDetails/error",
+                  },
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                console.log("[Payment] Vitamins subscribe response:", data);
+                const paymentUrl = data.paymentURL;
+                if (paymentUrl) {
+                  localStorage.setItem("temp_vitamin_bundle_id", vitaminBundleId);
+                  setIframeSrc(paymentUrl);
+                  setShowIframe(true);
+                } else {
+                  console.error("[Payment] Vitamins payment failed:", data);
+                  setIsSubmitting(false);
+                  router.push("/cardDetails/error");
+                }
+              } else if (bundleId) {
                 console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
                 const { data } = await axios.post(
                   `${apiUrl}/execute-onetime-bundle-payment`,
@@ -195,7 +232,7 @@ const CardDetailsContent: React.FC = () => {
 
     window.addEventListener("message", handle3DSMessage);
     return () => window.removeEventListener("message", handle3DSMessage);
-  }, [router, discountedPrice, promoCode, searchParams, bundleId]);
+  }, [router, discountedPrice, promoCode, searchParams, bundleId, vitaminBundleId]);
 
   // 2) Load and initialize MyFatoorah script after it's loaded
   useEffect(() => {

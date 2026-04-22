@@ -207,18 +207,19 @@ export default function SubscribePage() {
     setApiError(null);
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      // 1. Initiate MyFatoorah session
+      const bundleId = selectedBundleId;
+      if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
+
+      // 1. Initiate MyFatoorah session (gets SessionId for CardView widget)
       const { data: sessionData } = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/initiate-session`,
         { InvoiceAmount: price, CurrencyIso: "SAR" },
         { headers }
       );
       const sessionId = sessionData?.Data?.SessionId;
+      if (!sessionId) throw new Error("فشل تهيئة جلسة الدفع");
 
-      // 2. Subscribe
-      const bundleId = selectedBundleId;
-      if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
-
+      // 2. Store survey answers + token in localStorage for cardDetails to use
       const surveyAnswers = {
         name,
         age: Number(age),
@@ -228,22 +229,15 @@ export default function SubscribePage() {
         city,
         healthGoals: goals,
       };
+      localStorage.setItem("vitamin_survey_answers", JSON.stringify(surveyAnswers));
+      localStorage.setItem("vitamin_bundle_id", String(bundleId));
+      // labass_token is already stored by verifyOTPandLogin
 
-      const callBackUrl = `${window.location.origin}/vitaminsPackages/subscribe/success`;
-      const errorUrl = `${window.location.origin}/vitaminsPackages/subscribe/error`;
-
-      const { data: subData } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/vitamins/subscribe`,
-        { bundleId, sessionId, surveyAnswers, callBackUrl, errorUrl },
-        { headers }
-      );
-
-      // 3. Redirect to payment
-      window.location.href = subData.paymentURL;
+      // 3. Redirect to cardDetails to collect card info via MyFatoorah widget
+      window.location.href = `/cardDetails?sessionId=${sessionId}&vitaminBundleId=${bundleId}&discountedPrice=${price}`;
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "حدث خطأ، حاول مرة أخرى";
       setApiError(msg);
-    } finally {
       setLoading(false);
     }
   };
