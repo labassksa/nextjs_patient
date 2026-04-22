@@ -3,6 +3,7 @@ export interface Bundle {
   name: string;
   type: string;
   price: number;
+  originalPrice?: number;
   consultationCount: number;
   currency: string;
   recurringType: string;
@@ -15,6 +16,7 @@ export interface CreateBundlePayload {
   name: string;
   type: string;
   price: number;
+  originalPrice?: number;
   consultationCount: number;
   currency: string;
   recurringType: string;
@@ -23,6 +25,7 @@ export interface CreateBundlePayload {
 
 export interface UpdateBundlePayload {
   price?: number;
+  originalPrice?: number;
   consultationCount?: number;
   description?: string;
   name?: string;

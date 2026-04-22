@@ -48,14 +48,45 @@ export default function SubscribePage() {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Backend state
+  const [token, setToken] = useState<string | null>(null);
+  const [bundleMap, setBundleMap] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
   const cityLabel =
     cityOptions.find((c) => c.value === city)?.label || "";
 
-  // OTP timer
+  // Fetch vitamins bundles on mount to map plan → bundleId
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then((r) => r.json())
+      .then((bundles: any[]) => {
+        const vitamins = bundles.filter((b) => b.type === "Vitamins" && b.isActive);
+        const map: Record<string, number> = {};
+        vitamins.forEach((b) => {
+          if (Number(b.price) === 299) map["monthly"] = b.id;
+          if (Number(b.price) === 810) map["quarterly"] = b.id;
+        });
+        setBundleMap(map);
+      })
+      .catch(() => {});
+  }, []);
+
+  // OTP timer + send OTP when entering step 4
   useEffect(() => {
     if (currentStep === 4 && !otpSent) {
       setOtpTimer(60);
       setOtpSent(true);
+
+      // Send OTP to patient's phone
+      const phoneNumber = "966" + phone.replace(/\s/g, "");
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber, role: "Patient" }),
+      }).catch(() => {});
+
       timerRef.current = setInterval(() => {
         setOtpTimer((prev) => {
           if (prev <= 1) {
@@ -74,6 +105,12 @@ export default function SubscribePage() {
   const resendOtp = () => {
     setOtp(["", "", "", ""]);
     setOtpTimer(60);
+    const phoneNumber = "966" + phone.replace(/\s/g, "");
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phoneNumber, role: "Patient" }),
+    }).catch(() => {});
     timerRef.current = setInterval(() => {
       setOtpTimer((prev) => {
         if (prev <= 1) {
@@ -140,9 +177,82 @@ export default function SubscribePage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    setApiError(null);
+
+    // Step 4: verify OTP → get token
+    if (currentStep === 4) {
+      setLoading(true);
+      try {
+        const phoneNumber = "966" + phone.replace(/\s/g, "");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verifyOTPandLogin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phoneNumber, otpcode: otp.join(""), role: "Patient" }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "فشل التحقق من الرمز");
+        setToken(data.authResponse.token);
+        goToStep(5);
+      } catch (err: any) {
+        setApiError(err.message);
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     if (currentStep < TOTAL_STEPS) {
       goToStep(currentStep + 1);
+    }
+  };
+
+  const handleSubscribe = async () => {
+    if (!token) return;
+    setLoading(true);
+    setApiError(null);
+    try {
+      // 1. Initiate MyFatoorah session
+      const sessionRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/initiate-session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ InvoiceAmount: price, CurrencyIso: "SAR" }),
+      });
+      const sessionData = await sessionRes.json();
+      if (!sessionRes.ok) throw new Error(sessionData.message || "فشل تهيئة الدفع");
+      const sessionId = sessionData.SessionId;
+
+      // 2. Subscribe
+      const bundleId = bundleMap[plan];
+      if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
+
+      const surveyAnswers = {
+        name,
+        age: Number(age),
+        gender,
+        height: Number(height),
+        weight: Number(weight),
+        city,
+        healthGoals: goals,
+      };
+
+      const callBackUrl = `${window.location.origin}/vitaminsPackages/subscribe/success`;
+      const errorUrl = `${window.location.origin}/vitaminsPackages/subscribe/error`;
+
+      const subRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vitamins/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ bundleId, sessionId, surveyAnswers, callBackUrl, errorUrl }),
+      });
+      const subData = await subRes.json();
+      if (!subRes.ok) throw new Error(subData.message || "فشل الاشتراك");
+
+      // 3. Redirect to payment
+      window.location.href = subData.paymentURL;
+    } catch (err: any) {
+      setApiError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -778,22 +888,28 @@ export default function SubscribePage() {
       )}
 
       {/* Footer Actions */}
+      {apiError && (
+        <div style={{ color: "red", textAlign: "center", padding: "8px 16px", fontSize: 14 }}>
+          {apiError}
+        </div>
+      )}
       <div className={s.actions}>
         <button
           className={`${s.btnBack} ${
             currentStep === 1 ? s.btnBackHidden : ""
           }`}
           onClick={prevStep}
+          disabled={loading}
         >
           السابق
         </button>
         <button
           className={s.btnNext}
-          onClick={currentStep === 5 ? () => goToStep(1) : nextStep}
-          disabled={!isStepValid()}
+          onClick={currentStep === 5 ? handleSubscribe : nextStep}
+          disabled={!isStepValid() || loading}
         >
-          {getNextLabel()}
-          <div className={s.btnNextArr}>←</div>
+          {loading ? "جاري التحميل..." : getNextLabel()}
+          {!loading && <div className={s.btnNextArr}>←</div>}
         </button>
       </div>
     </div>
