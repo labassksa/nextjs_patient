@@ -221,6 +221,7 @@ export default function SubscribePage() {
         { InvoiceAmount: price, CurrencyIso: "SAR" }
       );
       const sessionId = sessionData?.Data?.SessionId;
+      const countryCode = sessionData?.Data?.CountryCode || "SAU";
       if (!sessionId) throw new Error("فشل تهيئة جلسة الدفع");
 
       // 2. Store survey answers in localStorage for cardDetails to use
@@ -235,8 +236,8 @@ export default function SubscribePage() {
       };
       localStorage.setItem("vitamin_survey_answers", JSON.stringify(surveyAnswers));
 
-      // 3. Navigate to cardDetails to collect card info via MyFatoorah widget
-      router.push(`/cardDetails?sessionId=${encodeURIComponent(sessionId)}&bundleId=${bundleId}&discountedPrice=${price}&countryCode=SAU`);
+      // 3. Navigate to cardDetails — same URL structure as orgPortal bundle flow
+      router.push(`/cardDetails?sessionId=${encodeURIComponent(sessionId)}&countryCode=${countryCode}&bundleId=${bundleId}&discountedPrice=${price}`);
     } catch (err: any) {
       const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || "حدث خطأ، حاول مرة أخرى";
       setApiError(msg);
