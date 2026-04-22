@@ -53,24 +53,28 @@ export default function SubscribePage() {
 
   // Backend state
   const [token, setToken] = useState<string | null>(null);
-  const [bundleMap, setBundleMap] = useState<Record<string, number>>({});
+  const [vitaminBundles, setVitaminBundles] = useState<any[]>([]);
+  const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const cityLabel =
     cityOptions.find((c) => c.value === city)?.label || "";
 
-  // Fetch vitamins bundles on mount to map plan → bundleId
+  // Fetch vitamins bundles on mount
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
       .then(({ data }) => {
-        const vitamins = (data as any[]).filter((b) => b.type === "Vitamins" && b.isActive);
-        const map: Record<string, number> = {};
-        vitamins.forEach((b) => {
-          if (Number(b.price) === 299) map["monthly"] = b.id;
-          if (Number(b.price) === 810) map["quarterly"] = b.id;
-        });
-        setBundleMap(map);
+        const vitamins = (data as any[])
+          .filter((b) => b.type === "Vitamins" && b.isActive)
+          .sort((a, b) => Number(a.price) - Number(b.price)); // cheapest first
+        setVitaminBundles(vitamins);
+        if (vitamins.length > 0) {
+          // Default to the most expensive (quarterly equivalent)
+          const defaultBundle = vitamins[vitamins.length - 1];
+          setSelectedBundleId(defaultBundle.id);
+          setPrice(Number(defaultBundle.price));
+        }
       })
       .catch(() => {});
   }, []);
@@ -155,10 +159,11 @@ export default function SubscribePage() {
     }
   }, [currentStep, plan, name, phone, age, gender, height, weight, city, goals, otp]);
 
-  const selectPlan = (p: string, pr: number, label: string) => {
-    setPlan(p);
+  const selectPlan = (bundleId: number, pr: number, label: string, planKey: string) => {
+    setPlan(planKey);
     setPrice(pr);
     setPlanLabel(label);
+    setSelectedBundleId(bundleId);
   };
 
   const toggleGoal = (g: string) => {
@@ -210,7 +215,7 @@ export default function SubscribePage() {
       const sessionId = sessionData.SessionId;
 
       // 2. Subscribe
-      const bundleId = bundleMap[plan];
+      const bundleId = selectedBundleId;
       if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
 
       const surveyAnswers = {
@@ -327,38 +332,33 @@ export default function SubscribePage() {
           </p>
 
           <div className={s.plans}>
-            <div
-              className={`${s.plan} ${
-                plan === "monthly" ? s.planSelected : ""
-              }`}
-              onClick={() => selectPlan("monthly", 299, "شهري")}
-            >
-              <div className={s.planRadio} />
-              <div className={s.planName}>شهري</div>
-              <div className={s.planPrice}>
-                <div className={s.planNum}>٢٩٩</div>
-                <div className={s.planCur}>ريال</div>
-              </div>
-              <div className={s.planPeriod}>يُجدّد كل شهر</div>
-              <PlanFeatures />
-            </div>
-
-            <div
-              className={`${s.plan} ${s.planPopular} ${
-                plan === "quarterly" ? s.planSelected : ""
-              }`}
-              onClick={() => selectPlan("quarterly", 810, "كل ٣ أشهر")}
-            >
-              <div className={s.planRadio} />
-              <div className={s.planPop}>الأكثر طلباً</div>
-              <div className={s.planName}>كل ٣ أشهر</div>
-              <div className={s.planPrice}>
-                <div className={s.planNum}>٨١٠</div>
-                <div className={s.planCur}>ريال</div>
-              </div>
-              <div className={s.planPeriod}>توفّر ١٠٪ · ٢٧٠ ريال/شهر</div>
-              <PlanFeatures />
-            </div>
+            {vitaminBundles.map((bundle, i) => {
+              const isSelected = selectedBundleId === bundle.id;
+              const isPopular = i === vitaminBundles.length - 1 && vitaminBundles.length > 1;
+              const bundlePrice = Number(bundle.price).toLocaleString("ar-SA");
+              const label = bundle.description || (bundle.recurringType === "Monthly" ? "شهري" : `كل ${bundle.intervalDays || 90} يوم`);
+              return (
+                <div
+                  key={bundle.id}
+                  className={`${s.plan} ${isPopular ? s.planPopular : ""} ${isSelected ? s.planSelected : ""}`}
+                  onClick={() => selectPlan(bundle.id, Number(bundle.price), label, `bundle_${bundle.id}`)}
+                >
+                  <div className={s.planRadio} />
+                  {isPopular && <div className={s.planPop}>الأكثر طلباً</div>}
+                  <div className={s.planName}>{label}</div>
+                  <div className={s.planPrice}>
+                    <div className={s.planNum}>{bundlePrice}</div>
+                    <div className={s.planCur}>ريال</div>
+                  </div>
+                  {bundle.originalPrice && (
+                    <div className={s.planPeriod} style={{ textDecoration: "line-through", opacity: 0.6 }}>
+                      {Number(bundle.originalPrice).toLocaleString("ar-SA")} ريال
+                    </div>
+                  )}
+                  <PlanFeatures />
+                </div>
+              );
+            })}
           </div>
 
         </div>
