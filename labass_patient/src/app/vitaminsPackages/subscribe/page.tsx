@@ -213,7 +213,7 @@ export default function SubscribePage() {
         { InvoiceAmount: price, CurrencyIso: "SAR" },
         { headers }
       );
-      const sessionId = sessionData.SessionId;
+      const sessionId = sessionData?.Data?.SessionId;
 
       // 2. Subscribe
       const bundleId = selectedBundleId;
