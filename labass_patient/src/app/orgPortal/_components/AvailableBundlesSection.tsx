@@ -32,7 +32,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
         const response = await getBundles();
         if (response.success && response.data) {
           // Filter only active bundles
-          const activeBundles = response.data.filter((bundle) => bundle.isActive);
+          const activeBundles = response.data.filter((bundle) => bundle.isActive && bundle.type !== "Vitamins");
           setBundles(activeBundles);
         } else {
           setError(response.message || t('subscription.errorLoadingBundles'));
