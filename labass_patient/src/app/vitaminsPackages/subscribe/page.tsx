@@ -65,18 +65,19 @@ export default function SubscribePage() {
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
       .then(({ data }) => {
-        const vitamins = (data as any[])
-          .filter((b) => b.type === "Vitamins" && b.isActive)
+        console.log("All bundles from API:", data);
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const vitamins = list
+          .filter((b) => b.type === "Vitamins")
           .sort((a, b) => Number(a.price) - Number(b.price)); // cheapest first
         setVitaminBundles(vitamins);
         if (vitamins.length > 0) {
-          // Default to the most expensive (quarterly equivalent)
           const defaultBundle = vitamins[vitamins.length - 1];
           setSelectedBundleId(defaultBundle.id);
           setPrice(Number(defaultBundle.price));
         }
       })
-      .catch(() => {});
+      .catch((err) => console.error("Bundles fetch error:", err));
   }, []);
 
   // OTP timer + send OTP when entering step 4
@@ -331,6 +332,9 @@ export default function SubscribePage() {
             المخصّصة. الاختلاف في المدة ونسبة التوفير.
           </p>
 
+          {vitaminBundles.length === 0 && (
+            <p style={{ textAlign: "center", color: "#888", marginTop: 16 }}>جاري تحميل الباقات...</p>
+          )}
           <div className={s.plans}>
             {vitaminBundles.map((bundle, i) => {
               const isSelected = selectedBundleId === bundle.id;
