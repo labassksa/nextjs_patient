@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
 import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
@@ -32,6 +33,7 @@ const cityOptions = [
 ];
 
 export default function SubscribePage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [plan, setPlan] = useState("quarterly");
   const [price, setPrice] = useState(810);
@@ -202,10 +204,13 @@ export default function SubscribePage() {
   };
 
   const handleSubscribe = async () => {
-    if (!token) return;
+    const authToken = token || localStorage.getItem("labass_token");
+    if (!authToken) {
+      setApiError("انتهت الجلسة، يرجى تسجيل الدخول مجدداً");
+      return;
+    }
     setLoading(true);
     setApiError(null);
-    const headers = { Authorization: `Bearer ${token}` };
     try {
       const bundleId = selectedBundleId;
       if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
@@ -213,13 +218,12 @@ export default function SubscribePage() {
       // 1. Initiate MyFatoorah session (gets SessionId for CardView widget)
       const { data: sessionData } = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/initiate-session`,
-        { InvoiceAmount: price, CurrencyIso: "SAR" },
-        { headers }
+        { InvoiceAmount: price, CurrencyIso: "SAR" }
       );
       const sessionId = sessionData?.Data?.SessionId;
       if (!sessionId) throw new Error("فشل تهيئة جلسة الدفع");
 
-      // 2. Store survey answers + token in localStorage for cardDetails to use
+      // 2. Store survey answers in localStorage for cardDetails to use
       const surveyAnswers = {
         name,
         age: Number(age),
@@ -230,13 +234,11 @@ export default function SubscribePage() {
         healthGoals: goals,
       };
       localStorage.setItem("vitamin_survey_answers", JSON.stringify(surveyAnswers));
-      localStorage.setItem("vitamin_bundle_id", String(bundleId));
-      // labass_token is already stored by verifyOTPandLogin
 
-      // 3. Redirect to cardDetails to collect card info via MyFatoorah widget
-      window.location.href = `/cardDetails?sessionId=${sessionId}&vitaminBundleId=${bundleId}&discountedPrice=${price}`;
+      // 3. Navigate to cardDetails to collect card info via MyFatoorah widget
+      router.push(`/cardDetails?sessionId=${encodeURIComponent(sessionId)}&bundleId=${bundleId}&discountedPrice=${price}&countryCode=SAU`);
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || "حدث خطأ، حاول مرة أخرى";
+      const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || "حدث خطأ، حاول مرة أخرى";
       setApiError(msg);
       setLoading(false);
     }

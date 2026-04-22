@@ -23,7 +23,6 @@ const CardDetailsContent: React.FC = () => {
   const promoCode = searchParams.get("promoCode") || "";
   const consultationType = searchParams.get("consultationType");
   const bundleId = searchParams.get("bundleId");
-  const vitaminBundleId = searchParams.get("vitaminBundleId");
 
   // Store consultationType in localStorage if it exists
   useEffect(() => {
@@ -51,17 +50,17 @@ const CardDetailsContent: React.FC = () => {
 
           // Check success or error
           if (finalUrl.includes("/success")) {
-            const tempVitaminBundleId = localStorage.getItem('temp_vitamin_bundle_id');
             const tempBundleId = localStorage.getItem('temp_bundle_id');
-            if (tempVitaminBundleId) {
-              localStorage.removeItem('temp_vitamin_bundle_id');
-              localStorage.removeItem('vitamin_survey_answers');
-              localStorage.removeItem('vitamin_bundle_id');
-              router.push("/vitaminsPackages/subscribe/success");
-            } else if (tempBundleId) {
-              // Bundle payment - redirect to orgPortal
+            if (tempBundleId) {
               localStorage.removeItem('temp_bundle_id');
-              router.push("/orgPortal?bundlePaymentSuccess=true");
+              const isVitamin = localStorage.getItem('temp_vitamin_payment');
+              if (isVitamin) {
+                localStorage.removeItem('temp_vitamin_payment');
+                localStorage.removeItem('vitamin_survey_answers');
+                router.push("/vitaminsPackages/subscribe/success");
+              } else {
+                router.push("/orgPortal?bundlePaymentSuccess=true");
+              }
             } else {
               const consultationId = localStorage.getItem('temp_consultation_id');
               const promoFromUrl = localStorage.getItem('temp_promo_from_url');
@@ -69,7 +68,7 @@ const CardDetailsContent: React.FC = () => {
             }
           } else {
             localStorage.removeItem('temp_bundle_id');
-            localStorage.removeItem('temp_vitamin_bundle_id');
+            localStorage.removeItem('temp_vitamin_payment');
             router.push("/cardDetails/error");
           }
           return;
@@ -110,67 +109,51 @@ const CardDetailsContent: React.FC = () => {
 
               console.log("[Payment] Executing payment with sessionId:", newSessionId);
 
-              // Check if this is a vitamins bundle payment
-              if (vitaminBundleId) {
-                console.log("[Payment] Vitamins payment detected, vitaminBundleId:", vitaminBundleId);
-                const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
-                const surveyAnswers = surveyAnswersRaw ? JSON.parse(surveyAnswersRaw) : {};
-                const { data } = await axios.post(
-                  `${apiUrl}/vitamins/subscribe`,
-                  {
-                    bundleId: Number(vitaminBundleId),
-                    sessionId: newSessionId,
-                    surveyAnswers,
-                    callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
-                    errorUrl: "https://labass.sa/cardDetails/error",
-                  },
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                );
-
-                console.log("[Payment] Vitamins subscribe response:", data);
-                const paymentUrl = data.paymentURL;
-                if (paymentUrl) {
-                  localStorage.setItem("temp_vitamin_bundle_id", vitaminBundleId);
-                  setIframeSrc(paymentUrl);
-                  setShowIframe(true);
-                } else {
-                  console.error("[Payment] Vitamins payment failed:", data);
-                  setIsSubmitting(false);
-                  router.push("/cardDetails/error");
-                }
-              } else if (bundleId) {
+              // Check if this is a bundle payment (org or vitamins)
+              if (bundleId) {
                 console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
-                const { data } = await axios.post(
-                  `${apiUrl}/execute-onetime-bundle-payment`,
-                  {
-                    bundleId: Number(bundleId),
-                    sessionId: newSessionId,
-                    CallBackUrl: "https://labass.sa/cardDetails/success",
-                    ErrorUrl: "https://labass.sa/cardDetails/error",
-                  },
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                );
+                const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
+                const isVitamin = !!surveyAnswersRaw;
 
-                console.log("[Payment] Bundle payment response:", data);
-                // Support both MyFatoorah format (IsSuccess/Data.PaymentURL) and wrapped format (success/data.paymentURL)
-                const bundleSuccess = data.IsSuccess ?? data.success;
-                const bundlePaymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL;
-                if (bundleSuccess && bundlePaymentUrl) {
-                  const paymentUrl = bundlePaymentUrl;
-                  console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
+                let paymentUrl: string | null = null;
 
-                  // Store bundle info before showing 3D-Secure iframe
+                if (isVitamin) {
+                  const surveyAnswers = JSON.parse(surveyAnswersRaw!);
+                  const { data } = await axios.post(
+                    `${apiUrl}/vitamins/subscribe`,
+                    {
+                      bundleId: Number(bundleId),
+                      sessionId: newSessionId,
+                      surveyAnswers,
+                      callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
+                      errorUrl: "https://labass.sa/cardDetails/error",
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  console.log("[Payment] Vitamins subscribe response:", data);
+                  paymentUrl = data.paymentURL ?? null;
+                } else {
+                  const { data } = await axios.post(
+                    `${apiUrl}/execute-onetime-bundle-payment`,
+                    {
+                      bundleId: Number(bundleId),
+                      sessionId: newSessionId,
+                      CallBackUrl: "https://labass.sa/cardDetails/success",
+                      ErrorUrl: "https://labass.sa/cardDetails/error",
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  console.log("[Payment] Bundle payment response:", data);
+                  paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
+                }
+
+                if (paymentUrl) {
                   localStorage.setItem("temp_bundle_id", bundleId);
-
-                  // Show 3D-Secure iframe
+                  if (isVitamin) localStorage.setItem("temp_vitamin_payment", "1");
                   setIframeSrc(paymentUrl);
                   setShowIframe(true);
                 } else {
-                  console.error("[Payment] Bundle payment failed:", data);
+                  console.error("[Payment] Bundle payment failed");
                   setIsSubmitting(false);
                   router.push("/cardDetails/error");
                 }
@@ -232,7 +215,7 @@ const CardDetailsContent: React.FC = () => {
 
     window.addEventListener("message", handle3DSMessage);
     return () => window.removeEventListener("message", handle3DSMessage);
-  }, [router, discountedPrice, promoCode, searchParams, bundleId, vitaminBundleId]);
+  }, [router, discountedPrice, promoCode, searchParams, bundleId]);
 
   // 2) Load and initialize MyFatoorah script after it's loaded
   useEffect(() => {
