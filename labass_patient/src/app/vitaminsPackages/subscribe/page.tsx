@@ -2,6 +2,9 @@
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import axios from "axios";
+import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
+import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
 import s from "./subscribe.module.css";
 
 const TOTAL_STEPS = 5;
@@ -59,10 +62,9 @@ export default function SubscribePage() {
 
   // Fetch vitamins bundles on mount to map plan → bundleId
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
-      .then((r) => r.json())
-      .then((bundles: any[]) => {
-        const vitamins = bundles.filter((b) => b.type === "Vitamins" && b.isActive);
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const vitamins = (data as any[]).filter((b) => b.type === "Vitamins" && b.isActive);
         const map: Record<string, number> = {};
         vitamins.forEach((b) => {
           if (Number(b.price) === 299) map["monthly"] = b.id;
@@ -79,13 +81,8 @@ export default function SubscribePage() {
       setOtpTimer(60);
       setOtpSent(true);
 
-      // Send OTP to patient's phone
-      const phoneNumber = "966" + phone.replace(/\s/g, "");
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/send-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber, role: "Patient" }),
-      }).catch(() => {});
+      const cleanPhone = phone.replace(/\s/g, "");
+      loginPatient(cleanPhone, "+966").catch(() => {});
 
       timerRef.current = setInterval(() => {
         setOtpTimer((prev) => {
@@ -102,15 +99,13 @@ export default function SubscribePage() {
     };
   }, [currentStep, otpSent]);
 
-  const resendOtp = () => {
+  const resendOtp = async () => {
     setOtp(["", "", "", ""]);
     setOtpTimer(60);
-    const phoneNumber = "966" + phone.replace(/\s/g, "");
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/send-otp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phoneNumber, role: "Patient" }),
-    }).catch(() => {});
+    setApiError(null);
+    const cleanPhone = phone.replace(/\s/g, "");
+    const result = await loginPatient(cleanPhone, "+966");
+    if (!result.success) setApiError(result.message || "فشل إعادة إرسال الرمز");
     timerRef.current = setInterval(() => {
       setOtpTimer((prev) => {
         if (prev <= 1) {
@@ -183,22 +178,15 @@ export default function SubscribePage() {
     // Step 4: verify OTP → get token
     if (currentStep === 4) {
       setLoading(true);
-      try {
-        const phoneNumber = "966" + phone.replace(/\s/g, "");
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/verifyOTPandLogin`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phoneNumber, otpcode: otp.join(""), role: "Patient" }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "فشل التحقق من الرمز");
-        setToken(data.authResponse.token);
-        goToStep(5);
-      } catch (err: any) {
-        setApiError(err.message);
-      } finally {
-        setLoading(false);
+      const fullPhone = "+966" + phone.replace(/\s/g, "");
+      const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
+      setLoading(false);
+      if (!result || !result.success) {
+        setApiError(result?.message || "فشل التحقق من الرمز");
+        return;
       }
+      setToken(result.token!);
+      goToStep(5);
       return;
     }
 
@@ -211,15 +199,14 @@ export default function SubscribePage() {
     if (!token) return;
     setLoading(true);
     setApiError(null);
+    const headers = { Authorization: `Bearer ${token}` };
     try {
       // 1. Initiate MyFatoorah session
-      const sessionRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/initiate-session`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ InvoiceAmount: price, CurrencyIso: "SAR" }),
-      });
-      const sessionData = await sessionRes.json();
-      if (!sessionRes.ok) throw new Error(sessionData.message || "فشل تهيئة الدفع");
+      const { data: sessionData } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/initiate-session`,
+        { InvoiceAmount: price, CurrencyIso: "SAR" },
+        { headers }
+      );
       const sessionId = sessionData.SessionId;
 
       // 2. Subscribe
@@ -239,18 +226,17 @@ export default function SubscribePage() {
       const callBackUrl = `${window.location.origin}/vitaminsPackages/subscribe/success`;
       const errorUrl = `${window.location.origin}/vitaminsPackages/subscribe/error`;
 
-      const subRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vitamins/subscribe`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ bundleId, sessionId, surveyAnswers, callBackUrl, errorUrl }),
-      });
-      const subData = await subRes.json();
-      if (!subRes.ok) throw new Error(subData.message || "فشل الاشتراك");
+      const { data: subData } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/vitamins/subscribe`,
+        { bundleId, sessionId, surveyAnswers, callBackUrl, errorUrl },
+        { headers }
+      );
 
       // 3. Redirect to payment
       window.location.href = subData.paymentURL;
     } catch (err: any) {
-      setApiError(err.message);
+      const msg = err.response?.data?.message || err.message || "حدث خطأ، حاول مرة أخرى";
+      setApiError(msg);
     } finally {
       setLoading(false);
     }
