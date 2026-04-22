@@ -366,7 +366,7 @@ const CardDetailsContent: React.FC = () => {
             setTimeout(() => {
               console.log("[Script] Attempting to reload MyFatoorah script...");
               const script = document.createElement("script");
-              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://sa.myfatoorah.com/cardview/v2/session.js";
+              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://demo.myfatoorah.com/cardview/v2/session.js";
               script.onload = () => {
                 console.log("[Script] MyFatoorah script reloaded successfully");
                 setIsScriptLoaded(true);
