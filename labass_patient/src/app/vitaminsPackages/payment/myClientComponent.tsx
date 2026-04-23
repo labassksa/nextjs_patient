@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 
 import PaymentHeader from "./_components/payment/paymentHeader";
 import PaymentIntro from "./_components/payment/paymentIntro";
@@ -13,140 +14,117 @@ import PromoCode from "./_components/payment/promoCodeInput";
 import { PaymentMethodEnum } from "@/types/paymentMethods";
 import { getMagicLink } from "./_controllers/getMagicLink";
 
+import s from "./payment.module.css";
+
 const VitaminsPaymentClient: React.FC = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const priceParam = searchParams.get("discountedPrice");
+  const planLabelParam = searchParams.get("planLabel");
+  const bundleIdParam = searchParams.get("bundleId");
+  const tokenUUIDParam = searchParams.get("tokenUUID");
+  const promoCodeParam = searchParams.get("promoCode");
+
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.ApplePay);
-  const [discountedPrice, setDiscountedPrice] = useState(289);
+  const [discountedPrice, setDiscountedPrice] = useState(
+    priceParam ? Number(priceParam) : 289
+  );
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
 
-  const searchParams = useSearchParams();
-  const tokenUUIDFromQuery = searchParams.get("tokenUUID");
-  const promoCodeFromQuery = searchParams.get("promoCode");
-  const consultationType = searchParams.get("consultationType");
-  const priceFromQuery = searchParams.get("discountedPrice");
+  const planLabel = planLabelParam || "الباقة الشهرية";
+  const bundleId = bundleIdParam ? Number(bundleIdParam) : null;
 
+  // Apply magic-link promo on mount
   useEffect(() => {
-    if (priceFromQuery) setDiscountedPrice(Number(priceFromQuery));
-  }, [priceFromQuery]);
-
-  useEffect(() => {
-    if (consultationType) {
-      localStorage.setItem("consultationType", consultationType);
-    } else {
-      localStorage.removeItem("consultationType");
-    }
-  }, [consultationType]);
-
-  useEffect(() => {
-    const applyMagicLinkPromo = async () => {
-      if (tokenUUIDFromQuery && promoCodeFromQuery) {
-        try {
-          setMagicLinkLoading(true);
-          const responseData = await getMagicLink(
-            tokenUUIDFromQuery,
-            promoCodeFromQuery
-          );
-          if (responseData.tokenJWT) {
-            localStorage.setItem("labass_token", responseData.tokenJWT);
-          }
-          if (responseData.discountedPrice) {
-            setDiscountedPrice(responseData.discountedPrice);
-            setPromoCode(promoCodeFromQuery);
-          }
-        } catch (error) {
-          console.error("Error applying magic link promo:", error);
-        } finally {
-          setMagicLinkLoading(false);
+    if (!tokenUUIDParam || !promoCodeParam) return;
+    const apply = async () => {
+      try {
+        setMagicLinkLoading(true);
+        const data = await getMagicLink(tokenUUIDParam, promoCodeParam);
+        if (data.tokenJWT) localStorage.setItem("labass_token", data.tokenJWT);
+        if (data.discountedPrice) {
+          setDiscountedPrice(data.discountedPrice);
+          setPromoCode(promoCodeParam);
         }
+      } catch (e) {
+        console.error("Magic link error:", e);
+      } finally {
+        setMagicLinkLoading(false);
       }
     };
-    applyMagicLinkPromo();
-  }, [tokenUUIDFromQuery, promoCodeFromQuery]);
+    apply();
+  }, [tokenUUIDParam, promoCodeParam]);
 
   return (
-    <div
-      style={{
-        background: "#fdfcf7",
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-        fontFamily:
-          "'Tajawal', 'IBM Plex Sans Arabic', 'Segoe UI', system-ui, sans-serif",
-      }}
-    >
-      <PaymentHeader />
+    <div dir="rtl" className={s.app}>
 
-      {/* Scrollable content */}
-      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 16 }}>
-        <PaymentIntro />
-        <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
+      {/* ── Sticky nav ── */}
+      <PaymentHeader onBack={() => router.back()} />
 
-        <div style={{ margin: "12px 16px 0" }}>
+      {/* ── Scrollable content ── */}
+      <div className={s.scroll}>
+
+        {/* Green plan banner */}
+        <PaymentIntro planLabel={planLabel} price={discountedPrice} />
+
+        <div className={s.body}>
+
+          {/* Payment method selector */}
+          <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
+
+          {/* Promo code */}
           <PromoCode
             setDiscountedPrice={setDiscountedPrice}
             setPromoCode={setPromoCode}
             selectedPaymentMethod={paymentMethod}
           />
-        </div>
 
-        <PaymentSummary discountedPrice={discountedPrice} />
+          {/* Order summary */}
+          <PaymentSummary discountedPrice={discountedPrice} />
+
+          {/* Trust strip */}
+          <div>
+            <div className={s.trust}>
+              <span className={s.trustIc}>🔒</span>
+              <span className={s.trustTxt}>مدفوع بأمان عبر MyFatoorah</span>
+            </div>
+            <div className={s.trustLogos}>
+              {[
+                { src: "/icons/visa.svg", alt: "Visa" },
+                { src: "/icons/mada.svg", alt: "Mada" },
+                { src: "/icons/mc.svg", alt: "Mastercard" },
+                { src: "/icons/apple_pay.svg", alt: "Apple Pay" },
+              ].map((logo) => (
+                <div key={logo.alt} className={s.trustLogo}>
+                  <Image src={logo.src} alt={logo.alt} width={44} height={28} />
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
       </div>
 
-      {/* Sticky pay button */}
-      <div
-        style={{
-          padding: "14px 16px 20px",
-          background: "#ffffff",
-          borderTop: "0.5px solid rgba(23, 52, 4, 0.1)",
-          flexShrink: 0,
-          position: "sticky",
-          bottom: 0,
-        }}
-      >
+      {/* ── Sticky pay footer ── */}
+      <div className={s.footer}>
         <PaymentButton
           method={paymentMethod}
           discountedPrice={discountedPrice}
           promoCode={promoCode}
+          bundleId={bundleId}
         />
       </div>
 
-      {/* Magic-link loading overlay */}
+      {/* ── Magic-link loading overlay ── */}
       {magicLinkLoading && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-          }}
-        >
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: "50%",
-              border: "3px solid rgba(255,255,255,0.25)",
-              borderTopColor: "#7ED957",
-              animation: "spin 0.85s linear infinite",
-            }}
-          />
-          <p style={{ color: "#ffffff", fontSize: 14, marginTop: 14, fontWeight: 500 }}>
-            جاري تطبيق العرض...
-          </p>
+        <div className={s.loading}>
+          <div className={s.loadingSpinner} />
+          <p className={s.loadingTxt}>جاري تطبيق العرض...</p>
         </div>
       )}
 
-      <style jsx global>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 };

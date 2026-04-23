@@ -1,75 +1,58 @@
 import React from "react";
-import Image from "next/image";
+import s from "../../payment.module.css";
 
-const PaymentIntro: React.FC = () => {
+interface PaymentIntroProps {
+  planLabel: string;
+  price: number;
+}
+
+const features = [
+  "فحص دم منزلي شامل",
+  "تحليل متقدم للنتائج",
+  "فيتامينات مخصصة لك",
+  "استشارة مع طبيب عام",
+];
+
+const PaymentIntro: React.FC<PaymentIntroProps> = ({ planLabel, price }) => {
   return (
-    <div
-      dir="rtl"
-      style={{
-        background: "#ffffff",
-        border: "0.5px solid rgba(23, 52, 4, 0.1)",
-        borderRadius: 14,
-        padding: "18px 20px",
-        margin: "16px 16px 0",
-      }}
-    >
-      {/* Live indicator */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginBottom: 14,
-          fontSize: 13.5,
-          color: "rgba(23, 52, 4, 0.72)",
-        }}
-      >
-        <span
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            background: "#7ED957",
-            flexShrink: 0,
-            display: "inline-block",
-          }}
-        />
-        سيتم معالجة اشتراكك خلال دقيقة واحدة
-      </div>
+    <div className={s.planBanner} dir="rtl">
+      <div className={s.planBannerGrain} />
+      <div className={s.planBannerBlob} />
 
-      <h2
-        style={{
-          fontSize: 15,
-          fontWeight: 700,
-          color: "#0d2002",
-          margin: "0 0 14px",
-          letterSpacing: "-0.2px",
-        }}
-      >
-        طرق الدفع المتوفرة
-      </h2>
+      <div className={s.planBannerInner}>
+        {/* Badge */}
+        <div className={s.planBadge}>
+          <span className={s.planBadgeDot} />
+          باقتك المختارة
+        </div>
 
-      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        {[
-          { src: "/icons/visa.svg", alt: "Visa" },
-          { src: "/icons/mada.svg", alt: "Mada" },
-          { src: "/icons/mc.svg", alt: "Mastercard" },
-          { src: "/icons/apple_pay.svg", alt: "Apple Pay" },
-        ].map((logo) => (
-          <div
-            key={logo.alt}
-            style={{
-              border: "0.5px solid rgba(23, 52, 4, 0.1)",
-              borderRadius: 8,
-              padding: "4px 8px",
-              background: "#fafaf7",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Image src={logo.src} alt={logo.alt} width={52} height={34} />
-          </div>
-        ))}
+        {/* Plan name */}
+        <p className={s.planName}>{planLabel || "الباقة الشهرية"}</p>
+
+        {/* Price */}
+        <div className={s.planPrice}>
+          <span className={s.planPriceNum}>
+            {price.toLocaleString("ar-SA")}
+          </span>
+          <span className={s.planPriceCur}>ريال</span>
+        </div>
+
+        {/* Divider */}
+        <div className={s.planDivider}>
+          <div className={s.planDividerLine} />
+          <span className={s.planDividerTxt}>ما يشمله اشتراكك</span>
+          <div className={s.planDividerLine} />
+        </div>
+
+        {/* Features */}
+        <div className={s.planFeats}>
+          {features.map((f) => (
+            <div key={f} className={s.planFeat}>
+              <div className={s.planFeatCk}>✓</div>
+              <span>{f}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
