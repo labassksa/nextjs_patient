@@ -85,20 +85,23 @@ const VitaminsPaymentClient: React.FC = () => {
           <PaymentSummary discountedPrice={discountedPrice} />
 
           {/* Trust strip */}
-          <div>
-            <div className={s.trust}>
-              <span className={s.trustIc}>🔒</span>
-              <span className={s.trustTxt}>مدفوع بأمان عبر MyFatoorah</span>
+          <div className={s.trustCard}>
+            <div className={s.trustRow}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2Z" stroke="#639922" strokeWidth="1.8" strokeLinejoin="round"/>
+                <path d="M9 12l2 2 4-4" stroke="#639922" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className={s.trustTxt}>مدفوع بأمان عبر MyFatoorah · SSL مشفّر</span>
             </div>
             <div className={s.trustLogos}>
               {[
-                { src: "/icons/visa.svg", alt: "Visa" },
-                { src: "/icons/mada.svg", alt: "Mada" },
-                { src: "/icons/mc.svg", alt: "Mastercard" },
-                { src: "/icons/apple_pay.svg", alt: "Apple Pay" },
+                { src: "/icons/visa.svg", alt: "Visa", w: 38 },
+                { src: "/icons/mada.svg", alt: "Mada", w: 38 },
+                { src: "/icons/mc.svg", alt: "Mastercard", w: 30 },
+                { src: "/icons/apple_pay.svg", alt: "Apple Pay", w: 46 },
               ].map((logo) => (
-                <div key={logo.alt} className={s.trustLogo}>
-                  <Image src={logo.src} alt={logo.alt} width={44} height={28} />
+                <div key={logo.alt} className={s.trustLogoBox}>
+                  <Image src={logo.src} alt={logo.alt} width={logo.w} height={20} />
                 </div>
               ))}
             </div>
