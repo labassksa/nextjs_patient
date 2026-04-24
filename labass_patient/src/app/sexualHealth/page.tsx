@@ -112,7 +112,7 @@ export default function SexualHealth() {
     },
     {
       q: "كم يستغرق وصول الطلبية؟",
-      a: "٤٨ ساعة للرياض، جدة، الدمام. ٧٢ ساعة لباقي المدن. التوصيل مجاني في كل الباقات.",
+      a: "خلال ٤٨ ساعة داخل الرياض. الخدمة متوفّرة حالياً في الرياض فقط. التوصيل مجاني في كل الباقات.",
     },
     {
       q: "هل يمكنني الإلغاء متى شئت؟",
@@ -144,13 +144,18 @@ export default function SexualHealth() {
   const annualFeatures = [
     "كل ما في الباقة الربعيّة",
     "٩٦ جرعة سنوياً",
-    "فحص دم سنوي مجاني",
+    "فحص دم سنوي مجاني — من مختبر معتمد",
     "إعادة تقييم مع طبيبك",
     "أولوية في الدعم",
   ];
 
   return (
     <div dir="rtl" className={styles.app}>
+      {/* ─── LICENSE TAG ─── */}
+      <div style={{ background: "#f2faed", borderBottom: "0.5px solid rgba(23,52,4,0.08)", padding: "8px 48px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#27500A", letterSpacing: "0.2px" }}>
+        شركة سعودية مرخّصة من وزارة الصحة &middot; ترخيص رقم 1400055938
+      </div>
+
       {/* ─── NAV ─── */}
       <nav className={styles.nav}>
         <Link href="/" className={styles.brand}>
@@ -183,11 +188,11 @@ export default function SexualHealth() {
             </h1>
 
             <p className={styles.heroLead}>
-              علاج <span className={styles.lat}>ED</span> بوصفة طبيب، وتتابع طبيبك متى ما احتجت.
+              علاج متكامل بوصفة طبيب، وتتابع طبيبك متى ما احتجت.
             </p>
 
             <p className={styles.heroSub}>
-              احصل على علاج شخصي، أطبّاء ذوي خبرة، توصيل مجاني، والمزيد. مكوّنات موثوقة طبّياً لأداء أطول.
+              ضعف الانتصاب، الالتهابات، سرعة القذف — احصل على تشخيص وعلاج شخصي من أطبّاء ذوي خبرة، بخصوصية تامّة.
             </p>
 
             <ul className={styles.heroBullets}>
@@ -204,11 +209,15 @@ export default function SexualHealth() {
             <div className={styles.heroBadges}>
               <div className={`${styles.brandBadge} ${styles.bbSil}`}>
                 <div className={styles.bbDot} />
-                <span className={styles.bbLat}>Sildenafil</span> &middot; متوفّر
+                ضعف الانتصاب
               </div>
               <div className={`${styles.brandBadge} ${styles.bbTad}`}>
                 <div className={styles.bbDot} />
-                <span className={styles.bbLat}>Tadalafil</span> &middot; متوفّر
+                الالتهابات في المنطقة الحساسة
+              </div>
+              <div className={`${styles.brandBadge} ${styles.bbSil}`}>
+                <div className={styles.bbDot} />
+                سرعة القذف
               </div>
             </div>
 
@@ -353,28 +362,30 @@ export default function SexualHealth() {
 
       {/* ─── AVAILABILITY STRIP ─── */}
       <div className={styles.avail}>
-        <span className={styles.availTtl}>الأدوية المتوفّرة عبر منصّة لاباس — بوصفة طبّية</span>
+        <span className={styles.availTtl}>الحالات التي نعالجها عبر منصّة لاباس — بإشراف طبّي</span>
         <div className={styles.availBrands}>
           <div className={styles.availBrand}>
-            <div className={`${styles.availBrandMark} ${styles.abSil}`}>Si</div>
+            <div className={`${styles.availBrandMark} ${styles.abSil}`}>٠١</div>
             <div>
-              <div className={styles.availBrandNm}>Sildenafil</div>
-              <div className={styles.availBrandSub}>Generic for Viagra&reg;</div>
+              <div className={styles.availBrandNm}>ضعف الانتصاب</div>
+              <div className={styles.availBrandSub}>تشخيص وعلاج بوصفة طبّية</div>
             </div>
           </div>
           <div className={styles.availBrand}>
-            <div className={`${styles.availBrandMark} ${styles.abTad}`}>Ta</div>
+            <div className={`${styles.availBrandMark} ${styles.abTad}`}>٠٢</div>
             <div>
-              <div className={styles.availBrandNm}>Tadalafil</div>
-              <div className={styles.availBrandSub}>Generic for Cialis&reg;</div>
+              <div className={styles.availBrandNm}>الالتهابات في المنطقة الحساسة</div>
+              <div className={styles.availBrandSub}>تقييم ووصف العلاج المناسب</div>
+            </div>
+          </div>
+          <div className={styles.availBrand}>
+            <div className={`${styles.availBrandMark} ${styles.abSil}`}>٠٣</div>
+            <div>
+              <div className={styles.availBrandNm}>سرعة القذف</div>
+              <div className={styles.availBrandSub}>خطّة علاج شخصية ومتابعة</div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* ─── TRADEMARK BAR ─── */}
-      <div className={styles.tmBar}>
-        <strong>&reg;</strong> Viagra علامة تجاريّة مسجّلة لشركة Viatris Specialty LLC. Cialis علامة تجاريّة مسجّلة لشركة Eli Lilly and Company. لاباس غير تابعة لهاتين الشركتين. الأدوية تُوصف من طبيب سعودي مرخّص بعد تقييم الأهلية الطبّية. الصور المعروضة توضيحيّة.
       </div>
 
       {/* ─── STATS STRIP ─── */}
@@ -437,12 +448,12 @@ export default function SexualHealth() {
             <div className={styles.howStepNum}>٣</div>
             <h3 className={styles.howStepTtl}>توصيل سريع</h3>
             <p className={styles.howStepDesc}>
-              يوصلك طلبك خلال ٤٨-٧٢ ساعة.
+              يوصلك طلبك خلال ٤٨ ساعة داخل الرياض.
             </p>
           </div>
           <div className={styles.howStep}>
             <div className={styles.howStepNum}>٤</div>
-            <h3 className={styles.howStepTtl}>استشر متى شئت</h3>
+            <h3 className={styles.howStepTtl}>استشر الطبيب ٢٤ ساعة في أي وقت</h3>
             <p className={styles.howStepDesc}>
               تواصل مع طبيبك عبر المحادثة لتعديل الجرعة أو الردّ على أي سؤال — بدون رسوم إضافية.
             </p>
@@ -450,19 +461,19 @@ export default function SexualHealth() {
         </div>
       </section>
 
-      {/* ─── TREATMENTS ─── */}
+      {/* ─── CONDITIONS WE TREAT ─── */}
       <section className={styles.treats}>
         <div className={styles.secEyebrow}>
           <span className={styles.secEyebrowDot} />
-          الأدوية المتوفّرة
+          الحالات التي نعالجها
         </div>
-        <h2 className={styles.secTtl}>خياران، بحسب احتياجك</h2>
+        <h2 className={styles.secTtl}>ثلاث حالات — نعالجها من بيتك</h2>
         <p className={styles.secSub}>
-          كلاهما من فئة PDE5 inhibitors — نفس الآلية، لكن مدّة المفعول مختلفة. طبيبك يقرّر أيّهما يناسبك.
+          تقييم طبّي دقيق، تشخيص من طبيب مرخّص، وعلاج مخصّص لحالتك — بخصوصية تامّة.
         </p>
 
         <div className={styles.treatsGrid}>
-          {/* Sildenafil Card */}
+          {/* Erectile Dysfunction */}
           <div className={styles.treatCard}>
             <div className={styles.treatNmRow}>
               <div className={styles.treatArt}>
@@ -472,22 +483,19 @@ export default function SexualHealth() {
                   <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
                 </svg>
               </div>
-              <h3 className={styles.treatNm}>Sildenafil</h3>
+              <h3 className={styles.treatNm}>ضعف الانتصاب</h3>
             </div>
-            <div className={styles.treatSub}>جنريك <em>Viagra&reg;</em> &middot; نفس المادة الفعّالة</div>
+            <div className={styles.treatSub}>تشخيص وعلاج طبّي متكامل</div>
             <p className={styles.treatDesc}>
-              يعمل خلال ٣٠-٦٠ دقيقة، ويدوم مفعوله حتى ٤-٥ ساعات. الأنسب للمواعيد المخطّطة.
+              مشكلة شائعة تصيب أكثر من ٤٠٪ من الرجال فوق الأربعين. نوفّر تقييماً طبّياً شاملاً وعلاجاً بوصفة طبّية مناسبة لحالتك.
             </p>
             <div className={styles.treatMeta}>
-              <div className={styles.treatPill}>25 / 50 / 100 mg</div>
-              <div className={styles.treatPill}>عند الحاجة</div>
-            </div>
-            <div className={styles.treatPrice}>
-              يبدأ من <span className={styles.treatPriceNum}>١٥</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
+              <div className={styles.treatPill}>تقييم طبّي</div>
+              <div className={styles.treatPill}>وصفة مخصّصة</div>
             </div>
           </div>
 
-          {/* Tadalafil Card */}
+          {/* Infections */}
           <div className={styles.treatCard}>
             <div className={styles.treatNmRow}>
               <div className={styles.treatArt}>
@@ -497,18 +505,37 @@ export default function SexualHealth() {
                   <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
                 </svg>
               </div>
-              <h3 className={styles.treatNm}>Tadalafil</h3>
+              <h3 className={styles.treatNm}>الالتهابات في المنطقة الحساسة</h3>
             </div>
-            <div className={styles.treatSub}>جنريك <em>Cialis&reg;</em> &middot; نفس المادة الفعّالة</div>
+            <div className={styles.treatSub}>تقييم ووصف العلاج المناسب</div>
             <p className={styles.treatDesc}>
-              يعمل خلال ٣٠-١٢٠ دقيقة، ويدوم حتى ٣٦ ساعة. الأنسب للعفوية. متوفّر بجرعة يومية منخفضة.
+              التهابات فطرية أو بكتيرية في المنطقة الحساسة. طبيبك يحدّد نوع الالتهاب ويصف العلاج المناسب — بدون حرج.
             </p>
             <div className={styles.treatMeta}>
-              <div className={styles.treatPill}>2.5 / 5 / 10 / 20 mg</div>
-              <div className={styles.treatPill}>يومي أو عند الحاجة</div>
+              <div className={styles.treatPill}>تشخيص دقيق</div>
+              <div className={styles.treatPill}>علاج موجّه</div>
             </div>
-            <div className={styles.treatPrice}>
-              يبدأ من <span className={styles.treatPriceNum}>١٨</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
+          </div>
+
+          {/* Premature Ejaculation */}
+          <div className={styles.treatCard}>
+            <div className={styles.treatNmRow}>
+              <div className={styles.treatArt}>
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="60" cy="60" r="48" fill="#5B8B3B" />
+                  <circle cx="60" cy="60" r="48" fill="#BCE1A4" opacity="0.4" />
+                  <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
+                </svg>
+              </div>
+              <h3 className={styles.treatNm}>سرعة القذف</h3>
+            </div>
+            <div className={styles.treatSub}>خطّة علاج شخصية ومتابعة</div>
+            <p className={styles.treatDesc}>
+              من أكثر المشاكل الجنسية شيوعاً عند الرجال. طبيبك يضع لك خطّة علاج شخصية تشمل الأدوية والنصائح السلوكية.
+            </p>
+            <div className={styles.treatMeta}>
+              <div className={styles.treatPill}>علاج دوائي</div>
+              <div className={styles.treatPill}>إرشاد سلوكي</div>
             </div>
           </div>
         </div>
@@ -521,7 +548,7 @@ export default function SexualHealth() {
             <span className={styles.secEyebrowDot} />
             لماذا لاباس
           </div>
-          <h2 className={styles.secTtl}>ستّ أسباب تختار البرنامج</h2>
+          <h2 className={styles.secTtl}>خمس أسباب تختار البرنامج</h2>
           <p className={styles.secSub}>
             لأن الخصوصية ليست ترفاً — هي شرط أساسي لبرنامج علاج مثل هذا.
           </p>
@@ -600,23 +627,6 @@ export default function SexualHealth() {
             <p className={styles.pillarDesc}>رقم جوّالك لا يُشارَك، ودفعك يظهر &quot;Labass&quot; على البيان فقط.</p>
           </div>
 
-          {/* 2. Saudi Doctor */}
-          <div className={styles.pillar}>
-            <div className={styles.pillarIc} style={{ background: "#BCE1A4" }}>
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M13 10 V20 Q13 25 18 25 Q23 25 23 20 V10" stroke="#4DA514" strokeWidth="2.8" strokeLinecap="round" fill="none" opacity="0.5" />
-                <circle cx="13" cy="10" r="2.6" fill="#4DA514" />
-                <circle cx="23" cy="10" r="2.6" fill="#4DA514" />
-                <path d="M18 25 V30 Q18 35 23 35" stroke="#4DA514" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-                <circle cx="30" cy="33" r="6" fill="#5B8B3B" />
-                <circle cx="30" cy="33" r="3.5" fill="#BCE1A4" />
-                <path d="M30 31 V35 M28 33 H32" stroke="#4DA514" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
-            </div>
-            <h4 className={styles.pillarTtl}>طبيب سعودي مرخّص</h4>
-            <p className={styles.pillarDesc}>ليست خوارزمية — طبيب حقيقي يراجع ملفّك، يحدّد الجرعة، ويرد على أسئلتك.</p>
-          </div>
-
           {/* 3. Authentic */}
           <div className={styles.pillar}>
             <div className={styles.pillarIc} style={{ background: "#BCE1A4" }}>
@@ -655,8 +665,8 @@ export default function SexualHealth() {
                 <circle cx="30" cy="22" r="1.8" fill="#BCE1A4" />
               </svg>
             </div>
-            <h4 className={styles.pillarTtl}>استشر متى احتجت</h4>
-            <p className={styles.pillarDesc}>تواصل مباشر مع طبيبك عبر المحادثة — بدون حجز، بدون انتظار، وبدون رسوم.</p>
+            <h4 className={styles.pillarTtl}>استشر الطبيب ٢٤ ساعة</h4>
+            <p className={styles.pillarDesc}>تواصل مباشر مع طبيبك عبر المحادثة في أي وقت — بدون حجز، بدون انتظار، وبدون رسوم.</p>
           </div>
 
           {/* 6. Shipping */}
@@ -671,76 +681,8 @@ export default function SexualHealth() {
               </svg>
             </div>
             <h4 className={styles.pillarTtl}>توصيل سريع</h4>
-            <p className={styles.pillarDesc}>٤٨-٧٢ ساعة لأغلب المدن السعودية. توصيل مجاني على كل الباقات.</p>
+            <p className={styles.pillarDesc}>خلال ٤٨ ساعة داخل الرياض. توصيل مجاني على كل الباقات.</p>
           </div>
-        </div>
-      </section>
-
-      {/* ─── DOCTOR ─── */}
-      <section className={styles.doctor}>
-        <div>
-          <div className={styles.docCard}>
-            <div className={styles.docPhoto}>د.خ</div>
-            <h3 className={styles.docName}>د. خالد الزهراني</h3>
-            <p className={styles.docRole}>استشاري مسالك بولية وأندرولوجيا</p>
-            <div className={styles.docCreds}>
-              <div className={styles.docCred}>
-                <span className={styles.docCredIc}>&#10003;</span>
-                بورد سعودي في جراحة المسالك البولية
-              </div>
-              <div className={styles.docCred}>
-                <span className={styles.docCredIc}>&#10003;</span>
-                زمالة الأندرولوجيا — المملكة المتحدة
-              </div>
-              <div className={styles.docCred}>
-                <span className={styles.docCredIc}>&#10003;</span>
-                عضو الجمعية السعودية لطبّ المسالك البولية
-              </div>
-              <div className={styles.docCred}>
-                <span className={styles.docCredIc}>&#10003;</span>
-                +١٤ سنة خبرة إكلينيكية
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div className={styles.secEyebrow}>
-            <span className={styles.secEyebrowDot} />
-            فريقنا الطبّي
-          </div>
-          <h2 className={styles.secTtl}>طبيب حقيقي</h2>
-          <p className={styles.secSub} style={{ marginBottom: "24px" }}>
-            ضعف الانتصاب غالباً مؤشّر على مشكلة صحّية أخرى — القلب، السكّر، الهرمونات. لذلك المراجعة الطبّية الحقيقية مهمّة.
-          </p>
-          <ul className={styles.docPoints}>
-            <li className={styles.docPoint}>
-              <span className={styles.docPtIc}>١</span>
-              <div>
-                <h4 className={styles.docPtTtl}>يراجع ملفّك بنفسه</h4>
-                <p className={styles.docPtDesc}>
-                  سجلّك الصحّي والأدوية التي تتناولها حالياً، للتأكّد من عدم وجود تعارض دوائي.
-                </p>
-              </div>
-            </li>
-            <li className={styles.docPoint}>
-              <span className={styles.docPtIc}>٢</span>
-              <div>
-                <h4 className={styles.docPtTtl}>يختار الدواء والجرعة</h4>
-                <p className={styles.docPtDesc}>
-                  بناء على حالتك تحديداً. Sildenafil أو Tadalafil؟ جرعة يومية أم عند الحاجة؟
-                </p>
-              </div>
-            </li>
-            <li className={styles.docPoint}>
-              <span className={styles.docPtIc}>٣</span>
-              <div>
-                <h4 className={styles.docPtTtl}>يراقب ويعدّل</h4>
-                <p className={styles.docPtDesc}>
-                  إن لم تلاحظ التحسّن المتوقّع، يعدّل الجرعة أو يحوّلك للدواء الآخر بدون رسوم.
-                </p>
-              </div>
-            </li>
-          </ul>
         </div>
       </section>
 
@@ -882,7 +824,7 @@ export default function SexualHealth() {
               <div className={`${styles.testAv} ${styles.testAv2}`}>ف.ح</div>
               <div>
                 <div className={styles.testName}>ف. الحارثي</div>
-                <div className={styles.testMeta}>٣٨ سنة &middot; جدة</div>
+                <div className={styles.testMeta}>٣٨ سنة &middot; الرياض</div>
               </div>
               <span className={styles.testVt}>موثّق</span>
             </div>
@@ -898,7 +840,7 @@ export default function SexualHealth() {
               <div className={`${styles.testAv} ${styles.testAv3}`}>س.ق</div>
               <div>
                 <div className={styles.testName}>س. القحطاني</div>
-                <div className={styles.testMeta}>٥١ سنة &middot; الدمام</div>
+                <div className={styles.testMeta}>٥١ سنة &middot; الرياض</div>
               </div>
               <span className={styles.testVt}>موثّق</span>
             </div>
@@ -1080,7 +1022,7 @@ export default function SexualHealth() {
           <span className={styles.secEyebrowDot} />
           الأسئلة الشائعة
         </div>
-        <h2 className={styles.secTtl}>إجابات مباشرة، بدون دوران</h2>
+        <h2 className={styles.secTtl}>إجابات مباشرة</h2>
 
         <div className={styles.faqList}>
           {faqItems.map((item, i) => (
@@ -1120,6 +1062,11 @@ export default function SexualHealth() {
           </p>
         </div>
       </section>
+
+      {/* ─── LICENSE TAG ─── */}
+      <div style={{ background: "#f2faed", borderTop: "0.5px solid rgba(23,52,4,0.08)", padding: "8px 48px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#27500A", letterSpacing: "0.2px" }}>
+        شركة سعودية مرخّصة من وزارة الصحة &middot; ترخيص رقم 1400055938
+      </div>
 
       {/* ─── FOOTER ─── */}
       <footer className={styles.foot}>

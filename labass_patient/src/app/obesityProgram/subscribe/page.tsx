@@ -163,7 +163,7 @@ const MultiSelect = ({
 
 export default function ObesitySubscribePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({ qCity: "riyadh" });
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -214,7 +214,7 @@ export default function ObesitySubscribePage() {
   const isStepValid = useCallback(() => {
     switch (currentStep) {
       case 1:
-        return !!(answers.q1 && answers.q2 && answers.q3);
+        return !!(answers.q1 && answers.q2 && answers.q3 && answers.qCity);
       case 2:
         return ["q4", "q5", "q6", "q7", "q8", "q9", "q10"].every(
           (k) => answers[k]
@@ -368,6 +368,11 @@ export default function ObesitySubscribePage() {
           </QuestionBlock>
           <QuestionBlock num="٣" text="ما محيط خصرك؟">
             <NumberInput qKey="q3" unit="سم" value={(answers.q3 as string) || ""} onChangeValue={setInput} />
+          </QuestionBlock>
+          <QuestionBlock num="٤" text="ما مدينتك؟" note="الخدمة متوفّرة حالياً في الرياض فقط">
+            <SingleSelect qKey="qCity" value={answers.qCity as string} onPick={pickOne} options={[
+              { label: "الرياض", value: "riyadh" },
+            ]} />
           </QuestionBlock>
         </div>
       )}
@@ -753,6 +758,10 @@ export default function ObesitySubscribePage() {
               <span className={s.summaryVal}>+٩٦٦ {phone}</span>
             </div>
             <div className={s.summaryRow}>
+              <span className={s.summaryLbl}>المدينة</span>
+              <span className={s.summaryVal}>الرياض</span>
+            </div>
+            <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الوزن الحالي</span>
               <span className={s.summaryVal}>
                 {(answers.q1 as string) || "—"} كجم
@@ -804,7 +813,7 @@ export default function ObesitySubscribePage() {
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٤</div>
                 <div className={s.nextTxt}>
-                  <strong>استشر طبيبك:</strong> متى ما احتجت، عبر المحادثة أو
+                  <strong>استشر الطبيب:</strong> متى ما احتجت، عبر المحادثة أو
                   مكالمة فيديو مباشرة — بدون حجز موعد.
                 </div>
               </li>

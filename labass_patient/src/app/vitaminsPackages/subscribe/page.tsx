@@ -25,11 +25,6 @@ const goalLabels: Record<string, string> = {
 const cityOptions = [
   { value: "", label: "اختر مدينتك" },
   { value: "riyadh", label: "الرياض" },
-  { value: "jeddah", label: "جدة" },
-  { value: "dammam", label: "الدمام / الخبر" },
-  { value: "mecca", label: "مكة المكرّمة" },
-  { value: "medina", label: "المدينة المنوّرة" },
-  { value: "other", label: "مدينة أخرى" },
 ];
 
 export default function SubscribePage() {
@@ -44,7 +39,7 @@ export default function SubscribePage() {
   const [gender, setGender] = useState("");
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const [city, setCity] = useState("");
+  const [city, setCity] = useState("riyadh");
   const [phoneError, setPhoneError] = useState("");
   const [goals, setGoals] = useState<string[]>([]);
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -325,7 +320,7 @@ export default function SubscribePage() {
           </div>
           <h1 className={s.pageTtl}>اختر الباقة المناسبة لك</h1>
           <p className={s.pageSub}>
-            كل الباقات تشمل فحص دم منزلي شامل، تفسير الطبيب، والفيتامينات
+            كل الباقات تشمل فحص دم منزلي شامل من مختبر طبّي معتمد، تفسير الطبيب، والفيتامينات
             المخصّصة. الاختلاف في المدة ونسبة التوفير.
           </p>
 
@@ -919,8 +914,8 @@ export default function SubscribePage() {
 
 function PlanFeatures() {
   const features = [
-    "فحص دم منزلي شامل",
-    "تحليل متقدم للنتائج",
+    "فحص دم منزلي شامل — من مختبر معتمد",
+    "تحليل متقدّم للنتائج بجودة عالية",
     "فيتامينات مخصّصة",
     "استشارة مع طبيب عام",
   ];

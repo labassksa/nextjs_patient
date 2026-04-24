@@ -181,7 +181,7 @@ const MultiSelectInput = ({
 
 export default function SexualHealthSubscribePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({ qCity: "riyadh" });
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -262,11 +262,13 @@ export default function SexualHealthSubscribePage() {
         const age = (answers.q2 as string) || "";
         const height = (answers.q3 as string) || "";
         const weight = (answers.q4 as string) || "";
+        const city = (answers.qCity as string) || "";
         return (
           name.trim().length >= 2 &&
           age.length > 0 && parseInt(age) > 0 &&
           height.length > 0 && parseInt(height) > 0 &&
-          weight.length > 0 && parseInt(weight) > 0
+          weight.length > 0 && parseInt(weight) > 0 &&
+          city.length > 0
         );
       }
       case 2:
@@ -421,6 +423,11 @@ export default function SexualHealthSubscribePage() {
           </QuestionBlock>
           <QuestionBlock num="٤" text="ما وزنك؟" qKey="q4" qRefs={qRefs}>
             <TextInput qKey="q4" unit="كجم" isNumeric placeholder="80" value={(answers.q4 as string) || ""} onChangeValue={setInput} />
+          </QuestionBlock>
+          <QuestionBlock num="٥" text="ما مدينتك؟" note="الخدمة متوفّرة حالياً في الرياض فقط" qKey="qCity" qRefs={qRefs}>
+            <SingleSelect qKey="qCity" value={answers.qCity as string} onPick={pickOne} options={[
+              { label: "الرياض", value: "riyadh" },
+            ]} />
           </QuestionBlock>
         </div>
       )}
@@ -801,6 +808,10 @@ export default function SexualHealthSubscribePage() {
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>رقم الجوّال</span>
               <span className={s.summaryVal}>+٩٦٦ {phone}</span>
+            </div>
+            <div className={s.summaryRow}>
+              <span className={s.summaryLbl}>المدينة</span>
+              <span className={s.summaryVal}>الرياض</span>
             </div>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>التفضيل</span>

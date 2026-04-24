@@ -13,9 +13,9 @@ export default function ObesityProgram() {
   const planFeatures = [
     "تقييم طبّي شامل (٢٦ سؤالاً)",
     "أدوية طبّية بوصفة من طبيبك",
-    "تحاليل دم منزلية شاملة",
+    "تحاليل دم منزلية شاملة — من مختبر معتمد",
     "خطّة غذائية ورياضية مخصّصة",
-    "استشر طبيبك في أي وقت",
+    "استشر الطبيب في أي وقت",
   ];
 
   const faqItems = [
@@ -39,6 +39,11 @@ export default function ObesityProgram() {
 
   return (
     <div dir="rtl" className={s.app}>
+      {/* ─── LICENSE TAG ─── */}
+      <div style={{ background: "#f2faed", borderBottom: "0.5px solid rgba(23,52,4,0.08)", padding: "8px 48px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#27500A", letterSpacing: "0.2px" }}>
+        شركة سعودية مرخّصة من وزارة الصحة &middot; ترخيص رقم 1400055938
+      </div>
+
       {/* ─── NAV ─── */}
       <nav className={s.nav}>
         <Link href="/" className={s.brand}>
@@ -335,7 +340,7 @@ export default function ObesityProgram() {
             <div className={s.howStepNum}>٢</div>
             <h3 className={s.howStepTtl}>تحاليل دم منزلية</h3>
             <p className={s.howStepDesc}>
-              فريقنا يزورك في المنزل لسحب عيّنة الدم — النتائج خلال ٤٨ ساعة.
+              فريقنا يزورك في المنزل لسحب عيّنة الدم — من مختبر طبّي معتمد بجودة عالية. النتائج خلال ٤٨ ساعة.
             </p>
           </div>
           <div className={s.howStep}>
@@ -389,7 +394,7 @@ export default function ObesityProgram() {
             </div>
             <h3 className={s.pillarTtl}>تحاليل طبّية شاملة</h3>
             <p className={s.pillarDesc}>
-              تحاليل دم منزلية تشمل الغدة الدرقية، السكّر التراكمي، الدهون، والفيتامينات — تُقرأ من طبيب مختصّ.
+              تحاليل دم منزلية من مختبر طبّي معتمد بجودة عالية — تشمل الغدة الدرقية، السكّر التراكمي، الدهون، والفيتامينات. تُقرأ من طبيب مختصّ.
             </p>
           </div>
 
@@ -422,7 +427,7 @@ export default function ObesityProgram() {
             </p>
           </div>
 
-          {/* 3 - استشر طبيبك في أي وقت */}
+          {/* 3 - استشر الطبيب في أي وقت */}
           <div className={s.pillar}>
             <div className={s.pillarIc} style={{ background: "#FCEBEB" }}>
               <svg viewBox="0 0 28 28" fill="none">
@@ -444,7 +449,7 @@ export default function ObesityProgram() {
                 <circle cx="17" cy="14" r="1" fill="#A32D2D" />
               </svg>
             </div>
-            <h3 className={s.pillarTtl}>استشر طبيبك في أي وقت</h3>
+            <h3 className={s.pillarTtl}>استشر الطبيب في أي وقت</h3>
             <p className={s.pillarDesc}>
               محادثة مباشرة أو مكالمة فيديو مع طبيبك — بدون حجز مسبق، بدون انتظار.
             </p>
@@ -527,70 +532,6 @@ export default function ObesityProgram() {
         </div>
       </section>
 
-      {/* ─── DOCTOR ─── */}
-      <section className={s.doctor}>
-        <div className={s.docCard}>
-          <div className={s.docPhoto}>د</div>
-          <h3 className={s.docName}>د. سارة الخالدي</h3>
-          <p className={s.docRole}>استشارية طبّ السمنة والتغذية العلاجية</p>
-          <div className={s.docCreds}>
-            <div className={s.docCred}>
-              <span className={s.docCredIc}>&#10003;</span>
-              البورد السعودي في طبّ الأسرة
-            </div>
-            <div className={s.docCred}>
-              <span className={s.docCredIc}>&#10003;</span>
-              زمالة طبّ السمنة — الجمعية الأمريكية
-            </div>
-            <div className={s.docCred}>
-              <span className={s.docCredIc}>&#10003;</span>
-              +١٠ سنوات خبرة سريرية
-            </div>
-          </div>
-        </div>
-
-        <ul className={s.docPoints}>
-          <li className={s.docPoint}>
-            <span className={s.docPtIc}>١</span>
-            <div>
-              <h4 className={s.docPtTtl}>تقييم طبّي دقيق</h4>
-              <p className={s.docPtDesc}>
-                طبيبك يراجع تحاليلك وتاريخك الصحّي بالكامل قبل وصف أي دواء.
-              </p>
-            </div>
-          </li>
-          <li className={s.docPoint}>
-            <span className={s.docPtIc}>٢</span>
-            <div>
-              <h4 className={s.docPtTtl}>وصفة مخصّصة</h4>
-              <p className={s.docPtDesc}>
-                الدواء والجرعة يُحدّدان بناءً على نتائجك — لا توجد وصفة واحدة
-                تناسب الجميع.
-              </p>
-            </div>
-          </li>
-          <li className={s.docPoint}>
-            <span className={s.docPtIc}>٣</span>
-            <div>
-              <h4 className={s.docPtTtl}>متابعة مستمرّة</h4>
-              <p className={s.docPtDesc}>
-                تواصل مع طبيبك في أي وقت عبر المحادثة أو مكالمة الفيديو — بدون
-                حجز.
-              </p>
-            </div>
-          </li>
-          <li className={s.docPoint}>
-            <span className={s.docPtIc}>٤</span>
-            <div>
-              <h4 className={s.docPtTtl}>تعديل الخطّة حسب التقدّم</h4>
-              <p className={s.docPtDesc}>
-                كلّ ٤ أسابيع، طبيبك يراجع نتائجك ويعدّل الخطّة إذا احتاجت.
-              </p>
-            </div>
-          </li>
-        </ul>
-      </section>
-
       {/* ─── PLANS ─── */}
       <section className={s.plansSec}>
         <div className={s.secEyebrow}>
@@ -656,7 +597,7 @@ export default function ObesityProgram() {
               ))}
               <li className={s.planFeat}>
                 <span className={s.planCk}>&#10003;</span>
-                إعادة تحليل بعد ٩٠ يوماً
+                إعادة تحليل بعد ٩٠ يوماً — من مختبر معتمد
               </li>
             </ul>
             <Link href="/obesityProgram/subscribe" className={s.planCta}>
@@ -722,7 +663,7 @@ export default function ObesityProgram() {
               <div className={`${s.testAv} ${s.testAv2}`}>ر</div>
               <div>
                 <div className={s.testName}>رهف الشمري</div>
-                <div className={s.testMeta}>٣١ سنة &middot; جدة</div>
+                <div className={s.testMeta}>٣١ سنة &middot; الرياض</div>
               </div>
               <span className={s.testVt}>مشترك فعّال</span>
             </div>
@@ -759,7 +700,7 @@ export default function ObesityProgram() {
               <div className={`${s.testAv} ${s.testAv3}`}>خ</div>
               <div>
                 <div className={s.testName}>خالد القحطاني</div>
-                <div className={s.testMeta}>٤٢ سنة &middot; الدمام</div>
+                <div className={s.testMeta}>٤٢ سنة &middot; الرياض</div>
               </div>
               <span className={s.testVt}>مشترك فعّال</span>
             </div>
@@ -842,6 +783,11 @@ export default function ObesityProgram() {
           </p>
         </div>
       </section>
+
+      {/* ─── LICENSE TAG ─── */}
+      <div style={{ background: "#f2faed", borderTop: "0.5px solid rgba(23,52,4,0.08)", padding: "8px 48px", textAlign: "center", fontSize: "12px", fontWeight: 600, color: "#27500A", letterSpacing: "0.2px" }}>
+        شركة سعودية مرخّصة من وزارة الصحة &middot; ترخيص رقم 1400055938
+      </div>
 
       {/* ─── FOOTER ─── */}
       <footer className={s.foot}>
