@@ -27,6 +27,158 @@ const stepLabels = [
   "التحقّق",
 ];
 
+/* ── Sub-components (defined outside to avoid remount on every render) ── */
+
+const QuestionBlock = ({
+  num,
+  text,
+  note,
+  qKey,
+  qRefs,
+  children,
+}: {
+  num: string;
+  text: string;
+  note?: string;
+  qKey?: string;
+  qRefs?: React.MutableRefObject<Record<string, HTMLDivElement | null>>;
+  children: React.ReactNode;
+}) => (
+  <div className={s.qBlock} ref={qKey && qRefs ? (el) => { qRefs.current[qKey] = el; } : undefined}>
+    <div className={s.qLbl}>
+      <div className={s.qNum}>{num}</div>
+      <div className={s.qTxt}>
+        {text}
+        {note && (
+          <>
+            {" "}
+            <span className={s.qNote}>({note})</span>
+          </>
+        )}
+      </div>
+    </div>
+    {children}
+  </div>
+);
+
+const SingleSelect = ({
+  qKey,
+  options,
+  className,
+  value,
+  onPick,
+}: {
+  qKey: string;
+  options: { label: string; value: string }[];
+  className?: string;
+  value?: string;
+  onPick: (key: string, val: string) => void;
+}) => (
+  <div className={className || s.qOpts}>
+    {options.map((o) => (
+      <div
+        key={o.value}
+        className={`${s.qOpt} ${value === o.value ? s.qOptSelected : ""}`}
+        onClick={() => onPick(qKey, o.value)}
+      >
+        {o.label}
+      </div>
+    ))}
+  </div>
+);
+
+const YesNo = ({
+  qKey,
+  labels,
+  value,
+  onPick,
+}: {
+  qKey: string;
+  labels?: { yes: string; no: string };
+  value?: string;
+  onPick: (key: string, val: string) => void;
+}) => {
+  const yesLabel = labels?.yes || "نعم";
+  const noLabel = labels?.no || "لا";
+  return (
+    <div className={s.qYesno}>
+      {[
+        { label: yesLabel, value: "yes" },
+        { label: noLabel, value: "no" },
+      ].map((o) => (
+        <div
+          key={o.value}
+          className={`${s.qOpt} ${value === o.value ? s.qOptSelected : ""}`}
+          onClick={() => onPick(qKey, o.value)}
+        >
+          {o.label}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const TextInput = ({
+  qKey,
+  unit,
+  isNumeric = false,
+  placeholder,
+  value,
+  onChangeValue,
+}: {
+  qKey: string;
+  unit?: string;
+  isNumeric?: boolean;
+  placeholder?: string;
+  value: string;
+  onChangeValue: (key: string, val: string) => void;
+}) => (
+  <div className={s.qInpWrap}>
+    <input
+      className={`${s.qInp} ${value.length > 0 ? s.qInpFilled : ""}`}
+      type="text"
+      inputMode={isNumeric ? "numeric" : "text"}
+      pattern={isNumeric ? "[0-9]*" : undefined}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (isNumeric && v && !/^\d+$/.test(v)) return;
+        onChangeValue(qKey, v);
+      }}
+    />
+    {unit && <div className={s.qInpUnit}>{unit}</div>}
+  </div>
+);
+
+const MultiSelectInput = ({
+  qKey,
+  options,
+  selected,
+  onToggle,
+}: {
+  qKey: string;
+  options: { label: string; value: string }[];
+  selected: string[];
+  onToggle: (key: string, val: string) => void;
+}) => (
+  <div className={s.qCbGrid}>
+    {options.map((o) => {
+      const isSelected = selected.includes(o.value);
+      return (
+        <div
+          key={o.value}
+          className={`${s.qCb} ${isSelected ? s.qCbSelected : ""}`}
+          onClick={() => onToggle(qKey, o.value)}
+        >
+          <div className={s.qCbBox}>{isSelected ? "✓" : ""}</div>
+          {o.label}
+        </div>
+      );
+    })}
+  </div>
+);
+
 export default function SexualHealthSubscribePage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -64,9 +216,13 @@ export default function SexualHealthSubscribePage() {
   const scrollToNext = (currentKey: string) => {
     const num = parseInt(currentKey.replace("q", ""));
     const nextKey = `q${num + 1}`;
+    // Only scroll if the next question exists on screen (same step)
     setTimeout(() => {
-      qRefs.current[nextKey]?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 250);
+      const el = qRefs.current[nextKey];
+      if (el && el.offsetParent !== null) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 300);
   };
 
   const pickOne = (key: string, val: string) => {
@@ -206,142 +362,6 @@ export default function SexualHealthSubscribePage() {
     return name.split(" ")[0] || "مرحباً";
   };
 
-  /* ── Reusable mini-components ── */
-  const QuestionBlock = ({
-    num,
-    text,
-    note,
-    qKey,
-    children,
-  }: {
-    num: string;
-    text: string;
-    note?: string;
-    qKey?: string;
-    children: React.ReactNode;
-  }) => (
-    <div className={s.qBlock} ref={qKey ? (el) => { qRefs.current[qKey] = el; } : undefined}>
-      <div className={s.qLbl}>
-        <div className={s.qNum}>{num}</div>
-        <div className={s.qTxt}>
-          {text}
-          {note && (
-            <>
-              {" "}
-              <span className={s.qNote}>({note})</span>
-            </>
-          )}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-
-  const SingleSelect = ({
-    qKey,
-    options,
-    className,
-  }: {
-    qKey: string;
-    options: { label: string; value: string }[];
-    className?: string;
-  }) => (
-    <div className={className || s.qOpts}>
-      {options.map((o) => (
-        <div
-          key={o.value}
-          className={`${s.qOpt} ${answers[qKey] === o.value ? s.qOptSelected : ""}`}
-          onClick={() => pickOne(qKey, o.value)}
-        >
-          {o.label}
-        </div>
-      ))}
-    </div>
-  );
-
-  const YesNo = ({
-    qKey,
-    labels,
-  }: {
-    qKey: string;
-    labels?: { yes: string; no: string };
-  }) => {
-    const yesLabel = labels?.yes || "نعم";
-    const noLabel = labels?.no || "لا";
-    return (
-      <div className={s.qYesno}>
-        {[
-          { label: yesLabel, value: "yes" },
-          { label: noLabel, value: "no" },
-        ].map((o) => (
-          <div
-            key={o.value}
-            className={`${s.qOpt} ${answers[qKey] === o.value ? s.qOptSelected : ""}`}
-            onClick={() => pickOne(qKey, o.value)}
-          >
-            {o.label}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const NumberInput = ({
-    qKey,
-    unit,
-    type = "number",
-    placeholder,
-  }: {
-    qKey: string;
-    unit?: string;
-    type?: string;
-    placeholder?: string;
-  }) => (
-    <div className={s.qInpWrap}>
-      <input
-        className={`${s.qInp} ${(answers[qKey] as string)?.length > 0 ? s.qInpFilled : ""}`}
-        type={type}
-        inputMode={type === "number" ? "numeric" : undefined}
-        placeholder={placeholder}
-        value={(answers[qKey] as string) || ""}
-        onChange={(e) => setInput(qKey, e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            scrollToNext(qKey);
-          }
-        }}
-      />
-      {unit && <div className={s.qInpUnit}>{unit}</div>}
-    </div>
-  );
-
-  const MultiSelect = ({
-    qKey,
-    options,
-  }: {
-    qKey: string;
-    options: { label: string; value: string }[];
-  }) => (
-    <div className={s.qCbGrid}>
-      {options.map((o) => {
-        const selected =
-          Array.isArray(answers[qKey]) &&
-          (answers[qKey] as string[]).includes(o.value);
-        return (
-          <div
-            key={o.value}
-            className={`${s.qCb} ${selected ? s.qCbSelected : ""}`}
-            onClick={() => toggleCb(qKey, o.value)}
-          >
-            <div className={s.qCbBox}>{selected ? "✓" : ""}</div>
-            {o.label}
-          </div>
-        );
-      })}
-    </div>
-  );
-
   /* ── RENDER ── */
   return (
     <div dir="rtl" className={s.app}>
@@ -390,17 +410,17 @@ export default function SexualHealthSubscribePage() {
             أي جهة خارجية.
           </p>
 
-          <QuestionBlock num="١" text="ما اسمك الكامل؟" qKey="q1">
-            <NumberInput qKey="q1" type="text" placeholder="مثال: محمد عبدالله" />
+          <QuestionBlock num="١" text="ما اسمك الكامل؟" qKey="q1" qRefs={qRefs}>
+            <TextInput qKey="q1" placeholder="محمد عبدالله" value={(answers.q1 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
-          <QuestionBlock num="٢" text="ما عمرك؟" qKey="q2">
-            <NumberInput qKey="q2" unit="سنة" placeholder="مثال: ٣٥" />
+          <QuestionBlock num="٢" text="ما عمرك؟" qKey="q2" qRefs={qRefs}>
+            <TextInput qKey="q2" unit="سنة" isNumeric placeholder="35" value={(answers.q2 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
-          <QuestionBlock num="٣" text="ما طولك؟" qKey="q3">
-            <NumberInput qKey="q3" unit="سم" placeholder="مثال: ١٧٥" />
+          <QuestionBlock num="٣" text="ما طولك؟" qKey="q3" qRefs={qRefs}>
+            <TextInput qKey="q3" unit="سم" isNumeric placeholder="175" value={(answers.q3 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
-          <QuestionBlock num="٤" text="ما وزنك؟" qKey="q4">
-            <NumberInput qKey="q4" unit="كجم" placeholder="مثال: ٨٠" />
+          <QuestionBlock num="٤" text="ما وزنك؟" qKey="q4" qRefs={qRefs}>
+            <TextInput qKey="q4" unit="كجم" isNumeric placeholder="80" value={(answers.q4 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
         </div>
       )}
@@ -418,106 +438,67 @@ export default function SexualHealthSubscribePage() {
             الإجابات محميّة وتصل مباشرة لطبيبك.
           </p>
 
-          <QuestionBlock
-            num="٥"
-            text="خلال الأسابيع الستة الماضية، ما مدى ثقتك في قدرتك على الحصول على انتصاب والمحافظة عليه؟"
-           qKey="q5">
-            <SingleSelect
-              qKey="q5"
-              options={[
-                { label: "عالية جداً", value: "very-high" },
-                { label: "عالية", value: "high" },
-                { label: "متوسطة", value: "mid" },
-                { label: "منخفضة", value: "low" },
-                { label: "منخفضة جداً", value: "very-low" },
-              ]}
-            />
+          <QuestionBlock num="٥" text="خلال الأسابيع الستة الماضية، ما مدى ثقتك في قدرتك على الحصول على انتصاب والمحافظة عليه؟" qKey="q5" qRefs={qRefs}>
+            <SingleSelect qKey="q5" value={answers.q5 as string} onPick={pickOne} options={[
+              { label: "عالية جداً", value: "very-high" },
+              { label: "عالية", value: "high" },
+              { label: "متوسطة", value: "mid" },
+              { label: "منخفضة", value: "low" },
+              { label: "منخفضة جداً", value: "very-low" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="٦"
-            text="عند الإثارة، كم مرة كان الانتصاب قوياً بما يكفي للإيلاج؟"
-           qKey="q6">
-            <SingleSelect
-              qKey="q6"
-              options={[
-                { label: "دائماً تقريباً", value: "always" },
-                { label: "في أغلب الأحيان", value: "most" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "قليلاً", value: "few" },
-                { label: "أبداً", value: "never" },
-              ]}
-            />
+          <QuestionBlock num="٦" text="عند الإثارة، كم مرة كان الانتصاب قوياً بما يكفي للإيلاج؟" qKey="q6" qRefs={qRefs}>
+            <SingleSelect qKey="q6" value={answers.q6 as string} onPick={pickOne} options={[
+              { label: "دائماً تقريباً", value: "always" },
+              { label: "في أغلب الأحيان", value: "most" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "قليلاً", value: "few" },
+              { label: "أبداً", value: "never" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="٧"
-            text="خلال الجماع، كم مرة تمكّنت من الحفاظ على الانتصاب بعد الإيلاج؟"
-           qKey="q7">
-            <SingleSelect
-              qKey="q7"
-              options={[
-                { label: "دائماً تقريباً", value: "always" },
-                { label: "في أغلب الأحيان", value: "most" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "قليلاً", value: "few" },
-                { label: "أبداً", value: "never" },
-              ]}
-            />
+          <QuestionBlock num="٧" text="خلال الجماع، كم مرة تمكّنت من الحفاظ على الانتصاب بعد الإيلاج؟" qKey="q7" qRefs={qRefs}>
+            <SingleSelect qKey="q7" value={answers.q7 as string} onPick={pickOne} options={[
+              { label: "دائماً تقريباً", value: "always" },
+              { label: "في أغلب الأحيان", value: "most" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "قليلاً", value: "few" },
+              { label: "أبداً", value: "never" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="٨"
-            text="خلال الجماع، ما مدى صعوبة الحفاظ على الانتصاب حتى إكمال الجماع؟"
-           qKey="q8">
-            <SingleSelect
-              qKey="q8"
-              options={[
-                { label: "صعب للغاية", value: "extremely" },
-                { label: "صعب جداً", value: "very" },
-                { label: "صعب", value: "difficult" },
-                { label: "صعب قليلاً", value: "little" },
-                { label: "ليس صعباً", value: "not" },
-              ]}
-            />
+          <QuestionBlock num="٨" text="خلال الجماع، ما مدى صعوبة الحفاظ على الانتصاب حتى إكمال الجماع؟" qKey="q8" qRefs={qRefs}>
+            <SingleSelect qKey="q8" value={answers.q8 as string} onPick={pickOne} options={[
+              { label: "صعب للغاية", value: "extremely" },
+              { label: "صعب جداً", value: "very" },
+              { label: "صعب", value: "difficult" },
+              { label: "صعب قليلاً", value: "little" },
+              { label: "ليس صعباً", value: "not" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="٩"
-            text="عند محاولة الجماع، كم مرة كان الأمر مرضياً لك؟"
-           qKey="q9">
-            <SingleSelect
-              qKey="q9"
-              options={[
-                { label: "دائماً تقريباً", value: "always" },
-                { label: "في أغلب الأحيان", value: "most" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "قليلاً", value: "few" },
-                { label: "أبداً", value: "never" },
-              ]}
-            />
+          <QuestionBlock num="٩" text="عند محاولة الجماع، كم مرة كان الأمر مرضياً لك؟" qKey="q9" qRefs={qRefs}>
+            <SingleSelect qKey="q9" value={answers.q9 as string} onPick={pickOne} options={[
+              { label: "دائماً تقريباً", value: "always" },
+              { label: "في أغلب الأحيان", value: "most" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "قليلاً", value: "few" },
+              { label: "أبداً", value: "never" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock num="١٠" text="متى بدأت تلاحظ المشكلة؟" qKey="q10">
-            <SingleSelect
-              qKey="q10"
-              options={[
-                { label: "أقل من ٣ أشهر", value: "<3m" },
-                { label: "٣-١٢ شهراً", value: "3-12m" },
-                { label: "١-٣ سنوات", value: "1-3y" },
-                { label: "أكثر من ٣ سنوات", value: "3y+" },
-              ]}
-            />
+          <QuestionBlock num="١٠" text="متى بدأت تلاحظ المشكلة؟" qKey="q10" qRefs={qRefs}>
+            <SingleSelect qKey="q10" value={answers.q10 as string} onPick={pickOne} options={[
+              { label: "أقل من ٣ أشهر", value: "<3m" },
+              { label: "٣-١٢ شهراً", value: "3-12m" },
+              { label: "١-٣ سنوات", value: "1-3y" },
+              { label: "أكثر من ٣ سنوات", value: "3y+" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١١"
-            text="هل تلاحظ انتصاباً تلقائياً في الصباح أو أثناء النوم؟"
-           qKey="q11">
-            <YesNo
-              qKey="q11"
-              labels={{ yes: "نعم، أحياناً", no: "نادراً أو لا" }}
-            />
+          <QuestionBlock num="١١" text="هل تلاحظ انتصاباً تلقائياً في الصباح أو أثناء النوم؟" qKey="q11" qRefs={qRefs}>
+            <YesNo qKey="q11" value={answers.q11 as string} onPick={pickOne} labels={{ yes: "نعم، أحياناً", no: "نادراً أو لا" }} />
           </QuestionBlock>
         </div>
       )}
@@ -535,59 +516,37 @@ export default function SexualHealthSubscribePage() {
             مضمونة.
           </p>
 
-          <QuestionBlock
-            num="١٢"
-            text="هل شُخّصت بأي من التالي؟"
-            note="يمكن اختيار أكثر من واحد"
-          >
-            <MultiSelect
-              qKey="q12"
-              options={[
-                { label: "أمراض القلب", value: "heart" },
-                { label: "ارتفاع ضغط الدم", value: "bp-high" },
-                { label: "انخفاض ضغط الدم", value: "bp-low" },
-                { label: "سكّري", value: "diabetes" },
-                { label: "كولسترول مرتفع", value: "chol" },
-                { label: "أمراض كبد", value: "liver" },
-                { label: "أمراض كلى", value: "kidney" },
-                { label: "لا شيء ممّا سبق", value: "none" },
-              ]}
-            />
+          <QuestionBlock num="١٢" text="هل شُخّصت بأي من التالي؟" note="يمكن اختيار أكثر من واحد" qKey="q12" qRefs={qRefs}>
+            <MultiSelectInput qKey="q12" selected={Array.isArray(answers.q12) ? answers.q12 as string[] : []} onToggle={toggleCb} options={[
+              { label: "أمراض القلب", value: "heart" },
+              { label: "ارتفاع ضغط الدم", value: "bp-high" },
+              { label: "انخفاض ضغط الدم", value: "bp-low" },
+              { label: "سكّري", value: "diabetes" },
+              { label: "كولسترول مرتفع", value: "chol" },
+              { label: "أمراض كبد", value: "liver" },
+              { label: "أمراض كلى", value: "kidney" },
+              { label: "لا شيء ممّا سبق", value: "none" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٣"
-            text="هل أُصبت بنوبة قلبية أو جلطة دماغية خلال الستة أشهر الماضية؟"
-           qKey="q13">
-            <YesNo qKey="q13" />
+          <QuestionBlock num="١٣" text="هل أُصبت بنوبة قلبية أو جلطة دماغية خلال الستة أشهر الماضية؟" qKey="q13" qRefs={qRefs}>
+            <YesNo qKey="q13" value={answers.q13 as string} onPick={pickOne} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٤"
-            text="هل تشعر بألم في الصدر عند المجهود أو الجماع؟"
-           qKey="q14">
-            <YesNo qKey="q14" />
+          <QuestionBlock num="١٤" text="هل تشعر بألم في الصدر عند المجهود أو الجماع؟" qKey="q14" qRefs={qRefs}>
+            <YesNo qKey="q14" value={answers.q14 as string} onPick={pickOne} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٥"
-            text="هل هناك تاريخ عائلي لوفاة مبكّرة بأمراض القلب؟"
-           qKey="q15">
-            <YesNo qKey="q15" />
+          <QuestionBlock num="١٥" text="هل هناك تاريخ عائلي لوفاة مبكّرة بأمراض القلب؟" qKey="q15" qRefs={qRefs}>
+            <YesNo qKey="q15" value={answers.q15 as string} onPick={pickOne} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٦"
-            text="هل خضعت لأي عملية جراحية في الجهاز التناسلي أو البروستاتا؟"
-           qKey="q16">
-            <YesNo qKey="q16" />
+          <QuestionBlock num="١٦" text="هل خضعت لأي عملية جراحية في الجهاز التناسلي أو البروستاتا؟" qKey="q16" qRefs={qRefs}>
+            <YesNo qKey="q16" value={answers.q16 as string} onPick={pickOne} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٧"
-            text="هل لديك مرض في شبكية العين (اعتلال شبكي صباغي)؟"
-           qKey="q17">
-            <YesNo qKey="q17" />
+          <QuestionBlock num="١٧" text="هل لديك مرض في شبكية العين (اعتلال شبكي صباغي)؟" qKey="q17" qRefs={qRefs}>
+            <YesNo qKey="q17" value={answers.q17 as string} onPick={pickOne} />
           </QuestionBlock>
         </div>
       )}
@@ -611,46 +570,34 @@ export default function SexualHealthSubscribePage() {
             <strong>ممنوعة عليك تماماً</strong> — قد يحدث هبوط حادّ في ضغط الدم.
           </div>
 
-          <QuestionBlock num="١٨" text="هل تتناول أي من الأدوية التالية؟" qKey="q18">
-            <MultiSelect
-              qKey="q18"
-              options={[
-                { label: "نترات (Nitroglycerin، Isordil)", value: "nitrates" },
-                { label: "حاصرات ألفا (Tamsulosin)", value: "alpha" },
-                { label: "مضادّات الفطريات (Ketoconazole)", value: "antifungal" },
-                { label: "مضادّات حيوية", value: "antibiotic" },
-                { label: "أدوية ضغط الدم", value: "antihyper" },
-                { label: "مضادّات اكتئاب (SSRIs)", value: "antidepressant" },
-                { label: "أدوية HIV (Ritonavir)", value: "hiv" },
-                { label: "لا شيء من هذه", value: "none" },
-              ]}
-            />
+          <QuestionBlock num="١٨" text="هل تتناول أي من الأدوية التالية؟" qKey="q18" qRefs={qRefs}>
+            <MultiSelectInput qKey="q18" selected={Array.isArray(answers.q18) ? answers.q18 as string[] : []} onToggle={toggleCb} options={[
+              { label: "نترات (Nitroglycerin، Isordil)", value: "nitrates" },
+              { label: "حاصرات ألفا (Tamsulosin)", value: "alpha" },
+              { label: "مضادّات الفطريات (Ketoconazole)", value: "antifungal" },
+              { label: "مضادّات حيوية", value: "antibiotic" },
+              { label: "أدوية ضغط الدم", value: "antihyper" },
+              { label: "مضادّات اكتئاب (SSRIs)", value: "antidepressant" },
+              { label: "أدوية HIV (Ritonavir)", value: "hiv" },
+              { label: "لا شيء من هذه", value: "none" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٩"
-            text="هل جرّبت Viagra أو Cialis من قبل؟"
-           qKey="q19">
-            <SingleSelect
-              qKey="q19"
-              options={[
-                { label: "نعم، عمل معي", value: "yes-works" },
-                { label: "نعم، جزئياً", value: "yes-partial" },
-                { label: "نعم، لم يعمل", value: "yes-no" },
-                { label: "لم أجرّب", value: "no" },
-              ]}
-            />
+          <QuestionBlock num="١٩" text="هل جرّبت Viagra أو Cialis من قبل؟" qKey="q19" qRefs={qRefs}>
+            <SingleSelect qKey="q19" value={answers.q19 as string} onPick={pickOne} options={[
+              { label: "نعم، عمل معي", value: "yes-works" },
+              { label: "نعم، جزئياً", value: "yes-partial" },
+              { label: "نعم، لم يعمل", value: "yes-no" },
+              { label: "لم أجرّب", value: "no" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="٢٠"
-            text="هل عانيت من آثار جانبية مع أي دواء سابقاً (صداع، احمرار، عسر هضم)؟"
-           qKey="q20">
-            <YesNo qKey="q20" />
+          <QuestionBlock num="٢٠" text="هل عانيت من آثار جانبية مع أي دواء سابقاً (صداع، احمرار، عسر هضم)؟" qKey="q20" qRefs={qRefs}>
+            <YesNo qKey="q20" value={answers.q20 as string} onPick={pickOne} />
           </QuestionBlock>
 
-          <QuestionBlock num="٢١" text="هل لديك حساسية من أي دواء؟" qKey="q21">
-            <YesNo qKey="q21" />
+          <QuestionBlock num="٢١" text="هل لديك حساسية من أي دواء؟" qKey="q21" qRefs={qRefs}>
+            <YesNo qKey="q21" value={answers.q21 as string} onPick={pickOne} />
           </QuestionBlock>
         </div>
       )}
@@ -667,69 +614,47 @@ export default function SexualHealthSubscribePage() {
             نمط حياتك يحدّد أيّ دواء وأيّ جرعة. كُن دقيقاً.
           </p>
 
-          <QuestionBlock num="٢٢" text="هل تدخّن؟" qKey="q22">
-            <SingleSelect
-              qKey="q22"
-              options={[
-                { label: "نعم، يومياً", value: "yes" },
-                { label: "أحياناً", value: "occasional" },
-                { label: "أقلعت", value: "past" },
-                { label: "لم أدخّن أبداً", value: "never" },
-              ]}
-            />
+          <QuestionBlock num="٢٢" text="هل تدخّن؟" qKey="q22" qRefs={qRefs}>
+            <SingleSelect qKey="q22" value={answers.q22 as string} onPick={pickOne} options={[
+              { label: "نعم، يومياً", value: "yes" },
+              { label: "أحياناً", value: "occasional" },
+              { label: "أقلعت", value: "past" },
+              { label: "لم أدخّن أبداً", value: "never" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٣" text="كم مرة تمارس الرياضة أسبوعياً؟" qKey="q23">
-            <SingleSelect
-              qKey="q23"
-              options={[
-                { label: "نادراً", value: "none" },
-                { label: "١-٢ مرة", value: "1-2" },
-                { label: "٣-٤ مرات", value: "3-4" },
-                { label: "٥+ مرات", value: "5+" },
-              ]}
-            />
+          <QuestionBlock num="٢٣" text="كم مرة تمارس الرياضة أسبوعياً؟" qKey="q23" qRefs={qRefs}>
+            <SingleSelect qKey="q23" value={answers.q23 as string} onPick={pickOne} options={[
+              { label: "نادراً", value: "none" },
+              { label: "١-٢ مرة", value: "1-2" },
+              { label: "٣-٤ مرات", value: "3-4" },
+              { label: "٥+ مرات", value: "5+" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٤" text="كيف تقيّم مستوى التوتّر لديك مؤخراً؟" qKey="q24">
-            <SingleSelect
-              qKey="q24"
-              options={[
-                { label: "منخفض", value: "low" },
-                { label: "متوسط", value: "mid" },
-                { label: "عالٍ", value: "high" },
-                { label: "عالٍ جداً", value: "very-high" },
-              ]}
-            />
+          <QuestionBlock num="٢٤" text="كيف تقيّم مستوى التوتّر لديك مؤخراً؟" qKey="q24" qRefs={qRefs}>
+            <SingleSelect qKey="q24" value={answers.q24 as string} onPick={pickOne} options={[
+              { label: "منخفض", value: "low" },
+              { label: "متوسط", value: "mid" },
+              { label: "عالٍ", value: "high" },
+              { label: "عالٍ جداً", value: "very-high" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٥" text="هل تشعر بقلق قبل أو أثناء الجماع؟" qKey="q25">
-            <SingleSelect
-              qKey="q25"
-              options={[
-                { label: "أبداً", value: "never" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "غالباً", value: "often" },
-                { label: "دائماً", value: "always" },
-              ]}
-            />
+          <QuestionBlock num="٢٥" text="هل تشعر بقلق قبل أو أثناء الجماع؟" qKey="q25" qRefs={qRefs}>
+            <SingleSelect qKey="q25" value={answers.q25 as string} onPick={pickOne} options={[
+              { label: "أبداً", value: "never" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "غالباً", value: "often" },
+              { label: "دائماً", value: "always" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٦" text="أيّ الخيارين يناسبك أكثر؟" qKey="q26">
-            <SingleSelect
-              qKey="q26"
-              className={s.qPrefGrid}
-              options={[
-                {
-                  label: "عند الحاجة · سريع المفعول (٤-٥ ساعات)",
-                  value: "asneeded",
-                },
-                {
-                  label: "مفعول طويل (حتى ٣٦ ساعة) · للعفوية",
-                  value: "daily",
-                },
-              ]}
-            />
+          <QuestionBlock num="٢٦" text="أيّ الخيارين يناسبك أكثر؟" qKey="q26" qRefs={qRefs}>
+            <SingleSelect qKey="q26" value={answers.q26 as string} onPick={pickOne} className={s.qPrefGrid} options={[
+              { label: "عند الحاجة · سريع المفعول (٤-٥ ساعات)", value: "asneeded" },
+              { label: "مفعول طويل (حتى ٣٦ ساعة) · للعفوية", value: "daily" },
+            ]} />
           </QuestionBlock>
 
           <div className={s.secIntro}>

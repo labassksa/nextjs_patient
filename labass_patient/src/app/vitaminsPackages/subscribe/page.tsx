@@ -430,12 +430,16 @@ export default function SubscribePage() {
               <div className={s.dualInp}>
                 <input
                   className={s.dualInpField}
-                  type="number"
-                  min={18}
-                  max={90}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="٣٠"
                   value={age}
-                  onChange={(e) => setAge(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v && !/^\d+$/.test(v)) return;
+                    setAge(v);
+                  }}
                 />
                 <div className={s.dualUnit}>سنة</div>
               </div>
@@ -472,12 +476,16 @@ export default function SubscribePage() {
               <div className={s.dualInp}>
                 <input
                   className={s.dualInpField}
-                  type="number"
-                  min={100}
-                  max={230}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="١٧٥"
                   value={height}
-                  onChange={(e) => setHeight(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v && !/^\d+$/.test(v)) return;
+                    setHeight(v);
+                  }}
                 />
                 <div className={s.dualUnit}>سم</div>
               </div>
@@ -490,12 +498,16 @@ export default function SubscribePage() {
               <div className={s.dualInp}>
                 <input
                   className={s.dualInpField}
-                  type="number"
-                  min={30}
-                  max={250}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   placeholder="٧٥"
                   value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v && !/^\d+$/.test(v)) return;
+                    setWeight(v);
+                  }}
                 />
                 <div className={s.dualUnit}>كجم</div>
               </div>

@@ -6,7 +6,7 @@ const features = [
     title: "طبيب يتابع حالتك",
     description:
       "طبيب مرخّص يقرأ نتائج تحاليلك ويفسّرها لك ويحدد الفيتامينات اللي تحتاجها بالضبط.",
-    icon: "/icons/widgets/icon-doctor.svg",
+    icon: "",
   },
   {
     title: "فحص دم شامل في المنزل",
@@ -18,7 +18,7 @@ const features = [
     title: "فيتامينات مخصصة لك",
     description:
       "مكملات غذائية يختارها الطبيب بناءً على نتائج تحاليلك الشخصية.",
-    icon: "/icons/widgets/icon-anxiety.svg",
+    icon: "/icons/widgets/icon-doctor.svg",
   },
   {
     title: "استشارة طبية في أي وقت",
