@@ -12,10 +12,6 @@ export default function SexualHealth() {
 
   const faqItems = [
     {
-      q: "هل سيظهر اسم الدواء على علبة الشحن؟",
-      a: "لا. العلبة بيج محايدة، بدون شعار لاباس، بدون ذكر الدواء، بدون أي إشارة طبّية. اسم المرسل يظهر \"شركة الخدمات اللوجستية\" فقط.",
-    },
-    {
       q: "هل هذه الأدوية أصلية أم مقلّدة؟",
       a: "أصلية وبوصفة طبّية. Sildenafil و Tadalafil جنريك معتمد — نفس المادة الفعّالة في Viagra و Cialis، تصنيع شركات دوائية مرخّصة، ومسجّلة لدى هيئة الغذاء والدواء السعودية.",
     },
@@ -24,8 +20,8 @@ export default function SexualHealth() {
       a: "هذا بالضبط سبب وجود تقييم طبّي. بعض أدوية الضغط (خاصة النترات) تتعارض تعارضاً خطيراً مع PDE5. الطبيب يراجع كل أدويتك قبل الموافقة على الوصفة.",
     },
     {
-      q: "كم يستغرق وصول الشحنة؟",
-      a: "٤٨ ساعة للرياض، جدة، الدمام. ٧٢ ساعة لباقي المدن. الشحن مجاني في كل الباقات.",
+      q: "كم يستغرق وصول الطلبية؟",
+      a: "٤٨ ساعة للرياض، جدة، الدمام. ٧٢ ساعة لباقي المدن. التوصيل مجاني في كل الباقات.",
     },
     {
       q: "هل يمكنني الإلغاء متى شئت؟",
@@ -42,7 +38,7 @@ export default function SexualHealth() {
     "وصفة من طبيب مرخّص",
     "٨ جرعات شهرياً",
     "استشارة عبر المحادثة",
-    "شحن مجاني في علبة محايدة",
+    "توصيل مجاني",
   ];
 
   const quarterlyFeatures = [
@@ -50,7 +46,7 @@ export default function SexualHealth() {
     "وصفة من طبيب مرخّص",
     "٢٤ جرعة كل ٣ أشهر",
     "استشارة عبر المحادثة",
-    "شحن مجاني في علبة محايدة",
+    "توصيل مجاني",
     "إمكانية تبديل الدواء مجاناً",
   ];
 
@@ -86,55 +82,6 @@ export default function SexualHealth() {
 
       {/* ─── HERO ─── */}
       <section className={styles.hero}>
-        {/* Floating ornaments */}
-        <div className={styles.heroParticles}>
-          {/* Male symbol - top left */}
-          <div className={`${styles.heroOrn} ${styles.o1}`}>
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M34.1353 17.6974L37.6206 12.8729L38.3144 17.2133L40.9283 16.7938L39.9279 10.6139L39.5084 8L36.8945 8.41952L30.7146 9.41991L31.1342 12.0338L35.4746 11.34L31.9732 16.1806C27.8909 14.0508 22.7437 15.1803 19.9685 19.0366C16.9027 23.2641 17.8547 29.1696 22.0822 32.2354C26.3097 35.285 32.2152 34.3491 35.281 30.1216C38.0885 26.2007 37.5238 20.9083 34.1353 17.6974ZM23.6473 30.0732C20.5977 27.8627 19.9201 23.6191 22.1145 20.5695C24.325 17.5199 28.5686 16.8422 31.6182 19.0366C34.6678 21.2472 35.3455 25.4908 33.1511 28.5404C30.9405 31.5899 26.6808 32.2676 23.6473 30.0732Z" fill="#173404" />
-            </svg>
-          </div>
-          {/* Female symbol - top right */}
-          <div className={`${styles.heroOrn} ${styles.o2}`}>
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M28.5202 20.6989C27.0519 15.697 21.7917 12.8249 16.7897 14.2932C11.7878 15.7615 8.91567 21.0216 10.384 26.0236C11.7232 30.6061 16.225 33.3813 20.8236 32.7198L21.8724 36.2857L19.1939 37.0763L19.9362 39.6096L22.6146 38.819L23.2923 41.1102L25.8256 40.368L25.1479 38.0767L28.0361 37.2377L27.2939 34.7044L24.4057 35.5435L23.3569 31.9776C27.5843 30.0575 29.8756 25.2814 28.5202 20.6989ZM12.9334 25.2814C11.8685 21.667 13.9499 17.8914 17.5481 16.8264C21.1624 15.7615 24.9381 17.8268 25.9869 21.4412C27.0519 25.0555 24.9865 28.8312 21.3722 29.8961C17.774 30.961 13.9822 28.8957 12.9334 25.2814Z" fill="#173404" />
-            </svg>
-          </div>
-          {/* Male symbol - bottom left */}
-          <div className={`${styles.heroOrn} ${styles.o3}`}>
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M34.1353 17.6974L37.6206 12.8729L38.3144 17.2133L40.9283 16.7938L39.9279 10.6139L39.5084 8L36.8945 8.41952L30.7146 9.41991L31.1342 12.0338L35.4746 11.34L31.9732 16.1806C27.8909 14.0508 22.7437 15.1803 19.9685 19.0366C16.9027 23.2641 17.8547 29.1696 22.0822 32.2354C26.3097 35.285 32.2152 34.3491 35.281 30.1216C38.0885 26.2007 37.5238 20.9083 34.1353 17.6974ZM23.6473 30.0732C20.5977 27.8627 19.9201 23.6191 22.1145 20.5695C24.325 17.5199 28.5686 16.8422 31.6182 19.0366C34.6678 21.2472 35.3455 25.4908 33.1511 28.5404C30.9405 31.5899 26.6808 32.2676 23.6473 30.0732Z" fill="#173404" opacity="0.7" />
-            </svg>
-          </div>
-          {/* Female symbol - bottom right */}
-          <div className={`${styles.heroOrn} ${styles.o4}`}>
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M28.5202 20.6989C27.0519 15.697 21.7917 12.8249 16.7897 14.2932C11.7878 15.7615 8.91567 21.0216 10.384 26.0236C11.7232 30.6061 16.225 33.3813 20.8236 32.7198L21.8724 36.2857L19.1939 37.0763L19.9362 39.6096L22.6146 38.819L23.2923 41.1102L25.8256 40.368L25.1479 38.0767L28.0361 37.2377L27.2939 34.7044L24.4057 35.5435L23.3569 31.9776C27.5843 30.0575 29.8756 25.2814 28.5202 20.6989ZM12.9334 25.2814C11.8685 21.667 13.9499 17.8914 17.5481 16.8264C21.1624 15.7615 24.9381 17.8268 25.9869 21.4412C27.0519 25.0555 24.9865 28.8312 21.3722 29.8961C17.774 30.961 13.9822 28.8957 12.9334 25.2814Z" fill="#173404" opacity="0.7" />
-            </svg>
-          </div>
-          {/* Heart sparks */}
-          <div className={`${styles.heroOrn} ${styles.h1}`}>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" />
-            </svg>
-          </div>
-          <div className={`${styles.heroOrn} ${styles.h2}`}>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.65" />
-            </svg>
-          </div>
-          <div className={`${styles.heroOrn} ${styles.h3}`}>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.55" />
-            </svg>
-          </div>
-          <div className={`${styles.heroOrn} ${styles.h4}`}>
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.55" />
-            </svg>
-          </div>
-        </div>
-
         <div className={styles.heroGrid}>
           {/* TEXT COLUMN */}
           <div>
@@ -144,15 +91,15 @@ export default function SexualHealth() {
             </div>
 
             <h1 className={styles.heroH1}>
-              الأداد اللي تبيه ، بخصوصية تامة
+              الأداء اللي تبيه،<br/><span className={styles.dim}>بخصوصية تامة</span>
             </h1>
 
             <p className={styles.heroLead}>
-              علاج <span className={styles.lat}>ED</span> بوصفة طبيب، يصلك في علبة محايدة، وتتابع طبيبك متى ما احتجت.
+              علاج <span className={styles.lat}>ED</span> بوصفة طبيب، وتتابع طبيبك متى ما احتجت.
             </p>
 
             <p className={styles.heroSub}>
-              احصل على علاج شخصي، أطبّاء ذوي خبرة، شحن مجاني، والمزيد. مكوّنات موثوقة طبّياً لأداء أطول.
+              احصل على علاج شخصي، أطبّاء ذوي خبرة، توصيل مجاني، والمزيد. مكوّنات موثوقة طبّياً لأداء أطول.
             </p>
 
             <ul className={styles.heroBullets}>
@@ -182,9 +129,6 @@ export default function SexualHealth() {
                 اشترك الآن
                 <span className={styles.heroBtnArr}>&larr;</span>
               </Link>
-              <Link href="#plansSec" className={styles.heroBtnGhost}>
-                شاهد الباقات
-              </Link>
             </div>
 
             <div className={styles.heroTrust}>
@@ -202,6 +146,49 @@ export default function SexualHealth() {
 
           {/* VISUAL COLUMN */}
           <div className={styles.heroVisual}>
+            {/* Floating ornaments */}
+            <div className={styles.heroParticles}>
+              <div className={`${styles.heroOrn} ${styles.o1}`}>
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M34.1353 17.6974L37.6206 12.8729L38.3144 17.2133L40.9283 16.7938L39.9279 10.6139L39.5084 8L36.8945 8.41952L30.7146 9.41991L31.1342 12.0338L35.4746 11.34L31.9732 16.1806C27.8909 14.0508 22.7437 15.1803 19.9685 19.0366C16.9027 23.2641 17.8547 29.1696 22.0822 32.2354C26.3097 35.285 32.2152 34.3491 35.281 30.1216C38.0885 26.2007 37.5238 20.9083 34.1353 17.6974ZM23.6473 30.0732C20.5977 27.8627 19.9201 23.6191 22.1145 20.5695C24.325 17.5199 28.5686 16.8422 31.6182 19.0366C34.6678 21.2472 35.3455 25.4908 33.1511 28.5404C30.9405 31.5899 26.6808 32.2676 23.6473 30.0732Z" fill="#173404" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.o2}`}>
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M28.5202 20.6989C27.0519 15.697 21.7917 12.8249 16.7897 14.2932C11.7878 15.7615 8.91567 21.0216 10.384 26.0236C11.7232 30.6061 16.225 33.3813 20.8236 32.7198L21.8724 36.2857L19.1939 37.0763L19.9362 39.6096L22.6146 38.819L23.2923 41.1102L25.8256 40.368L25.1479 38.0767L28.0361 37.2377L27.2939 34.7044L24.4057 35.5435L23.3569 31.9776C27.5843 30.0575 29.8756 25.2814 28.5202 20.6989ZM12.9334 25.2814C11.8685 21.667 13.9499 17.8914 17.5481 16.8264C21.1624 15.7615 24.9381 17.8268 25.9869 21.4412C27.0519 25.0555 24.9865 28.8312 21.3722 29.8961C17.774 30.961 13.9822 28.8957 12.9334 25.2814Z" fill="#173404" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.o3}`}>
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M34.1353 17.6974L37.6206 12.8729L38.3144 17.2133L40.9283 16.7938L39.9279 10.6139L39.5084 8L36.8945 8.41952L30.7146 9.41991L31.1342 12.0338L35.4746 11.34L31.9732 16.1806C27.8909 14.0508 22.7437 15.1803 19.9685 19.0366C16.9027 23.2641 17.8547 29.1696 22.0822 32.2354C26.3097 35.285 32.2152 34.3491 35.281 30.1216C38.0885 26.2007 37.5238 20.9083 34.1353 17.6974ZM23.6473 30.0732C20.5977 27.8627 19.9201 23.6191 22.1145 20.5695C24.325 17.5199 28.5686 16.8422 31.6182 19.0366C34.6678 21.2472 35.3455 25.4908 33.1511 28.5404C30.9405 31.5899 26.6808 32.2676 23.6473 30.0732Z" fill="#173404" opacity="0.7" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.o4}`}>
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M28.5202 20.6989C27.0519 15.697 21.7917 12.8249 16.7897 14.2932C11.7878 15.7615 8.91567 21.0216 10.384 26.0236C11.7232 30.6061 16.225 33.3813 20.8236 32.7198L21.8724 36.2857L19.1939 37.0763L19.9362 39.6096L22.6146 38.819L23.2923 41.1102L25.8256 40.368L25.1479 38.0767L28.0361 37.2377L27.2939 34.7044L24.4057 35.5435L23.3569 31.9776C27.5843 30.0575 29.8756 25.2814 28.5202 20.6989ZM12.9334 25.2814C11.8685 21.667 13.9499 17.8914 17.5481 16.8264C21.1624 15.7615 24.9381 17.8268 25.9869 21.4412C27.0519 25.0555 24.9865 28.8312 21.3722 29.8961C17.774 30.961 13.9822 28.8957 12.9334 25.2814Z" fill="#173404" opacity="0.7" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.h1}`}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.h2}`}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.65" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.h3}`}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.55" />
+                </svg>
+              </div>
+              <div className={`${styles.heroOrn} ${styles.h4}`}>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 20 L4 12 C1 9 3 4 7 4 C9.5 4 11 5.5 12 7 C13 5.5 14.5 4 17 4 C21 4 23 9 20 12 Z" fill="#173404" opacity="0.55" />
+                </svg>
+              </div>
+            </div>
             {/* Spinning pill */}
             <div className={`${styles.pillWrap} ${styles.blister}`}>
               <svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
@@ -340,7 +327,7 @@ export default function SexualHealth() {
         </div>
         <h2 className={styles.secTtl}>أربع خطوات — كلّها من بيتك</h2>
         <p className={styles.secSub}>
-          لا زيارات عيادة، لا صيدلي يراك، لا مواعيد محرجة. تقييم سريع، وصفة من طبيب، وشحنة سرّيّة.
+          لا زيارات عيادة، لا مواعيد. تقييم سريع، وصفة من طبيب، وتوصيل سريع.
         </p>
 
         <div className={styles.howSteps}>
@@ -360,9 +347,9 @@ export default function SexualHealth() {
           </div>
           <div className={styles.howStep}>
             <div className={styles.howStepNum}>٣</div>
-            <h3 className={styles.howStepTtl}>شحنة محايدة</h3>
+            <h3 className={styles.howStepTtl}>توصيل سريع</h3>
             <p className={styles.howStepDesc}>
-              علبة بدون أي دليل على محتواها تصل إلى بابك خلال ٤٨-٧٢ ساعة.
+              يوصلك طلبك خلال ٤٨-٧٢ ساعة.
             </p>
           </div>
           <div className={styles.howStep}>
@@ -389,51 +376,51 @@ export default function SexualHealth() {
         <div className={styles.treatsGrid}>
           {/* Sildenafil Card */}
           <div className={styles.treatCard}>
-            <div className={styles.treatArt}>
-              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="60" cy="60" r="48" fill="#7aa3d4" />
-                <circle cx="60" cy="60" r="48" fill="#bfd6ef" opacity="0.4" />
-                <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
-              </svg>
-            </div>
-            <div className={styles.treatBody}>
+            <div className={styles.treatNmRow}>
+              <div className={styles.treatArt}>
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="60" cy="60" r="48" fill="#7aa3d4" />
+                  <circle cx="60" cy="60" r="48" fill="#bfd6ef" opacity="0.4" />
+                  <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
+                </svg>
+              </div>
               <h3 className={styles.treatNm}>Sildenafil</h3>
-              <div className={styles.treatSub}>جنريك <em>Viagra&reg;</em> &middot; نفس المادة الفعّالة</div>
-              <p className={styles.treatDesc}>
-                يعمل خلال ٣٠-٦٠ دقيقة، ويدوم مفعوله حتى ٤-٥ ساعات. الأنسب للمواعيد المخطّطة.
-              </p>
-              <div className={styles.treatMeta}>
-                <div className={styles.treatPill}>25 / 50 / 100 mg</div>
-                <div className={styles.treatPill}>عند الحاجة</div>
-              </div>
-              <div className={styles.treatPrice}>
-                يبدأ من <span className={styles.treatPriceNum}>١٥</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
-              </div>
+            </div>
+            <div className={styles.treatSub}>جنريك <em>Viagra&reg;</em> &middot; نفس المادة الفعّالة</div>
+            <p className={styles.treatDesc}>
+              يعمل خلال ٣٠-٦٠ دقيقة، ويدوم مفعوله حتى ٤-٥ ساعات. الأنسب للمواعيد المخطّطة.
+            </p>
+            <div className={styles.treatMeta}>
+              <div className={styles.treatPill}>25 / 50 / 100 mg</div>
+              <div className={styles.treatPill}>عند الحاجة</div>
+            </div>
+            <div className={styles.treatPrice}>
+              يبدأ من <span className={styles.treatPriceNum}>١٥</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
             </div>
           </div>
 
           {/* Tadalafil Card */}
           <div className={styles.treatCard}>
-            <div className={styles.treatArt}>
-              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="60" cy="60" r="48" fill="#d87a6c" />
-                <circle cx="60" cy="60" r="48" fill="#f2a59a" opacity="0.4" />
-                <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
-              </svg>
-            </div>
-            <div className={styles.treatBody}>
+            <div className={styles.treatNmRow}>
+              <div className={styles.treatArt}>
+                <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="60" cy="60" r="48" fill="#d87a6c" />
+                  <circle cx="60" cy="60" r="48" fill="#f2a59a" opacity="0.4" />
+                  <circle cx="48" cy="44" r="14" fill="#ffffff" opacity="0.2" />
+                </svg>
+              </div>
               <h3 className={styles.treatNm}>Tadalafil</h3>
-              <div className={styles.treatSub}>جنريك <em>Cialis&reg;</em> &middot; نفس المادة الفعّالة</div>
-              <p className={styles.treatDesc}>
-                يعمل خلال ٣٠-١٢٠ دقيقة، ويدوم حتى ٣٦ ساعة. الأنسب للعفوية. متوفّر بجرعة يومية منخفضة.
-              </p>
-              <div className={styles.treatMeta}>
-                <div className={styles.treatPill}>2.5 / 5 / 10 / 20 mg</div>
-                <div className={styles.treatPill}>يومي أو عند الحاجة</div>
-              </div>
-              <div className={styles.treatPrice}>
-                يبدأ من <span className={styles.treatPriceNum}>١٨</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
-              </div>
+            </div>
+            <div className={styles.treatSub}>جنريك <em>Cialis&reg;</em> &middot; نفس المادة الفعّالة</div>
+            <p className={styles.treatDesc}>
+              يعمل خلال ٣٠-١٢٠ دقيقة، ويدوم حتى ٣٦ ساعة. الأنسب للعفوية. متوفّر بجرعة يومية منخفضة.
+            </p>
+            <div className={styles.treatMeta}>
+              <div className={styles.treatPill}>2.5 / 5 / 10 / 20 mg</div>
+              <div className={styles.treatPill}>يومي أو عند الحاجة</div>
+            </div>
+            <div className={styles.treatPrice}>
+              يبدأ من <span className={styles.treatPriceNum}>١٨</span> ريال <span className={styles.treatPriceFrom}>/ الجرعة</span>
             </div>
           </div>
         </div>
@@ -522,7 +509,7 @@ export default function SexualHealth() {
               </svg>
             </div>
             <h4 className={styles.pillarTtl}>خصوصية تامّة</h4>
-            <p className={styles.pillarDesc}>علبة محايدة بدون شعار، رقم جوّالك لا يُشارَك، ودفعك يظهر &quot;Labass&quot; على البيان فقط.</p>
+            <p className={styles.pillarDesc}>رقم جوّالك لا يُشارَك، ودفعك يظهر &quot;Labass&quot; على البيان فقط.</p>
           </div>
 
           {/* 2. Saudi Doctor */}
@@ -566,7 +553,7 @@ export default function SexualHealth() {
               </svg>
             </div>
             <h4 className={styles.pillarTtl}>سعر ثابت، بلا مفاجآت</h4>
-            <p className={styles.pillarDesc}>اشتراك بسعر واضح، شحن مجاني، ولا رسوم استشارة إضافية. ألغِ متى شئت.</p>
+            <p className={styles.pillarDesc}>اشتراك بسعر واضح، توصيل مجاني، ولا رسوم استشارة إضافية. ألغِ متى شئت.</p>
           </div>
 
           {/* 5. Consultation */}
@@ -595,7 +582,7 @@ export default function SexualHealth() {
                 <rect x="14" y="21.5" width="7" height="5" rx="0.5" fill="#BCE1A4" />
               </svg>
             </div>
-            <h4 className={styles.pillarTtl}>شحن سريع</h4>
+            <h4 className={styles.pillarTtl}>توصيل سريع</h4>
             <p className={styles.pillarDesc}>٤٨-٧٢ ساعة لأغلب المدن السعودية. توصيل مجاني على كل الباقات.</p>
           </div>
         </div>
@@ -633,7 +620,7 @@ export default function SexualHealth() {
             <span className={styles.secEyebrowDot} />
             فريقنا الطبّي
           </div>
-          <h2 className={styles.secTtl}>طبيب حقيقي، ليس نموذج ذكاء اصطناعي</h2>
+          <h2 className={styles.secTtl}>طبيب حقيقي</h2>
           <p className={styles.secSub} style={{ marginBottom: "24px" }}>
             ضعف الانتصاب غالباً مؤشّر على مشكلة صحّية أخرى — القلب، السكّر، الهرمونات. لذلك المراجعة الطبّية الحقيقية مهمّة.
           </p>
@@ -1041,7 +1028,7 @@ export default function SexualHealth() {
             <span className={styles.ctaBtnArr}>&larr;</span>
           </Link>
           <p className={styles.ctaFoot}>
-            مشفّر &middot; متوافق مع PDPL السعودي &middot; شحن محايد
+            مشفّر &middot; متوافق مع PDPL السعودي
           </p>
         </div>
       </section>

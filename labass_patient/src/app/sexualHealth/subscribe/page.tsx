@@ -769,7 +769,7 @@ export default function SexualHealthSubscribePage() {
               <div className={s.privacyIc}>🔒</div>
               <p className={s.privacyTxt}>
                 <strong>سرّيّتك أولاً.</strong> الدفع يظهر في بيانك البنكي باسم
-                &quot;Labass&quot; فقط. الشحنة بعلبة محايدة. رقم جوّالك لا
+                &quot;Labass&quot; فقط. رقم جوّالك لا
                 يُشارَك مع طرف ثالث.
               </p>
             </div>
@@ -887,14 +887,13 @@ export default function SexualHealthSubscribePage() {
                 <div className={s.nextNum}>٢</div>
                 <div className={s.nextTxt}>
                   <strong>تأكيد الوصفة:</strong> يصلك إشعار بقبول الوصفة
-                  وتفاصيل الشحنة.
+                  وتفاصيل التوصيل.
                 </div>
               </li>
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٣</div>
                 <div className={s.nextTxt}>
-                  <strong>٤٨-٧٢ ساعة:</strong> الشحنة تصل في علبة محايدة، بدون
-                  شعار، بدون ذكر المحتوى.
+                  <strong>٤٨-٧٢ ساعة:</strong> الطلبية توصلك لبابك.
                 </div>
               </li>
               <li className={s.nextItem}>
