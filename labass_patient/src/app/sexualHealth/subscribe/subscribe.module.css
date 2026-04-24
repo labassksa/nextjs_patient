@@ -50,6 +50,7 @@
 /* NUMBER INPUT */
 .qInpWrap { position: relative; display: flex; align-items: center; background: #ffffff; border: 1px solid rgba(23,52,4,0.15); border-radius: 10px; overflow: hidden; max-width: 260px; transition: border-color 0.2s; }
 .qInpWrap:focus-within { border-color: #173404; }
+.qInpFilled { color: #173404; font-weight: 600; }
 .qInp { flex: 1; padding: 12px 14px; border: none; background: transparent; font-size: 14px; font-family: inherit; color: #0d2002; direction: rtl; outline: none; width: 100%; font-weight: 500; }
 .qInpUnit { padding: 12px 14px; font-size: 12px; color: rgba(23,52,4,0.55); font-weight: 500; border-right: 1px solid rgba(23,52,4,0.1); }
 

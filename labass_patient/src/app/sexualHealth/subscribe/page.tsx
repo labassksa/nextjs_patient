@@ -37,6 +37,7 @@ export default function SexualHealthSubscribePage() {
   const [otpSent, setOtpSent] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const qRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const plan = "quarterly";
   const price = PLANS[plan].price;
@@ -60,8 +61,17 @@ export default function SexualHealthSubscribePage() {
   };
 
   /* helpers */
+  const scrollToNext = (currentKey: string) => {
+    const num = parseInt(currentKey.replace("q", ""));
+    const nextKey = `q${num + 1}`;
+    setTimeout(() => {
+      qRefs.current[nextKey]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 250);
+  };
+
   const pickOne = (key: string, val: string) => {
     setAnswers((prev) => ({ ...prev, [key]: val }));
+    scrollToNext(key);
   };
 
   const toggleCb = (key: string, val: string) => {
@@ -93,14 +103,14 @@ export default function SexualHealthSubscribePage() {
     switch (currentStep) {
       case 1: {
         const name = (answers.q1 as string) || "";
-        const age = parseInt(answers.q2 as string);
-        const height = parseInt(answers.q3 as string);
-        const weight = parseInt(answers.q4 as string);
+        const age = (answers.q2 as string) || "";
+        const height = (answers.q3 as string) || "";
+        const weight = (answers.q4 as string) || "";
         return (
-          name.length >= 2 &&
-          age >= 18 && age <= 100 &&
-          height >= 140 && height <= 220 &&
-          weight >= 40 && weight <= 200
+          name.trim().length >= 2 &&
+          age.length > 0 && parseInt(age) > 0 &&
+          height.length > 0 && parseInt(height) > 0 &&
+          weight.length > 0 && parseInt(weight) > 0
         );
       }
       case 2:
@@ -201,14 +211,16 @@ export default function SexualHealthSubscribePage() {
     num,
     text,
     note,
+    qKey,
     children,
   }: {
     num: string;
     text: string;
     note?: string;
+    qKey?: string;
     children: React.ReactNode;
   }) => (
-    <div className={s.qBlock}>
+    <div className={s.qBlock} ref={qKey ? (el) => { qRefs.current[qKey] = el; } : undefined}>
       <div className={s.qLbl}>
         <div className={s.qNum}>{num}</div>
         <div className={s.qTxt}>
@@ -287,11 +299,18 @@ export default function SexualHealthSubscribePage() {
   }) => (
     <div className={s.qInpWrap}>
       <input
-        className={s.qInp}
+        className={`${s.qInp} ${(answers[qKey] as string)?.length > 0 ? s.qInpFilled : ""}`}
         type={type}
+        inputMode={type === "number" ? "numeric" : undefined}
         placeholder={placeholder}
         value={(answers[qKey] as string) || ""}
-        onInput={(e) => setInput(qKey, (e.target as HTMLInputElement).value)}
+        onChange={(e) => setInput(qKey, e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            scrollToNext(qKey);
+          }
+        }}
       />
       {unit && <div className={s.qInpUnit}>{unit}</div>}
     </div>
@@ -371,17 +390,17 @@ export default function SexualHealthSubscribePage() {
             أي جهة خارجية.
           </p>
 
-          <QuestionBlock num="١" text="ما اسمك الكامل؟">
+          <QuestionBlock num="١" text="ما اسمك الكامل؟" qKey="q1">
             <NumberInput qKey="q1" type="text" placeholder="مثال: محمد عبدالله" />
           </QuestionBlock>
-          <QuestionBlock num="٢" text="ما عمرك؟">
-            <NumberInput qKey="q2" unit="سنة" />
+          <QuestionBlock num="٢" text="ما عمرك؟" qKey="q2">
+            <NumberInput qKey="q2" unit="سنة" placeholder="مثال: ٣٥" />
           </QuestionBlock>
-          <QuestionBlock num="٣" text="ما طولك؟">
-            <NumberInput qKey="q3" unit="سم" />
+          <QuestionBlock num="٣" text="ما طولك؟" qKey="q3">
+            <NumberInput qKey="q3" unit="سم" placeholder="مثال: ١٧٥" />
           </QuestionBlock>
-          <QuestionBlock num="٤" text="ما وزنك؟">
-            <NumberInput qKey="q4" unit="كجم" />
+          <QuestionBlock num="٤" text="ما وزنك؟" qKey="q4">
+            <NumberInput qKey="q4" unit="كجم" placeholder="مثال: ٨٠" />
           </QuestionBlock>
         </div>
       )}
@@ -402,7 +421,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٥"
             text="خلال الأسابيع الستة الماضية، ما مدى ثقتك في قدرتك على الحصول على انتصاب والمحافظة عليه؟"
-          >
+           qKey="q5">
             <SingleSelect
               qKey="q5"
               options={[
@@ -418,7 +437,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٦"
             text="عند الإثارة، كم مرة كان الانتصاب قوياً بما يكفي للإيلاج؟"
-          >
+           qKey="q6">
             <SingleSelect
               qKey="q6"
               options={[
@@ -434,7 +453,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٧"
             text="خلال الجماع، كم مرة تمكّنت من الحفاظ على الانتصاب بعد الإيلاج؟"
-          >
+           qKey="q7">
             <SingleSelect
               qKey="q7"
               options={[
@@ -450,7 +469,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٨"
             text="خلال الجماع، ما مدى صعوبة الحفاظ على الانتصاب حتى إكمال الجماع؟"
-          >
+           qKey="q8">
             <SingleSelect
               qKey="q8"
               options={[
@@ -466,7 +485,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٩"
             text="عند محاولة الجماع، كم مرة كان الأمر مرضياً لك؟"
-          >
+           qKey="q9">
             <SingleSelect
               qKey="q9"
               options={[
@@ -479,7 +498,7 @@ export default function SexualHealthSubscribePage() {
             />
           </QuestionBlock>
 
-          <QuestionBlock num="١٠" text="متى بدأت تلاحظ المشكلة؟">
+          <QuestionBlock num="١٠" text="متى بدأت تلاحظ المشكلة؟" qKey="q10">
             <SingleSelect
               qKey="q10"
               options={[
@@ -494,7 +513,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="١١"
             text="هل تلاحظ انتصاباً تلقائياً في الصباح أو أثناء النوم؟"
-          >
+           qKey="q11">
             <YesNo
               qKey="q11"
               labels={{ yes: "نعم، أحياناً", no: "نادراً أو لا" }}
@@ -539,35 +558,35 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="١٣"
             text="هل أُصبت بنوبة قلبية أو جلطة دماغية خلال الستة أشهر الماضية؟"
-          >
+           qKey="q13">
             <YesNo qKey="q13" />
           </QuestionBlock>
 
           <QuestionBlock
             num="١٤"
             text="هل تشعر بألم في الصدر عند المجهود أو الجماع؟"
-          >
+           qKey="q14">
             <YesNo qKey="q14" />
           </QuestionBlock>
 
           <QuestionBlock
             num="١٥"
             text="هل هناك تاريخ عائلي لوفاة مبكّرة بأمراض القلب؟"
-          >
+           qKey="q15">
             <YesNo qKey="q15" />
           </QuestionBlock>
 
           <QuestionBlock
             num="١٦"
             text="هل خضعت لأي عملية جراحية في الجهاز التناسلي أو البروستاتا؟"
-          >
+           qKey="q16">
             <YesNo qKey="q16" />
           </QuestionBlock>
 
           <QuestionBlock
             num="١٧"
             text="هل لديك مرض في شبكية العين (اعتلال شبكي صباغي)؟"
-          >
+           qKey="q17">
             <YesNo qKey="q17" />
           </QuestionBlock>
         </div>
@@ -592,7 +611,7 @@ export default function SexualHealthSubscribePage() {
             <strong>ممنوعة عليك تماماً</strong> — قد يحدث هبوط حادّ في ضغط الدم.
           </div>
 
-          <QuestionBlock num="١٨" text="هل تتناول أي من الأدوية التالية؟">
+          <QuestionBlock num="١٨" text="هل تتناول أي من الأدوية التالية؟" qKey="q18">
             <MultiSelect
               qKey="q18"
               options={[
@@ -611,7 +630,7 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="١٩"
             text="هل جرّبت Viagra أو Cialis من قبل؟"
-          >
+           qKey="q19">
             <SingleSelect
               qKey="q19"
               options={[
@@ -626,11 +645,11 @@ export default function SexualHealthSubscribePage() {
           <QuestionBlock
             num="٢٠"
             text="هل عانيت من آثار جانبية مع أي دواء سابقاً (صداع، احمرار، عسر هضم)؟"
-          >
+           qKey="q20">
             <YesNo qKey="q20" />
           </QuestionBlock>
 
-          <QuestionBlock num="٢١" text="هل لديك حساسية من أي دواء؟">
+          <QuestionBlock num="٢١" text="هل لديك حساسية من أي دواء؟" qKey="q21">
             <YesNo qKey="q21" />
           </QuestionBlock>
         </div>
@@ -648,7 +667,7 @@ export default function SexualHealthSubscribePage() {
             نمط حياتك يحدّد أيّ دواء وأيّ جرعة. كُن دقيقاً.
           </p>
 
-          <QuestionBlock num="٢٢" text="هل تدخّن؟">
+          <QuestionBlock num="٢٢" text="هل تدخّن؟" qKey="q22">
             <SingleSelect
               qKey="q22"
               options={[
@@ -660,7 +679,7 @@ export default function SexualHealthSubscribePage() {
             />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٣" text="كم مرة تمارس الرياضة أسبوعياً؟">
+          <QuestionBlock num="٢٣" text="كم مرة تمارس الرياضة أسبوعياً؟" qKey="q23">
             <SingleSelect
               qKey="q23"
               options={[
@@ -672,7 +691,7 @@ export default function SexualHealthSubscribePage() {
             />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٤" text="كيف تقيّم مستوى التوتّر لديك مؤخراً؟">
+          <QuestionBlock num="٢٤" text="كيف تقيّم مستوى التوتّر لديك مؤخراً؟" qKey="q24">
             <SingleSelect
               qKey="q24"
               options={[
@@ -684,7 +703,7 @@ export default function SexualHealthSubscribePage() {
             />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٥" text="هل تشعر بقلق قبل أو أثناء الجماع؟">
+          <QuestionBlock num="٢٥" text="هل تشعر بقلق قبل أو أثناء الجماع؟" qKey="q25">
             <SingleSelect
               qKey="q25"
               options={[
@@ -696,7 +715,7 @@ export default function SexualHealthSubscribePage() {
             />
           </QuestionBlock>
 
-          <QuestionBlock num="٢٦" text="أيّ الخيارين يناسبك أكثر؟">
+          <QuestionBlock num="٢٦" text="أيّ الخيارين يناسبك أكثر؟" qKey="q26">
             <SingleSelect
               qKey="q26"
               className={s.qPrefGrid}
