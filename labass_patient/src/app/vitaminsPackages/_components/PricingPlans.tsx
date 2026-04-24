@@ -53,7 +53,7 @@ const PricingPlans: React.FC = () => {
             <ul className="text-xs text-gray-700 space-y-2 mb-5 text-right">
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                فحص دم منزلي شامل
+                فحص دم من مختبر معتمد بأعلى معايير الجودة
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
@@ -65,7 +65,7 @@ const PricingPlans: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                استشر طبيبك في أي وقت
+                استشر الطبيب في أي وقت
               </li>
             </ul>
             <Link
@@ -108,7 +108,7 @@ const PricingPlans: React.FC = () => {
             <ul className="text-sm text-gray-700 space-y-2 mb-6 text-right">
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                فحص دم منزلي شامل
+                فحص دم من مختبر معتمد بأعلى معايير الجودة
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
@@ -120,7 +120,7 @@ const PricingPlans: React.FC = () => {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-custom-green">&#10003;</span>
-                استشر طبيبك في أي وقت
+                استشر الطبيب في أي وقت
               </li>
             </ul>
             <Link
