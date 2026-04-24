@@ -4,9 +4,100 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./sexualHealth.module.css";
 
+const blogArticles = [
+  {
+    slug: "ed-prevalence",
+    cat: "صحة الرجل",
+    title: "ضعف الانتصاب: كم هو شائع فعلاً؟ الأرقام التي يخفيها الصمت",
+    author: "فريق لاباس · القسم الطبّي",
+    readTime: "١٠ دقائق قراءة",
+    date: "٢٢ أبريل ٢٠٢٦",
+    refs: "مراجع من: Arab J Urology, J Sex Medicine, Cureus",
+    refsCount: "٥",
+    content: [
+      { type: "lead" as const, text: "مراجعة موسّعة لأبحاث الأندرولوجيا الخليجية — من دراسة El-Sakka في Int J Impotence Research التي رصدت خصائص ED في مرضى سعوديين، إلى GOSS العربية التي شملت ٨٠٤ رجلاً من الشرق الأوسط." },
+      { type: "heading" as const, text: "ما مدى انتشار ضعف الانتصاب؟" },
+      { type: "paragraph" as const, text: "تشير الدراسات الحديثة إلى أن ضعف الانتصاب يصيب ما بين ٢٥٪ إلى ٤٠٪ من الرجال فوق سن الأربعين في المنطقة العربية. النسبة ترتفع مع التقدّم في العمر، لتصل إلى أكثر من ٧٠٪ بعد سن الستّين." },
+      { type: "paragraph" as const, text: "في دراسة El-Sakka التي شملت مرضى سعوديين، وُجد أن ٨٦٪ من مرضى السكري من النوع الثاني يعانون من درجة ما من ضعف الانتصاب. كما أن ارتفاع ضغط الدم وأمراض القلب من العوامل المرتبطة بقوة." },
+      { type: "heading" as const, text: "لماذا لا يتحدّث الرجال عن المشكلة؟" },
+      { type: "paragraph" as const, text: "رغم الانتشار الواسع، أظهرت دراسة GOSS أن ٢٨٪ فقط من المصابين ناقشوا المشكلة مع طبيبهم. الحاجز الأكبر ليس طبّياً — بل ثقافي واجتماعي. كثير من الرجال يعتبرون الموضوع محرجاً أو علامة ضعف." },
+      { type: "callout" as const, text: "هذا بالضبط ما صُمّم لاباس لحلّه: منصة خاصّة وسرّيّة تتيح لك التحدّث مع طبيب مرخّص دون الحاجة لزيارة عيادة." },
+      { type: "heading" as const, text: "ما هي الخيارات العلاجية المتاحة؟" },
+      { type: "paragraph" as const, text: "الأدوية من فئة PDE5 inhibitors (مثل Sildenafil و Tadalafil) تُعتبر الخطّ الأول في العلاج. نسبة نجاحها تصل إلى ٦٦٪ في التجارب السريرية الكبرى. يختار الطبيب الدواء المناسب بناءً على حالتك الصحية ونمط حياتك." },
+      { type: "paragraph" as const, text: "إلى جانب الأدوية، هناك تغييرات في نمط الحياة أثبتت فعاليتها: فقدان الوزن، ممارسة الرياضة بانتظام، الإقلاع عن التدخين، وتقليل التوتر — كلها عوامل تحسّن الأداء بشكل ملحوظ." },
+    ],
+  },
+  {
+    slug: "pde5-explained",
+    cat: "فسيولوجيا",
+    title: "كيف تعمل أدوية PDE5؟ الشرح العلمي المبسّط",
+    author: "فريق لاباس",
+    readTime: "٧ دقائق",
+    date: "",
+    refs: "BMJ, FDA Labels",
+    refsCount: "٤",
+    content: [
+      { type: "lead" as const, text: "Sildenafil و Tadalafil — نفس الآلية، لكن اختلافات مهمّة في التوقيت والمدّة. إليك الشرح العلمي بلغة بسيطة." },
+      { type: "heading" as const, text: "ما هو إنزيم PDE5؟" },
+      { type: "paragraph" as const, text: "PDE5 (فوسفوديستيراز النوع الخامس) هو إنزيم طبيعي في الجسم، يوجد بتركيز عالٍ في الأوعية الدموية للعضو الذكري. وظيفته تحليل مادة cGMP المسؤولة عن استرخاء العضلات الملساء وتدفّق الدم." },
+      { type: "paragraph" as const, text: "عند التنبيه الجنسي، يُفرز أكسيد النيتريك (NO) الذي ينشّط إنتاج cGMP. هذا يؤدي لاسترخاء العضلات الملساء في الأوعية الدموية، ممّا يسمح بتدفّق الدم وحدوث الانتصاب." },
+      { type: "heading" as const, text: "كيف تعمل الأدوية؟" },
+      { type: "paragraph" as const, text: "أدوية PDE5 inhibitors تمنع عمل الإنزيم مؤقّتاً، ممّا يحافظ على مستوى cGMP مرتفعاً لفترة أطول. النتيجة: انتصاب أقوى يدوم لوقت كافٍ." },
+      { type: "callout" as const, text: "مهم: هذه الأدوية لا تسبّب انتصاباً تلقائياً — يجب أن يكون هناك تنبيه جنسي طبيعي أولاً. الدواء يُسهّل الاستجابة، لا يخلقها." },
+      { type: "heading" as const, text: "الفرق بين Sildenafil و Tadalafil" },
+      { type: "paragraph" as const, text: "Sildenafil (جنريك Viagra): يبدأ مفعوله خلال ٣٠-٦٠ دقيقة ويستمر ٤-٥ ساعات. مناسب للمواعيد المخطّطة. يُفضّل تناوله على معدة فارغة." },
+      { type: "paragraph" as const, text: "Tadalafil (جنريك Cialis): يبدأ خلال ٣٠-١٢٠ دقيقة لكنه يستمر حتى ٣٦ ساعة. مناسب للعفوية. متوفّر بجرعة يومية منخفضة (2.5-5mg) للاستخدام المستمر." },
+    ],
+  },
+  {
+    slug: "ed-heart-diabetes",
+    cat: "قلب وسكّر",
+    title: "ضعف الانتصاب كإنذار مبكّر لأمراض القلب والسكّري",
+    author: "فريق لاباس",
+    readTime: "٨ دقائق",
+    date: "",
+    refs: "Circulation, JACC",
+    refsCount: "٤",
+    content: [
+      { type: "lead" as const, text: "العلاقة ليست صدفة — الأوعية الدموية في العضو الذكري من الأضيق في الجسم، وتتأثّر أولاً." },
+      { type: "heading" as const, text: "العلاقة بين ضعف الانتصاب وأمراض القلب" },
+      { type: "paragraph" as const, text: "أظهرت دراسات نُشرت في مجلة Circulation أن ضعف الانتصاب يسبق أمراض القلب بـ ٢-٥ سنوات في كثير من الحالات. السبب بسيط: الأوعية الدموية الصغيرة تتأثّر بتصلّب الشرايين قبل الكبيرة." },
+      { type: "paragraph" as const, text: "الشرايين التي تغذّي العضو الذكري قطرها ١-٢ ملم فقط، بينما الشرايين التاجية قطرها ٣-٤ ملم. لذلك، نفس الترسّبات التي ستسبب ذبحة صدرية لاحقاً، تظهر أعراضها أولاً كضعف انتصاب." },
+      { type: "callout" as const, text: "إذا كنت تعاني من ضعف الانتصاب وعمرك أقل من ٥٠ — هذا ليس مجرد مشكلة جنسية، بل قد يكون إنذاراً مبكراً يستحقّ الفحص." },
+      { type: "heading" as const, text: "السكّري وضعف الانتصاب" },
+      { type: "paragraph" as const, text: "٨٦٪ من مرضى السكري من النوع الثاني يعانون من درجة ما من ضعف الانتصاب. ارتفاع السكر المزمن يؤذي الأعصاب والأوعية الدموية الدقيقة، ممّا يؤثّر مباشرة على القدرة الجنسية." },
+      { type: "paragraph" as const, text: "الخبر الجيد: السيطرة على السكر، فقدان الوزن، وأدوية PDE5 يمكن أن تحسّن الوضع بشكل ملحوظ حتى مع وجود السكّري." },
+    ],
+  },
+  {
+    slug: "lifestyle-changes",
+    cat: "نمط حياة",
+    title: "خمس تغييرات في نمط الحياة تحسّن الأداء بدون دواء",
+    author: "فريق لاباس",
+    readTime: "٦ دقائق",
+    date: "",
+    refs: "JAMA Internal Medicine, Am J Med",
+    refsCount: "٣",
+    content: [
+      { type: "lead" as const, text: "النوم، الرياضة، التوتّر، التدخين، والوزن — الدراسات تؤكّد الأرقام." },
+      { type: "heading" as const, text: "١. خسارة الوزن الزائد" },
+      { type: "paragraph" as const, text: "دراسة نُشرت في JAMA أظهرت أن خسارة ١٠٪ من وزن الجسم حسّنت وظيفة الانتصاب عند ثلث المشاركين بدون أي دواء. الدهون الزائدة تخفض التستوستيرون وتزيد الالتهابات." },
+      { type: "heading" as const, text: "٢. التمارين الرياضية" },
+      { type: "paragraph" as const, text: "١٥٠ دقيقة من التمارين المعتدلة أسبوعياً (مشي سريع، سباحة) تحسّن تدفّق الدم وتخفض ضغط الدم. تمارين كيجل تقوّي عضلات الحوض المسؤولة عن الانتصاب." },
+      { type: "heading" as const, text: "٣. تحسين النوم" },
+      { type: "paragraph" as const, text: "٧-٩ ساعات نوم جيد ضرورية. قلة النوم تخفض التستوستيرون بنسبة تصل إلى ١٥٪. انقطاع النفس أثناء النوم مرتبط بقوة بضعف الانتصاب." },
+      { type: "heading" as const, text: "٤. الإقلاع عن التدخين" },
+      { type: "paragraph" as const, text: "التدخين يضيّق الأوعية الدموية ويتلف بطانتها. دراسات أثبتت تحسّناً ملحوظاً في الانتصاب خلال ٦ أشهر من الإقلاع." },
+      { type: "heading" as const, text: "٥. إدارة التوتر" },
+      { type: "paragraph" as const, text: "الكورتيزول المرتفع (هرمون التوتر) يثبّط التستوستيرون ويعيق الاستجابة الجنسية. التأمل، التنفس العميق، وتقليل ساعات العمل — كلها تساعد." },
+    ],
+  },
+];
+
 export default function SexualHealth() {
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly" | "annual">("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [openArticle, setOpenArticle] = useState<number | null>(null);
 
   const toggleFaq = (i: number) => setOpenFaq(openFaq === i ? null : i);
 
@@ -72,12 +163,9 @@ export default function SexualHealth() {
           <span className={`${styles.navLink} ${styles.navLinkActive}`}>الصحة الجنسية</span>
           <span className={styles.navLink}>المدوّنة</span>
         </div>
-        <div className={styles.navRight}>
-          <span className={styles.navGhost}>تسجيل الدخول</span>
-          <Link href="/sexualHealth/subscribe" className={styles.navCta}>
-            اشترك
-          </Link>
-        </div>
+        <Link href="/sexualHealth/subscribe" className={styles.navCta}>
+          اشترك
+        </Link>
       </nav>
 
       {/* ─── HERO ─── */}
@@ -835,7 +923,7 @@ export default function SexualHealth() {
 
         <div className={styles.blogGrid}>
           {/* Featured Blog Card */}
-          <div className={`${styles.blogCard} ${styles.feat}`}>
+          <div className={`${styles.blogCard} ${styles.feat}`} onClick={() => setOpenArticle(0)}>
             <div className={styles.blogThumb}>
               <span className={styles.blogCat}>صحة الرجل</span>
               <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -882,7 +970,7 @@ export default function SexualHealth() {
           </div>
 
           {/* Blog Card 2 */}
-          <div className={styles.blogCard}>
+          <div className={styles.blogCard} onClick={() => setOpenArticle(1)}>
             <div className={styles.blogThumb}>
               <span className={styles.blogCat}>فسيولوجيا</span>
               <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -919,7 +1007,7 @@ export default function SexualHealth() {
           </div>
 
           {/* Blog Card 3 */}
-          <div className={styles.blogCard}>
+          <div className={styles.blogCard} onClick={() => setOpenArticle(2)}>
             <div className={styles.blogThumb}>
               <span className={styles.blogCat}>قلب وسكّر</span>
               <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -952,7 +1040,7 @@ export default function SexualHealth() {
           </div>
 
           {/* Blog Card 4 */}
-          <div className={styles.blogCard}>
+          <div className={styles.blogCard} onClick={() => setOpenArticle(3)}>
             <div className={styles.blogThumb}>
               <span className={styles.blogCat}>نمط حياة</span>
               <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -1048,6 +1136,42 @@ export default function SexualHealth() {
           متوافق مع PDPL &middot; مرخّص من وزارة الصحّة
         </span>
       </footer>
+
+      {/* ─── ARTICLE READER OVERLAY ─── */}
+      {openArticle !== null && (
+        <div className={styles.artOverlay} onClick={() => setOpenArticle(null)}>
+          <div className={styles.artPanel} onClick={(e) => e.stopPropagation()}>
+            <button className={styles.artClose} onClick={() => setOpenArticle(null)}>&times;</button>
+            <div className={styles.artCat}>{blogArticles[openArticle].cat}</div>
+            <h2 className={styles.artTitle}>{blogArticles[openArticle].title}</h2>
+            <div className={styles.artMeta}>
+              <span>{blogArticles[openArticle].author}</span>
+              {blogArticles[openArticle].date && <> · <span>{blogArticles[openArticle].date}</span></>}
+              <> · <span>{blogArticles[openArticle].readTime}</span></>
+            </div>
+            <div className={styles.artBody}>
+              {blogArticles[openArticle].content.map((block, i) => {
+                switch (block.type) {
+                  case "lead":
+                    return <p key={i} className={styles.artLead}>{block.text}</p>;
+                  case "heading":
+                    return <h3 key={i} className={styles.artH3}>{block.text}</h3>;
+                  case "paragraph":
+                    return <p key={i} className={styles.artP}>{block.text}</p>;
+                  case "callout":
+                    return <div key={i} className={styles.artCallout}>{block.text}</div>;
+                  default:
+                    return null;
+                }
+              })}
+            </div>
+            <div className={styles.artRefs}>
+              <div className={styles.artRefsIc}>{blogArticles[openArticle].refsCount}</div>
+              <div>{blogArticles[openArticle].refs}</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

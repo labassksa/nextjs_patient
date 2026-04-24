@@ -247,7 +247,7 @@
   .heroH1 { font-size: 34px; }
   .doctor { grid-template-columns: 1fr; }
   .stripGrid, .howSteps, .pillarsGrid, .plansRow, .testGrid {
-    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px;
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; gap: 12px;
   }
   .stripGrid::-webkit-scrollbar, .howSteps::-webkit-scrollbar, .pillarsGrid::-webkit-scrollbar, .plansRow::-webkit-scrollbar, .testGrid::-webkit-scrollbar { display: none; }
   .stripStat, .howStep, .pillar, .planCard, .testCard { flex-shrink: 0; width: 72%; scroll-snap-align: start; }
