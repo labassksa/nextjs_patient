@@ -24,9 +24,146 @@ const stepLabels = [
   "التحقّق",
 ];
 
+/* ── Sub-components (outside to prevent remount on state change) ── */
+
+const QuestionBlock = ({
+  num,
+  text,
+  note,
+  children,
+}: {
+  num: string;
+  text: string;
+  note?: string;
+  children: React.ReactNode;
+}) => (
+  <div className={s.qBlock}>
+    <div className={s.qLbl}>
+      <div className={s.qNum}>{num}</div>
+      <div className={s.qTxt}>
+        {text}
+        {note && (
+          <>
+            {" "}
+            <span className={s.qNote}>({note})</span>
+          </>
+        )}
+      </div>
+    </div>
+    {children}
+  </div>
+);
+
+const SingleSelect = ({
+  qKey,
+  options,
+  className,
+  value,
+  onPick,
+}: {
+  qKey: string;
+  options: { label: string; value: string }[];
+  className?: string;
+  value?: string;
+  onPick: (key: string, val: string) => void;
+}) => (
+  <div className={className || s.qOpts}>
+    {options.map((o) => (
+      <div
+        key={o.value}
+        className={`${s.qOpt} ${value === o.value ? s.qOptSelected : ""}`}
+        onClick={() => onPick(qKey, o.value)}
+      >
+        {o.label}
+      </div>
+    ))}
+  </div>
+);
+
+const YesNo = ({
+  qKey,
+  value,
+  onPick,
+}: {
+  qKey: string;
+  value?: string;
+  onPick: (key: string, val: string) => void;
+}) => (
+  <div className={s.qYesno}>
+    {[
+      { label: "نعم", value: "yes" },
+      { label: "لا", value: "no" },
+    ].map((o) => (
+      <div
+        key={o.value}
+        className={`${s.qOpt} ${value === o.value ? s.qOptSelected : ""}`}
+        onClick={() => onPick(qKey, o.value)}
+      >
+        {o.label}
+      </div>
+    ))}
+  </div>
+);
+
+const NumberInput = ({
+  qKey,
+  unit,
+  value,
+  onChangeValue,
+}: {
+  qKey: string;
+  unit: string;
+  value: string;
+  onChangeValue: (key: string, val: string) => void;
+}) => (
+  <div className={s.qInpWrap}>
+    <input
+      className={s.qInp}
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={value}
+      onChange={(e) => {
+        const v = e.target.value;
+        if (v && !/^\d+$/.test(v)) return;
+        onChangeValue(qKey, v);
+      }}
+    />
+    <div className={s.qInpUnit}>{unit}</div>
+  </div>
+);
+
+const MultiSelect = ({
+  qKey,
+  options,
+  selected,
+  onToggle,
+}: {
+  qKey: string;
+  options: { label: string; value: string }[];
+  selected: string[];
+  onToggle: (key: string, val: string) => void;
+}) => (
+  <div className={s.qCbGrid}>
+    {options.map((o) => {
+      const isSelected = selected.includes(o.value);
+      return (
+        <div
+          key={o.value}
+          className={`${s.qCb} ${isSelected ? s.qCbSelected : ""}`}
+          onClick={() => onToggle(qKey, o.value)}
+        >
+          <div className={s.qCbBox}>{isSelected ? "✓" : ""}</div>
+          {o.label}
+        </div>
+      );
+    })}
+  </div>
+);
+
 export default function ObesitySubscribePage() {
   const [currentStep, setCurrentStep] = useState(1);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [answers, setAnswers] = useState<Record<string, string | string[]>>({ qCity: "riyadh" });
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -77,7 +214,7 @@ export default function ObesitySubscribePage() {
   const isStepValid = useCallback(() => {
     switch (currentStep) {
       case 1:
-        return !!(answers.q1 && answers.q2 && answers.q3);
+        return !!(answers.q1 && answers.q2 && answers.q3 && answers.qCity);
       case 2:
         return ["q4", "q5", "q6", "q7", "q8", "q9", "q10"].every(
           (k) => answers[k]
@@ -175,118 +312,6 @@ export default function ObesitySubscribePage() {
     return "—";
   };
 
-  /* ── Reusable mini-components ── */
-  const QuestionBlock = ({
-    num,
-    text,
-    note,
-    children,
-  }: {
-    num: string;
-    text: string;
-    note?: string;
-    children: React.ReactNode;
-  }) => (
-    <div className={s.qBlock}>
-      <div className={s.qLbl}>
-        <div className={s.qNum}>{num}</div>
-        <div className={s.qTxt}>
-          {text}
-          {note && (
-            <>
-              {" "}
-              <span className={s.qNote}>({note})</span>
-            </>
-          )}
-        </div>
-      </div>
-      {children}
-    </div>
-  );
-
-  const SingleSelect = ({
-    qKey,
-    options,
-    className,
-  }: {
-    qKey: string;
-    options: { label: string; value: string }[];
-    className?: string;
-  }) => (
-    <div className={className || s.qOpts}>
-      {options.map((o) => (
-        <div
-          key={o.value}
-          className={`${s.qOpt} ${answers[qKey] === o.value ? s.qOptSelected : ""}`}
-          onClick={() => pickOne(qKey, o.value)}
-        >
-          {o.label}
-        </div>
-      ))}
-    </div>
-  );
-
-  const YesNo = ({ qKey }: { qKey: string }) => (
-    <div className={s.qYesno}>
-      {[
-        { label: "نعم", value: "yes" },
-        { label: "لا", value: "no" },
-      ].map((o) => (
-        <div
-          key={o.value}
-          className={`${s.qOpt} ${answers[qKey] === o.value ? s.qOptSelected : ""}`}
-          onClick={() => pickOne(qKey, o.value)}
-        >
-          {o.label}
-        </div>
-      ))}
-    </div>
-  );
-
-  const NumberInput = ({
-    qKey,
-    unit,
-  }: {
-    qKey: string;
-    unit: string;
-  }) => (
-    <div className={s.qInpWrap}>
-      <input
-        className={s.qInp}
-        type="number"
-        value={(answers[qKey] as string) || ""}
-        onInput={(e) => setInput(qKey, (e.target as HTMLInputElement).value)}
-      />
-      <div className={s.qInpUnit}>{unit}</div>
-    </div>
-  );
-
-  const MultiSelect = ({
-    qKey,
-    options,
-  }: {
-    qKey: string;
-    options: { label: string; value: string }[];
-  }) => (
-    <div className={s.qCbGrid}>
-      {options.map((o) => {
-        const selected =
-          Array.isArray(answers[qKey]) &&
-          (answers[qKey] as string[]).includes(o.value);
-        return (
-          <div
-            key={o.value}
-            className={`${s.qCb} ${selected ? s.qCbSelected : ""}`}
-            onClick={() => toggleCb(qKey, o.value)}
-          >
-            <div className={s.qCbBox}>{selected ? "✓" : ""}</div>
-            {o.label}
-          </div>
-        );
-      })}
-    </div>
-  );
-
   /* ── RENDER ── */
   return (
     <div dir="rtl" className={s.app}>
@@ -336,13 +361,18 @@ export default function ObesitySubscribePage() {
           </p>
 
           <QuestionBlock num="١" text="ما وزنك الحالي؟">
-            <NumberInput qKey="q1" unit="كجم" />
+            <NumberInput qKey="q1" unit="كجم" value={(answers.q1 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
           <QuestionBlock num="٢" text="ما طولك؟">
-            <NumberInput qKey="q2" unit="سم" />
+            <NumberInput qKey="q2" unit="سم" value={(answers.q2 as string) || ""} onChangeValue={setInput} />
           </QuestionBlock>
           <QuestionBlock num="٣" text="ما محيط خصرك؟">
-            <NumberInput qKey="q3" unit="سم" />
+            <NumberInput qKey="q3" unit="سم" value={(answers.q3 as string) || ""} onChangeValue={setInput} />
+          </QuestionBlock>
+          <QuestionBlock num="٤" text="ما مدينتك؟" note="الخدمة متوفّرة حالياً في الرياض فقط">
+            <SingleSelect qKey="qCity" value={answers.qCity as string} onPick={pickOne} options={[
+              { label: "الرياض", value: "riyadh" },
+            ]} />
           </QuestionBlock>
         </div>
       )}
@@ -360,79 +390,61 @@ export default function ObesitySubscribePage() {
           </p>
 
           <QuestionBlock num="٤" text="كم وجبة رئيسية تتناول يومياً؟">
-            <SingleSelect
-              qKey="q4"
-              options={[
-                { label: "١", value: "1" },
-                { label: "٢", value: "2" },
-                { label: "٣", value: "3" },
-                { label: "أكثر من ٣", value: "3+" },
-              ]}
-            />
+            <SingleSelect qKey="q4" value={answers.q4 as string} onPick={pickOne} options={[
+              { label: "١", value: "1" },
+              { label: "٢", value: "2" },
+              { label: "٣", value: "3" },
+              { label: "أكثر من ٣", value: "3+" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٥" text="هل تتناول وجبات خفيفة بين الوجبات؟">
-            <SingleSelect
-              qKey="q5"
-              options={[
-                { label: "أبداً", value: "never" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "غالباً", value: "often" },
-                { label: "دائماً", value: "always" },
-              ]}
-            />
+            <SingleSelect qKey="q5" value={answers.q5 as string} onPick={pickOne} options={[
+              { label: "أبداً", value: "never" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "غالباً", value: "often" },
+              { label: "دائماً", value: "always" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٦" text="كم كوب ماء تشرب يومياً؟">
-            <SingleSelect
-              qKey="q6"
-              options={[
-                { label: "أقل من ٤", value: "<4" },
-                { label: "٤–٦", value: "4-6" },
-                { label: "٧–٩", value: "7-9" },
-                { label: "١٠+", value: "10+" },
-              ]}
-            />
+            <SingleSelect qKey="q6" value={answers.q6 as string} onPick={pickOne} options={[
+              { label: "أقل من ٤", value: "<4" },
+              { label: "٤–٦", value: "4-6" },
+              { label: "٧–٩", value: "7-9" },
+              { label: "١٠+", value: "10+" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٧" text="هل تتناول المشروبات الغازية أو العصائر المحلّاة؟">
-            <SingleSelect
-              qKey="q7"
-              options={[
-                { label: "يومياً", value: "daily" },
-                { label: "أسبوعياً", value: "weekly" },
-                { label: "نادراً", value: "rarely" },
-                { label: "أبداً", value: "never" },
-              ]}
-            />
+            <SingleSelect qKey="q7" value={answers.q7 as string} onPick={pickOne} options={[
+              { label: "يومياً", value: "daily" },
+              { label: "أسبوعياً", value: "weekly" },
+              { label: "نادراً", value: "rarely" },
+              { label: "أبداً", value: "never" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٨" text="هل تتناول الوجبات السريعة؟">
-            <SingleSelect
-              qKey="q8"
-              options={[
-                { label: "يومياً", value: "daily" },
-                { label: "٢–٣ أسبوعياً", value: "2-3" },
-                { label: "مرة أسبوعياً", value: "weekly" },
-                { label: "نادراً", value: "rarely" },
-              ]}
-            />
+            <SingleSelect qKey="q8" value={answers.q8 as string} onPick={pickOne} options={[
+              { label: "يومياً", value: "daily" },
+              { label: "٢–٣ أسبوعياً", value: "2-3" },
+              { label: "مرة أسبوعياً", value: "weekly" },
+              { label: "نادراً", value: "rarely" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٩" text="هل تأكل حتى الشبع الكامل؟">
-            <SingleSelect
-              qKey="q9"
-              options={[
-                { label: "دائماً", value: "always" },
-                { label: "غالباً", value: "often" },
-                { label: "أحياناً", value: "sometimes" },
-                { label: "نادراً", value: "rarely" },
-              ]}
-            />
+            <SingleSelect qKey="q9" value={answers.q9 as string} onPick={pickOne} options={[
+              { label: "دائماً", value: "always" },
+              { label: "غالباً", value: "often" },
+              { label: "أحياناً", value: "sometimes" },
+              { label: "نادراً", value: "rarely" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="١٠" text="هل تأكل أثناء مشاهدة التلفاز أو الجوال؟">
-            <YesNo qKey="q10" />
+            <YesNo qKey="q10" value={answers.q10 as string} onPick={pickOne} />
           </QuestionBlock>
         </div>
       )}
@@ -450,48 +462,35 @@ export default function ObesitySubscribePage() {
           </p>
 
           <QuestionBlock num="١١" text="كم مرة تمارس الرياضة أسبوعياً؟">
-            <SingleSelect
-              qKey="q11"
-              options={[
-                { label: "لا أمارس", value: "none" },
-                { label: "١–٢", value: "1-2" },
-                { label: "٣–٤", value: "3-4" },
-                { label: "٥+", value: "5+" },
-              ]}
-            />
+            <SingleSelect qKey="q11" value={answers.q11 as string} onPick={pickOne} options={[
+              { label: "لا أمارس", value: "none" },
+              { label: "١–٢", value: "1-2" },
+              { label: "٣–٤", value: "3-4" },
+              { label: "٥+", value: "5+" },
+            ]} />
           </QuestionBlock>
 
-          <QuestionBlock
-            num="١٢"
-            text="ما نوع النشاط البدني؟"
-            note="يمكن اختيار أكثر من نوع"
-          >
-            <MultiSelect
-              qKey="q12"
-              options={[
-                { label: "مشي", value: "walk" },
-                { label: "جري", value: "run" },
-                { label: "سباحة", value: "swim" },
-                { label: "رياضة منزلية", value: "home" },
-                { label: "نادي رياضي", value: "gym" },
-                { label: "أخرى", value: "other" },
-              ]}
-            />
+          <QuestionBlock num="١٢" text="ما نوع النشاط البدني؟" note="يمكن اختيار أكثر من نوع">
+            <MultiSelect qKey="q12" selected={Array.isArray(answers.q12) ? answers.q12 as string[] : []} onToggle={toggleCb} options={[
+              { label: "مشي", value: "walk" },
+              { label: "جري", value: "run" },
+              { label: "سباحة", value: "swim" },
+              { label: "رياضة منزلية", value: "home" },
+              { label: "نادي رياضي", value: "gym" },
+              { label: "أخرى", value: "other" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="١٣" text="كم ساعة تجلس يومياً؟">
-            <SingleSelect
-              qKey="q13"
-              options={[
-                { label: "أقل من ٤", value: "<4" },
-                { label: "٤–٨", value: "4-8" },
-                { label: "أكثر من ٨", value: "8+" },
-              ]}
-            />
+            <SingleSelect qKey="q13" value={answers.q13 as string} onPick={pickOne} options={[
+              { label: "أقل من ٤", value: "<4" },
+              { label: "٤–٨", value: "4-8" },
+              { label: "أكثر من ٨", value: "8+" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="١٤" text="هل تستخدم السيارة للمسافات القصيرة؟">
-            <YesNo qKey="q14" />
+            <YesNo qKey="q14" value={answers.q14 as string} onPick={pickOne} />
           </QuestionBlock>
         </div>
       )}
@@ -510,41 +509,32 @@ export default function ObesitySubscribePage() {
           </p>
 
           <QuestionBlock num="١٥" text="كم ساعة تنام يومياً؟">
-            <SingleSelect
-              qKey="q15"
-              options={[
-                { label: "أقل من ٥", value: "<5" },
-                { label: "٥–٧", value: "5-7" },
-                { label: "٧–٩", value: "7-9" },
-                { label: "أكثر من ٩", value: "9+" },
-              ]}
-            />
+            <SingleSelect qKey="q15" value={answers.q15 as string} onPick={pickOne} options={[
+              { label: "أقل من ٥", value: "<5" },
+              { label: "٥–٧", value: "5-7" },
+              { label: "٧–٩", value: "7-9" },
+              { label: "أكثر من ٩", value: "9+" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="١٦" text="هل تعاني من مشاكل في النوم؟">
-            <YesNo qKey="q16" />
+            <YesNo qKey="q16" value={answers.q16 as string} onPick={pickOne} />
           </QuestionBlock>
 
           <QuestionBlock num="١٧" text="هل تدخّن؟">
-            <SingleSelect
-              qKey="q17"
-              options={[
-                { label: "نعم", value: "yes" },
-                { label: "سابقاً", value: "past" },
-                { label: "لا", value: "no" },
-              ]}
-            />
+            <SingleSelect qKey="q17" value={answers.q17 as string} onPick={pickOne} options={[
+              { label: "نعم", value: "yes" },
+              { label: "سابقاً", value: "past" },
+              { label: "لا", value: "no" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="١٨" text="كيف تقيّم مستوى التوتّر لديك؟">
-            <SingleSelect
-              qKey="q18"
-              options={[
-                { label: "منخفض", value: "low" },
-                { label: "متوسط", value: "mid" },
-                { label: "عالي", value: "high" },
-              ]}
-            />
+            <SingleSelect qKey="q18" value={answers.q18 as string} onPick={pickOne} options={[
+              { label: "منخفض", value: "low" },
+              { label: "متوسط", value: "mid" },
+              { label: "عالي", value: "high" },
+            ]} />
           </QuestionBlock>
         </div>
       )}
@@ -562,44 +552,34 @@ export default function ObesitySubscribePage() {
             التعارضات الدوائية.
           </p>
 
-          <QuestionBlock
-            num="١٩"
-            text="هل تم تشخيصك بأي من التالي؟"
-            note="يمكن اختيار أكثر من واحد"
-          >
-            <MultiSelect
-              qKey="q19"
-              options={[
-                { label: "سكّري", value: "diabetes" },
-                { label: "ضغط", value: "bp" },
-                { label: "كولسترول", value: "chol" },
-                { label: "الغدة الدرقية", value: "thyroid" },
-                { label: "لا شيء", value: "none" },
-              ]}
-            />
+          <QuestionBlock num="١٩" text="هل تم تشخيصك بأي من التالي؟" note="يمكن اختيار أكثر من واحد">
+            <MultiSelect qKey="q19" selected={Array.isArray(answers.q19) ? answers.q19 as string[] : []} onToggle={toggleCb} options={[
+              { label: "سكّري", value: "diabetes" },
+              { label: "ضغط", value: "bp" },
+              { label: "كولسترول", value: "chol" },
+              { label: "الغدة الدرقية", value: "thyroid" },
+              { label: "لا شيء", value: "none" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٢٠" text="هل يوجد تاريخ عائلي للسمنة؟">
-            <YesNo qKey="q20" />
+            <YesNo qKey="q20" value={answers.q20 as string} onPick={pickOne} />
           </QuestionBlock>
 
           <QuestionBlock num="٢١" text="هل تتناول أدوية قد تؤثر على الوزن؟">
-            <YesNo qKey="q21" />
+            <YesNo qKey="q21" value={answers.q21 as string} onPick={pickOne} />
           </QuestionBlock>
 
           <QuestionBlock num="٢٢" text="هل سبق لك اتباع حمية غذائية؟">
-            <SingleSelect
-              qKey="q22"
-              options={[
-                { label: "نعم ونجحت", value: "yes_success" },
-                { label: "نعم ولم تنجح", value: "yes_fail" },
-                { label: "لا", value: "no" },
-              ]}
-            />
+            <SingleSelect qKey="q22" value={answers.q22 as string} onPick={pickOne} options={[
+              { label: "نعم ونجحت", value: "yes_success" },
+              { label: "نعم ولم تنجح", value: "yes_fail" },
+              { label: "لا", value: "no" },
+            ]} />
           </QuestionBlock>
 
           <QuestionBlock num="٢٣" text="هل أجريت عملية لإنقاص الوزن سابقاً؟">
-            <YesNo qKey="q23" />
+            <YesNo qKey="q23" value={answers.q23 as string} onPick={pickOne} />
           </QuestionBlock>
         </div>
       )}
@@ -618,24 +598,20 @@ export default function ObesitySubscribePage() {
           </p>
 
           <QuestionBlock num="٢٤" text="هل تأكل عند الشعور بالتوتر أو الحزن؟">
-            <YesNo qKey="q24" />
+            <YesNo qKey="q24" value={answers.q24 as string} onPick={pickOne} />
           </QuestionBlock>
 
           <QuestionBlock num="٢٥" text="هل أنت راضٍ عن وزنك الحالي؟">
-            <YesNo qKey="q25" />
+            <YesNo qKey="q25" value={answers.q25 as string} onPick={pickOne} />
           </QuestionBlock>
 
           <QuestionBlock num="٢٦" text="ما هدفك الأساسي؟">
-            <SingleSelect
-              qKey="q26"
-              className={s.qGoalGrid}
-              options={[
-                { label: "إنقاص وزن", value: "lose" },
-                { label: "ثبات وزن", value: "maintain" },
-                { label: "زيادة لياقة", value: "fitness" },
-                { label: "تحسين تغذية", value: "nutrition" },
-              ]}
-            />
+            <SingleSelect qKey="q26" value={answers.q26 as string} onPick={pickOne} className={s.qGoalGrid} options={[
+              { label: "إنقاص وزن", value: "lose" },
+              { label: "ثبات وزن", value: "maintain" },
+              { label: "زيادة لياقة", value: "fitness" },
+              { label: "تحسين تغذية", value: "nutrition" },
+            ]} />
           </QuestionBlock>
 
           <div className={s.secIntro}>
@@ -782,6 +758,10 @@ export default function ObesitySubscribePage() {
               <span className={s.summaryVal}>+٩٦٦ {phone}</span>
             </div>
             <div className={s.summaryRow}>
+              <span className={s.summaryLbl}>المدينة</span>
+              <span className={s.summaryVal}>الرياض</span>
+            </div>
+            <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الوزن الحالي</span>
               <span className={s.summaryVal}>
                 {(answers.q1 as string) || "—"} كجم
@@ -833,7 +813,7 @@ export default function ObesitySubscribePage() {
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٤</div>
                 <div className={s.nextTxt}>
-                  <strong>استشر طبيبك:</strong> متى ما احتجت، عبر المحادثة أو
+                  <strong>استشر الطبيب 24/7:</strong> متى ما احتجت، عبر المحادثة أو
                   مكالمة فيديو مباشرة — بدون حجز موعد.
                 </div>
               </li>

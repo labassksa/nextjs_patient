@@ -8,7 +8,7 @@ const FooterCTA: React.FC = () => {
         وش تنتظر، ابدأ رحلة صحتك اليوم
       </h2>
       <p className="text-xs md:text-sm mb-6 md:mb-8 opacity-90">
-        فحص دم شامل في منزلك، تحليل متقدم، ومكملات غذائية مصممة خصيصاً لك كل
+        فحص دم شامل في منزلك، تحليل متقدم، وفيتامينات ومعادن مصممة خصيصاً لك كل
         شهر
       </p>
       <Link href="/vitaminsPackages/subscribe" className="inline-block bg-white text-custom-green font-bold py-3 px-8 md:px-10 rounded-full text-base md:text-lg shadow-lg hover:opacity-90 transition-opacity mb-6 md:mb-8">

@@ -9,22 +9,28 @@ const features = [
     icon: "/icons/widgets/icon-doctor.svg",
   },
   {
-    title: "فحص دم شامل في المنزل",
+    title: "فحص دم من مختبر معتمد بأعلى معايير الجودة",
     description:
       "يزورك ممرض لأخذ عينة الدم والتأكد أن الفيتامينات فعالة — بدون ما تطلع من بيتك.",
     icon: "/icons/widgets/icon-lab.svg",
   },
   {
-    title: "فيتامينات مخصصة لك",
+    title: "فيتامينات ومعادن مخصصة لك",
     description:
-      "مكملات غذائية يختارها الطبيب بناءً على نتائج تحاليلك الشخصية.",
-    icon: "/icons/widgets/icon-anxiety.svg",
+      "مكملات غذائية من فيتامينات وأملاح ومعادن يختارها الطبيب بناءً على نتائج تحاليلك الشخصية.",
+    icon: "/icons/widgets/icon-doctor.svg",
   },
   {
-    title: "استشارة طبية في أي وقت",
+    title: "استشارة طبية 24/7",
     description:
       "تقدر تتواصل مع طبيبك وتستشيره عن صحتك أو فيتاميناتك متى ما احتجت.",
     icon: "/icons/widgets/icon-sex.svg",
+  },
+  {
+    title: "دعم القلق والتوتر",
+    description:
+      "فيتامينات ومعادن تساعد على تحسين المزاج وتخفيف القلق والتوتر مثل المغنيسيوم وB المركب.",
+    icon: "/icons/widgets/icon-anxiety.svg",
   },
 ];
 

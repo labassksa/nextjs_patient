@@ -16,15 +16,15 @@ const HeroSection: React.FC = () => {
           </div>
 
           <h1 className={styles.headline}>
-            صحتك بيدك<span className={styles.dim}>…</span>
+            تعب مستمر؟ تساقط شعر؟
             <br />
-            وبياناتك هي الدليل
+            <span className={styles.headlineSub}>جسمك يرسل لك إشارات</span>
           </h1>
 
-          <p className={styles.sub}>فيتامينات مخصصة لاحتياجك الشخصي</p>
+          <p className={styles.sub}>فيتامينات ومعادن مخصصة لاحتياجك الشخصي</p>
           <p className={styles.desc}>
-            ممرض يزورك للتحليل، طبيب يقرأ تحاليلك ويختار لك الفيتامينات المناسبة. فحص دم في
-            منزلك، مكمّلات مصمَّمة لك، واستشر طبيبك في أي وقت.
+            مشاكل النوم، البشرة الباهتة، تساقط الشعر، وضعف التركيز — كلها علامات نقص فيتامينات ومعادن.
+            فحص دم في منزلك، طبيب يقرأ تحاليلك ويختار لك المكمّلات المناسبة، واستشر الطبيب 24/7.
           </p>
 
           <div className={styles.ctas}>
@@ -61,11 +61,11 @@ const HeroSection: React.FC = () => {
           </div>
           <div className={`${styles.chip} ${styles.chipLab}`}>
             <div className={styles.chipDot} style={{ background: "#BA7517" }} />
-            الحديد — ضمن المعدل
+            الحديد والزنك — ضمن المعدل
           </div>
           <div className={`${styles.chip} ${styles.chipDoc}`}>
             <div className={styles.chipDot} style={{ background: "#1D9E75" }} />
-            د. سارة تقدم لك استشارة
+            المغنيسيوم — يحتاج متابعة
           </div>
         </div>
       </div>
