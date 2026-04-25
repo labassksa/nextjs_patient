@@ -60,14 +60,7 @@ const CardDetailsContent: React.FC = () => {
                 localStorage.removeItem('temp_subscription_flow');
                 router.push("/vitaminsPackages");
               } else {
-                const isVitamin = localStorage.getItem('temp_vitamin_payment');
-                if (isVitamin) {
-                  localStorage.removeItem('temp_vitamin_payment');
-                  localStorage.removeItem('vitamin_survey_answers');
-                  router.push("/vitaminsPackages/subscribe/success");
-                } else {
-                  router.push("/orgPortal?bundlePaymentSuccess=true");
-                }
+                router.push("/orgPortal?bundlePaymentSuccess=true");
               }
             } else {
               const consultationId = localStorage.getItem('temp_consultation_id');
@@ -76,7 +69,7 @@ const CardDetailsContent: React.FC = () => {
             }
           } else {
             localStorage.removeItem('temp_bundle_id');
-            localStorage.removeItem('temp_vitamin_payment');
+            localStorage.removeItem('temp_subscription_flow');
             router.push("/cardDetails/error");
           }
           return;
@@ -117,14 +110,14 @@ const CardDetailsContent: React.FC = () => {
 
               console.log("[Payment] Executing payment with sessionId:", newSessionId);
 
-              // Check if this is a bundle payment (org or vitamins)
+              // Check if this is a bundle payment
               if (bundleId) {
                 console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
 
                 let paymentUrl: string | null = null;
 
                 if (subscriberType) {
-                  // New subscription flow — vitamins payment page
+                  // Subscription flow — always has bundleId + subscriberType + isRecurring
                   const { data } = await axios.post(
                     `${apiUrl}/execute-subscription-payment`,
                     {
@@ -142,43 +135,23 @@ const CardDetailsContent: React.FC = () => {
                   paymentUrl = data.data?.paymentURL ?? null;
                   if (paymentUrl) localStorage.setItem('temp_subscription_flow', '1');
                 } else {
-                  const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
-                  const isVitamin = !!surveyAnswersRaw;
-
-                  if (isVitamin) {
-                    const surveyAnswers = JSON.parse(surveyAnswersRaw!);
-                    const { data } = await axios.post(
-                      `${apiUrl}/vitamins/subscribe`,
-                      {
-                        bundleId: Number(bundleId),
-                        sessionId: newSessionId,
-                        surveyAnswers,
-                        callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
-                        errorUrl: "https://labass.sa/cardDetails/error",
-                      },
-                      { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    console.log("[Payment] Vitamins subscribe response:", data);
-                    paymentUrl = data.paymentURL ?? null;
-                  } else {
-                    const { data } = await axios.post(
-                      `${apiUrl}/execute-onetime-bundle-payment`,
-                      {
-                        bundleId: Number(bundleId),
-                        sessionId: newSessionId,
-                        CallBackUrl: "https://labass.sa/cardDetails/success",
-                        ErrorUrl: "https://labass.sa/cardDetails/error",
-                      },
-                      { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                    console.log("[Payment] Bundle payment response:", data);
-                    paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
-                  }
+                  // Org portal one-time bundle payment
+                  const { data } = await axios.post(
+                    `${apiUrl}/execute-onetime-bundle-payment`,
+                    {
+                      bundleId: Number(bundleId),
+                      sessionId: newSessionId,
+                      CallBackUrl: "https://labass.sa/cardDetails/success",
+                      ErrorUrl: "https://labass.sa/cardDetails/error",
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  console.log("[Payment] Org bundle payment response:", data);
+                  paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
                 }
 
                 if (paymentUrl) {
                   localStorage.setItem("temp_bundle_id", bundleId);
-                  if (isVitamin) localStorage.setItem("temp_vitamin_payment", "1");
                   setIframeSrc(paymentUrl);
                   setShowIframe(true);
                 } else {

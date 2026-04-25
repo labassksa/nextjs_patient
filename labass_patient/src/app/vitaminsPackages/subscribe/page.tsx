@@ -57,9 +57,6 @@ export default function SubscribePage() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const cityLabel =
-    cityOptions.find((c) => c.value === city)?.label || "";
-
   // Fetch vitamins bundles on mount
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
@@ -229,30 +226,21 @@ export default function SubscribePage() {
 
   const getNextLabel = () => {
     switch (currentStep) {
-      case 1:
-        return "متابعة";
-      case 2:
-        return "متابعة";
-      case 3:
-        return "تحقّق";
-      case 4:
-        return "تأكيد الاشتراك";
-      case 5:
-        return "ابدأ رحلتك مع لاباس";
-      default:
-        return "متابعة";
+      case 3: return "تحقّق";
+      case 4: return "مراجعة الطلب";
+      case 5: return "الانتقال للدفع";
+      default: return "متابعة";
     }
   };
 
   const progPct = ((currentStep - 1) / (TOTAL_STEPS - 1)) * 100;
-  const firstName = name.split(" ")[0] || "عزيزي";
 
   const stepLabels = [
     "اختر الباقة",
     "بياناتك الشخصية",
     "أهدافك الصحية",
     "تحقّق الجوّال",
-    "تأكيد الاشتراك",
+    "مراجعة ودفع",
   ];
 
   return (
@@ -819,37 +807,38 @@ export default function SubscribePage() {
         </div>
       )}
 
-      {/* Step 5: Confirmation */}
+      {/* Step 5: Review before payment */}
       {currentStep === 5 && (
         <div className={s.page} key="step5">
-          <div className={s.confirmIconWrap}>
-            <div className={s.confirmCircle}>
-              <div className={s.confirmCheck}>✓</div>
-            </div>
+          <div className={s.eyebrow}>
+            <div className={s.eyeDot} />
+            الخطوة ٥ من ٥
           </div>
-
-          <h1 className={s.confirmTtl}>تم تأكيد اشتراكك، {firstName}</h1>
-          <p className={s.confirmSub}>
-            يسعدنا انضمامك إلى لاباس. سيصلك خلال دقائق رسالة على جوّالك فيها
-            تفاصيل موعد زيارة الممرّض وخطوات تسجيل الدفع.
+          <h1 className={s.pageTtl}>مراجعة طلبك</h1>
+          <p className={s.pageSub}>
+            تأكّد من التفاصيل أدناه ثم انتقل لصفحة الدفع لإتمام اشتراكك.
           </p>
 
           <div className={s.summary}>
-            <p className={s.summaryTtl}>ملخّص اشتراكك</p>
+            <p className={s.summaryTtl}>ملخّص الطلب</p>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الباقة</span>
               <span className={s.summaryVal}>{planLabel}</span>
             </div>
             <div className={s.summaryRow}>
-              <span className={s.summaryLbl}>المدينة</span>
-              <span className={s.summaryVal}>{cityLabel || "—"}</span>
-            </div>
-            <div className={s.summaryRow}>
-              <span className={s.summaryLbl}>الأهداف الصحية</span>
+              <span className={s.summaryLbl}>نوع الدفع</span>
               <span className={s.summaryVal}>
-                {goals.map((g) => goalLabels[g]).join("، ")}
+                {isRecurring ? "اشتراك متكرّر" : "دفعة واحدة"}
               </span>
             </div>
+            {goals.length > 0 && (
+              <div className={s.summaryRow}>
+                <span className={s.summaryLbl}>الأهداف الصحية</span>
+                <span className={s.summaryVal}>
+                  {goals.map((g) => goalLabels[g]).join("، ")}
+                </span>
+              </div>
+            )}
             <div className={`${s.summaryRow} ${s.summaryRowTotal}`}>
               <span className={s.summaryLbl}>المبلغ المستحقّ</span>
               <span className={s.summaryVal}>
@@ -857,42 +846,6 @@ export default function SubscribePage() {
                 {price.toLocaleString("ar-SA")}
               </span>
             </div>
-          </div>
-
-          <div className={s.nextSteps}>
-            <p className={s.nextTtl}>ماذا يحدث الآن؟</p>
-            <ul className={s.nextList}>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>١</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٢٤ ساعة:</strong> يتواصل معك فريقنا لتحديد
-                  موعد زيارة الممرّض المناسب لك في المنزل. إذا كان لديك
-                  تحليل دم حديث، يمكن تخطّي هذه الخطوة والانتقال مباشرة
-                  لتفسير النتائج.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٢</div>
-                <div className={s.nextTxt}>
-                  <strong>في الموعد:</strong> يزورك ممرّض مرخّص، يأخذ عيّنة
-                  الدم ويرسلها للمختبر المعتمد.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٣</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٤٨ ساعة:</strong> يقرأ طبيبك نتائجك ويصمّم لك
-                  خطة المكمّلات المخصّصة.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٤</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال أسبوع:</strong> تصلك الفيتامينات إلى بابك،
-                  وتبدأ رحلتك مع لاباس.
-                </div>
-              </li>
-            </ul>
           </div>
         </div>
       )}
