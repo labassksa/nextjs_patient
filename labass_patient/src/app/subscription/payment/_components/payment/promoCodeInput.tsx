@@ -24,7 +24,6 @@ const PromoCode: React.FC<PromoCodeProps> = ({
   const [frozen, setFrozen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const defaultPrice = 289;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const handleApply = async () => {
@@ -80,7 +79,6 @@ const PromoCode: React.FC<PromoCodeProps> = ({
     if (frozen) {
       setFrozen(false);
       setPromoCode("");
-      setDiscountedPrice(defaultPrice);
       setMessage("");
       setIsOk(false);
     }
@@ -124,7 +122,7 @@ const PromoCode: React.FC<PromoCodeProps> = ({
       </div>
 
       {message && (
-        <p className={`${s.promoMsg} ${isOk ? s.promoMsgOk : s.promoMsgErr}`}>
+        <p className={`${s.promoMsg} ${isOk ? s.promoOk : s.promoErr}`}>
           {message}
         </p>
       )}

@@ -1,10 +1,10 @@
 import React, { Suspense } from "react";
-import VitaminsPaymentClient from "./myClientComponent";
+import SubscriptionPaymentClient from "./myClientComponent";
 
-export default function VitaminsPaymentPage() {
+export default function SubscriptionPaymentPage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <VitaminsPaymentClient />
+      <SubscriptionPaymentClient />
     </Suspense>
   );
 }

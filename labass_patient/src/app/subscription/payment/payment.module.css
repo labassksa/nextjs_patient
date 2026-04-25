@@ -147,10 +147,13 @@
   color: rgba(126, 217, 87, 0.7);
   margin-bottom: 6px;
 }
-.planSep {
-  height: 1px;
-  background: rgba(234, 243, 222, 0.1);
-  margin-bottom: 20px;
+.planOriginalPrice {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(234, 243, 222, 0.4);
+  text-decoration: line-through;
+  margin-bottom: 6px;
+  align-self: flex-end;
 }
 .planFeats {
   display: grid;

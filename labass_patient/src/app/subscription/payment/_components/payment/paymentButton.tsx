@@ -120,8 +120,9 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
       if (data.success) {
         localStorage.removeItem("vitamin_survey_answers");
         setShowModal(true);
+      } else {
+        console.error("Payment failed:", data);
       }
-      else console.error("Payment failed:", data);
     } catch (err) {
       console.error("executeSubscriptionPayment error:", err);
     }
@@ -139,7 +140,6 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
       });
       if (data.IsSuccess) {
         const { SessionId, CountryCode } = data.Data;
-        // TODO: update cardDetails page to handle bundleId for subscriptions
         router.push(
           `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${encodeURIComponent(promoCode)}${bundleId ? `&bundleId=${bundleId}` : ""}&subscriberType=${subscriberType}&isRecurring=${isRecurring}`
         );
@@ -149,11 +149,6 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSuccess = () => {
-    // TODO: update to subscription success page once created
-    router.push("/vitaminsPackages");
   };
 
   return (
@@ -173,7 +168,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         </button>
       )}
 
-      {/* Cash – no action button needed (handled via promo code) */}
+      {/* Cash – handled via promo code */}
       {method === PaymentMethodEnum.Cash && (
         <button className={s.payBtn} disabled>
           الدفع نقداً — استخدم الرمز الترويجي أعلاه
@@ -192,7 +187,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
               سيتواصل معك فريق لاباس خلال ٢٤ ساعة لتحديد موعد زيارة الممرّض
               وبدء رحلتك الصحية.
             </p>
-            <button className={s.modalBtn} onClick={handleSuccess}>
+            <button className={s.modalBtn} onClick={() => router.push("/")}>
               متابعة
             </button>
           </div>

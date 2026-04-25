@@ -9,7 +9,7 @@ interface PaymentHeaderProps {
 const PaymentHeader: React.FC<PaymentHeaderProps> = ({ onBack }) => {
   return (
     <div className={s.nav}>
-      <Link href="/vitaminsPackages" className={s.brand}>
+      <Link href="/" className={s.brand}>
         <div className={s.mark} />
         <span className={s.bname}>لاباس</span>
       </Link>

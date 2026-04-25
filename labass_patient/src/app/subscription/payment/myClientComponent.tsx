@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import axios from "axios";
 
 import PaymentHeader from "./_components/payment/paymentHeader";
 import PaymentIntro from "./_components/payment/paymentIntro";
@@ -16,27 +17,48 @@ import { getMagicLink } from "./_controllers/getMagicLink";
 
 import s from "./payment.module.css";
 
-const VitaminsPaymentClient: React.FC = () => {
+export interface Bundle {
+  id: number;
+  type: string;
+  price: number;
+  description?: string;
+  recurringType?: string;
+  intervalDays?: number;
+  originalPrice?: number;
+}
+
+const SubscriptionPaymentClient: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const priceParam        = searchParams.get("discountedPrice");
-  const planLabelParam    = searchParams.get("planLabel");
-  const bundleIdParam     = searchParams.get("bundleId");
-  const tokenUUIDParam    = searchParams.get("tokenUUID");
-  const promoCodeParam    = searchParams.get("promoCode");
-  const subscriberType    = (searchParams.get("subscriberType") || "patient") as "patient" | "organization";
-  const isRecurring       = searchParams.get("isRecurring") === "true";
+  const priceParam     = searchParams.get("discountedPrice");
+  const bundleIdParam  = searchParams.get("bundleId");
+  const tokenUUIDParam = searchParams.get("tokenUUID");
+  const promoCodeParam = searchParams.get("promoCode");
+  const subscriberType = (searchParams.get("subscriberType") || "patient") as "patient" | "organization";
+  const isRecurring    = searchParams.get("isRecurring") === "true";
+
+  const bundleId = bundleIdParam ? Number(bundleIdParam) : null;
 
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.ApplePay);
-  const [discountedPrice, setDiscountedPrice] = useState(
-    priceParam ? Number(priceParam) : 289
-  );
+  const [discountedPrice, setDiscountedPrice] = useState(priceParam ? Number(priceParam) : 0);
   const [promoCode, setPromoCode] = useState("");
+  const [bundle, setBundle] = useState<Bundle | null>(null);
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
 
-  const planLabel = planLabelParam || "الباقة الشهرية";
-  const bundleId = bundleIdParam ? Number(bundleIdParam) : null;
+  // Fetch bundle details
+  useEffect(() => {
+    if (!bundleId) return;
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: Bundle[] = Array.isArray(data) ? data : (data.data ?? []);
+        const found = list.find((b) => b.id === bundleId) ?? null;
+        setBundle(found);
+        if (found && !priceParam) setDiscountedPrice(Number(found.price));
+      })
+      .catch((err) => console.error("Bundle fetch error:", err));
+  }, [bundleId]);
 
   // Apply magic-link promo on mount
   useEffect(() => {
@@ -68,8 +90,8 @@ const VitaminsPaymentClient: React.FC = () => {
       {/* ── Scrollable content ── */}
       <div className={s.scroll}>
 
-        {/* Green plan banner */}
-        <PaymentIntro planLabel={planLabel} price={discountedPrice} />
+        {/* Bundle banner */}
+        <PaymentIntro bundle={bundle} price={discountedPrice} />
 
         <div className={s.body}>
 
@@ -97,10 +119,10 @@ const VitaminsPaymentClient: React.FC = () => {
             </div>
             <div className={s.trustLogos}>
               {[
-                { src: "/icons/visa.svg", alt: "Visa", w: 38 },
-                { src: "/icons/mada.svg", alt: "Mada", w: 38 },
-                { src: "/icons/mc.svg", alt: "Mastercard", w: 30 },
-                { src: "/icons/apple_pay.svg", alt: "Apple Pay", w: 46 },
+                { src: "/icons/visa.svg",      alt: "Visa",       w: 38 },
+                { src: "/icons/mada.svg",      alt: "Mada",       w: 38 },
+                { src: "/icons/mc.svg",        alt: "Mastercard", w: 30 },
+                { src: "/icons/apple_pay.svg", alt: "Apple Pay",  w: 46 },
               ].map((logo) => (
                 <div key={logo.alt} className={s.trustLogoBox}>
                   <Image src={logo.src} alt={logo.alt} width={logo.w} height={20} />
@@ -126,7 +148,7 @@ const VitaminsPaymentClient: React.FC = () => {
 
       {/* ── Magic-link loading overlay ── */}
       {magicLinkLoading && (
-        <div className={s.loading}>
+        <div className={s.loadingOverlay}>
           <div className={s.loadingSpinner} />
           <p className={s.loadingTxt}>جاري تطبيق العرض...</p>
         </div>
@@ -136,4 +158,4 @@ const VitaminsPaymentClient: React.FC = () => {
   );
 };
 
-export default VitaminsPaymentClient;
+export default SubscriptionPaymentClient;

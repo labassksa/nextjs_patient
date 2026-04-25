@@ -225,7 +225,7 @@ export default function SubscribePage() {
       isRecurring: String(isRecurring),
       subscriberType: "patient",
     });
-    router.push(`/vitaminsPackages/payment?${params.toString()}`);
+    router.push(`/subscription/payment?${params.toString()}`);
   };
 
   const prevStep = () => {
