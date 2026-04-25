@@ -101,6 +101,8 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
     const token = localStorage.getItem("labass_token");
     if (!token) { router.push("/login"); return; }
     try {
+      const surveyRaw = localStorage.getItem("vitamin_survey_answers");
+      const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
       const { data } = await axios.post(
         `${apiUrl}/execute-subscription-payment`,
         {
@@ -111,10 +113,14 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
           subscriberType,
           isRecurring,
           promoCode,
+          surveyAnswers,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (data.success) setShowModal(true);
+      if (data.success) {
+        localStorage.removeItem("vitamin_survey_answers");
+        setShowModal(true);
+      }
       else console.error("Payment failed:", data);
     } catch (err) {
       console.error("executeSubscriptionPayment error:", err);

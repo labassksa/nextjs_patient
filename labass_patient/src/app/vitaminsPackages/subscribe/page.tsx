@@ -208,6 +208,16 @@ export default function SubscribePage() {
       setApiError("الباقة غير متاحة، تواصل مع الدعم");
       return;
     }
+    localStorage.setItem("vitamin_survey_answers", JSON.stringify({
+      name,
+      age: Number(age),
+      gender,
+      height: Number(height),
+      weight: Number(weight),
+      city,
+      healthGoals: goals,
+    }));
+
     const params = new URLSearchParams({
       bundleId: String(bundleId),
       discountedPrice: String(price),
