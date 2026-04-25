@@ -7,6 +7,7 @@ import s from "./obesity.module.css";
 export default function ObesityProgram() {
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly">("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [showFdaPopup, setShowFdaPopup] = useState(false);
 
   const toggleFaq = (i: number) => setOpenFaq(openFaq === i ? null : i);
 
@@ -15,7 +16,7 @@ export default function ObesityProgram() {
     "أدوية طبّية بوصفة طبّية",
     "فحص دم من مختبر معتمد بأعلى معايير الجودة",
     "خطّة غذائية ورياضية مخصّصة",
-    "استشر الطبيب في أي وقت",
+    "استشر الطبيب 24/7",
     "توصيل مجاني",
   ];
 
@@ -215,11 +216,11 @@ export default function ObesityProgram() {
             <div className={s.penShadow} />
 
             {/* Floating Chips */}
-            <div className={`${s.hvChip} ${s.chipFda}`}>
+            <div className={`${s.hvChip} ${s.chipFda}`} onClick={() => setShowFdaPopup(true)} style={{ cursor: "pointer" }}>
               <div className={s.hvChipIc}>FDA</div>
               <div>
                 <div className={s.hvChipLbl}>الحالة</div>
-                <div className={s.hvChipVal}>معتمد من FDA</div>
+                <div className={s.hvChipVal}>معتمد من FDA للسمنة</div>
               </div>
             </div>
 
@@ -428,7 +429,7 @@ export default function ObesityProgram() {
             </p>
           </div>
 
-          {/* 3 - استشر الطبيب في أي وقت */}
+          {/* 3 - استشر الطبيب 24/7 */}
           <div className={s.pillar}>
             <div className={s.pillarIc} style={{ background: "#FCEBEB" }}>
               <svg viewBox="0 0 28 28" fill="none">
@@ -450,7 +451,7 @@ export default function ObesityProgram() {
                 <circle cx="17" cy="14" r="1" fill="#A32D2D" />
               </svg>
             </div>
-            <h3 className={s.pillarTtl}>استشر الطبيب في أي وقت</h3>
+            <h3 className={s.pillarTtl}>استشر الطبيب 24/7</h3>
             <p className={s.pillarDesc}>
               محادثة مباشرة أو مكالمة فيديو مع طبيبك — بدون حجز مسبق، بدون انتظار.
             </p>
@@ -617,19 +618,19 @@ export default function ObesityProgram() {
         </div>
         <h2 className={s.secTtl}>نتائج حقيقية من مشتركين حقيقيين</h2>
         <p className={s.secSub}>
-          أرقام فعلية من مشتركين في البرنامج — الأسماء مستعارة لحماية الخصوصية.
+          أرقام فعلية من مشتركات في البرنامج — الأسماء مستعارة لحماية الخصوصية.
         </p>
 
         <div className={s.testGrid}>
           {/* Card 1 */}
           <div className={s.testCard}>
             <div className={s.testHead}>
-              <div className={`${s.testAv} ${s.testAv1}`}>ع</div>
+              <div className={`${s.testAv} ${s.testAv1}`}>س</div>
               <div>
-                <div className={s.testName}>عبدالله المطيري</div>
-                <div className={s.testMeta}>٣٨ سنة &middot; الرياض</div>
+                <div className={s.testName}>سارة الدوسري</div>
+                <div className={s.testMeta}>٣٥ سنة &middot; الرياض</div>
               </div>
-              <span className={s.testVt}>مشترك فعّال</span>
+              <span className={s.testVt}>مشتركة فعّالة</span>
             </div>
             <div className={s.testBio}>
               الوزن <span>كجم</span>
@@ -654,7 +655,7 @@ export default function ObesityProgram() {
               <circle cx="180" cy="28" r="3.2" fill="#3B6D11" stroke="#ffffff" strokeWidth="1.2" />
             </svg>
             <p className={s.testQ}>
-              لاباس غيّر حياتي — الدكتور تابع معي خطوة بخطوة وحسّيت إن الخطّة فعلاً مصمّمة لي.
+              لاباس غيّر حياتي — الدكتور تابع معاي خطوة بخطوة وحسّيت إن الخطّة فعلاً مصمّمة لي.
             </p>
           </div>
 
@@ -666,7 +667,7 @@ export default function ObesityProgram() {
                 <div className={s.testName}>رهف الشمري</div>
                 <div className={s.testMeta}>٣١ سنة &middot; الرياض</div>
               </div>
-              <span className={s.testVt}>مشترك فعّال</span>
+              <span className={s.testVt}>مشتركة فعّالة</span>
             </div>
             <div className={s.testBio}>
               محيط الخصر <span>سم</span>
@@ -698,12 +699,12 @@ export default function ObesityProgram() {
           {/* Card 3 */}
           <div className={s.testCard}>
             <div className={s.testHead}>
-              <div className={`${s.testAv} ${s.testAv3}`}>خ</div>
+              <div className={`${s.testAv} ${s.testAv3}`}>م</div>
               <div>
-                <div className={s.testName}>خالد القحطاني</div>
-                <div className={s.testMeta}>٤٢ سنة &middot; الرياض</div>
+                <div className={s.testName}>منيرة العتيبي</div>
+                <div className={s.testMeta}>٤٠ سنة &middot; الرياض</div>
               </div>
-              <span className={s.testVt}>مشترك فعّال</span>
+              <span className={s.testVt}>مشتركة فعّالة</span>
             </div>
             <div className={s.testBio}>
               HbA1c <span>%</span>
@@ -805,6 +806,97 @@ export default function ObesityProgram() {
           &copy; ٢٠٢٥ لاباس. جميع الحقوق محفوظة.
         </span>
       </footer>
+
+      {/* ─── FDA POPUP ─── */}
+      {showFdaPopup && (
+        <div
+          onClick={() => setShowFdaPopup(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            backdropFilter: "blur(6px)",
+            WebkitBackdropFilter: "blur(6px)",
+            zIndex: 9999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "24px 16px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              borderRadius: 20,
+              maxWidth: 520,
+              width: "100%",
+              padding: "32px 24px",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={() => setShowFdaPopup(false)}
+              style={{
+                position: "absolute",
+                top: 14,
+                left: 14,
+                background: "#f3f4f6",
+                border: "none",
+                borderRadius: "50%",
+                width: 34,
+                height: 34,
+                fontSize: 20,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#374151",
+              }}
+            >
+              &times;
+            </button>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <div style={{ background: "#EEF2FF", borderRadius: 10, width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#4338CA" }}>
+                FDA
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111" }}>اعتماد FDA للمادة الفعّالة</h3>
+            </div>
+
+            <div style={{ fontSize: 14, color: "#4b5563", lineHeight: 1.85 }}>
+              <p style={{ marginBottom: 14 }}>
+                المادة الفعّالة <strong>تيرزيباتيد (Tirzepatide)</strong> حاصلة على اعتماد هيئة الغذاء والدواء الأمريكية (FDA) للاستخدامات التالية:
+              </p>
+
+              <div style={{ background: "#f0fdf4", borderRadius: 12, padding: "14px 16px", marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, color: "#15803d", fontSize: 13, marginBottom: 6 }}>✓ إنقاص الوزن (باسم Zepbound)</div>
+                <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>
+                  معتمد منذ نوفمبر ٢٠٢٣ لعلاج السمنة المزمنة عند البالغين الذين يعانون من مؤشر كتلة جسم ≥ ٣٠، أو ≥ ٢٧ مع حالة صحية مرتبطة بالوزن.
+                </p>
+              </div>
+
+              <div style={{ background: "#EEF2FF", borderRadius: 12, padding: "14px 16px", marginBottom: 12 }}>
+                <div style={{ fontWeight: 700, color: "#4338CA", fontSize: 13, marginBottom: 6 }}>✓ داء السكري من النوع الثاني (باسم Mounjaro)</div>
+                <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>
+                  معتمد منذ مايو ٢٠٢٢ كعلاج مساعد للنظام الغذائي والرياضة لتحسين مستوى السكر في الدم.
+                </p>
+              </div>
+
+              <div style={{ background: "#FFF7ED", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
+                <div style={{ fontWeight: 700, color: "#C2410C", fontSize: 13, marginBottom: 6 }}>✓ انقطاع النفس أثناء النوم (باسم Zepbound)</div>
+                <p style={{ fontSize: 13, color: "#374151", margin: 0 }}>
+                  معتمد منذ ديسمبر ٢٠٢٤ لعلاج انقطاع النفس الانسدادي المعتدل إلى الشديد عند البالغين المصابين بالسمنة.
+                </p>
+              </div>
+
+              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>
+                المصدر: هيئة الغذاء والدواء الأمريكية (U.S. FDA) · آخر تحديث: ٢٠٢٤
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

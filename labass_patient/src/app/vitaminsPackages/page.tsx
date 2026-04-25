@@ -2,6 +2,7 @@
 
 import React from "react";
 import HeroSection from "./_components/HeroSection";
+import Symptoms from "./_components/Symptoms";
 // import HowItWorks from "./_components/HowItWorks";
 import WhatsIncluded from "./_components/WhatsIncluded";
 import PricingPlans from "./_components/PricingPlans";
@@ -18,6 +19,7 @@ const VitaminsPackagesPage = () => {
         شركة سعودية مرخّصة من وزارة الصحة · ترخيص رقم 1400055938
       </div>
       <HeroSection />
+      <Symptoms />
       {/* <HowItWorks /> */}
       <div style={{ backgroundColor: "#7ED957" }}>
         <WhatsIncluded />

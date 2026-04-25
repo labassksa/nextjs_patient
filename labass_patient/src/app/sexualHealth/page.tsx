@@ -95,7 +95,7 @@ const blogArticles = [
 ];
 
 export default function SexualHealth() {
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly" | "annual">("quarterly");
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly" | "annual" | "youth">("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [openArticle, setOpenArticle] = useState<number | null>(null);
 
@@ -149,6 +149,15 @@ export default function SexualHealth() {
     "فحص دم من مختبر معتمد بأعلى معايير الجودة",
     "إعادة تقييم مع طبيبك",
     "أولوية في الدعم",
+  ];
+
+  const youthFeatures = [
+    "تقييم طبّي مخصّص لأقل من ٤٠",
+    "وصفة من طبيب مرخّص",
+    "٢٤ جرعة كل ٣ أشهر",
+    "فحص دم من مختبر معتمد بأعلى معايير الجودة",
+    "استشارة عبر المحادثة",
+    "توصيل مجاني",
   ];
 
   return (
@@ -782,6 +791,35 @@ export default function SexualHealth() {
             </ul>
             <Link href="/sexualHealth/subscribe" className={styles.planCta}>
               اشترك سنوياً
+              <span className={styles.planCtaArr}>&larr;</span>
+            </Link>
+          </div>
+
+          {/* Under 40 - 3 months */}
+          <div
+            className={`${styles.planCard} ${selectedPlan === "youth" ? styles.planCardSelected : ""}`}
+            onClick={() => setSelectedPlan("youth")}
+          >
+            <div className={styles.planRadio} />
+            <span className={styles.planSaveBadge}>لأقل من ٤٠ سنة</span>
+            <p className={styles.planName}>٣ أشهر · شباب</p>
+            <div className={styles.planPrice}>
+              <span className={styles.planNum}>٤٤٩</span>
+              <span className={styles.planCur}>ريال / كل ٣ أشهر</span>
+            </div>
+            <p className={styles.planPeriod}>
+              ~١٥٠ ريال شهرياً &middot; مصمّمة للشباب
+            </p>
+            <ul className={styles.planFeats}>
+              {youthFeatures.map((f, i) => (
+                <li key={i} className={styles.planFeat}>
+                  <span className={styles.planCk}>&#10003;</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link href="/sexualHealth/subscribe" className={styles.planCta}>
+              اشترك الآن
               <span className={styles.planCtaArr}>&larr;</span>
             </Link>
           </div>

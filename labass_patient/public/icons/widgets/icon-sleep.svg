@@ -1,0 +1,11 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" rx="12" fill="#BCE1A4"/>
+<path d="M32 18C32 24.6274 26.6274 30 20 30C17.4 30 15 29.2 13 27.8C15.4 31.4 19.4 34 24 34C30.6274 34 36 28.6274 36 22C36 19.0 34.4 16.4 32 14.4C32 15.6 32 16.8 32 18Z" fill="#4DA514"/>
+<path d="M31 17C31 23.0751 26.0751 28 20 28C16.8 28 13.9 26.6 12 24.4C11.4 23.6 11 22.8 10.6 22C10.2 21 10 19.9 10 18.7C10 12.3 15.4 7 21.7 7.1C23.6 7.2 25.4 7.7 27 8.6C29.4 10.2 31 13 31 17Z" stroke="#22313F" stroke-width="1.2" fill="none"/>
+<path d="M20 28C26.0751 28 31 23.0751 31 17C31 13 29.4 10.2 27 8.6" stroke="#22313F" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+<text x="23" y="24" fill="#22313F" font-family="system-ui" font-size="9" font-weight="700">Z</text>
+<text x="28" y="20" fill="#22313F" font-family="system-ui" font-size="7" font-weight="700" opacity="0.6">Z</text>
+<text x="32" y="16" fill="#22313F" font-family="system-ui" font-size="5" font-weight="700" opacity="0.3">Z</text>
+<path d="M14 36H34" stroke="#22313F" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M18 40H30" stroke="#22313F" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

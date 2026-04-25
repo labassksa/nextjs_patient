@@ -813,7 +813,7 @@ export default function ObesitySubscribePage() {
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٤</div>
                 <div className={s.nextTxt}>
-                  <strong>استشر الطبيب:</strong> متى ما احتجت، عبر المحادثة أو
+                  <strong>استشر الطبيب 24/7:</strong> متى ما احتجت، عبر المحادثة أو
                   مكالمة فيديو مباشرة — بدون حجز موعد.
                 </div>
               </li>

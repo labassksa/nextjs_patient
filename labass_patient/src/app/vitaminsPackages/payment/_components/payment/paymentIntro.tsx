@@ -9,8 +9,8 @@ interface PaymentIntroProps {
 const features = [
   "فحص دم من مختبر معتمد بأعلى معايير الجودة",
   "طبيب يحلل نتائجك",
-  "فيتامينات مخصّصة لك توصلك لبيتك",
-  "استشر الطبيب في أي وقت",
+  "فيتامينات ومعادن مخصّصة لك توصلك لبيتك",
+  "استشر الطبيب 24/7",
 ];
 
 const PaymentIntro: React.FC<PaymentIntroProps> = ({ planLabel, price }) => {
