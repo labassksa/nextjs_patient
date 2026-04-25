@@ -20,11 +20,13 @@ const VitaminsPaymentClient: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const priceParam = searchParams.get("discountedPrice");
-  const planLabelParam = searchParams.get("planLabel");
-  const bundleIdParam = searchParams.get("bundleId");
-  const tokenUUIDParam = searchParams.get("tokenUUID");
-  const promoCodeParam = searchParams.get("promoCode");
+  const priceParam        = searchParams.get("discountedPrice");
+  const planLabelParam    = searchParams.get("planLabel");
+  const bundleIdParam     = searchParams.get("bundleId");
+  const tokenUUIDParam    = searchParams.get("tokenUUID");
+  const promoCodeParam    = searchParams.get("promoCode");
+  const subscriberType    = (searchParams.get("subscriberType") || "patient") as "patient" | "organization";
+  const isRecurring       = searchParams.get("isRecurring") === "true";
 
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.ApplePay);
   const [discountedPrice, setDiscountedPrice] = useState(
@@ -117,6 +119,8 @@ const VitaminsPaymentClient: React.FC = () => {
           discountedPrice={discountedPrice}
           promoCode={promoCode}
           bundleId={bundleId}
+          subscriberType={subscriberType}
+          isRecurring={isRecurring}
         />
       </div>
 

@@ -53,6 +53,8 @@ export default function SubscribePage() {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [isRecurring, setIsRecurring] = useState(false);
+
   // Backend state
   const [token, setToken] = useState<string | null>(null);
   const [vitaminBundles, setVitaminBundles] = useState<any[]>([]);
@@ -203,46 +205,25 @@ export default function SubscribePage() {
     }
   };
 
-  const handleSubscribe = async () => {
+  const handleSubscribe = () => {
     const authToken = token || localStorage.getItem("labass_token");
     if (!authToken) {
       setApiError("انتهت الجلسة، يرجى تسجيل الدخول مجدداً");
       return;
     }
-    setLoading(true);
-    setApiError(null);
-    try {
-      const bundleId = selectedBundleId;
-      if (!bundleId) throw new Error("الباقة غير متاحة، تواصل مع الدعم");
-
-      // 1. Initiate MyFatoorah session (gets SessionId for CardView widget)
-      const { data: sessionData } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/initiate-session`,
-        { InvoiceAmount: price, CurrencyIso: "SAR" }
-      );
-      const sessionId = sessionData?.Data?.SessionId;
-      const countryCode = sessionData?.Data?.CountryCode || "SAU";
-      if (!sessionId) throw new Error("فشل تهيئة جلسة الدفع");
-
-      // 2. Store survey answers in localStorage for cardDetails to use
-      const surveyAnswers = {
-        name,
-        age: Number(age),
-        gender,
-        height: Number(height),
-        weight: Number(weight),
-        city,
-        healthGoals: goals,
-      };
-      localStorage.setItem("vitamin_survey_answers", JSON.stringify(surveyAnswers));
-
-      // 3. Navigate to cardDetails — same URL structure as orgPortal bundle flow
-      router.push(`/cardDetails?sessionId=${encodeURIComponent(sessionId)}&countryCode=${countryCode}&bundleId=${bundleId}&discountedPrice=${price}`);
-    } catch (err: any) {
-      const msg = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || "حدث خطأ، حاول مرة أخرى";
-      setApiError(msg);
-      setLoading(false);
+    const bundleId = selectedBundleId;
+    if (!bundleId) {
+      setApiError("الباقة غير متاحة، تواصل مع الدعم");
+      return;
     }
+    const params = new URLSearchParams({
+      bundleId: String(bundleId),
+      discountedPrice: String(price),
+      planLabel,
+      isRecurring: String(isRecurring),
+      subscriberType: "patient",
+    });
+    router.push(`/vitaminsPackages/payment?${params.toString()}`);
   };
 
   const prevStep = () => {
@@ -360,6 +341,41 @@ export default function SubscribePage() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Recurring toggle */}
+          <div className={s.recurringWrap}>
+            <p className={s.recurringLabel}>نوع الدفع</p>
+            <div className={s.recurringToggle}>
+              <button
+                className={`${s.recurringOpt} ${!isRecurring ? s.recurringOptActive : ""}`}
+                onClick={() => setIsRecurring(false)}
+                type="button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M3 10h18" stroke="currentColor" strokeWidth="1.8" />
+                </svg>
+                دفعة واحدة
+              </button>
+              <button
+                className={`${s.recurringOpt} ${isRecurring ? s.recurringOptActive : ""}`}
+                onClick={() => setIsRecurring(true)}
+                type="button"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M1 4v6h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M23 20v-6h-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                اشتراك متكرّر
+              </button>
+            </div>
+            <p className={s.recurringHint}>
+              {isRecurring
+                ? "سيتجدّد الاشتراك تلقائياً في نهاية كل دورة"
+                : "ادفع مرة واحدة فقط بدون تجديد تلقائي"}
+            </p>
           </div>
 
         </div>

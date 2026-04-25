@@ -1066,3 +1066,56 @@
     transition: none !important;
   }
 }
+
+/* -------- Recurring toggle -------- */
+.recurringWrap {
+  margin-top: 24px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 0.5px solid rgba(23, 52, 4, 0.12);
+  border-radius: 14px;
+}
+.recurringLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(23, 52, 4, 0.55);
+  letter-spacing: 0.3px;
+  margin: 0 0 10px;
+}
+.recurringToggle {
+  display: flex;
+  gap: 8px;
+}
+.recurringOpt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 14px;
+  background: rgba(234, 243, 222, 0.4);
+  border: 1.5px solid rgba(23, 52, 4, 0.1);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(23, 52, 4, 0.65);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.recurringOpt:hover {
+  border-color: rgba(99, 153, 34, 0.4);
+  color: #173404;
+}
+.recurringOptActive {
+  background: #173404;
+  border-color: #173404;
+  color: #eaf3de;
+}
+.recurringHint {
+  font-size: 11.5px;
+  color: rgba(23, 52, 4, 0.55);
+  margin: 10px 0 0;
+  line-height: 1.5;
+  text-align: center;
+}

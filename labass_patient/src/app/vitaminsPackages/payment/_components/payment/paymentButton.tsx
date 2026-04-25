@@ -11,6 +11,8 @@ interface PaymentButtonProps {
   discountedPrice: number;
   promoCode: string;
   bundleId?: number | null;
+  subscriberType?: "patient" | "organization";
+  isRecurring?: boolean;
 }
 
 interface ApplePayConfig {
@@ -31,6 +33,8 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
   discountedPrice,
   promoCode,
   bundleId,
+  subscriberType = "patient",
+  isRecurring = false,
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -97,21 +101,20 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
     const token = localStorage.getItem("labass_token");
     if (!token) { router.push("/login"); return; }
     try {
-      // TODO: replace with subscription-specific endpoint when ready
       const { data } = await axios.post(
-        `${apiUrl}/execute-payment`,
+        `${apiUrl}/execute-subscription-payment`,
         {
-          SessionId: sessionId,
-          DisplayCurrencyIso: "SAR",
-          InvoiceValue: discountedPrice.toFixed(2),
-          PromoCode: promoCode,
-          BundleId: bundleId ?? undefined,
-          CallBackUrl: "https://labass.sa/success",
-          ErrorUrl: "https://labass.sa/error",
+          bundleId: bundleId ?? undefined,
+          sessionId,
+          callBackUrl: "https://labass.sa/success",
+          errorUrl: "https://labass.sa/error",
+          subscriberType,
+          isRecurring,
+          promoCode,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (data.IsSuccess) setShowModal(true);
+      if (data.success) setShowModal(true);
       else console.error("Payment failed:", data);
     } catch (err) {
       console.error("executeSubscriptionPayment error:", err);
@@ -132,7 +135,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         const { SessionId, CountryCode } = data.Data;
         // TODO: update cardDetails page to handle bundleId for subscriptions
         router.push(
-          `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${promoCode}${bundleId ? `&bundleId=${bundleId}` : ""}`
+          `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${encodeURIComponent(promoCode)}${bundleId ? `&bundleId=${bundleId}` : ""}&subscriberType=${subscriberType}&isRecurring=${isRecurring}`
         );
       }
     } catch (err) {

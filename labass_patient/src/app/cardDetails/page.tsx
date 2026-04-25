@@ -23,6 +23,8 @@ const CardDetailsContent: React.FC = () => {
   const promoCode = searchParams.get("promoCode") || "";
   const consultationType = searchParams.get("consultationType");
   const bundleId = searchParams.get("bundleId");
+  const subscriberType = searchParams.get("subscriberType");
+  const isRecurring = searchParams.get("isRecurring") === "true";
 
   // Store consultationType in localStorage if it exists
   useEffect(() => {
@@ -53,13 +55,19 @@ const CardDetailsContent: React.FC = () => {
             const tempBundleId = localStorage.getItem('temp_bundle_id');
             if (tempBundleId) {
               localStorage.removeItem('temp_bundle_id');
-              const isVitamin = localStorage.getItem('temp_vitamin_payment');
-              if (isVitamin) {
-                localStorage.removeItem('temp_vitamin_payment');
-                localStorage.removeItem('vitamin_survey_answers');
-                router.push("/vitaminsPackages/subscribe/success");
+              const isSubscriptionFlow = localStorage.getItem('temp_subscription_flow');
+              if (isSubscriptionFlow) {
+                localStorage.removeItem('temp_subscription_flow');
+                router.push("/vitaminsPackages");
               } else {
-                router.push("/orgPortal?bundlePaymentSuccess=true");
+                const isVitamin = localStorage.getItem('temp_vitamin_payment');
+                if (isVitamin) {
+                  localStorage.removeItem('temp_vitamin_payment');
+                  localStorage.removeItem('vitamin_survey_answers');
+                  router.push("/vitaminsPackages/subscribe/success");
+                } else {
+                  router.push("/orgPortal?bundlePaymentSuccess=true");
+                }
               }
             } else {
               const consultationId = localStorage.getItem('temp_consultation_id');
@@ -112,39 +120,60 @@ const CardDetailsContent: React.FC = () => {
               // Check if this is a bundle payment (org or vitamins)
               if (bundleId) {
                 console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
-                const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
-                const isVitamin = !!surveyAnswersRaw;
 
                 let paymentUrl: string | null = null;
 
-                if (isVitamin) {
-                  const surveyAnswers = JSON.parse(surveyAnswersRaw!);
+                if (subscriberType) {
+                  // New subscription flow — vitamins payment page
                   const { data } = await axios.post(
-                    `${apiUrl}/vitamins/subscribe`,
+                    `${apiUrl}/execute-subscription-payment`,
                     {
                       bundleId: Number(bundleId),
                       sessionId: newSessionId,
-                      surveyAnswers,
-                      callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
-                      errorUrl: "https://labass.sa/cardDetails/error",
+                      callBackUrl: "https://labass.sa/success",
+                      errorUrl: "https://labass.sa/error",
+                      subscriberType,
+                      isRecurring,
+                      promoCode,
                     },
                     { headers: { Authorization: `Bearer ${token}` } }
                   );
-                  console.log("[Payment] Vitamins subscribe response:", data);
-                  paymentUrl = data.paymentURL ?? null;
+                  console.log("[Payment] Subscription payment response:", data);
+                  paymentUrl = data.data?.paymentURL ?? null;
+                  if (paymentUrl) localStorage.setItem('temp_subscription_flow', '1');
                 } else {
-                  const { data } = await axios.post(
-                    `${apiUrl}/execute-onetime-bundle-payment`,
-                    {
-                      bundleId: Number(bundleId),
-                      sessionId: newSessionId,
-                      CallBackUrl: "https://labass.sa/cardDetails/success",
-                      ErrorUrl: "https://labass.sa/cardDetails/error",
-                    },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                  );
-                  console.log("[Payment] Bundle payment response:", data);
-                  paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
+                  const surveyAnswersRaw = localStorage.getItem("vitamin_survey_answers");
+                  const isVitamin = !!surveyAnswersRaw;
+
+                  if (isVitamin) {
+                    const surveyAnswers = JSON.parse(surveyAnswersRaw!);
+                    const { data } = await axios.post(
+                      `${apiUrl}/vitamins/subscribe`,
+                      {
+                        bundleId: Number(bundleId),
+                        sessionId: newSessionId,
+                        surveyAnswers,
+                        callBackUrl: "https://labass.sa/vitaminsPackages/subscribe/success",
+                        errorUrl: "https://labass.sa/cardDetails/error",
+                      },
+                      { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    console.log("[Payment] Vitamins subscribe response:", data);
+                    paymentUrl = data.paymentURL ?? null;
+                  } else {
+                    const { data } = await axios.post(
+                      `${apiUrl}/execute-onetime-bundle-payment`,
+                      {
+                        bundleId: Number(bundleId),
+                        sessionId: newSessionId,
+                        CallBackUrl: "https://labass.sa/cardDetails/success",
+                        ErrorUrl: "https://labass.sa/cardDetails/error",
+                      },
+                      { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    console.log("[Payment] Bundle payment response:", data);
+                    paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
+                  }
                 }
 
                 if (paymentUrl) {
