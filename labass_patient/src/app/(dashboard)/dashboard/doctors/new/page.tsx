@@ -51,7 +51,7 @@ export default function CreateDoctorPage() {
     try {
       await createDoctor.mutateAsync({
         ...values,
-        role: "doctor",
+        role: ["doctor"],
       });
       router.push("/dashboard/doctors");
     } catch {
