@@ -165,6 +165,7 @@ const CardDetailsContent: React.FC = () => {
                 }
               } else {
                 // Regular consultation payment
+                const consultationType = localStorage.getItem("consultationType") || undefined;
                 const { data } = await axios.post(
                   `${apiUrl}/execute-payment`,
                   {
@@ -174,6 +175,7 @@ const CardDetailsContent: React.FC = () => {
                     PromoCode: promoCode,
                     CallBackUrl: "https://labass.sa/cardDetails/success",
                     ErrorUrl: "https://labass.sa/cardDetails/error",
+                    consultationType,
                   },
                   {
                     headers: { Authorization: `Bearer ${token}` },
