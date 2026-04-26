@@ -24,7 +24,7 @@ export interface CreateDoctorPayload {
   gender: string;
   dateOfBirth: string;
   nationalId: string;
-  role: string;
+  role: string[];
   iban: string;
   specialty: string;
   medicalLicenseNumber: string;
