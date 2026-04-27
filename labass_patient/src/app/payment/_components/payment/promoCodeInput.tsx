@@ -42,9 +42,10 @@ const PromoCode: React.FC<{
     setResponseMessage("");
 
     try {
+      const consultationType = localStorage.getItem("consultationType") || undefined;
       const response = await axios.post(
         `${apiUrl}/use-promo`,
-        { promoCode: promoCodeInput, price: cashAmount || undefined },
+        { promoCode: promoCodeInput, price: cashAmount || undefined, consultationType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import PaymentIntro from "./_components/payment/paymentIntro";
@@ -29,10 +29,14 @@ const PaymentClient: React.FC = () => {
   const consultationType = searchParams.get("consultationType");
   const priceFromQuery = searchParams.get("price");
 
-  const basePrice = priceFromQuery
-    ? Number(priceFromQuery)
-    : consultationType && CONSULTATION_PRICES[consultationType]
-    ? CONSULTATION_PRICES[consultationType]
+  // Capture initial values in refs so URL changes after mount have no effect
+  const initialConsultationType = useRef(consultationType);
+  const initialPriceFromQuery = useRef(priceFromQuery);
+
+  const basePrice = initialPriceFromQuery.current
+    ? Number(initialPriceFromQuery.current)
+    : initialConsultationType.current && CONSULTATION_PRICES[initialConsultationType.current]
+    ? CONSULTATION_PRICES[initialConsultationType.current]
     : 89;
 
   // Client-side states
@@ -43,11 +47,10 @@ const PaymentClient: React.FC = () => {
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
 
-  // Store consultationType in localStorage once on mount only
-  // Using [] so URL changes after mount don't override it and change the consultation type
+  // Store the initial consultationType in localStorage — ref ensures URL changes never override it
   useEffect(() => {
-    if (consultationType) {
-      localStorage.setItem("consultationType", consultationType);
+    if (initialConsultationType.current) {
+      localStorage.setItem("consultationType", initialConsultationType.current);
     } else {
       localStorage.removeItem("consultationType");
     }
