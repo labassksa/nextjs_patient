@@ -13,23 +13,35 @@ import Header from "../../components/common/header";
 import { PaymentMethodEnum } from "../../types/paymentMethods";
 import { getMagicLink } from "./_controllers/getMagicLink";
 
+const CONSULTATION_PRICES: Record<string, number> = {
+  obesity: 89,
+  sickleave: 49,
+  psychiatric: 49,
+};
+
 const PaymentClient: React.FC = () => {
   const router = useRouter();
+
+  // Read query parameters in the client — must be before useState to use in initial state
+  const searchParams = useSearchParams();
+  const tokenUUIDFromQuery = searchParams.get("tokenUUID");
+  const promoCodeFromQuery = searchParams.get("promoCode");
+  const consultationType = searchParams.get("consultationType");
+  const priceFromQuery = searchParams.get("price");
+
+  const basePrice = priceFromQuery
+    ? Number(priceFromQuery)
+    : consultationType && CONSULTATION_PRICES[consultationType]
+    ? CONSULTATION_PRICES[consultationType]
+    : 89;
 
   // Client-side states
   const [paymentMethod, setPaymentMethod] = useState(
     PaymentMethodEnum.ApplePay
   );
-  const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
+  const [discountedPrice, setDiscountedPrice] = useState(basePrice);
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Read query parameters in the client
-  const searchParams = useSearchParams();
-  const tokenUUIDFromQuery = searchParams.get("tokenUUID");
-  const promoCodeFromQuery = searchParams.get("promoCode");
-  const consultationType = searchParams.get("consultationType");
 
   // Store consultationType in localStorage for later use after payment
   // Always update (or clear) to avoid stale values from previous consultations
@@ -92,6 +104,7 @@ const PaymentClient: React.FC = () => {
             setDiscountedPrice={setDiscountedPrice}
             setPromoCode={setPromoCode}
             selectedPaymentMethod={paymentMethod}
+            basePrice={basePrice}
           />
         </div>
 
