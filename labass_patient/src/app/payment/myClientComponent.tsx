@@ -43,15 +43,15 @@ const PaymentClient: React.FC = () => {
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
 
-  // Store consultationType in localStorage for later use after payment
-  // Always update (or clear) to avoid stale values from previous consultations
+  // Store consultationType in localStorage once on mount only
+  // Using [] so URL changes after mount don't override it and change the consultation type
   useEffect(() => {
     if (consultationType) {
       localStorage.setItem("consultationType", consultationType);
     } else {
       localStorage.removeItem("consultationType");
     }
-  }, [consultationType]);
+  }, []);
 
   useEffect(() => {
     const applyMagicLinkPromo = async () => {
