@@ -359,8 +359,8 @@ export default function SexualHealth() {
                 <circle cx="180" cy="180" r="140" fill="#4DA514" filter="url(#hp-atoms-bright)" opacity="0.75" />
                 <circle cx="180" cy="180" r="140" fill="#5B8B3B" filter="url(#hp-atoms-mid)" opacity="0.7" />
 
-                <text x="185" y="231" fill="#000000" fontFamily="Inter, system-ui, sans-serif" fontSize="170" fontWeight="700" textAnchor="middle" letterSpacing="-5" opacity="0.09">L</text>
-                <text x="185" y="231" fontFamily="Inter, system-ui, sans-serif" fontSize="170" fontWeight="700" textAnchor="middle" letterSpacing="-5" filter="url(#hp-inner-shadow)">L</text>
+                <text x="185" y="200" fill="#000000" fontFamily="Tajawal, system-ui, sans-serif" fontSize="64" fontWeight="800" textAnchor="middle" letterSpacing="-1.5" opacity="0.09">لاباس</text>
+                <text x="185" y="200" fontFamily="Tajawal, system-ui, sans-serif" fontSize="64" fontWeight="800" textAnchor="middle" letterSpacing="-1.5" filter="url(#hp-inner-shadow)">لاباس</text>
               </svg>
             </div>
 

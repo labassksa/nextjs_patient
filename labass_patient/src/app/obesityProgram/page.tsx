@@ -70,8 +70,7 @@ export default function ObesityProgram() {
             <h1 className={s.heroH1}>
               اخسر وزنك <span className={s.dim}>بإشراف طبّي</span>
               <br />
-              مع أدوية&nbsp;
-              <span className={s.glp}>GLP-1</span>
+              مع <span className={s.glp}>مونجارو و اوزمبيك</span>
             </h1>
 
             <p className={s.heroLead}>
