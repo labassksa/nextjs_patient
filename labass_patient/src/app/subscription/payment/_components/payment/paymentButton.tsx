@@ -187,7 +187,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
               سيتواصل معك فريق لاباس خلال ٢٤ ساعة لتحديد موعد زيارة الممرّض
               وبدء رحلتك الصحية.
             </p>
-            <button className={s.modalBtn} onClick={() => router.push("/")}>
+            <button className={s.modalBtn} onClick={() => router.push("/home")}>
               متابعة
             </button>
           </div>

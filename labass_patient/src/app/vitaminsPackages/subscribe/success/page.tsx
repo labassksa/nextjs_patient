@@ -13,7 +13,7 @@ export default function VitaminSubscribeSuccessPage() {
         <p style={{ color: "#555", marginBottom: 24, lineHeight: 1.7 }}>
           شكراً لاشتراكك في برنامج الفيتامينات المخصّصة من لاباس. سيتواصل معك فريقنا خلال ٢٤ ساعة لتحديد موعد زيارة الممرّض.
         </p>
-        <Link href="/" style={{ display: "inline-block", background: "#1D9E75", color: "#fff", padding: "12px 32px", borderRadius: 8, fontWeight: 600, textDecoration: "none" }}>
+        <Link href="/home" style={{ display: "inline-block", background: "#1D9E75", color: "#fff", padding: "12px 32px", borderRadius: 8, fontWeight: 600, textDecoration: "none" }}>
           العودة للرئيسية
         </Link>
       </div>

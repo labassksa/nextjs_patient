@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" width="180" height="60">
+  <!-- Cross symbol -->
+  <rect x="12" y="22" width="8" height="24" rx="2" fill="#1a7a3c"/>
+  <rect x="6" y="28" width="20" height="8" rx="2" fill="#1a7a3c"/>
+  <!-- Arabic text: صيدليات الشافي -->
+  <text x="38" y="28" font-family="'Tajawal','Arial Arabic','Segoe UI',sans-serif" font-size="11" font-weight="700" fill="#1a7a3c" direction="rtl" text-anchor="start">صيدليات</text>
+  <text x="38" y="46" font-family="'Tajawal','Arial Arabic','Segoe UI',sans-serif" font-size="14" font-weight="800" fill="#1a7a3c" direction="rtl" text-anchor="start">الشافي</text>
+</svg>
