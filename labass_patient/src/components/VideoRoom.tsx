@@ -168,9 +168,7 @@ const VideoRoom: React.FC<VideoRoomProps> = ({
       `}</style>
       <LiveKitRoom
         room={room}
-        token={token}
-        serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
-        connect={true}
+        connect={false}
         onDisconnected={onDisconnect}
         style={{ height: '100vh', width: '100vw' }}
       >
