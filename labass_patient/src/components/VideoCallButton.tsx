@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { VideoCameraIcon, VideoCameraSlashIcon } from '@heroicons/react/24/outline';
+import { VideoCameraIcon } from '@heroicons/react/24/outline';
 import { useVideoCall } from '../hooks/useVideoCall';
 import VideoRoom from './VideoRoom';
 
@@ -19,23 +19,18 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
   isConsultationOpen,
 }) => {
   const [livekitToken, setLivekitToken] = useState<string>('');
-  const [isCallActive, setIsCallActive] = useState(false);
   const [incomingCall, setIncomingCall] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const {
     callState,
     room,
-    startCall,
+    setupRoom,
     endCall,
     toggleAudio,
     toggleVideo,
-  } = useVideoCall({
-    consultationId,
-    userId,
-    socket,
-  });
+  } = useVideoCall({ consultationId, userId, socket });
 
-  // Listen for incoming video call events
   useEffect(() => {
     if (!socket) return;
 
@@ -45,9 +40,9 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
       }
     };
 
-    const handleVideoCallEnded = (data: any) => {
+    const handleVideoCallEnded = () => {
       setIncomingCall(false);
-      setIsCallActive(false);
+      setLivekitToken('');
     };
 
     socket.on('videoCallStarted', handleVideoCallStarted);
@@ -59,25 +54,44 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     };
   }, [socket]);
 
-  // Update call active state based on hook state
-  useEffect(() => {
-    setIsCallActive(callState.isInCall);
-  }, [callState.isInCall]);
+  const fetchLivekitToken = async (): Promise<string> => {
+    const authToken = localStorage.getItem("labass_token");
+    if (!authToken) throw new Error("Authentication token not found");
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/get-token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId: `patient_${userId}`,
+        roomName: `consultation_${consultationId}`,
+      }),
+    });
+
+    if (!response.ok) throw new Error(`Failed to get token: ${response.statusText}`);
+    const data = await response.json();
+    return data.token;
+  };
 
   const handleStartCall = async () => {
     try {
-      await startCall();
-      setLivekitToken('connected');
+      setIsStarting(true);
+      const token = await fetchLivekitToken();
+      setupRoom(); // create room + attach event listeners (no connect yet)
+      setLivekitToken(token); // triggers re-render → VideoRoom mounts → LiveKitRoom connects
     } catch (error) {
       console.error('Failed to start video call:', error);
       alert(`فشل في بدء المكالمة المرئية: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
+    } finally {
+      setIsStarting(false);
     }
   };
 
   const handleEndCall = async () => {
     await endCall();
     setLivekitToken('');
-    setIsCallActive(false);
     setIncomingCall(false);
   };
 
@@ -86,12 +100,10 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     await handleStartCall();
   };
 
-  if (!isConsultationOpen) {
-    return null;
-  }
+  if (!isConsultationOpen) return null;
 
-  // Show incoming call notification
-  if (incomingCall && !isCallActive) {
+  // Incoming call notification
+  if (incomingCall && !livekitToken) {
     return (
       <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-blue-100 border border-blue-400 text-blue-700 px-6 py-4 rounded-lg shadow-lg z-40">
         <div className="flex items-center space-x-4" dir="rtl">
@@ -119,12 +131,13 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     );
   }
 
-  // Show video room if call is active (render via portal to escape parent layout)
-  if (isCallActive && livekitToken) {
+  // Active call — render VideoRoom via portal
+  if (livekitToken && room) {
     return typeof document !== 'undefined' ? createPortal(
       <VideoRoom
         room={room}
         token={livekitToken}
+        serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL!}
         onDisconnect={handleEndCall}
         isConnecting={callState.isConnecting}
       />,
@@ -132,20 +145,16 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     ) : null;
   }
 
-  // Show video call button
+  // Start call button
   return (
     <div className="p-4">
       <button
         onClick={handleStartCall}
-        disabled={callState.isConnecting}
-        className={`w-full ${
-          callState.isConnecting
-            ? 'bg-blue-400'
-            : 'bg-blue-600 hover:bg-blue-700'
-        } text-white text-sm py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center space-x-2`}
+        disabled={isStarting}
+        className={`w-full ${isStarting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center space-x-2`}
         dir="rtl"
       >
-        {callState.isConnecting ? (
+        {isStarting ? (
           <>
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             <span>جاري الاتصال...</span>
