@@ -25,6 +25,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
   });
 
   const roomRef = useRef<Room | null>(null);
+  const [livekitToken, setLivekitToken] = useState<string>('');
 
   const generateToken = async (): Promise<string> => {
     const token = localStorage.getItem("labass_token");
@@ -51,7 +52,8 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
     try {
       setCallState(prev => ({ ...prev, isConnecting: true, error: null }));
 
-      const livekitToken = await generateToken();
+      const token = await generateToken();
+      setLivekitToken(token);
 
       const room = new Room();
       roomRef.current = room;
@@ -105,7 +107,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
         setCallState(prev => ({ ...prev, connectionState: ConnectionState.Reconnecting }));
       });
 
-      await room.connect(process.env.NEXT_PUBLIC_LIVEKIT_URL!, livekitToken, {
+      await room.connect(process.env.NEXT_PUBLIC_LIVEKIT_URL!, token, {
         audio: true,
         video: true,
       } as any);
@@ -127,6 +129,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
         roomRef.current = null;
       }
 
+      setLivekitToken('');
       setCallState(prev => ({
         ...prev,
         isInCall: false,
@@ -164,6 +167,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
   return {
     callState,
     room: roomRef.current,
+    livekitToken,
     startCall,
     endCall,
     toggleAudio,

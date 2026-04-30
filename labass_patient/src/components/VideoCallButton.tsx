@@ -18,13 +18,13 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
   socket,
   isConsultationOpen,
 }) => {
-  const [livekitToken, setLivekitToken] = useState<string>('');
   const [isCallActive, setIsCallActive] = useState(false);
   const [incomingCall, setIncomingCall] = useState(false);
 
   const {
     callState,
     room,
+    livekitToken,
     startCall,
     endCall,
   } = useVideoCall({ consultationId, userId, socket });
@@ -58,39 +58,14 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
 
   const handleStartCall = async () => {
     try {
-      const token = localStorage.getItem("labass_token");
-      if (!token) {
-        alert("رمز المصادقة غير موجود");
-        return;
-      }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/get-token`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: `patient_${userId}`,
-          roomName: `consultation_${consultationId}`,
-        }),
-      });
-
-      if (!response.ok) throw new Error(`Failed to generate token: ${response.statusText}`);
-
-      const data = await response.json();
-      setLivekitToken(data.token);
-
       await startCall();
     } catch (error) {
       console.error('Failed to start video call:', error);
-      alert(`فشل في بدء المكالمة المرئية: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
     }
   };
 
   const handleEndCall = async () => {
     await endCall();
-    setLivekitToken('');
     setIsCallActive(false);
     setIncomingCall(false);
   };

@@ -1,4 +1,5 @@
 "use client";
+import '@livekit/components-styles';
 import React from 'react';
 import { Room } from 'livekit-client';
 import {

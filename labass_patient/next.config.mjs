@@ -7,6 +7,7 @@ const nextConfig = {
   images: {
     domains: ['storage.googleapis.com'],
   },
+  transpilePackages: ['@livekit/components-react', '@livekit/components-styles'],
 };
 
 export default nextConfig;
