@@ -12,7 +12,6 @@ import '@livekit/components-styles';
 interface VideoRoomProps {
   room: Room | null;
   token: string;
-  serverUrl: string;
   onDisconnect: () => void;
   isConnecting: boolean;
 }
@@ -20,7 +19,6 @@ interface VideoRoomProps {
 const VideoRoom: React.FC<VideoRoomProps> = ({
   room,
   token,
-  serverUrl,
   onDisconnect,
   isConnecting,
 }) => {
@@ -171,7 +169,7 @@ const VideoRoom: React.FC<VideoRoomProps> = ({
       <LiveKitRoom
         room={room}
         token={token}
-        serverUrl={serverUrl}
+        serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
         connect={true}
         onDisconnected={onDisconnect}
         style={{ height: '100vh', width: '100vw' }}
