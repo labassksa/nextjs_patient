@@ -7,7 +7,6 @@ import {
   RoomAudioRenderer,
   useTracks,
 } from '@livekit/components-react';
-import '@livekit/components-styles';
 
 interface VideoRoomProps {
   room: Room | null;
