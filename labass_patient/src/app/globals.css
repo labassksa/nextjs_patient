@@ -1,4 +1,4 @@
-@import '@livekit/components-styles';
+@import '@livekit/components-styles/dist/general/index.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
