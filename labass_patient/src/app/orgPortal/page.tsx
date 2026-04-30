@@ -54,7 +54,7 @@ const OrgPatientsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orgError, setOrgError] = useState("");
   const [submitError, setSubmitError] = useState("");
-  const [dealType, setDealType] = useState<DealType | "">("");
+  const [dealType, setDealType] = useState<DealType[]>([]);
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
   const [orgName, setOrgName] = useState<string>("");
   const [userData, setUserData] = useState<any>(null);
@@ -440,7 +440,7 @@ const OrgPatientsPage: React.FC = () => {
           patientInfo,
           paymentMethod,
           orgType,
-          dealType,
+          dealType: DealType.REVENUE_SHARE,
           consultationPrice: selectedPrice || cashPrice,
           testType,
           consultationType: getConsultationType(doctorType),
@@ -745,7 +745,7 @@ const OrgPatientsPage: React.FC = () => {
                   />
 
                   {/* Payment method section — shown for revenue share orgs or when subscription exists */}
-                  {(dealType === DealType.REVENUE_SHARE || subscription) && (
+                  {(dealType.includes(DealType.REVENUE_SHARE) || subscription) && (
                     <>
                       <PaymentMethodSection
                         paymentMethod={paymentMethod}
@@ -973,9 +973,10 @@ const OrgPatientsPage: React.FC = () => {
                 <div className="flex gap-3" dir="rtl">
                   <button
                     onClick={handleSendConsultation}
-                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600"
+                    disabled={isSubmitting}
+                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                   >
-                    نعم، إرسال
+                    {isSubmitting ? <div className="spinner" /> : "نعم، إرسال"}
                   </button>
                   <button
                     onClick={() => setShowSendConsultationConfirm(false)}
@@ -1007,9 +1008,10 @@ const OrgPatientsPage: React.FC = () => {
                 <div className="flex gap-3" dir="rtl">
                   <button
                     onClick={handleOpenConsultation}
-                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    disabled={isOpeningConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                   >
-                    نعم، فتح الآن
+                    {isOpeningConsultation ? <div className="spinner" /> : "نعم، فتح الآن"}
                   </button>
                   <button
                     onClick={() => setShowOpenConsultationConfirm(false)}
