@@ -27,9 +27,9 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
     {
       type: DoctorType.SickLeave,
       label: "اخصائي طب اسرة (تشمل اصدار الاجازة المرضية)",
-      disabled: false,
+      disabled: true,
       note: "سيتم إرسال رابط دفع 49 ريال للمريض",
-      badge: "نشطة الان",
+      badge: "غير متاحة",
     },
   ];
 

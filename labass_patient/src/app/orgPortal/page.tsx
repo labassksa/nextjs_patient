@@ -104,6 +104,8 @@ const OrgPatientsPage: React.FC = () => {
   const possiblePaymentMethods: PaymentMethodEnum[] =
     doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity || doctorType === DoctorType.Psychiatrist
       ? [PaymentMethodEnum.THROUGH_LABASS]
+      : subscription
+      ? [PaymentMethodEnum.THROUGH_LABASS]
       : [
           PaymentMethodEnum.THROUGH_LABASS,
           PaymentMethodEnum.THROUGH_ORGANIZATION,
@@ -215,11 +217,11 @@ const OrgPatientsPage: React.FC = () => {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(89);
     } else {
-      // Reset both price and payment method when switching away from auto-selected types
       setSelectedPrice(null);
-      setPaymentMethod(PaymentMethodEnum.THROUGH_ORGANIZATION);
+      // If active subscription exists, THROUGH_ORGANIZATION is not available
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_ORGANIZATION);
     }
-  }, [doctorType, dealType]);
+  }, [doctorType, dealType, subscription]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
