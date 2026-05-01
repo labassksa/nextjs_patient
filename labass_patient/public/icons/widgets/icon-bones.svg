@@ -1,0 +1,11 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" rx="12" fill="#BCE1A4"/>
+<path d="M16 14C16 12.3 17.3 11 19 11C20.7 11 22 12.3 22 14C22 14.8 21.6 15.5 21 16L20 17V31L21 32C21.6 32.5 22 33.2 22 34C22 35.7 20.7 37 19 37C17.3 37 16 35.7 16 34C16 33.2 16.4 32.5 17 32L18 31V17L17 16C16.4 15.5 16 14.8 16 14Z" fill="#C2E0AF" stroke="#22313F" stroke-width="1.2"/>
+<path d="M26 14C26 12.3 27.3 11 29 11C30.7 11 32 12.3 32 14C32 14.8 31.6 15.5 31 16L30 17V31L31 32C31.6 32.5 32 33.2 32 34C32 35.7 30.7 37 29 37C27.3 37 26 35.7 26 34C26 33.2 26.4 32.5 27 32L28 31V17L27 16C26.4 15.5 26 14.8 26 14Z" fill="#4DA514" stroke="#22313F" stroke-width="1.2"/>
+<circle cx="19" cy="14" r="1.5" fill="#4DA514"/>
+<circle cx="19" cy="34" r="1.5" fill="#4DA514"/>
+<circle cx="29" cy="14" r="1.5" fill="#C2E0AF"/>
+<circle cx="29" cy="34" r="1.5" fill="#C2E0AF"/>
+<path d="M22 22H26" stroke="#22313F" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2"/>
+<path d="M22 26H26" stroke="#22313F" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2 2"/>
+</svg>

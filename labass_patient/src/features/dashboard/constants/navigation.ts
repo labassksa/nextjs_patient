@@ -5,6 +5,7 @@ import {
   Megaphone,
   Building2,
   Package,
+  Pill,
   CreditCard,
   Ticket,
   ClipboardList,
@@ -18,6 +19,7 @@ export const sidebarNavigation = [
   { label: "Marketers", href: "/dashboard/marketers", icon: Megaphone },
   { label: "Organizations", href: "/dashboard/organizations", icon: Building2 },
   { label: "Bundles", href: "/dashboard/bundles", icon: Package },
+  { label: "Individual Bundles", href: "/dashboard/individual-bundles", icon: Pill },
   { label: "Subscriptions", href: "/dashboard/subscriptions", icon: CreditCard },
   { label: "Promo Codes", href: "/dashboard/promo-codes", icon: Ticket },
 ];

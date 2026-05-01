@@ -25,13 +25,11 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
   });
 
   const roomRef = useRef<Room | null>(null);
+  const [livekitToken, setLivekitToken] = useState<string>('');
 
   const generateToken = async (): Promise<string> => {
     const token = localStorage.getItem("labass_token");
-
-    if (!token) {
-      throw new Error("Authentication token not found");
-    }
+    if (!token) throw new Error("Authentication token not found");
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/get-token`, {
       method: 'POST',
@@ -45,10 +43,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
       }),
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to generate token: ${response.statusText}`);
-    }
-
+    if (!response.ok) throw new Error(`Failed to generate token: ${response.statusText}`);
     const data = await response.json();
     return data.token;
   };
@@ -57,14 +52,12 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
     try {
       setCallState(prev => ({ ...prev, isConnecting: true, error: null }));
 
-      // Generate LiveKit token
-      const livekitToken = await generateToken();
+      const token = await generateToken();
+      setLivekitToken(token);
 
-      // Create and configure room
       const room = new Room();
       roomRef.current = room;
 
-      // Set up event listeners
       room.on(RoomEvent.Connected, () => {
         setCallState(prev => ({
           ...prev,
@@ -73,16 +66,12 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
           connectionState: ConnectionState.Connected,
         }));
 
-        // Notify other participant via socket
         if (socket) {
           socket.emit("videoCallStarted", {
             room: `${consultationId}`,
             initiatedBy: "patient",
             timestamp: new Date(),
           });
-
-          // Notify backend that this user joined the call
-          // This prevents false MISSED_CALL notifications
           socket.emit("videoCallJoined", {
             room: `${consultationId}`,
             userId: userId,
@@ -103,7 +92,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
       room.on(RoomEvent.ParticipantConnected, () => {
         setCallState(prev => ({
           ...prev,
-          participants: room.remoteParticipants.size + 1, // +1 for local participant
+          participants: room.remoteParticipants.size + 1,
         }));
       });
 
@@ -118,8 +107,10 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
         setCallState(prev => ({ ...prev, connectionState: ConnectionState.Reconnecting }));
       });
 
-      // Connect to room with audio and video enabled
-      await room.connect(process.env.NEXT_PUBLIC_LIVEKIT_URL!, livekitToken);
+      await room.connect(process.env.NEXT_PUBLIC_LIVEKIT_URL!, token, {
+        audio: true,
+        video: true,
+      } as any);
 
     } catch (error) {
       console.error('Failed to start video call:', error);
@@ -138,6 +129,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
         roomRef.current = null;
       }
 
+      setLivekitToken('');
       setCallState(prev => ({
         ...prev,
         isInCall: false,
@@ -146,7 +138,6 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
         participants: 0,
       }));
 
-      // Notify other participant via socket
       if (socket) {
         socket.emit("videoCallEnded", {
           room: `${consultationId}`,
@@ -176,6 +167,7 @@ export const useVideoCall = ({ consultationId, userId, socket }: UseVideoCallPro
   return {
     callState,
     room: roomRef.current,
+    livekitToken,
     startCall,
     endCall,
     toggleAudio,

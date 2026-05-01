@@ -8,10 +8,11 @@ import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish
 const PromoCode: React.FC<{
   setDiscountedPrice: (price: number) => void;
   setPromoCode: (code: string) => void;
-  selectedPaymentMethod: PaymentMethodEnum; // Use PaymentMethodEnum type
-}> = ({ setDiscountedPrice, setPromoCode, selectedPaymentMethod }) => {
+  selectedPaymentMethod: PaymentMethodEnum;
+  basePrice: number;
+}> = ({ setDiscountedPrice, setPromoCode, selectedPaymentMethod, basePrice }) => {
   const [promoCodeInput, setPromoCodeInput] = useState("");
-  const [cashAmount, setCashAmount] = useState(""); // State for cash amount input
+  const [cashAmount, setCashAmount] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFieldFrozen, setIsFieldFrozen] = useState(false);
@@ -20,7 +21,6 @@ const PromoCode: React.FC<{
   const [consultationId, setConsultationId] = useState<number | null>(null);
 
   const router = useRouter();
-  const defaultPrice = 89;
 
   const handleApplyPromo = async () => {
     if (promoCodeInput.length !== 7) {
@@ -42,9 +42,10 @@ const PromoCode: React.FC<{
     setResponseMessage("");
 
     try {
+      const consultationType = localStorage.getItem("consultationType") || undefined;
       const response = await axios.post(
         `${apiUrl}/use-promo`,
-        { promoCode: promoCodeInput, price: cashAmount || undefined },
+        { promoCode: promoCodeInput, price: cashAmount || undefined, consultationType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -118,7 +119,7 @@ const PromoCode: React.FC<{
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isFieldFrozen) {
       setPromoCode("");
-      setDiscountedPrice(defaultPrice);
+      setDiscountedPrice(basePrice);
       setIsFieldFrozen(false);
       setResponseMessage("");
       setIsSuccess(false);

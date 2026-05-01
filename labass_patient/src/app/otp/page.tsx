@@ -72,7 +72,7 @@ const OTPPage = () => {
       const result = await verifyOTPandLogin("patient", fullNumber, otpCode);
 
       if (result && result.success) {
-        router.push("/");
+        router.push("/home");
       } else if (result) {
         setErrorMessage(result.message ?? "حدث خطأ ، حاول مرة أخرى");
       } else {

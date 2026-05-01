@@ -1,0 +1,629 @@
+/* ================================================================
+   Vitamins – Subscription Payment Page
+   ================================================================ */
+.app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #f2f5ee;
+  font-family: 'Tajawal', 'IBM Plex Sans Arabic', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(23, 52, 4, 0.07);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
+.mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #173404;
+  position: relative;
+  flex-shrink: 0;
+}
+.mark::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #7ed957;
+}
+.bname {
+  font-size: 19px;
+  font-weight: 800;
+  color: #173404;
+  letter-spacing: -0.3px;
+}
+.navBack {
+  padding: 7px 16px;
+  background: transparent;
+  color: #173404;
+  border: 1px solid rgba(23, 52, 4, 0.2);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  direction: ltr;
+  transition: background 0.15s, border-color 0.15s;
+}
+.navBack:hover { background: rgba(23, 52, 4, 0.05); border-color: rgba(23,52,4,0.35); }
+
+/* ── Scroll area ─────────────────────────────────────────────── */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Plan card (dark premium) ────────────────────────────────── */
+.planCard {
+  background: #173404;
+  padding: 28px 24px 30px;
+  position: relative;
+  overflow: hidden;
+  direction: rtl;
+}
+/* subtle glow top-left */
+.planCard::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 217, 87, 0.14) 0%, transparent 65%);
+  pointer-events: none;
+}
+.planBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px;
+  background: rgba(126, 217, 87, 0.15);
+  border: 1px solid rgba(126, 217, 87, 0.3);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #b5e57a;
+  margin-bottom: 20px;
+}
+.planBadgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7ed957;
+  flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+}
+.planMeta {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(234, 243, 222, 0.55);
+  letter-spacing: 0.2px;
+}
+.planName {
+  font-size: 24px;
+  font-weight: 700;
+  color: #eaf3de;
+  margin: 0 0 18px;
+  letter-spacing: -0.4px;
+}
+.planPriceRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.planPriceNum {
+  font-size: 56px;
+  font-weight: 800;
+  color: #7ed957;
+  line-height: 1;
+  letter-spacing: -2.5px;
+  font-variant-numeric: tabular-nums;
+}
+.planPriceCur {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(126, 217, 87, 0.7);
+  margin-bottom: 6px;
+}
+.planOriginalPrice {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(234, 243, 222, 0.4);
+  text-decoration: line-through;
+  margin-bottom: 6px;
+  align-self: flex-end;
+}
+.planFeats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.planFeat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: rgba(234, 243, 222, 0.8);
+  font-weight: 400;
+}
+.planFeatCk {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: rgba(126, 217, 87, 0.2);
+  border: 1px solid rgba(126, 217, 87, 0.4);
+  color: #7ed957;
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ── Content body ────────────────────────────────────────────── */
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── White card ──────────────────────────────────────────────── */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(23, 52, 4, 0.06), 0 4px 12px rgba(23, 52, 4, 0.04);
+}
+.cardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #173404;
+  margin: 0 0 14px;
+  letter-spacing: -0.1px;
+}
+
+/* ── Payment method items ────────────────────────────────────── */
+.methodList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.methodItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1.5px solid rgba(23, 52, 4, 0.09);
+  border-radius: 12px;
+  cursor: pointer;
+  background: #fdfcf9;
+  transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+  width: 100%;
+  font-family: inherit;
+  text-align: right;
+}
+.methodItem:hover {
+  border-color: rgba(99, 153, 34, 0.3);
+  background: #f9fbf5;
+}
+.methodItemActive {
+  border-color: #173404;
+  background: #f5faee;
+  box-shadow: 0 2px 10px rgba(23, 52, 4, 0.1);
+}
+.methodDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(23, 52, 4, 0.2);
+  background: #ffffff;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.18s, background 0.18s;
+}
+.methodDotActive {
+  border-color: #173404;
+  background: #173404;
+}
+.methodDotInner {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7ed957;
+  transform: scale(0);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.methodDotInnerVisible { transform: scale(1); }
+.methodLabel {
+  font-size: 13.5px;
+  color: #0d2002;
+  font-weight: 500;
+  flex: 1;
+}
+.methodLogos {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.methodLogo {
+  height: 20px;
+  width: auto;
+  border-radius: 4px;
+  object-fit: contain;
+}
+.methodLogoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid rgba(23, 52, 4, 0.08);
+  border-radius: 6px;
+  background: #fff;
+}
+.cashIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(23, 52, 4, 0.06);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Promo code ──────────────────────────────────────────────── */
+.promoRow {
+  display: flex;
+  gap: 8px;
+}
+.promoInput {
+  flex: 1;
+  padding: 11px 14px;
+  background: #fdfcf9;
+  border: 1.5px solid rgba(23, 52, 4, 0.12);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #0d2002;
+  direction: rtl;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.promoInput:focus {
+  border-color: #639922;
+  box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.15);
+}
+.promoInput::placeholder { color: rgba(23, 52, 4, 0.3); }
+.promoInput:disabled { background: #f0f4ea; cursor: not-allowed; }
+.promoBtn {
+  padding: 11px 18px;
+  background: #173404;
+  color: #eaf3de;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+}
+.promoBtn:hover:not(:disabled) { background: #0d2002; }
+.promoBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.promoMsg {
+  margin-top: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: right;
+}
+.promoOk { color: #639922; }
+.promoErr { color: #c94a72; }
+.cashInpWrap { margin-top: 10px; }
+.cashInp {
+  width: 100%;
+  padding: 11px 14px;
+  background: #fdfcf9;
+  border: 1.5px solid rgba(23, 52, 4, 0.12);
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #0d2002;
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.cashInp:focus {
+  border-color: #639922;
+  box-shadow: 0 0 0 3px rgba(126, 217, 87, 0.15);
+}
+
+/* ── Order summary ───────────────────────────────────────────── */
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(23, 52, 4, 0.06);
+}
+.summaryRow:last-child { border-bottom: none; }
+.summaryRowTotal {
+  border-top: 1.5px solid rgba(23, 52, 4, 0.1);
+  padding-top: 13px;
+  margin-top: 4px;
+  border-bottom: none;
+}
+.summaryLbl { font-size: 13px; color: rgba(23, 52, 4, 0.6); }
+.summaryVal { font-size: 13px; color: #0d2002; font-variant-numeric: tabular-nums; }
+.summaryLblTotal { font-size: 14px; font-weight: 700; color: #173404; }
+.summaryValTotal {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0d2002;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+.summaryValTotal sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(23, 52, 4, 0.45);
+  margin-left: 3px;
+  vertical-align: baseline;
+}
+
+/* ── Trust strip ─────────────────────────────────────────────── */
+.trustCard {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(23, 52, 4, 0.06), 0 4px 12px rgba(23, 52, 4, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.trustRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.trustTxt {
+  font-size: 12px;
+  color: rgba(23, 52, 4, 0.5);
+  font-weight: 500;
+}
+.trustLogos {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.trustLogoBox {
+  height: 26px;
+  padding: 3px 8px;
+  border: 1px solid rgba(23, 52, 4, 0.08);
+  border-radius: 7px;
+  background: #fafaf7;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Sticky footer ───────────────────────────────────────────── */
+.footer {
+  padding: 12px 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid rgba(23, 52, 4, 0.07);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+}
+.payBtn {
+  width: 100%;
+  padding: 15px 24px;
+  background: #173404;
+  color: #eaf3de;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  direction: rtl;
+}
+.payBtn:hover:not(:disabled) {
+  background: #0d2002;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(23, 52, 4, 0.2);
+}
+.payBtn:active:not(:disabled) { transform: translateY(0); }
+.payBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.payBtnArr {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7ed957;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: #173404;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.payBtn:hover:not(:disabled) .payBtnArr { transform: translateX(-3px); }
+
+/* ── Success modal ───────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 36px 28px 28px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  direction: rtl;
+}
+.modalIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eaf3de, #c0dd97);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+  position: relative;
+}
+.modalIcon::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(99, 153, 34, 0.35);
+  animation: spin 20s linear infinite;
+}
+.modalCheck {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #173404;
+  display: grid;
+  place-items: center;
+  color: #7ed957;
+  font-size: 20px;
+  font-weight: 800;
+}
+.modalTitle {
+  font-size: 21px;
+  font-weight: 800;
+  color: #0d2002;
+  margin: 0 0 10px;
+  letter-spacing: -0.4px;
+}
+.modalSub {
+  font-size: 13.5px;
+  color: rgba(23, 52, 4, 0.65);
+  line-height: 1.65;
+  margin: 0 0 26px;
+}
+.modalBtn {
+  width: 100%;
+  padding: 14px 24px;
+  background: #173404;
+  color: #eaf3de;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.modalBtn:hover { background: #0d2002; }
+
+/* ── Loading overlay ─────────────────────────────────────────── */
+.loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.loadingSpinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #7ed957;
+  animation: spin 0.8s linear infinite;
+}
+.loadingTxt {
+  color: #fff;
+  font-size: 14px;
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(1.5); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+
+/* Center on wide screens like a mobile shell */
+@media (min-width: 640px) {
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    box-shadow: 0 0 0 1px rgba(23,52,4,0.06), 0 20px 60px rgba(23,52,4,0.08);
+  }
+}
+
+@media (max-width: 400px) {
+  .planPriceNum  { font-size: 46px; }
+  .planFeats     { grid-template-columns: 1fr; gap: 8px; }
+  .planCard      { padding: 22px 18px 24px; }
+  .body          { padding: 12px; gap: 8px; }
+  .card          { padding: 16px; border-radius: 14px; }
+  .footer        { padding: 10px 14px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app, .app * { animation: none !important; transition: none !important; }
+}

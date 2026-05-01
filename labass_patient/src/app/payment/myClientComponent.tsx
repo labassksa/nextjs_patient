@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import PaymentIntro from "./_components/payment/paymentIntro";
@@ -13,33 +13,48 @@ import Header from "../../components/common/header";
 import { PaymentMethodEnum } from "../../types/paymentMethods";
 import { getMagicLink } from "./_controllers/getMagicLink";
 
+const CONSULTATION_PRICES: Record<string, number> = {
+  obesity: 89,
+  sickleave: 49,
+  psychiatric: 49,
+};
+
 const PaymentClient: React.FC = () => {
   const router = useRouter();
+
+  // Read query parameters in the client — must be before useState to use in initial state
+  const searchParams = useSearchParams();
+  const tokenUUIDFromQuery = searchParams.get("tokenUUID");
+  const promoCodeFromQuery = searchParams.get("promoCode");
+  const consultationType = searchParams.get("consultationType");
+  const priceFromQuery = searchParams.get("price");
+
+  // Capture initial values in refs so URL changes after mount have no effect
+  const initialConsultationType = useRef(consultationType);
+  const initialPriceFromQuery = useRef(priceFromQuery);
+
+  const basePrice = initialPriceFromQuery.current
+    ? Number(initialPriceFromQuery.current)
+    : initialConsultationType.current && CONSULTATION_PRICES[initialConsultationType.current]
+    ? CONSULTATION_PRICES[initialConsultationType.current]
+    : 89;
 
   // Client-side states
   const [paymentMethod, setPaymentMethod] = useState(
     PaymentMethodEnum.ApplePay
   );
-  const [discountedPrice, setDiscountedPrice] = useState(89); // Default price
+  const [discountedPrice, setDiscountedPrice] = useState(basePrice);
   const [promoCode, setPromoCode] = useState("");
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Read query parameters in the client
-  const searchParams = useSearchParams();
-  const tokenUUIDFromQuery = searchParams.get("tokenUUID");
-  const promoCodeFromQuery = searchParams.get("promoCode");
-  const consultationType = searchParams.get("consultationType");
-
-  // Store consultationType in localStorage for later use after payment
-  // Always update (or clear) to avoid stale values from previous consultations
+  // Store the initial consultationType in localStorage — ref ensures URL changes never override it
   useEffect(() => {
-    if (consultationType) {
-      localStorage.setItem("consultationType", consultationType);
+    if (initialConsultationType.current) {
+      localStorage.setItem("consultationType", initialConsultationType.current);
     } else {
       localStorage.removeItem("consultationType");
     }
-  }, [consultationType]);
+  }, []);
 
   useEffect(() => {
     const applyMagicLinkPromo = async () => {
@@ -92,6 +107,7 @@ const PaymentClient: React.FC = () => {
             setDiscountedPrice={setDiscountedPrice}
             setPromoCode={setPromoCode}
             selectedPaymentMethod={paymentMethod}
+            basePrice={basePrice}
           />
         </div>
 

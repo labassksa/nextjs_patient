@@ -54,7 +54,7 @@ const OrgPatientsPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orgError, setOrgError] = useState("");
   const [submitError, setSubmitError] = useState("");
-  const [dealType, setDealType] = useState<DealType | "">("");
+  const [dealType, setDealType] = useState<DealType[]>([]);
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
   const [orgName, setOrgName] = useState<string>("");
   const [userData, setUserData] = useState<any>(null);
@@ -103,6 +103,8 @@ const OrgPatientsPage: React.FC = () => {
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
     doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity || doctorType === DoctorType.Psychiatrist
+      ? [PaymentMethodEnum.THROUGH_LABASS]
+      : subscription
       ? [PaymentMethodEnum.THROUGH_LABASS]
       : [
           PaymentMethodEnum.THROUGH_LABASS,
@@ -215,11 +217,11 @@ const OrgPatientsPage: React.FC = () => {
       setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(89);
     } else {
-      // Reset both price and payment method when switching away from auto-selected types
       setSelectedPrice(null);
-      setPaymentMethod(PaymentMethodEnum.THROUGH_ORGANIZATION);
+      // If active subscription exists, THROUGH_ORGANIZATION is not available
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_ORGANIZATION);
     }
-  }, [doctorType, dealType]);
+  }, [doctorType, dealType, subscription]);
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ar' ? 'en' : 'ar';
@@ -440,7 +442,7 @@ const OrgPatientsPage: React.FC = () => {
           patientInfo,
           paymentMethod,
           orgType,
-          dealType,
+          dealType: DealType.REVENUE_SHARE,
           consultationPrice: selectedPrice || cashPrice,
           testType,
           consultationType: getConsultationType(doctorType),
@@ -744,20 +746,25 @@ const OrgPatientsPage: React.FC = () => {
                     setPdfFiles={setPdfFiles}
                   />
 
-                  <PaymentMethodSection
-                    paymentMethod={paymentMethod}
-                    setPaymentMethod={setPaymentMethod}
-                    possiblePaymentMethods={possiblePaymentMethods}
-                    cashPrice={cashPrice}
-                    setCashPrice={setCashPrice}
-                    subscription={subscription}
-                  />
-                  {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
-                    <ConsultationPriceSection
-                      selectedPrice={selectedPrice}
-                      onChange={(price) => setSelectedPrice(price)}
-                      possiblePrices={possiblePrices}
-                    />
+                  {/* Payment method section — shown for revenue share orgs or when subscription exists */}
+                  {(dealType.includes(DealType.REVENUE_SHARE) || subscription) && (
+                    <>
+                      <PaymentMethodSection
+                        paymentMethod={paymentMethod}
+                        setPaymentMethod={setPaymentMethod}
+                        possiblePaymentMethods={possiblePaymentMethods}
+                        cashPrice={cashPrice}
+                        setCashPrice={setCashPrice}
+                        subscription={subscription}
+                      />
+                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
+                        <ConsultationPriceSection
+                          selectedPrice={selectedPrice}
+                          onChange={(price) => setSelectedPrice(price)}
+                          possiblePrices={possiblePrices}
+                        />
+                      )}
+                    </>
                   )}
 
                   {/* Bottom Buttons for Web (not fixed) */}
@@ -968,9 +975,10 @@ const OrgPatientsPage: React.FC = () => {
                 <div className="flex gap-3" dir="rtl">
                   <button
                     onClick={handleSendConsultation}
-                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600"
+                    disabled={isSubmitting}
+                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                   >
-                    نعم، إرسال
+                    {isSubmitting ? <div className="spinner" /> : "نعم، إرسال"}
                   </button>
                   <button
                     onClick={() => setShowSendConsultationConfirm(false)}
@@ -1002,9 +1010,10 @@ const OrgPatientsPage: React.FC = () => {
                 <div className="flex gap-3" dir="rtl">
                   <button
                     onClick={handleOpenConsultation}
-                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    disabled={isOpeningConsultation}
+                    className="flex-1 p-3 text-sm font-bold bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
                   >
-                    نعم، فتح الآن
+                    {isOpeningConsultation ? <div className="spinner" /> : "نعم، فتح الآن"}
                   </button>
                   <button
                     onClick={() => setShowOpenConsultationConfirm(false)}

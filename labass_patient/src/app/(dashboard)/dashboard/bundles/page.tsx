@@ -34,7 +34,7 @@ export default function BundlesPage() {
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
     name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
-    currency: "SAR", recurringType: "Monthly", description: "",
+    currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -59,7 +59,7 @@ export default function BundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync(newBundle);
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "" });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined });
     setFormErrors({});
   };
 
@@ -94,9 +94,16 @@ export default function BundlesPage() {
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => (
-        <span className="font-mono text-sm font-medium">
-          {row.original.price} <span className="text-muted-foreground">{row.original.currency || "SAR"}</span>
-        </span>
+        <div className="flex flex-col">
+          <span className="font-mono text-sm font-medium">
+            {row.original.price} <span className="text-muted-foreground">{row.original.currency || "SAR"}</span>
+          </span>
+          {row.original.originalPrice && (
+            <span className="font-mono text-xs text-muted-foreground line-through">
+              {row.original.originalPrice} {row.original.currency || "SAR"}
+            </span>
+          )}
+        </div>
       ),
     },
     {
@@ -191,6 +198,12 @@ export default function BundlesPage() {
                 <Input type="number" min={0} step="0.01" value={newBundle.price} onChange={(e) => setNewBundle({ ...newBundle, price: Number(e.target.value) })} />
                 {formErrors.price && <p className="text-sm text-destructive">{formErrors.price}</p>}
               </div>
+              <div className="space-y-2">
+                <Label>Original Price <span className="text-muted-foreground text-xs">(optional, for display)</span></Label>
+                <Input type="number" min={0} step="0.01" placeholder="e.g. 600" value={newBundle.originalPrice ?? ""} onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Consultations</Label>
                 <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />

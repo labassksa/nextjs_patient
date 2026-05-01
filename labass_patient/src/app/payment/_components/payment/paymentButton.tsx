@@ -238,6 +238,8 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         promoCode
       );
 
+      const consultationType = localStorage.getItem("consultationType") || undefined;
+
       // Send discounted price & promo code to server
       const response = await axios.post(
         `${apiUrl}/execute-payment`,
@@ -248,6 +250,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           PromoCode: promoCode,
           CallBackUrl: "https://labass.sa/success",
           ErrorUrl: "https://labass.sa/error",
+          consultationType,
         },
         {
           headers: { Authorization: `Bearer ${token}` },

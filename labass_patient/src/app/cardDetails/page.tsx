@@ -23,6 +23,8 @@ const CardDetailsContent: React.FC = () => {
   const promoCode = searchParams.get("promoCode") || "";
   const consultationType = searchParams.get("consultationType");
   const bundleId = searchParams.get("bundleId");
+  const subscriberType = searchParams.get("subscriberType");
+  const isRecurring = searchParams.get("isRecurring") === "true";
 
   // Store consultationType in localStorage if it exists
   useEffect(() => {
@@ -52,9 +54,15 @@ const CardDetailsContent: React.FC = () => {
           if (finalUrl.includes("/success")) {
             const tempBundleId = localStorage.getItem('temp_bundle_id');
             if (tempBundleId) {
-              // Bundle payment - redirect to orgPortal
               localStorage.removeItem('temp_bundle_id');
-              router.push("/orgPortal?bundlePaymentSuccess=true");
+              const isSubscriptionFlow = localStorage.getItem('temp_subscription_flow');
+              if (isSubscriptionFlow) {
+                localStorage.removeItem('temp_subscription_flow');
+                localStorage.removeItem('vitamin_survey_answers');
+                router.push("/vitaminsPackages");
+              } else {
+                router.push("/orgPortal?bundlePaymentSuccess=true");
+              }
             } else {
               const consultationId = localStorage.getItem('temp_consultation_id');
               const promoFromUrl = localStorage.getItem('temp_promo_from_url');
@@ -62,6 +70,7 @@ const CardDetailsContent: React.FC = () => {
             }
           } else {
             localStorage.removeItem('temp_bundle_id');
+            localStorage.removeItem('temp_subscription_flow');
             router.push("/cardDetails/error");
           }
           return;
@@ -105,40 +114,58 @@ const CardDetailsContent: React.FC = () => {
               // Check if this is a bundle payment
               if (bundleId) {
                 console.log("[Payment] Bundle payment detected, bundleId:", bundleId);
-                const { data } = await axios.post(
-                  `${apiUrl}/execute-onetime-bundle-payment`,
-                  {
-                    bundleId: Number(bundleId),
-                    sessionId: newSessionId,
-                    CallBackUrl: "https://labass.sa/cardDetails/success",
-                    ErrorUrl: "https://labass.sa/cardDetails/error",
-                  },
-                  {
-                    headers: { Authorization: `Bearer ${token}` },
-                  }
-                );
 
-                console.log("[Payment] Bundle payment response:", data);
-                // Support both MyFatoorah format (IsSuccess/Data.PaymentURL) and wrapped format (success/data.paymentURL)
-                const bundleSuccess = data.IsSuccess ?? data.success;
-                const bundlePaymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL;
-                if (bundleSuccess && bundlePaymentUrl) {
-                  const paymentUrl = bundlePaymentUrl;
-                  console.log("[Payment] Opening 3D Secure iframe with URL:", paymentUrl);
+                let paymentUrl: string | null = null;
 
-                  // Store bundle info before showing 3D-Secure iframe
+                if (subscriberType) {
+                  // Subscription flow — always has bundleId + subscriberType + isRecurring
+                  const surveyRaw = localStorage.getItem("vitamin_survey_answers");
+                  const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
+                  const { data } = await axios.post(
+                    `${apiUrl}/execute-subscription-payment`,
+                    {
+                      bundleId: Number(bundleId),
+                      sessionId: newSessionId,
+                      callBackUrl: "https://labass.sa/success",
+                      errorUrl: "https://labass.sa/error",
+                      subscriberType,
+                      isRecurring,
+                      promoCode,
+                      surveyAnswers,
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  console.log("[Payment] Subscription payment response:", data);
+                  paymentUrl = data.data?.paymentURL ?? null;
+                  if (paymentUrl) localStorage.setItem('temp_subscription_flow', '1');
+                } else {
+                  // Org portal one-time bundle payment
+                  const { data } = await axios.post(
+                    `${apiUrl}/execute-onetime-bundle-payment`,
+                    {
+                      bundleId: Number(bundleId),
+                      sessionId: newSessionId,
+                      CallBackUrl: "https://labass.sa/cardDetails/success",
+                      ErrorUrl: "https://labass.sa/cardDetails/error",
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                  );
+                  console.log("[Payment] Org bundle payment response:", data);
+                  paymentUrl = data.Data?.PaymentURL ?? data.data?.paymentURL ?? data.data?.PaymentURL ?? null;
+                }
+
+                if (paymentUrl) {
                   localStorage.setItem("temp_bundle_id", bundleId);
-
-                  // Show 3D-Secure iframe
                   setIframeSrc(paymentUrl);
                   setShowIframe(true);
                 } else {
-                  console.error("[Payment] Bundle payment failed:", data);
+                  console.error("[Payment] Bundle payment failed");
                   setIsSubmitting(false);
                   router.push("/cardDetails/error");
                 }
               } else {
                 // Regular consultation payment
+                const consultationType = localStorage.getItem("consultationType") || undefined;
                 const { data } = await axios.post(
                   `${apiUrl}/execute-payment`,
                   {
@@ -148,6 +175,7 @@ const CardDetailsContent: React.FC = () => {
                     PromoCode: promoCode,
                     CallBackUrl: "https://labass.sa/cardDetails/success",
                     ErrorUrl: "https://labass.sa/cardDetails/error",
+                    consultationType,
                   },
                   {
                     headers: { Authorization: `Bearer ${token}` },
@@ -329,7 +357,7 @@ const CardDetailsContent: React.FC = () => {
             setTimeout(() => {
               console.log("[Script] Attempting to reload MyFatoorah script...");
               const script = document.createElement("script");
-              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://sa.myfatoorah.com/cardview/v2/session.js";
+              script.src = process.env.NEXT_PUBLIC_MYFATOORAH_CARDVIEW_URL || "https://demo.myfatoorah.com/cardview/v2/session.js";
               script.onload = () => {
                 console.log("[Script] MyFatoorah script reloaded successfully");
                 setIsScriptLoaded(true);

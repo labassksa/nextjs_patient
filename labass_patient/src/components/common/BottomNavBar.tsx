@@ -29,10 +29,10 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentPath }) => {
         active={isActive("/myConsultations")}
       />
       <NavLink
-        href="/"
+        href="/home"
         icon={HomeIcon}
         label="الرئيسية"
-        active={isActive("/")}
+        active={isActive("/home")}
       />
     </nav>
   );
