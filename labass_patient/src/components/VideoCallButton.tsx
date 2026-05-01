@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { VideoCameraIcon } from '@heroicons/react/24/outline';
-import { useVideoCall } from '../hooks/useVideoCall';
 import VideoRoom from './VideoRoom';
 
 interface VideoCallButtonProps {
@@ -18,16 +17,11 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
   socket,
   isConsultationOpen,
 }) => {
+  const [token, setToken] = useState('');
   const [isCallActive, setIsCallActive] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [incomingCall, setIncomingCall] = useState(false);
-
-  const {
-    callState,
-    room,
-    livekitToken,
-    startCall,
-    endCall,
-  } = useVideoCall({ consultationId, userId, socket });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -41,6 +35,7 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     const handleVideoCallEnded = () => {
       setIncomingCall(false);
       setIsCallActive(false);
+      setToken('');
     };
 
     socket.on('videoCallStarted', handleVideoCallStarted);
@@ -52,30 +47,81 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     };
   }, [socket]);
 
-  useEffect(() => {
-    setIsCallActive(callState.isInCall);
-  }, [callState.isInCall]);
-
-  const handleStartCall = async () => {
+  const fetchTokenAndJoin = async () => {
+    setIsConnecting(true);
+    setError(null);
     try {
-      await startCall();
-    } catch (error) {
-      console.error('Failed to start video call:', error);
+      const authToken = localStorage.getItem("labass_token");
+      if (!authToken) throw new Error("رمز المصادقة غير موجود");
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/get-token`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: `patient_${userId}`,
+          roomName: `consultation_${consultationId}`,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`فشل في الحصول على رمز الاتصال: ${response.statusText}`);
+
+      const data = await response.json();
+      console.log('[VideoCall] Token received, joining room...');
+      setToken(data.token);
+      setIsCallActive(true);
+    } catch (err) {
+      console.error('[VideoCall] Failed to fetch token:', err);
+      setError(err instanceof Error ? err.message : 'فشل في بدء المكالمة');
+    } finally {
+      setIsConnecting(false);
     }
   };
 
-  const handleEndCall = async () => {
-    await endCall();
-    setIsCallActive(false);
-    setIncomingCall(false);
+  const handleConnected = () => {
+    console.log('[VideoCall] Connected to LiveKit room');
+    if (socket) {
+      socket.emit("videoCallStarted", {
+        room: `${consultationId}`,
+        initiatedBy: "patient",
+        timestamp: new Date(),
+      });
+      socket.emit("videoCallJoined", {
+        room: `${consultationId}`,
+        userId,
+        timestamp: new Date(),
+      });
+    }
   };
 
-  const handleJoinCall = async () => {
+  const handleEndCall = () => {
+    console.log('[VideoCall] Call ended');
+    setIsCallActive(false);
+    setToken('');
     setIncomingCall(false);
-    await handleStartCall();
+    if (socket) {
+      socket.emit("videoCallEnded", {
+        room: `${consultationId}`,
+        endedBy: "patient",
+        timestamp: new Date(),
+      });
+    }
   };
 
   if (!isConsultationOpen) return null;
+
+  if (isCallActive && token) {
+    return typeof document !== 'undefined' ? createPortal(
+      <VideoRoom
+        token={token}
+        onDisconnect={handleEndCall}
+        onConnected={handleConnected}
+      />,
+      document.body
+    ) : null;
+  }
 
   if (incomingCall && !isCallActive) {
     return (
@@ -87,7 +133,7 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
             <p className="text-sm">الطبيب يبدأ مكالمة مرئية</p>
           </div>
           <div className="flex space-x-2">
-            <button onClick={handleJoinCall} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
+            <button onClick={fetchTokenAndJoin} className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
               انضمام
             </button>
             <button onClick={() => setIncomingCall(false)} className="bg-gray-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-600">
@@ -99,27 +145,15 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
     );
   }
 
-  if (isCallActive && livekitToken) {
-    return typeof document !== 'undefined' ? createPortal(
-      <VideoRoom
-        room={room}
-        token={livekitToken}
-        onDisconnect={handleEndCall}
-        isConnecting={callState.isConnecting}
-      />,
-      document.body
-    ) : null;
-  }
-
   return (
     <div className="p-4">
       <button
-        onClick={handleStartCall}
-        disabled={callState.isConnecting}
-        className={`w-full ${callState.isConnecting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center space-x-2`}
+        onClick={fetchTokenAndJoin}
+        disabled={isConnecting}
+        className={`w-full ${isConnecting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center space-x-2`}
         dir="rtl"
       >
-        {callState.isConnecting ? (
+        {isConnecting ? (
           <>
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
             <span>جاري الاتصال...</span>
@@ -132,8 +166,8 @@ const VideoCallButton: React.FC<VideoCallButtonProps> = ({
         )}
       </button>
 
-      {callState.error && (
-        <p className="text-red-600 text-xs mt-2 text-right" dir="rtl">{callState.error}</p>
+      {error && (
+        <p className="text-red-600 text-xs mt-2 text-right" dir="rtl">{error}</p>
       )}
     </div>
   );
