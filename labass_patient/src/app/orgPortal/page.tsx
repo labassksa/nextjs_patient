@@ -211,10 +211,10 @@ const OrgPatientsPage: React.FC = () => {
   // Auto-select payment method and price based on consultation type
   useEffect(() => {
     if (doctorType === DoctorType.SickLeave || doctorType === DoctorType.Psychiatrist) {
-      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(49);
     } else if (doctorType === DoctorType.Obesity) {
-      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(89);
     } else {
       setSelectedPrice(null);
