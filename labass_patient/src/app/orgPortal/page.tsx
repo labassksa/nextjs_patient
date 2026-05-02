@@ -101,15 +101,15 @@ const OrgPatientsPage: React.FC = () => {
       ? [49]
       : [80, 70, 50, 35, 25, 15];
 
+  const isSpecialistSubscription = subscription?.bundle?.type === "Specialist Consultations";
+  const showCashMethod = !subscription || (isSpecialistSubscription && doctorType === DoctorType.General);
+
   const possiblePaymentMethods: PaymentMethodEnum[] =
     doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity || doctorType === DoctorType.Psychiatrist
       ? [PaymentMethodEnum.THROUGH_LABASS]
-      : subscription
-      ? [PaymentMethodEnum.THROUGH_LABASS]
-      : [
-          PaymentMethodEnum.THROUGH_LABASS,
-          PaymentMethodEnum.THROUGH_ORGANIZATION,
-        ];
+      : showCashMethod
+      ? [PaymentMethodEnum.THROUGH_LABASS, PaymentMethodEnum.THROUGH_ORGANIZATION]
+      : [PaymentMethodEnum.THROUGH_LABASS];
 
   const fetchOrg = async () => {
     setIsLoadingOrg(true);
@@ -211,15 +211,18 @@ const OrgPatientsPage: React.FC = () => {
   // Auto-select payment method and price based on consultation type
   useEffect(() => {
     if (doctorType === DoctorType.SickLeave || doctorType === DoctorType.Psychiatrist) {
-      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(49);
     } else if (doctorType === DoctorType.Obesity) {
-      setPaymentMethod(PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(89);
     } else {
       setSelectedPrice(null);
-      // If active subscription exists, THROUGH_ORGANIZATION is not available
-      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_ORGANIZATION);
+      setPaymentMethod(
+        showCashMethod
+          ? PaymentMethodEnum.THROUGH_ORGANIZATION
+          : PaymentMethodEnum.USE_SUBSCRIPTION
+      );
     }
   }, [doctorType, dealType, subscription]);
 
