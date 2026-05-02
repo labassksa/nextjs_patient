@@ -750,7 +750,7 @@ const OrgPatientsPage: React.FC = () => {
                   />
 
                   {/* Payment method section — shown for revenue share orgs or when subscription exists */}
-                  {(dealType.includes(DealType.REVENUE_SHARE) || subscription) && (
+                  {(dealType.includes(DealType.REVENUE_SHARE) || dealType.includes(DealType.SUBSCRIPTION) || subscription) && (
                     <>
                       <PaymentMethodSection
                         paymentMethod={paymentMethod}
