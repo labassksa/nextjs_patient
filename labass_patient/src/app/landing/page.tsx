@@ -9,14 +9,14 @@ const packages = [
   {
     id: "vitamins",
     name: "فيتامينات ومعادن",
-    hook: "تعب مستمر؟ تساقط شعر؟ بشرة باهتة؟",
-    desc: "فحص دم واحد يكشف النقص — طبيب يختار مكملاتك، وتوصل لبيتك",
+    hook: "تعب مستمر؟ تساقط شعر؟",
+    desc: "جسمك يرسل لك إشارات — طبيب مختص يقيّم حالتك ويختار مكملاتك المناسبة",
     price: "٢٨٩ ريال",
     priceSub: "/ شهر",
     features: [
-      "فحص دم شامل في منزلك",
-      "طبيب يقرأ تحاليلك ويختار مكملاتك",
-      "مكملات مخصصة توصل لبيتك",
+      "طبيب مختص يقيّم حالتك الصحية",
+      "مكملات مخصصة بناءً على احتياجاتك",
+      "مكملات توصل لبيتك مجاناً",
       "استشارة طبيب 24/7",
     ],
     cta: "اشترك الآن",
@@ -26,9 +26,9 @@ const packages = [
   },
   {
     id: "obesity",
-    name: "برنامج السمنة",
-    hook: "حاولت كل الطرق ولا نتيجة؟",
-    desc: "أدوية معتمدة من FDA مع خطة غذائية ومتابعة طبيب — نتائج حقيقية",
+    name: "برنامج إنقاص الوزن",
+    hook: "اخسر وزنك بإشراف طبّي",
+    desc: "مع مونجارو و اوزمبيك — أدوية موصوفة، خطة غذائية، ومتابعة مستمرة",
     badge: "معتمد من FDA",
     features: [
       "أدوية سمنة معتمدة من FDA",
@@ -44,8 +44,8 @@ const packages = [
   {
     id: "sexual",
     name: "الصحة الجنسية",
-    hook: "موضوع خاص يستحق رعاية خاصة",
-    desc: "تحدّث مع طبيب مختص بسرّية تامة — علاج فعّال يوصلك لبيتك",
+    hook: "الأداء اللي تبيه، بخصوصية تامة",
+    desc: "علاج متكامل بوصفة طبيب — بدون عيادة، مع طبيب مختص يتابعك",
     features: [
       "سرية تامة مع طبيب مختص",
       "تشخيص ووصفة طبية معتمدة",
@@ -56,6 +56,24 @@ const packages = [
     href: "/sexualHealth",
     icon: "/icons/widgets/icon-sex.svg",
     gradient: "pkgGradSex",
+  },
+  {
+    id: "general",
+    name: "استشارة طبية عامة",
+    hook: "طبيبك دائماً متاح",
+    desc: "استشارة فورية مع طبيب أسرة وإعادة صرف وصفاتك — بدون انتظار وبدون عيادة",
+    price: "٩٩ ريال",
+    priceSub: "/ شهر",
+    features: [
+      "استشارة طبية 24/7 مع طبيب أسرة",
+      "إعادة صرف الوصفات الدائمة",
+      "وصفة إلكترونية معتمدة",
+      "تواصل مباشر مع الطبيب",
+    ],
+    cta: "اشترك الآن",
+    href: "/generalPackage",
+    icon: "/icons/widgets/icon-doctor.svg",
+    gradient: "pkgGradGen",
   },
 ];
 
@@ -143,11 +161,14 @@ export default function LandingPage() {
             <span className={s.bname}>لاباس</span>
           </div>
           <div className={s.navLinks}>
-            <a href="#shop" className={s.navLink}>للأفراد</a>
+            <a href="#b2c" className={s.navLink}>للأفراد</a>
             <a href="#b2b" className={s.navLink}>للمنشآت</a>
             <a href="#partners" className={s.navLink}>شركاؤنا</a>
           </div>
-          <a href="#b2b" className={s.navCta}>للمنشآت</a>
+          <div className={s.navAuth}>
+            <Link href="/home" className={s.navAuthInd}>تسجيل الدخول</Link>
+            <Link href="/orgPortal" className={s.navAuthOrg}>بوابة المنشآت</Link>
+          </div>
         </nav>
       </div>
 
@@ -225,13 +246,13 @@ export default function LandingPage() {
           <Link href="/vitaminsPackages" className={`${s.shopCard} ${s.shopVit}`}>
             <div className={s.shopCardTop}>
               <span className={s.shopCat}>فيتامينات ومعادن</span>
-              <p className={s.shopConcern}>تعب مستمر؟<br />تساقط شعر؟</p>
+              <p className={s.shopConcern}>تعب مستمر؟<br />جسمك يرسل لك إشارات</p>
               <div className={s.shopViz}>
                 <Image src="/icons/widgets/icon-lab-clear.svg" alt="فيتامينات" width={84} height={84} className={s.shopIcon} />
               </div>
             </div>
             <div className={s.shopCardBot}>
-              <p className={s.shopBenefit}>فحص دم في منزلك، طبيب يحلل نتائجك، مكملات مخصصة لك</p>
+              <p className={s.shopBenefit}>طبيب مختص يقيّم حالتك، مكملات مخصصة توصل لبيتك</p>
               <p className={s.shopPrice}>من <strong>٢٨٩ ريال</strong> / شهر</p>
               <span className={s.shopBtn}>اشترك الآن</span>
             </div>
@@ -239,8 +260,8 @@ export default function LandingPage() {
 
           <Link href="/obesityProgram" className={`${s.shopCard} ${s.shopOb}`}>
             <div className={s.shopCardTop}>
-              <span className={s.shopCat}>برنامج السمنة</span>
-              <p className={s.shopConcern}>وزن زائد<br />ولا نتيجة؟</p>
+              <span className={s.shopCat}>برنامج إنقاص الوزن</span>
+              <p className={s.shopConcern}>اخسر وزنك<br />بإشراف طبّي</p>
               <span className={s.shopBadge}>معتمد من FDA</span>
               <div className={s.shopViz}>
                 <Image src="/icons/widgets/icon-fat-clear.svg" alt="سمنة" width={84} height={84} className={s.shopIcon} />
@@ -256,7 +277,7 @@ export default function LandingPage() {
           <Link href="/sexualHealth" className={`${s.shopCard} ${s.shopSex}`}>
             <div className={s.shopCardTop}>
               <span className={s.shopCat}>الصحة الجنسية</span>
-              <p className={s.shopConcern}>مشكلة<br />لا تحكيها؟</p>
+              <p className={s.shopConcern}>الأداء اللي تبيه<br />بخصوصية تامة</p>
               <div className={s.shopViz}>
                 <Image src="/icons/widgets/icon-sex-clear.svg" alt="صحة جنسية" width={84} height={84} className={s.shopIcon} />
               </div>
@@ -310,6 +331,16 @@ export default function LandingPage() {
                     <div className={s.obOrbitTrack2}><div className={s.vitDot2} /></div>
                     <div className={s.obIconFloat}>
                       <Image src="/icons/widgets/icon-fat-clear.svg" alt={pkg.name} width={52} height={52} />
+                    </div>
+                  </div>
+                ) : pkg.id === "general" ? (
+                  <div className={s.genViz}>
+                    <div className={s.genRing} />
+                    <div className={s.genRing2} />
+                    <div className={s.genOrbitTrack}><div className={s.genDot} /></div>
+                    <div className={s.genOrbitTrack2}><div className={s.genDot2} /></div>
+                    <div className={s.genIconFloat}>
+                      <Image src="/icons/widgets/icon-doctor.svg" alt={pkg.name} width={52} height={52} />
                     </div>
                   </div>
                 ) : (

@@ -792,26 +792,19 @@ export default function ObesitySubscribePage() {
               <li className={s.nextItem}>
                 <div className={s.nextNum}>١</div>
                 <div className={s.nextTxt}>
-                  <strong>خلال ٢٤ ساعة:</strong> يتواصل معك فريقنا لتحديد
-                  موعد زيارة الممرّض المناسب لك.
+                  <strong>خلال ٢٤ ساعة:</strong> يراجع طبيبك تقييمك الطبّي ويصمّم
+                  خطّة إدارة الوزن المخصّصة لك.
                 </div>
               </li>
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٢</div>
                 <div className={s.nextTxt}>
-                  <strong>في الموعد:</strong> يزورك ممرّض مرخّص، يأخذ عيّنة
-                  الدم ومقاييس جسمك ويرسلها للمختبر المعتمد.
+                  <strong>خلال ٤٨ ساعة:</strong> تصلك وصفتك الطبية والأدوية
+                  مباشرة لبيتك مجاناً.
                 </div>
               </li>
               <li className={s.nextItem}>
                 <div className={s.nextNum}>٣</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٤٨ ساعة:</strong> يقرأ طبيبك نتائجك ويصمّم
-                  خطّة إدارة الوزن المخصّصة لك.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٤</div>
                 <div className={s.nextTxt}>
                   <strong>استشر الطبيب 24/7:</strong> متى ما احتجت، عبر المحادثة أو
                   مكالمة فيديو مباشرة — بدون حجز موعد.

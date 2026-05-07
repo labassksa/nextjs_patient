@@ -1,27 +1,89 @@
 # Vitamins Package — Customer Journey (A to Z)
 
-## Three Customer Types
+## Customer Types
 
-> **Priority note**: The lab customer is the PRIMARY and highest-converting customer type. Every part of the build should serve this flow first. The lab customer arrives pre-qualified (already in a consultation with a doctor), making them the most likely to subscribe — whether the consultation is pre-test (before results) or post-test (after results). In both cases the customer receives the vitamins package link. Pharmacy and ads customers are secondary channels built on top of the same infrastructure.
+> **Phase Rule**: **Phase 1** is exclusively for customers who **already have existing blood results** — the doctor reviews them and prescribes without ordering a new test. Vitamins cannot be responsibly prescribed without blood data, so any customer who does not arrive with existing results requires a lab test in the package (**Phase 2**).
 
-| Priority | # | Type | Entry Point | Who Pays for Initial Consultation? |
-|----------|---|------|-------------|-------------------------------------|
-| 🔴 **PRIMARY** | 1 | **Lab Customer (Pre or Post-Test)** | Lab org portal (pre_test or post_test consultation) | Lab subscription bundle |
-| 🟡 Secondary | 2 | **Pharmacy Referral** | Pharmacy org portal (free vitamins consultation) | Free — not counted on pharmacy subscription |
-| 🟢 Growth | 3 | **Ads Customer** | TikTok / Instagram / Snap → landing page | Self-pay (vitamins subscription) |
+> **Phase 1 customer type** (customer brings existing blood results — no lab test in package):
+> - **Lab Customer (Post-Test)** — arrives with existing blood results from their own independent lab visit. Package does not include a new test. Doctor reviews the results and prescribes.
+
+> **Phase 2 customer types** (lab test must be bundled in the package):
+> - **Ads Customer** — no existing blood results. Vitamins cannot be responsibly prescribed based on symptoms alone. Requires a lab test in the package — Phase 2.
+> - **Lab Customer (Pre-Test)** — does not have results yet. Cannot responsibly prescribe vitamins without blood data. The vitamins package for this customer type MUST include a lab test — Phase 2.
+> - **Pharmacy Referral — With Lab Test** — same logic. Package must include lab test.
+
+> **Not viable** (cannot offer vitamins at all):
+> - **Pharmacy Referral — No Lab Test** — no results, no lab test in the package. Cannot prescribe vitamins.
+
+<div style="margin:1.5em 0; overflow-x:auto">
+<table style="width:100%; border-collapse:collapse; font-size:0.8em; font-family:inherit">
+<thead>
+<tr style="background:#173404; color:#fff">
+<th style="padding:8px 12px; text-align:left">Priority</th>
+<th style="padding:8px 12px; text-align:left">#</th>
+<th style="padding:8px 12px; text-align:left">Customer Type</th>
+<th style="padding:8px 12px; text-align:left; white-space:nowrap">Phase</th>
+<th style="padding:8px 12px; text-align:left">Entry Point</th>
+<th style="padding:8px 12px; text-align:left">Who Pays (Initial Consult)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:#eaf3de">
+<td style="padding:7px 12px; font-weight:700; color:#173404">Primary</td>
+<td style="padding:7px 12px">1</td>
+<td style="padding:7px 12px"><strong>Lab Customer (Post-Test)</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 1 ✅</td>
+<td style="padding:7px 12px">Lab org portal — patient brings existing blood results, no new test ordered</td>
+<td style="padding:7px 12px">Lab subscription bundle</td>
+</tr>
+<tr style="background:#fff8e8">
+<td style="padding:7px 12px; font-weight:700; color:#7a5500">Secondary</td>
+<td style="padding:7px 12px">2</td>
+<td style="padding:7px 12px"><strong>Ads Customer</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 2 🚧</td>
+<td style="padding:7px 12px">TikTok / Instagram / Snap → landing page → lab test bundled in package</td>
+<td style="padding:7px 12px">Self-pay (vitamins subscription)</td>
+</tr>
+<tr style="background:#fff8e8">
+<td style="padding:7px 12px; font-weight:700; color:#7a5500">Secondary</td>
+<td style="padding:7px 12px">3</td>
+<td style="padding:7px 12px"><strong>Lab Customer (Pre-Test)</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 2 🚧</td>
+<td style="padding:7px 12px">Lab org portal — no results yet; vitamins package + lab test run → doctor prescribes</td>
+<td style="padding:7px 12px">Lab subscription bundle</td>
+</tr>
+<tr style="background:#fff8e8">
+<td style="padding:7px 12px; font-weight:700; color:#7a5500">Secondary</td>
+<td style="padding:7px 12px">4</td>
+<td style="padding:7px 12px"><strong>Pharmacy Referral — With Lab Test</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 2 🚧</td>
+<td style="padding:7px 12px">Pharmacy org portal → lab test ordered within the package</td>
+<td style="padding:7px 12px">Package pricing (Phase 2)</td>
+</tr>
+<tr style="background:#fde8e8">
+<td style="padding:7px 12px; font-weight:700; color:#8a0000">Not Viable</td>
+<td style="padding:7px 12px">5</td>
+<td style="padding:7px 12px"><strong>Pharmacy Referral — No Lab Test</strong></td>
+<td style="padding:7px 12px">—</td>
+<td style="padding:7px 12px">Cannot prescribe vitamins without blood results and no lab test is included</td>
+<td style="padding:7px 12px">—</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 ---
 
-## TYPE 1: Lab Customer (Pre or Post-Test) 🔴 PRIMARY
+## TYPE 1 🔴 PRIMARY (Phase 1 ✅): Patient Visits Lab → Gets Post-Test Consultation → Doctor Reviews Existing Blood Results → Prescribes Vitamins
 
-> **Note**: The vitamins package link is sent to the customer in both cases — pre-test (before results, doctor recommends vitamins proactively) and post-test (after results, doctor reviews findings and recommends a program). The lab sends whichever consultation type applies from the org portal.
+> The patient visits the lab independently, gets their blood work done, and arrives at the Labass consultation with those results in hand. The vitamins package does **NOT** include ordering a new lab test — the doctor uses the existing results to prescribe. This is the highest-converting customer type because the need is already proven by data.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
-<li>يزور العميل المختبر لإجراء التحاليل، أو للاستفسار قبل إجرائها</li>
-<li>يحصل العميل على استشارة من لاباس سواء كانت قبل ظهور النتائج (pre-test) أو بعدها (post-test) — المختبر يرسلها من بوابة المنشأة</li>
+<li>يزور العميل المختبر ويجري تحاليل الدم</li>
+<li>يحصل العميل على استشارة post-test من لاباس — المختبر يرسلها من بوابة المنشأة بعد رفع نتائج التحاليل</li>
 <li>يدخل العميل الاستشارة عبر الرابط المرسل على واتساب</li>
-<li>يراجع الدكتور حالة العميل الصحية (ويناقش النتائج إن وُجدت) — عند إغلاق الاستشارة يرسل النظام تلقائياً رابط صفحة الفيتامينات إلى العميل</li>
+<li>يراجع الدكتور نتائج التحاليل مع العميل — عند إغلاق الاستشارة يرسل النظام تلقائياً رابط صفحة الفيتامينات إلى العميل</li>
 <li><strong>(شرطي — عند الحاجة لتحاليل إضافية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب مباشرةً من تطبيق الدكتور — يُسجّل النظام تلقائياً: اسم المختبر، رقم جوال المدير، وقت الإرسال، رقم الاستشارة، واسم الدكتور</li>
 <li><strong>(شرطي — تابع)</strong> يستلم مدير المختبر رسالة الواتساب — يجري التحليل — ثم يدخل إلى تبويب "طلبات التحليل" في بوابة لاباس، يرفع ملف النتيجة PDF، ويضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من باقة المختبر ولا من باقة الفيتامينات</strong></li>
 <li>يدخل العميل إلى الصفحة، ويقوم بتعبئة المعلومات المطلوبة، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
@@ -35,50 +97,56 @@
 </ol>
 </div>
 
+<div style="page-break-before: always;"></div>
+
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
 | 1 | **Customer** | B2B | Visits the lab and does a blood test. | — |
-| 2 | **Lab — org portal** | B2B | Opens the Labass org portal. Enters the patient's phone number. Selects *pre-test* or *post-test* consultation type. Uploads the lab results PDF if post-test. Submits. | <small>• Remaining bundle count decreases by 1</small> |
+| 2 | **Lab — org portal** | B2B | Opens the Labass org portal. Enters the patient's phone number. Selects *post-test* consultation type. Uploads the lab results PDF. Submits. | <small>• Remaining bundle count decreases by 1</small> |
 | 3 | **System → Customer** | Tech | Sends the patient a WhatsApp + SMS with a one-time consultation link. | <small>• Patient receives: link to enter the consultation chat</small> |
 | 4 | **Customer** | Tech | Clicks the link and enters the consultation chat. | — |
-| 5 | **Doctor** | Medical | Sees the new consultation in their feed and accepts it. | <small>• Patient name, phone, consultation type (pre-test or post-test), lab results PDF (if post-test)<br>• Source label: "من المختبر — [lab name]" *(to be built)*<br>• Whether patient already has an active vitamins subscription *(to be built)*</small> |
+| 5 | **Doctor** | Medical | Sees the new consultation in their feed and accepts it. | <small>• Patient name, phone, consultation type (post-test), lab results PDF<br>• Source label: "من المختبر — [lab name]" *(to be built)*<br>• Whether patient already has an active vitamins subscription *(to be built)*</small> |
 | 6 | **Doctor ↔ Customer** | Medical | Reviews the lab results together. Discusses findings and health status. Recommends a vitamins program. | — |
-| 6a *(conditional)* | **Doctor → Lab Manager** | Medical | If additional lab tests are needed: Doctor clicks "إرسال للمختبر" in the doctor app. Selects the lab and enters the lab manager's phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 6b *(conditional)* | **Lab Manager** | B2B | Receives the WhatsApp referral. Contacts the patient. Collects blood sample. Runs the tests. Opens the Labass org portal → "طلبات التحليل" tab. Finds the pending referral. Uploads the lab results PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created automatically<br>• **NOT deducted** from the lab's bundle or the vitamins package — it is a free post-test consultation<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log updated: status → completed, postTestConsultationId recorded</small> |
-| 6c *(conditional)* | **Doctor** | Medical | Receives the post-test consultation in their feed (same as a normal consultation). Reviews the uploaded lab results PDF. | <small>• Lab results PDF from this referral<br>• Referral source: which lab manager sent it, when<br>• Linked to the original consultation (the pre-test one)</small> |
+| 6a *(🚧 Phase 2 — not in current build)* | **Doctor → Lab Manager** | Medical | If additional lab tests are needed: Doctor clicks "إرسال للمختبر" in the doctor app. Selects the lab and enters the lab manager's phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
+| 6b *(🚧 Phase 2 — not in current build)* | **Lab Manager** | B2B | Receives the WhatsApp referral. Contacts the patient. Collects blood sample. Runs the tests. Opens the Labass org portal → "طلبات التحليل" tab. Finds the pending referral. Uploads the lab results PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created automatically<br>• **NOT deducted** from the lab's bundle or the vitamins package — it is a free post-test consultation<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log updated: status → completed, postTestConsultationId recorded</small> |
+| 6c *(🚧 Phase 2 — not in current build)* | **Doctor** | Medical | Receives the post-test consultation in their feed (same as a normal consultation). Reviews the uploaded lab results PDF. | <small>• Lab results PDF from this referral<br>• Referral source: which lab manager sent it, when<br>• Linked to the original consultation (the pre-test one)</small> |
 | 7 | **Doctor** | Medical | Closes the consultation. | — |
-| 8 | **System → Customer** | Marketing | The moment the lab consultation closes (whether pre-test or post-test), automatically sends the patient the vitamins package link via WhatsApp. | <small>• Post-test message: "بناءً على نتائج تحاليلك، قد تحتاج لبرنامج فيتامينات مخصّص" + vitamins page link<br>• Pre-test message: "طبيبك يرشّح لك برنامج فيتامينات مخصّص من لاباس" + vitamins page link<br>• ⚠️ Requires Meta WhatsApp template approval</small> |
+| 8 | **System → Customer** | Marketing | The moment the post-test lab consultation closes, automatically sends the patient the vitamins package link via WhatsApp. | <small>• Message: "بناءً على نتائج تحاليلك، قد تحتاج لبرنامج فيتامينات مخصّص" + vitamins page link<br>• ⚠️ Requires Meta WhatsApp template approval</small> |
 | 9 | **Customer** | Sales | Visits the vitamins page. Clicks "اشترك الآن". Fills in: name, phone, age, height, weight, city, health goals. Selects a plan (289 SAR/month or 779 SAR/quarter). Verifies phone via OTP. Pays via card or Apple Pay. | — |
 | 10 | **System** *(to be built)* | Tech | Payment confirmed. Subscription activated. Automatically creates a new vitamins consultation and sends the customer a direct entry link (counted against the vitamins subscription, not the lab's bundle). If WhatsApp delivery fails, falls back to SMS. | <small>• Patient receives: WhatsApp/SMS — "تم الاشتراك بنجاح! ادخل استشارتك الآن" + direct consultation link<br>• Success page shows "ادخل استشارتك الآن" button (replaces current "سيتواصل معك فريقنا")</small> |
 | 11 | **Customer** | Tech | Clicks the link and enters the new vitamins consultation directly. | — |
-| 12 | **Doctor** | Medical | Accepts the vitamins consultation. | <small>• **Source** — where the patient came from (lab / pharmacy / direct). Shown because Labass has agreements with partner labs and pharmacies to bring their customers back — prescription routed accordingly *(to be built)*<br>• **Survey** — every question asked during signup with the patient's answer (health goals, height, weight, city)<br>• **Previous consultations** — the original lab consultation (pre or post-test): lab name, date, and link<br>• **Lab results** — PDF uploaded by the lab if it was a post-test consultation; displayed here even though it was uploaded in a different consultation; shown as "not yet available" if pre-test</small> |
+| 12 | **Doctor** | Medical | Accepts the vitamins consultation. | <small>• **Source** — where the patient came from (lab / pharmacy / direct). Shown because Labass has agreements with partner labs and pharmacies to bring their customers back — prescription routed accordingly *(to be built)*<br>• **Survey** — every question asked during signup with the patient's answer (health goals, height, weight, city)<br>• **Previous consultations** — the original post-test lab consultation: lab name, date, and link<br>• **Lab results** — PDF uploaded by the lab, displayed here even though it was uploaded in the original consultation</small> |
 | 13 | **Doctor → Patient** | Medical | Reviews all context. Issues a vitamins prescription with specific products and dosages. | <small>• Patient receives: prescription PDF via WhatsApp</small> |
 | 14 | **Admin** *(to be built)* | Ops | Opens the vitamins subscriber dashboard. Sees all active subscribers with their plan, consultation status, and prescription status. Verifies the system sent the vitamins link after the post-test consultation closed. Sees each patient's source to determine prescription routing. Selects a Labass partner pharmacy and sends the prescription. | <small>• Subscriber name, plan, source (lab / pharmacy / direct), consultations completed, prescription status<br>• ✅ vitamins link sent (with timestamp) / ❌ not sent — needs follow-up<br>• Partner pharmacy list to assign to<br>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
 | 15 | **Pharmacy Manager** | Ops | Receives the prescription. Dispenses the vitamins. Ships to the patient. | — |
 
 ---
 
-## TYPE 2: Pharmacy Referral Customer 🟡
+## TYPE 5 🚫 NOT VIABLE: Pharmacy Refers Patient With No Blood Results — Cannot Prescribe Vitamins Without Lab Data
+
+> 🚫 **Not supported in Phase 1**: Vitamins cannot be prescribed without blood results. A doctor cannot responsibly select specific vitamins and dosages based on self-reported symptoms alone — the risk of over- or under-dosing is too high. Therefore, the pharmacy referral flow (no lab test) **does not lead to a vitamins subscription** in Phase 1.
+>
+> 🔮 **Phase 2**: Once the vitamins package includes an integrated lab test (TYPE 4), pharmacy referrals can be offered the full vitamins program — the patient subscribes, a home blood test is ordered, results come in, and the doctor prescribes accordingly.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
 <li>يزور العميل الصيدلية (لشراء أدوية أو استفسار عن فيتامينات)</li>
 <li>الصيدلية ترسل استشارة فيتامينات مجانية من بوابة المنشأة (لا تُخصم من باقة الصيدلية)</li>
 <li>يحصل العميل على رابط الاستشارة عبر واتساب</li>
-<li>يدخل العميل الاستشارة، ثم يقوم الدكتور بإرسال رابط صفحة الفيتامينات والاشتراك</li>
+<li>يدخل العميل الاستشارة، ثم يقوم الدكتور بإرسال رابط صفحة الفيتامينات والاشتراك بناءً على الأعراض والأهداف الصحية فقط — <strong>لا يوجد تحليل دم في هذه المرحلة</strong></li>
 <li>يدخل العميل إلى الصفحة، ويقوم بتعبئة المعلومات المطلوبة، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
 <li>تصل إلى العميل رسالة تؤكد نجاح الاشتراك، وتتضمن كذلك رابطًا لطلب استشارة فيتامينات جديدة — <em>(مشترك)</em></li>
 <li>يطلب العميل استشارة فيتامينات جديدة مرتبطة بالباقة عبر الرابط المرسل (لا يدخل نفس الاستشارة الأولى) — <em>(مشترك)</em></li>
-<li>يدخل العميل إلى الاستشارة الجديدة، ثم يقوم الدكتور بإصدار وصفة طبية — <em>(مشترك)</em></li>
+<li>يدخل العميل إلى الاستشارة الجديدة، ثم يقوم الدكتور بإصدار وصفة طبية بناءً على الأعراض والأهداف الصحية — <em>(مشترك)</em></li>
 <li>تظهر الباقة التي اشترك فيها العميل للطبيب داخل تطبيق الدكتور عند قبول الاستشارة — <em>(مشترك)</em></li>
-<li><strong>(شرطي — عند الحاجة لتحاليل مخبرية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب من تطبيق الدكتور — يُسجّل النظام: اسم المختبر، رقم الجوال، وقت الإرسال، رقم الاستشارة</li>
-<li><strong>(شرطي — تابع)</strong> يُجري المختبر التحليل — يدخل مدير المختبر إلى تبويب "طلبات التحليل" في بوابة لاباس — يرفع ملف النتيجة PDF — يضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من الباقة</strong></li>
-<li><strong>(للأدمن)</strong> تظهر قائمة بالعملاء المشتركين مع الباقات والاستشارات المنفذة، ويظهر مصدر كل عميل (مختبر / صيدلية / اشتراك مباشر) — <em>(مشترك)</em></li>
-<li>يتحقق الأدمن من الروابط المرسلة من الدكتور للعميل (رابط صفحة الفيتامينات) للتأكد من إرسالها</li>
+<li><strong>(للأدمن)</strong> تظهر قائمة بالعملاء المشتركين مع الباقات والاستشارات المنفذة، ويظهر مصدر كل عميل — <em>(مشترك)</em></li>
+<li>يتحقق الأدمن من الروابط المرسلة من الدكتور للعميل للتأكد من إرسالها</li>
 <li>يرسل الدكتور الوصفة مباشرة لتلك الصيدلية (الصيدلية المصدر التي أرسلت الاستشارة)</li>
 <li>ترسل الوصفة مباشرة لمدير الصيدلية — <em>(مشترك)</em></li>
 </ol>
 </div>
+
+<div style="page-break-before: always;"></div>
 
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
@@ -86,23 +154,49 @@
 | 2 | **Pharmacy — org portal** *(to be built)* | B2B | Opens the Labass org portal. Enters the patient's phone number. Selects "فيتامينات" as the consultation type. Submits. | <small>• "استشارة الفيتامينات مجانية ولا تُخصم من باقتك"<br>• Bundle count does **not** decrease</small> |
 | 3 | **System → Customer** | Tech | Sends the patient a WhatsApp with a consultation link, referencing the pharmacy by name. | <small>• Patient receives: "صيدلية [اسم الصيدلية] ترشّح لك برنامج الفيتامينات من لاباس" + consultation link</small> |
 | 4 | **Customer** | Tech | Clicks the link and enters the consultation chat. | — |
-| 5 | **Doctor** | Medical | Accepts the consultation. | <small>• 🟢 "فيتامينات" badge<br>• Source: "من الصيدلية — [pharmacy name]"<br>• No lab results<br>• Not yet subscribed to a vitamins package *(to be built)*</small> |
-| 6 | **Doctor ↔ Customer** | Medical | Discusses the patient's health concerns, symptoms, and lifestyle. Recommends a vitamins program. Sends the vitamins package link in the chat. | — |
+| 5 | **Doctor** | Medical | Accepts the consultation. | <small>• 🟢 "فيتامينات" badge<br>• Source: "من الصيدلية — [pharmacy name]"<br>• **No lab results** — Phase 1 consultation-only flow<br>• Not yet subscribed to a vitamins package *(to be built)*</small> |
+| 6 | **Doctor ↔ Customer** | Medical | Discusses the patient's health concerns, symptoms, and lifestyle. Recommends a vitamins program based on symptom profile only. Sends the vitamins package link in the chat. | — |
 | 7 | **Doctor** | Medical | Closes the consultation. | — |
 | 8 | **Customer** | Sales | Visits the vitamins page. Fills in personal info and health goals. Selects a plan. Verifies phone via OTP. Pays. | — |
-| 9 | **System** *(to be built)* | Tech | Payment confirmed. Subscription activated. System sends customer a link to request a new vitamins consultation at any time during their subscription period. If WhatsApp delivery fails, falls back to SMS. | <small>• Patient receives: WhatsApp/SMS — "تم الاشتراك بنجاح! يمكنك طلب استشارة جديدة في أي وقت يناسبك" + consultation request link</small> |
-| 10 | **Customer** | Tech | Clicks the link and requests a new vitamins consultation linked to their subscription. Enters the consultation once it has been created. | — |
-| 11 | **Doctor** | Medical | Accepts the vitamins consultation. | <small>• 🟢 "فيتامينات" badge<br>• Source: "من الصيدلية — [pharmacy name]"<br>• Subscription plan + active status<br>• Health goals + physical info from signup<br>• No lab results *(to be built)*</small> |
-| 11a *(conditional)* | **Doctor → Lab Manager** | Medical | If lab tests are needed before prescribing: Doctor clicks "إرسال للمختبر". Selects lab name + manager phone. Submits. | <small>• Lab manager receives WhatsApp with patient name + phone + doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 11b *(conditional)* | **Lab Manager** | B2B | Receives the referral. Contacts the patient. Collects sample. Runs test. Opens Labass org portal → "طلبات التحليل" tab. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link<br>• Referral log: status → completed</small> |
-| 11c *(conditional)* | **Doctor** | Medical | Receives post-test consultation. Reviews lab results. Now has full picture to prescribe. | — |
-| 12 | **Doctor → Patient** | Medical | Reviews context. Issues a vitamins prescription. | <small>• Patient receives: prescription PDF via WhatsApp</small> |
-| 13 | **Doctor → Pharmacy** *(to be built)* | Medical | Since the patient came from this pharmacy, the doctor sends the prescription directly to the source pharmacy. No admin involvement needed. | <small>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
+| 9 | **System** *(to be built)* | Tech | Payment confirmed. Subscription activated. System sends customer a link to request a new vitamins consultation. | <small>• Patient receives: WhatsApp/SMS — "تم الاشتراك بنجاح! يمكنك طلب استشارة جديدة في أي وقت يناسبك" + consultation request link</small> |
+| 10 | **Customer** | Tech | Enters a new vitamins consultation linked to their subscription. | — |
+| 11 | **Doctor** | Medical | Accepts the vitamins consultation. Reviews symptom profile. Issues a vitamins prescription. | <small>• 🟢 "فيتامينات" badge<br>• Source: "من الصيدلية — [pharmacy name]"<br>• Subscription plan + active status<br>• Health goals + physical info from signup<br>• **No lab results** — Phase 1 *(to be built)*</small> |
+| 12 | **Doctor → Patient** | Medical | Issues a vitamins prescription based on symptoms and health goals. | <small>• Patient receives: prescription PDF via WhatsApp</small> |
+| 13 | **Doctor → Pharmacy** *(to be built)* | Medical | Sends the prescription directly to the source pharmacy. | <small>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
 | 14 | **Pharmacy Manager** | Ops | Receives the prescription. Dispenses the vitamins. Ships to the customer. | — |
 
 ---
 
-## TYPE 3: Ads Customer 🟢
+## TYPE 3 🔮 Phase 2: Patient Visits Lab Before Results Are Ready → Vitamins Package Must Include a Lab Test — Not Yet Built
+
+> 🚧 **Phase 2 — Not yet implemented.** The pre-test lab customer visits the lab before their results are ready. In Phase 1, we send them the vitamins link after the consultation closes, but cannot prescribe vitamins without blood results. In Phase 2, the vitamins package for this customer type **includes the lab test** — the patient subscribes, the lab test is ordered and run, results come in, and the doctor prescribes the appropriate vitamins based on actual blood data.
+
+| What changes vs Phase 1 | Details |
+|------------------------|---------|
+| Package price increases to cover lab test | Lab test cost bundled into subscription pricing |
+| Patient subscribes first, lab test ordered from within the vitamins package | Requires integration between the vitamins subscription and the lab ordering flow |
+| Lab runs panel and uploads results | Doctor receives vitamins consultation + lab results together |
+| Doctor prescribes based on actual blood results | Clinically superior to symptom-only prescription |
+
+---
+
+## TYPE 4 🔮 Phase 2: Pharmacy Refers Patient → Doctor Orders Home Blood Test Within Vitamins Package — Not Yet Built
+
+> 🚧 **Phase 2 — Not yet implemented.** In this future flow, after the initial pharmacy referral consultation, the doctor will be able to order a home blood test as part of the vitamins subscription. The lab (currently Jadar) collects the sample at home, runs the panel, and uploads results to Labass. The doctor reviews the results in a follow-up post-test consultation and refines the prescription accordingly. **No implementation date set.**
+
+| What changes in Phase 2 | Details |
+|------------------------|---------|
+| Package price increases to cover lab test | Lab test cost bundled into subscription pricing |
+| Doctor orders home lab test from within the consultation | Requires "إرسال للمختبر" feature in doctor app + home collection agreement with Jadar |
+| Lab uploads results to Labass org portal | Via "طلبات التحليل" tab (built, awaiting backend) |
+| Doctor receives free post-test consultation | Not deducted from any package — same lab referral backend (`POST /consultations/create-from-referral`) |
+| Prescription refined based on actual blood results | Higher clinical accuracy, better outcomes |
+
+---
+
+## TYPE 2 🔮 Phase 2: Customer Finds Ad (TikTok/Instagram) → No Blood Results → Must Include Lab Test in Package Before Doctor Can Prescribe — Not Yet Built
+
+> 🔮 **Phase 2 — Not yet implemented**: Vitamins cannot be responsibly prescribed without blood results. An ads customer without existing blood work requires a lab test as part of the package before the doctor can prescribe. This flow is planned for Phase 2 when lab testing is bundled into the subscription pricing.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
@@ -111,16 +205,18 @@
 <li>يقوم بتعبئة المعلومات المطلوبة، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
 <li>تصل إلى العميل رسالة تؤكد نجاح الاشتراك، وتتضمن كذلك رابطًا لطلب استشارة فيتامينات جديدة — <em>(مشترك)</em></li>
 <li>يطلب العميل استشارة فيتامينات جديدة مرتبطة بالباقة عبر الرابط المرسل (لا يدخل نفس الاستشارة الأولى) — <em>(مشترك)</em></li>
-<li>يدخل العميل إلى الاستشارة الجديدة، ثم يقوم الدكتور بإصدار وصفة طبية — <em>(مشترك)</em></li>
+<li>يدخل العميل إلى الاستشارة الجديدة، ثم يقوم الدكتور بإصدار وصفة طبية بناءً على الأعراض والأهداف الصحية — <strong>لا يوجد تحليل دم في هذه المرحلة</strong> — <em>(مشترك)</em></li>
 <li>تظهر الباقة التي اشترك فيها العميل للطبيب داخل تطبيق الدكتور عند قبول الاستشارة — <em>(مشترك)</em></li>
-<li><strong>(شرطي — عند الحاجة لتحاليل مخبرية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب من تطبيق الدكتور — يُسجّل النظام: اسم المختبر، رقم الجوال، وقت الإرسال، رقم الاستشارة</li>
-<li><strong>(شرطي — تابع)</strong> يُجري المختبر التحليل — يدخل مدير المختبر إلى تبويب "طلبات التحليل" في بوابة لاباس — يرفع ملف النتيجة PDF — يضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من الباقة</strong></li>
+<li><strong>(🚧 Phase 2 — عند الحاجة لتحاليل مخبرية في المرحلة القادمة)</strong> يرسل الدكتور معلومات المريض لمدير المختبر — هذه الخطوة غير مفعّلة حالياً</li>
+<li><strong>(🚧 Phase 2 — تابع)</strong> يُجري المختبر التحليل ويرفع النتائج — هذه الخطوة غير مفعّلة حالياً</li>
 <li><strong>(للأدمن)</strong> تظهر قائمة بالعملاء المشتركين مع الباقات والاستشارات المنفذة، ويظهر مصدر كل عميل (مختبر / صيدلية / اشتراك مباشر) — <em>(مشترك)</em></li>
 <li>يتحقق الأدمن من الروابط المرسلة من الدكتور للعميل (رابط صفحة الفيتامينات) للتأكد من إرسالها</li>
 <li>يقوم الأدمن باختيار صيدلية شريكة متعاقدة مع لاباس لبيع الفيتامينات ثم يرسل الوصفة</li>
 <li>ترسل الوصفة مباشرة لمدير الصيدلية — <em>(مشترك)</em></li>
 </ol>
 </div>
+
+<div style="page-break-before: always;"></div>
 
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
@@ -129,9 +225,9 @@
 | 3 | **System** *(to be built)* | Tech | Payment confirmed. Subscription activated. System sends customer a link to request a new vitamins consultation at any time during their subscription period. If WhatsApp delivery fails, falls back to SMS. | <small>• Patient receives: WhatsApp/SMS — "تم الاشتراك بنجاح! يمكنك طلب استشارة جديدة في أي وقت يناسبك" + consultation request link<br>• Success page shows an "اطلب استشارتك الآن" button</small> |
 | 4 | **Customer** | Tech | Clicks the link and requests a new vitamins consultation linked to their subscription. Enters the consultation once it has been created. | — |
 | 5 | **Doctor** | Medical | Accepts the consultation. | <small>• 🟢 "فيتامينات" badge<br>• Source: "اشتراك مباشر" (came via ads or landing page)<br>• Subscription plan + active status<br>• Health goals + physical info from signup<br>• No lab results *(to be built)*</small> |
-| 5a *(conditional)* | **Doctor → Lab Manager** | Medical | If lab tests are needed: Doctor clicks "إرسال للمختبر". Enters lab name + manager phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 5b *(conditional)* | **Lab Manager** | B2B | Receives the referral WhatsApp. Contacts the patient. Collects blood sample. Runs the tests. Opens Labass org portal → "طلبات التحليل" tab. Finds the referral. Uploads lab results PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed, postTestConsultationId recorded</small> |
-| 5c *(conditional)* | **Doctor** | Medical | Receives the post-test consultation (normal feed). Reviews the lab results PDF. Now has complete picture for a personalised vitamins prescription. | — |
+| 5a *(🚧 Phase 2 — not in current build)* | **Doctor → Lab Manager** | Medical | If lab tests are needed: Doctor clicks "إرسال للمختبر". Enters lab name + manager phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
+| 5b *(🚧 Phase 2 — not in current build)* | **Lab Manager** | B2B | Receives the referral WhatsApp. Contacts the patient. Collects blood sample. Runs the tests. Opens Labass org portal → "طلبات التحليل" tab. Finds the referral. Uploads lab results PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed, postTestConsultationId recorded</small> |
+| 5c *(🚧 Phase 2 — not in current build)* | **Doctor** | Medical | Receives the post-test consultation (normal feed). Reviews the lab results PDF. Now has complete picture for a personalised vitamins prescription. | — |
 | 6 | **Doctor → Patient** | Medical | Reviews health goals and context. Issues a vitamins prescription with specific products and dosages. | <small>• Patient receives: prescription PDF via WhatsApp</small> |
 | 7 | **Admin** *(to be built)* | Ops | Opens the vitamins subscriber dashboard. Finds this patient (no linked pharmacy). Selects a Labass partner pharmacy from the list. Sends the prescription to the pharmacy. | <small>• All active subscribers (name, plan, **source: lab / pharmacy / direct**, status)<br>• Patients with no assigned pharmacy highlighted for action<br>• Per subscriber: consultations completed, prescription status<br>• Partner pharmacy list to choose from<br>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
 | 8 | **Pharmacy Manager** | Ops | Receives the prescription. Dispenses the vitamins. Ships to the customer. | — |
@@ -270,16 +366,15 @@
 
 ---
 
-### GAP 8 — Auto-Send Vitamins Link When Lab Consultation Closes (Pre or Post-Test)
+### GAP 8 — Auto-Send Vitamins Link When Post-Test Lab Consultation Closes
 
-**Problem**: When a lab consultation closes (whether pre-test or post-test), nothing is sent about vitamins. The doctor must manually remember to send the link.
+**Problem**: When a post-test lab consultation closes, nothing is sent about vitamins. The doctor must manually remember to send the link.
 
-**What we need**: Every time a lab consultation closes — regardless of type — the system automatically sends the patient the vitamins package link via WhatsApp. This is a safety net in case the doctor forgot.
+**What we need**: Every time a **post-test** lab consultation closes, the system automatically sends the patient the vitamins package link via WhatsApp. This is a safety net in case the doctor forgot. Pre-test consultations are Phase 2 (the vitamins package for pre-test customers will include the lab test — not applicable in Phase 1).
 
 - Post-test message: "بناءً على نتائج تحاليلك، قد تستفيد من برنامج فيتامينات مخصّص" + link
-- Pre-test message: "طبيبك يرشّح لك برنامج فيتامينات مخصّص من لاباس" + link
 
-**Backend**: When any lab consultation (pre or post-test) closes, auto-send vitamins link to patient via WhatsApp.
+**Backend**: When a post-test lab consultation closes, auto-send vitamins link to patient via WhatsApp.
 
 ⚠️ Requires an approved WhatsApp message template with Meta before this can run.
 
@@ -318,6 +413,53 @@
 **Frontend (admin)**: Trigger button with confirmation showing the number of users to be contacted; results summary after send.
 
 ⚠️ Requires a separate approved WhatsApp marketing template with Meta.
+
+---
+
+## Technical Task Breakdown (by Sprint)
+
+> Ordered to ship the 🔴 lab customer flow end-to-end first. Each task references its GAP.
+
+### Sprint 1 — Lab Customer E2E (🔴 PRIMARY)
+
+| # | Task | GAP | Repo | Effort |
+|---|------|-----|------|--------|
+| 1.1 | Add `Vitamins` to `ConsultationType` enum | GAP 2 | backend | S |
+| 1.2 | Add `source` field + `ConsultationSource` enum to Consultation entity | GAP 3 | backend | S |
+| 1.3 | Set `source` automatically at consultation creation (lab → `lab_post_test`, bundle → `org_bundle`) | GAP 3 | backend | M |
+| 1.4 | On vitamins subscription activation (payment webhook): auto-create consultation, generate long-lived magic link, send WhatsApp | GAP 1 | backend | L |
+| 1.5 | Update success page — replace "سيتواصل معك فريقنا" with direct consultation link + "يمكنك الدخول في أي وقت" | GAP 1 | frontend (patient) | S |
+| 1.6 | Store survey data (health goals, height, weight, city) to backend on subscribe confirmation | GAP 7 | frontend (patient) + backend | M |
+| 1.7 | Expand doctor feed relations to include `subscription`, `subscription.bundle`, `source`, survey data, and lab results PDF from linked consultations | GAP 3 | backend | M |
+| 1.8 | Doctor app — show vitamins badge, source label, subscription status, survey answers, lab results PDF on consultation card/detail | GAP 3 | frontend (doctor) | M |
+| 1.9 | Auto-send vitamins WhatsApp link when a post-test lab consultation closes | GAP 8 | backend | S |
+| 1.10 | Submit WhatsApp template `vitamins_marketing_post_test` to Meta for approval | GAP 8 | ops | S |
+| 1.11 | Add `isVitaminPartner` flag to Organization entity | GAP 5 | backend | S |
+| 1.12 | `POST /admin/send-prescription-to-pharmacy` + `GET /admin/partner-pharmacies` endpoints | GAP 5 | backend | M |
+| 1.13 | Admin dashboard — subscriber list with plan, source, consultation status, prescription status, pharmacy assignment | GAP 4 + 5 | frontend (admin) | L |
+| 1.14 | Lab referral backend: `POST /lab-referrals`, `GET /lab-referrals`, `POST /consultations/create-from-referral` (free post-test) | GAP 10 | backend | L |
+
+### Sprint 2 — Pharmacy Flow + Doctor Tooling (🟡 SECONDARY)
+
+| # | Task | GAP | Repo | Effort |
+|---|------|-----|------|--------|
+| 2.1 | Skip bundle deduction when `consultationType === "vitamins"` in `createConsultationFromBundle` | GAP 2 | backend | S |
+| 2.2 | Org portal — add "فيتامينات" option in DoctorTypeSection with "مجانية ولا تُخصم من باقتك" note | GAP 2 | frontend (patient/orgPortal) | S |
+| 2.3 | Set `source: pharmacy_vitamins` when pharmacy sends a vitamins consultation | GAP 3 | backend | S |
+| 2.4 | Doctor app — "أرسل الوصفة للصيدلية" button for pharmacy-source consultations | GAP 5 | frontend (doctor) | M |
+| 2.5 | Doctor app — "إرسال للمختبر" button: enter lab name + manager phone, sends WhatsApp, logs referral | GAP 10 | frontend (doctor) + backend | M |
+| 2.6 | Admin dashboard — doctor compliance column: ✅ vitamins link sent / ❌ not sent (detect via `vitaminLinkSentAt` on Consultation) | GAP 4 | backend + frontend (admin) | M |
+| 2.7 | On monthly renewal webhook: auto-create new consultation + send WhatsApp reminder to patient | GAP 6 | backend | M |
+
+### Sprint 3 — Growth & Marketing (🟢)
+
+| # | Task | GAP | Repo | Effort |
+|---|------|-----|------|--------|
+| 3.1 | `POST /admin/marketing/send-vitamins-campaign` — bulk WhatsApp to all non-subscriber patients, rate-limited, with result logging | GAP 9 | backend | L |
+| 3.2 | Admin UI — campaign trigger button with user count confirmation + results summary | GAP 9 | frontend (admin) | M |
+| 3.3 | Submit WhatsApp template `vitamins_marketing_campaign` to Meta for approval | GAP 9 | ops | S |
+
+**Effort key**: S = small (< 1 day), M = medium (1–2 days), L = large (3+ days)
 
 ---
 
