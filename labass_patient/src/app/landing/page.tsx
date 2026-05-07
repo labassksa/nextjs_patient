@@ -44,7 +44,7 @@ const packages = [
   {
     id: "sexual",
     name: "الصحة الجنسية",
-    hook: "الأداء اللي تبيه، بخصوصية تامة",
+    hook: "علاج فعّال بسرية تامة وخصوصية",
     desc: "علاج متكامل بوصفة طبيب — بدون عيادة، مع طبيب مختص يتابعك",
     features: [
       "سرية تامة مع طبيب مختص",
@@ -277,7 +277,7 @@ export default function LandingPage() {
           <Link href="/sexualHealth" className={`${s.shopCard} ${s.shopSex}`}>
             <div className={s.shopCardTop}>
               <span className={s.shopCat}>الصحة الجنسية</span>
-              <p className={s.shopConcern}>الأداء اللي تبيه<br />بخصوصية تامة</p>
+              <p className={s.shopConcern}>علاج فعّال<br />بسرية تامة وخصوصية</p>
               <div className={s.shopViz}>
                 <Image src="/icons/widgets/icon-sex-clear.svg" alt="صحة جنسية" width={84} height={84} className={s.shopIcon} />
               </div>
