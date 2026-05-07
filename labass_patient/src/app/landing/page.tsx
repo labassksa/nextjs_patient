@@ -232,11 +232,7 @@ export default function LandingPage() {
       {/* ─── SHOP / EDITORIAL PACKAGE SHOWCASE ─── */}
       <section id="shop" className={s.shopSec}>
         <div className={s.shopHead}>
-          <div className={s.shopEyebrow}>
-            <span className={s.shopEyebrowDot} />
-            ابدأ من اهتمامك
-          </div>
-          <h2 className={s.shopTtl}>اختر برنامجك</h2>
+            <h2 className={s.shopTtl}>اختر برنامجك</h2>
           <p className={s.shopSub}>
             ثلاثة برامج — كل واحد يبدأ بفحص أو استشارة ويوصلك لعلاج مخصّص مع طبيب مرخّص
           </p>

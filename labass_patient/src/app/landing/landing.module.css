@@ -112,10 +112,10 @@
 .pkgCard { background: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e5e7eb; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; text-decoration: none; display: flex; flex-direction: column; }
 .pkgCard:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(23,52,4,0.12); }
 .pkgGrad { padding: 32px 24px 28px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px; }
-.pkgGradVit { background: linear-gradient(145deg, #7ED957 0%, #a0e87a 50%, #c7f0a8 100%); }
-.pkgGradOb { background: linear-gradient(145deg, #7ED957 0%, #97C459 50%, #b8d98a 100%); }
-.pkgGradSex { background: linear-gradient(145deg, #173404 0%, #27500A 50%, #3B6D11 100%); }
-.pkgGradGen { background: linear-gradient(145deg, #14B8A6 0%, #0F766E 50%, #0a5a54 100%); }
+.pkgGradVit { background: linear-gradient(145deg, #edfad8 0%, #f4fce8 50%, #f9fef4 100%); }
+.pkgGradOb { background: linear-gradient(145deg, #e6f5d0 0%, #eef8de 50%, #f5fbec 100%); }
+.pkgGradSex { background: linear-gradient(145deg, #e0f2d0 0%, #eaf6dc 50%, #f2faec 100%); }
+.pkgGradGen { background: linear-gradient(145deg, #d8f5f2 0%, #e6f9f7 50%, #f2fcfb 100%); }
 .pkgIconWrap { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.3); display: grid; place-items: center; margin-bottom: 12px; backdrop-filter: blur(4px); }
 .pkgGradSex .pkgIconWrap { background: rgba(126,217,87,0.15); }
 .pkgGradGen .pkgIconWrap { background: rgba(255,255,255,0.15); }
