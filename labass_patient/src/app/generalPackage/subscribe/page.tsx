@@ -14,10 +14,10 @@ const cityOptions = [
   { value: "riyadh", label: "الرياض" },
 ];
 
-const staticPlans = [
-  { id: "monthly",   label: "شهري",       price: 99,  period: "/ شهرياً",      popular: false },
-  { id: "quarterly", label: "كل ٣ أشهر", price: 249, period: "/ كل ٣ أشهر", popular: true  },
-];
+const planMeta: Record<string, { period: string; popular: boolean; fallbackLabel: string }> = {
+  monthly:   { period: "/ شهرياً",      popular: false, fallbackLabel: "شهري"       },
+  quarterly: { period: "/ كل ٣ أشهر", popular: true,  fallbackLabel: "كل ٣ أشهر" },
+};
 
 const planFeaturesList = [
   "استشارة طبية فورية 24/7 مع طبيب أسرة",
@@ -32,11 +32,12 @@ export default function GeneralPackageSubscribePage() {
 
   // Plan
   const [selectedPlanId, setSelectedPlanId] = useState("quarterly");
-  const [price, setPrice] = useState(249);
-  const [planLabel, setPlanLabel] = useState("كل ٣ أشهر");
-  const [monthlyBundleId, setMonthlyBundleId] = useState<number | null>(null);
-  const [quarterlyBundleId, setQuarterlyBundleId] = useState<number | null>(null);
-  const bundleId = selectedPlanId === "monthly" ? monthlyBundleId : quarterlyBundleId;
+  const [monthlyBundle,   setMonthlyBundle]   = useState<{ id: number; price: number; description: string } | null>(null);
+  const [quarterlyBundle, setQuarterlyBundle] = useState<{ id: number; price: number; description: string } | null>(null);
+  const selectedBundle = selectedPlanId === "monthly" ? monthlyBundle : quarterlyBundle;
+  const bundleId  = selectedBundle?.id ?? null;
+  const price     = selectedBundle?.price ?? 0;
+  const planLabel = selectedBundle?.description || planMeta[selectedPlanId].fallbackLabel;
 
   // Personal info
   const [name, setName] = useState("");
@@ -64,10 +65,10 @@ export default function GeneralPackageSubscribePage() {
         const individualGP = list.filter(
           (b: any) => b.type === "GP Consultations" && b.whoSubscribes === "individual"
         );
-        const monthly  = individualGP.find((b: any) => b.intervalDays === 30);
+        const monthly   = individualGP.find((b: any) => b.intervalDays === 30);
         const quarterly = individualGP.find((b: any) => b.intervalDays === 90);
-        if (monthly)  setMonthlyBundleId(monthly.id);
-        if (quarterly) setQuarterlyBundleId(quarterly.id);
+        if (monthly)   setMonthlyBundle({ id: monthly.id, price: Number(monthly.price), description: monthly.description || "" });
+        if (quarterly) setQuarterlyBundle({ id: quarterly.id, price: Number(quarterly.price), description: quarterly.description || "" });
       })
       .catch(() => {});
   }, []);
@@ -244,22 +245,26 @@ export default function GeneralPackageSubscribePage() {
           <p className={s.pageSub}>استشارة طبية 24/7 مع طبيب أسرة مرخّص.</p>
 
           <div className={s.plans}>
-            {staticPlans.map((plan) => {
-              const isSelected = selectedPlanId === plan.id;
+            {(["monthly", "quarterly"] as const).map((planId) => {
+              const meta   = planMeta[planId];
+              const bundle = planId === "monthly" ? monthlyBundle : quarterlyBundle;
+              const isSelected = selectedPlanId === planId;
               return (
                 <div
-                  key={plan.id}
-                  className={`${s.plan} ${plan.popular ? s.planPopular : ""} ${isSelected ? s.planSelected : ""}`}
-                  onClick={() => { setSelectedPlanId(plan.id); setPrice(plan.price); setPlanLabel(plan.label); }}
+                  key={planId}
+                  className={`${s.plan} ${meta.popular ? s.planPopular : ""} ${isSelected ? s.planSelected : ""}`}
+                  onClick={() => setSelectedPlanId(planId)}
                 >
                   <div className={s.planRadio} />
-                  {plan.popular && <div className={s.planPop}>الأكثر طلباً</div>}
-                  <div className={s.planName}>{plan.label}</div>
+                  {meta.popular && <div className={s.planPop}>الأكثر طلباً</div>}
+                  <div className={s.planName}>{bundle?.description || meta.fallbackLabel}</div>
                   <div className={s.planPrice}>
-                    <div className={s.planNum}>{plan.price.toLocaleString("ar-SA")}</div>
+                    <div className={s.planNum}>
+                      {bundle ? bundle.price.toLocaleString("ar-SA") : "—"}
+                    </div>
                     <div className={s.planCur}>ريال</div>
                   </div>
-                  <p className={s.planPeriod}>{plan.period}</p>
+                  <p className={s.planPeriod}>{meta.period}</p>
                   <ul className={s.planFeats}>
                     {planFeaturesList.map((f, i) => (
                       <li key={i} className={s.planFeat}>
