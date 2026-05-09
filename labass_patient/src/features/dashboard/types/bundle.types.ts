@@ -10,6 +10,8 @@ export interface Bundle {
   isActive: boolean;
   description: string;
   createdAt: string;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }
 
 export interface CreateBundlePayload {
@@ -21,6 +23,8 @@ export interface CreateBundlePayload {
   currency: string;
   recurringType: string;
   description: string;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }
 
 export interface UpdateBundlePayload {
@@ -31,4 +35,6 @@ export interface UpdateBundlePayload {
   name?: string;
   type?: string;
   recurringType?: string;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }

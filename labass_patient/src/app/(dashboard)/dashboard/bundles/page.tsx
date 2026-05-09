@@ -21,7 +21,8 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
+const WHO_SUBSCRIBES = ["organization", "individual"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function BundlesPage() {
@@ -35,6 +36,7 @@ export default function BundlesPage() {
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
     name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
     currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined,
+    whoSubscribes: "organization", isUnlimited: false,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -45,7 +47,7 @@ export default function BundlesPage() {
     if (!newBundle.name) {
       errors.name = "Please select a name";
     }
-    if (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount)) {
+    if (!newBundle.isUnlimited && (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount))) {
       errors.consultationCount = "Must be a positive integer";
     }
     if (newBundle.price < 0) {
@@ -59,7 +61,7 @@ export default function BundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync(newBundle);
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false });
     setFormErrors({});
   };
 
@@ -118,6 +120,24 @@ export default function BundlesPage() {
       header: "Recurring",
       cell: ({ row }) => (
         <Badge variant="outline" className="font-normal">{row.original.recurringType}</Badge>
+      ),
+    },
+    {
+      accessorKey: "whoSubscribes",
+      header: "Subscriber",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="font-normal capitalize">
+          {row.original.whoSubscribes === "individual" ? "Individual" : "Organization"}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "isUnlimited",
+      header: "Unlimited",
+      cell: ({ row }) => (
+        <span className={row.original.isUnlimited ? "text-green-600 font-semibold" : "text-muted-foreground"}>
+          {row.original.isUnlimited ? "✓" : "No"}
+        </span>
       ),
     },
     {
@@ -192,6 +212,15 @@ export default function BundlesPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Subscriber Type</Label>
+              <Select value={newBundle.whoSubscribes} onValueChange={(val) => setNewBundle({ ...newBundle, whoSubscribes: val as "individual" | "organization" })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {WHO_SUBSCRIBES.map((w) => <SelectItem key={w} value={w} className="capitalize">{w}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Price</Label>
@@ -203,8 +232,18 @@ export default function BundlesPage() {
                 <Input type="number" min={0} step="0.01" placeholder="e.g. 600" value={newBundle.originalPrice ?? ""} onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })} />
               </div>
             </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>Unlimited Consultations</Label>
+                <p className="text-xs text-muted-foreground">Consultation count becomes irrelevant when enabled</p>
+              </div>
+              <Switch
+                checked={!!newBundle.isUnlimited}
+                onCheckedChange={(checked) => setNewBundle({ ...newBundle, isUnlimited: checked })}
+              />
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              <div className={`space-y-2 transition-opacity ${newBundle.isUnlimited ? "opacity-40 pointer-events-none" : ""}`}>
                 <Label>Consultations</Label>
                 <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
                 {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
