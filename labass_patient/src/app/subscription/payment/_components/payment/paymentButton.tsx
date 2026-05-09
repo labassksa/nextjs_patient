@@ -107,6 +107,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         {
           bundleId: bundleId ?? undefined,
           sessionId,
+          invoiceAmount: discountedPrice,
           callBackUrl: "https://www.labass.sa/subscription/success",
           errorUrl: "https://www.labass.sa/subscription/error",
           subscriberType,
@@ -148,6 +149,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         {
           bundleId: bundleId ?? undefined,
           sessionId: SessionId,
+          invoiceAmount: discountedPrice,
           callBackUrl: "https://www.labass.sa/subscription/success",
           errorUrl: "https://www.labass.sa/subscription/error",
           subscriberType,
