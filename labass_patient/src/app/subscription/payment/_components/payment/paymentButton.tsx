@@ -139,33 +139,10 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         CurrencyIso: "SAR",
       });
       if (!sessionRes.data.IsSuccess) return;
-      const { SessionId } = sessionRes.data.Data;
-
-      const surveyRaw = localStorage.getItem("vitamin_survey_answers");
-      const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
-
-      const paymentRes = await axios.post(
-        `${apiUrl}/execute-subscription-payment`,
-        {
-          bundleId: bundleId ?? undefined,
-          sessionId: SessionId,
-          invoiceAmount: discountedPrice,
-          callBackUrl: "https://www.labass.sa/subscription/success",
-          errorUrl: "https://www.labass.sa/subscription/error",
-          subscriberType,
-          isRecurring,
-          promoCode,
-          surveyAnswers,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+      const { SessionId, CountryCode } = sessionRes.data.Data;
+      router.push(
+        `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&bundleId=${bundleId ?? ""}&subscriberType=${subscriberType}&isRecurring=${isRecurring}&discountedPrice=${discountedPrice}&promoCode=${promoCode}`
       );
-
-      if (paymentRes.data.success && paymentRes.data.data?.paymentURL) {
-        localStorage.removeItem("vitamin_survey_answers");
-        window.location.href = paymentRes.data.data.paymentURL;
-      } else {
-        console.error("Card payment failed:", paymentRes.data);
-      }
     } catch (err) {
       console.error("Card payment error:", err);
     } finally {

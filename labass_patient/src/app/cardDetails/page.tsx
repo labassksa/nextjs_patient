@@ -59,7 +59,7 @@ const CardDetailsContent: React.FC = () => {
               if (isSubscriptionFlow) {
                 localStorage.removeItem('temp_subscription_flow');
                 localStorage.removeItem('vitamin_survey_answers');
-                router.push("/vitaminsPackages");
+                router.push("/subscription/success");
               } else {
                 router.push("/orgPortal?bundlePaymentSuccess=true");
               }
@@ -69,9 +69,14 @@ const CardDetailsContent: React.FC = () => {
               router.push(`/cardDetails/success?consultationId=${consultationId}&promoFromUrl=${promoFromUrl}`);
             }
           } else {
+            const isSubscriptionFlow = localStorage.getItem('temp_subscription_flow');
             localStorage.removeItem('temp_bundle_id');
             localStorage.removeItem('temp_subscription_flow');
-            router.push("/cardDetails/error");
+            if (isSubscriptionFlow) {
+              router.push("/subscription/error");
+            } else {
+              router.push("/cardDetails/error");
+            }
           }
           return;
         }
@@ -126,8 +131,8 @@ const CardDetailsContent: React.FC = () => {
                     {
                       bundleId: Number(bundleId),
                       sessionId: newSessionId,
-                      callBackUrl: "https://labass.sa/success",
-                      errorUrl: "https://labass.sa/error",
+                      callBackUrl: "https://www.labass.sa/subscription/success",
+                      errorUrl: "https://www.labass.sa/subscription/error",
                       subscriberType,
                       isRecurring,
                       promoCode,
