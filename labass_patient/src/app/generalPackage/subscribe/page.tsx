@@ -48,7 +48,6 @@ export default function GeneralPackageSubscribePage() {
   // OTP
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpTimer, setOtpTimer] = useState(60);
-  const [otpSent, setOtpSent] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -73,13 +72,10 @@ export default function GeneralPackageSubscribePage() {
       .catch(() => {});
   }, []);
 
-  // OTP timer + auto-send on step 3
+  // Start countdown timer when arriving at step 3
   useEffect(() => {
-    if (currentStep === 3 && !otpSent) {
+    if (currentStep === 3) {
       setOtpTimer(60);
-      setOtpSent(true);
-      const cleanPhone = phone.replace(/\s/g, "");
-      loginPatient(cleanPhone, "+966").catch(() => {});
       timerRef.current = setInterval(() => {
         setOtpTimer((prev) => {
           if (prev <= 1) { if (timerRef.current) clearInterval(timerRef.current); return 0; }
@@ -88,7 +84,7 @@ export default function GeneralPackageSubscribePage() {
       }, 1000);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [currentStep, otpSent, phone]);
+  }, [currentStep]);
 
   const resendOtp = async () => {
     setOtp(["", "", "", ""]);
@@ -137,64 +133,41 @@ export default function GeneralPackageSubscribePage() {
 
   const nextStep = async () => {
     setApiError(null);
+    if (currentStep === 2) {
+      setLoading(true);
+      const cleanPhone = phone.replace(/\s/g, "");
+      const result = await loginPatient(cleanPhone, "+966");
+      setLoading(false);
+      if (result.success) {
+        goToStep(3);
+      } else {
+        setApiError(result.message || "فشل إرسال رمز التحقق");
+      }
+      return;
+    }
     if (currentStep === 3) {
       setLoading(true);
       const fullPhone = "+966" + phone.replace(/\s/g, "");
       const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
       setLoading(false);
-      if (!result || !result.success) {
-        setApiError(result?.message || "فشل التحقق من الرمز");
-        return;
+      if (result && result.success) {
+        setToken(result.token!);
+        goToStep(4);
+      } else if (result) {
+        setApiError(result.message ?? "حدث خطأ ، حاول مرة أخرى");
+      } else {
+        setApiError("حدث خطأ ، حاول مرة أخرى");
       }
-      setToken(result.token!);
-      goToStep(4);
       return;
     }
     if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
   };
 
-  const handleSubscribe = async () => {
-    const authToken = token || localStorage.getItem("labass_token");
-    if (!authToken) { setApiError("انتهت الجلسة، يرجى تسجيل الدخول مجدداً"); return; }
+  const handleSubscribe = () => {
     if (!bundleId) { setApiError("لم يتم تحديد الباقة، يرجى المحاولة مجدداً"); return; }
-
-    setLoading(true);
-    setApiError(null);
-
-    try {
-      const sessionRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/initiate-session`, {
-        InvoiceAmount: price,
-        CurrencyIso: "SAR",
-      });
-      if (!sessionRes.data.IsSuccess) {
-        setApiError("فشل إنشاء الجلسة، يرجى المحاولة مجدداً");
-        return;
-      }
-      const { SessionId } = sessionRes.data.Data;
-
-      const paymentRes = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/execute-subscription-payment`,
-        {
-          bundleId,
-          sessionId: SessionId,
-          callBackUrl: "https://www.labass.sa/subscription/success",
-          errorUrl: "https://www.labass.sa/subscription/error",
-          subscriberType: "patient",
-          isRecurring: false,
-        },
-        { headers: { Authorization: `Bearer ${authToken}` } }
-      );
-
-      if (paymentRes.data.success && paymentRes.data.data?.paymentURL) {
-        window.location.href = paymentRes.data.data.paymentURL;
-      } else {
-        setApiError("فشل بدء عملية الدفع، يرجى المحاولة مجدداً");
-      }
-    } catch {
-      setApiError("حدث خطأ، يرجى المحاولة مجدداً");
-    } finally {
-      setLoading(false);
-    }
+    router.push(
+      `/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`
+    );
   };
 
   const prevStep = () => { if (currentStep > 1) goToStep(currentStep - 1); };

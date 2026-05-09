@@ -38,7 +38,6 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const applePayConfigRef = useRef<ApplePayConfig | null>(null);
   const scriptLoadedRef = useRef(false);
 
@@ -108,8 +107,8 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         {
           bundleId: bundleId ?? undefined,
           sessionId,
-          callBackUrl: "https://labass.sa/success",
-          errorUrl: "https://labass.sa/error",
+          callBackUrl: "https://www.labass.sa/subscription/success",
+          errorUrl: "https://www.labass.sa/subscription/error",
           subscriberType,
           isRecurring,
           promoCode,
@@ -119,7 +118,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
       );
       if (data.success) {
         localStorage.removeItem("vitamin_survey_answers");
-        setShowModal(true);
+        router.push("/subscription/success");
       } else {
         console.error("Payment failed:", data);
       }
@@ -134,18 +133,39 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
     if (loading) return;
     setLoading(true);
     try {
-      const { data } = await axios.post(`${apiUrl}/initiate-session`, {
+      const sessionRes = await axios.post(`${apiUrl}/initiate-session`, {
         InvoiceAmount: discountedPrice,
         CurrencyIso: "SAR",
       });
-      if (data.IsSuccess) {
-        const { SessionId, CountryCode } = data.Data;
-        router.push(
-          `/cardDetails?sessionId=${SessionId}&countryCode=${CountryCode}&discountedPrice=${discountedPrice}&promoCode=${encodeURIComponent(promoCode)}${bundleId ? `&bundleId=${bundleId}` : ""}&subscriberType=${subscriberType}&isRecurring=${isRecurring}`
-        );
+      if (!sessionRes.data.IsSuccess) return;
+      const { SessionId } = sessionRes.data.Data;
+
+      const surveyRaw = localStorage.getItem("vitamin_survey_answers");
+      const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
+
+      const paymentRes = await axios.post(
+        `${apiUrl}/execute-subscription-payment`,
+        {
+          bundleId: bundleId ?? undefined,
+          sessionId: SessionId,
+          callBackUrl: "https://www.labass.sa/subscription/success",
+          errorUrl: "https://www.labass.sa/subscription/error",
+          subscriberType,
+          isRecurring,
+          promoCode,
+          surveyAnswers,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (paymentRes.data.success && paymentRes.data.data?.paymentURL) {
+        localStorage.removeItem("vitamin_survey_answers");
+        window.location.href = paymentRes.data.data.paymentURL;
+      } else {
+        console.error("Card payment failed:", paymentRes.data);
       }
     } catch (err) {
-      console.error("Card initiate-session error:", err);
+      console.error("Card payment error:", err);
     } finally {
       setLoading(false);
     }
@@ -175,24 +195,6 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         </button>
       )}
 
-      {/* Success modal */}
-      {showModal && (
-        <div className={s.overlay}>
-          <div className={s.modal}>
-            <div className={s.modalIcon}>
-              <div className={s.modalCheck}>✓</div>
-            </div>
-            <h3 className={s.modalTitle}>تمت عملية الدفع بنجاح!</h3>
-            <p className={s.modalSub}>
-              سيتواصل معك فريق لاباس خلال ٢٤ ساعة لتحديد موعد زيارة الممرّض
-              وبدء رحلتك الصحية.
-            </p>
-            <button className={s.modalBtn} onClick={() => router.push("/home")}>
-              متابعة
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 };
