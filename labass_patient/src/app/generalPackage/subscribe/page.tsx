@@ -34,8 +34,9 @@ export default function GeneralPackageSubscribePage() {
   const [selectedPlanId, setSelectedPlanId] = useState("quarterly");
   const [price, setPrice] = useState(249);
   const [planLabel, setPlanLabel] = useState("كل ٣ أشهر");
-  const [bundleId, setBundleId] = useState<number | null>(null);
-  const [isRecurring, setIsRecurring] = useState(false);
+  const [monthlyBundleId, setMonthlyBundleId] = useState<number | null>(null);
+  const [quarterlyBundleId, setQuarterlyBundleId] = useState<number | null>(null);
+  const bundleId = selectedPlanId === "monthly" ? monthlyBundleId : quarterlyBundleId;
 
   // Personal info
   const [name, setName] = useState("");
@@ -55,20 +56,18 @@ export default function GeneralPackageSubscribePage() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Fetch bundles (type: GeneralConsultation)
+  // Fetch individual GP bundles and map to monthly / quarterly by intervalDays
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
-        const general = list
-          .filter((b) => b.type === "GeneralConsultation")
-          .sort((a: any, b: any) => Number(a.price) - Number(b.price));
-        if (general.length > 0) {
-          const defaultBundle = general[general.length - 1];
-          setBundleId(defaultBundle.id);
-          setPrice(Number(defaultBundle.price));
-          setPlanLabel(defaultBundle.description || "كل ٣ أشهر");
-        }
+        const individualGP = list.filter(
+          (b: any) => b.type === "GP Consultations" && b.whoSubscribes === "individual"
+        );
+        const monthly  = individualGP.find((b: any) => b.intervalDays === 30);
+        const quarterly = individualGP.find((b: any) => b.intervalDays === 90);
+        if (monthly)  setMonthlyBundleId(monthly.id);
+        if (quarterly) setQuarterlyBundleId(quarterly.id);
       })
       .catch(() => {});
   }, []);
@@ -153,18 +152,48 @@ export default function GeneralPackageSubscribePage() {
     if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
   };
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     const authToken = token || localStorage.getItem("labass_token");
     if (!authToken) { setApiError("انتهت الجلسة، يرجى تسجيل الدخول مجدداً"); return; }
-    const bid = bundleId ?? (selectedPlanId === "monthly" ? -1 : -2);
-    const params = new URLSearchParams({
-      bundleId: String(bid),
-      discountedPrice: String(price),
-      planLabel,
-      isRecurring: String(isRecurring),
-      subscriberType: "patient",
-    });
-    router.push(`/subscription/payment?${params.toString()}`);
+    if (!bundleId) { setApiError("لم يتم تحديد الباقة، يرجى المحاولة مجدداً"); return; }
+
+    setLoading(true);
+    setApiError(null);
+
+    try {
+      const sessionRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/initiate-session`, {
+        InvoiceAmount: price,
+        CurrencyIso: "SAR",
+      });
+      if (!sessionRes.data.IsSuccess) {
+        setApiError("فشل إنشاء الجلسة، يرجى المحاولة مجدداً");
+        return;
+      }
+      const { SessionId } = sessionRes.data.Data;
+
+      const paymentRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/execute-subscription-payment`,
+        {
+          bundleId,
+          sessionId: SessionId,
+          callBackUrl: "https://www.labass.sa/subscription/success",
+          errorUrl: "https://www.labass.sa/subscription/error",
+          subscriberType: "patient",
+          isRecurring: false,
+        },
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
+
+      if (paymentRes.data.success && paymentRes.data.data?.paymentURL) {
+        window.location.href = paymentRes.data.data.paymentURL;
+      } else {
+        setApiError("فشل بدء عملية الدفع، يرجى المحاولة مجدداً");
+      }
+    } catch {
+      setApiError("حدث خطأ، يرجى المحاولة مجدداً");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const prevStep = () => { if (currentStep > 1) goToStep(currentStep - 1); };
@@ -247,7 +276,7 @@ export default function GeneralPackageSubscribePage() {
           <div className={s.recurringWrap} style={{ opacity: 0.4, pointerEvents: "none" }}>
             <p className={s.recurringLabel}>نوع الدفع</p>
             <div className={s.recurringToggle}>
-              <button className={`${s.recurringOpt} ${!isRecurring ? s.recurringOptActive : ""}`} type="button">
+              <button className={`${s.recurringOpt} ${s.recurringOptActive}`} type="button">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" /><path d="M3 10h18" stroke="currentColor" strokeWidth="1.8" /></svg>
                 دفعة واحدة
               </button>
@@ -383,7 +412,7 @@ export default function GeneralPackageSubscribePage() {
             </div>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>نوع الدفع</span>
-              <span className={s.summaryVal}>{isRecurring ? "اشتراك متكرّر" : "دفعة واحدة"}</span>
+              <span className={s.summaryVal}>دفعة واحدة</span>
             </div>
             <div className={`${s.summaryRow} ${s.summaryRowTotal}`}>
               <span className={s.summaryLbl}>المبلغ المستحقّ</span>
