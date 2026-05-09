@@ -22,6 +22,7 @@ export interface CreateBundlePayload {
   consultationCount: number;
   currency: string;
   recurringType: string;
+  intervalDays?: number;
   description: string;
   whoSubscribes?: "individual" | "organization";
   isUnlimited?: boolean;
@@ -35,6 +36,7 @@ export interface UpdateBundlePayload {
   name?: string;
   type?: string;
   recurringType?: string;
+  intervalDays?: number;
   whoSubscribes?: "individual" | "organization";
   isUnlimited?: boolean;
 }

@@ -35,7 +35,7 @@ export default function BundlesPage() {
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
     name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
-    currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined,
+    currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined,
     whoSubscribes: "organization", isUnlimited: false,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -53,6 +53,9 @@ export default function BundlesPage() {
     if (newBundle.price < 0) {
       errors.price = "Price must be non-negative";
     }
+    if (newBundle.recurringType === "Custom" && (!newBundle.intervalDays || newBundle.intervalDays < 1)) {
+      errors.intervalDays = "Required for Custom recurring type";
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -61,7 +64,7 @@ export default function BundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync(newBundle);
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false });
     setFormErrors({});
   };
 
@@ -190,9 +193,9 @@ export default function BundlesPage() {
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
-        <DialogContent>
+        <DialogContent className="flex flex-col max-h-[85vh]">
           <DialogHeader><DialogTitle>Create Bundle</DialogTitle></DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto flex-1 pr-1">
             <div className="space-y-2">
               <Label>Name</Label>
               <Select value={newBundle.name} onValueChange={(val) => setNewBundle({ ...newBundle, name: val })}>
@@ -261,7 +264,7 @@ export default function BundlesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Recurring Type</Label>
-                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val })}>
+                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val, intervalDays: undefined })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {RECURRING_TYPES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
@@ -269,6 +272,20 @@ export default function BundlesPage() {
                 </Select>
               </div>
             </div>
+            {newBundle.recurringType === "Custom" && (
+              <div className="space-y-2">
+                <Label>Interval Days</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  step={1}
+                  placeholder="e.g. 30 for monthly, 90 for quarterly"
+                  value={newBundle.intervalDays ?? ""}
+                  onChange={(e) => setNewBundle({ ...newBundle, intervalDays: e.target.value ? Number(e.target.value) : undefined })}
+                />
+                {formErrors.intervalDays && <p className="text-sm text-destructive">{formErrors.intervalDays}</p>}
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Description</Label>
               <Input value={newBundle.description} onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })} />
