@@ -1,20 +1,67 @@
 # Obesity Program — Customer Journey (A to Z)
 
-## Three Customer Types
+## Customer Types
 
-> **Priority note**: The lab customer is the PRIMARY and highest-converting customer type, identical to the vitamins program. The lab customer arrives pre-qualified (already in a consultation with a doctor), making them the most likely to subscribe — whether the consultation is pre-test (before the obesity panel) or post-test (after results arrive). In both cases the customer receives the obesity program link. Pharmacy customers already intend to purchase Mounjaro or Ozempic — they simply need the prescription. Ads customers require the most education before converting.
+> **Phase 1** is exclusively for the **Lab Customer (Post-Test)** — the customer who already has existing obesity panel results. The doctor reviews them and prescribes without ordering new blood work. **Phase 2** will bundle a lab test into the package for customers who arrive without results. Pharmacy referral and ads customers are currently served through consultation-only flows (no lab test required or ordered) — these are **not Phase 1**; they are independent customer types in the current build.
 
-| Priority | # | Type | Entry Point | Who Pays for Initial Consultation? |
-|----------|---|------|-------------|-------------------------------------|
-| 🔴 **PRIMARY** | 1 | **Lab Customer (Pre or Post-Test)** | Lab org portal (pre_test or post_test consultation — obesity panel) | Lab subscription bundle |
-| 🟡 Secondary | 2 | **Pharmacy Referral** | Pharmacy org portal — customer asks for Mounjaro / Ozempic | Pharmacy bundle (standard consultation) |
-| 🟢 Growth | 3 | **Ads Customer** | TikTok / Instagram / Snap → obesity program page | Self-pay (obesity subscription) |
+> **Priority note**: Two customer types are equally **PRIMARY** for the obesity program: (1) the **post-test lab customer** whose obesity panel (blood sugar, thyroid, HbA1c, lipids) reveals clinical indicators — the doctor sees the results and immediately offers the program; and (2) the **pharmacy referral customer** who walks in asking for Mounjaro or Ozempic — they already intend to buy, they just need the prescription. The doctor reviewing any lab panel can also identify whether results indicate obesity and offer the program accordingly. Ads customers are a growth channel.
+
+<div style="margin:1.5em 0; overflow-x:auto">
+<table style="width:100%; border-collapse:collapse; font-size:0.8em; font-family:inherit">
+<thead>
+<tr style="background:#173404; color:#fff">
+<th style="padding:8px 12px; text-align:left">Priority</th>
+<th style="padding:8px 12px; text-align:left">#</th>
+<th style="padding:8px 12px; text-align:left">Customer Type</th>
+<th style="padding:8px 12px; text-align:left; white-space:nowrap">Phase</th>
+<th style="padding:8px 12px; text-align:left">Entry Point</th>
+<th style="padding:8px 12px; text-align:left">Who Pays (Initial Consult)</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:#eaf3de">
+<td style="padding:7px 12px; font-weight:700; color:#173404">Primary</td>
+<td style="padding:7px 12px">1</td>
+<td style="padding:7px 12px"><strong>Lab Customer (Post-Test)</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 1 ✅</td>
+<td style="padding:7px 12px">Lab org portal — patient brings existing obesity panel (HbA1c, TSH, lipids), no new test ordered</td>
+<td style="padding:7px 12px">Lab subscription bundle</td>
+</tr>
+<tr style="background:#eaf3de">
+<td style="padding:7px 12px; font-weight:700; color:#173404">Primary</td>
+<td style="padding:7px 12px">2</td>
+<td style="padding:7px 12px"><strong>Pharmacy Referral — No Lab Test</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Current ✅</td>
+<td style="padding:7px 12px">Pharmacy org portal — customer walks in asking for Mounjaro / Ozempic</td>
+<td style="padding:7px 12px">Pharmacy bundle (standard consultation)</td>
+</tr>
+<tr style="background:#fff8e8">
+<td style="padding:7px 12px; font-weight:700; color:#7a5500">Secondary</td>
+<td style="padding:7px 12px">3</td>
+<td style="padding:7px 12px"><strong>Pharmacy Referral — With Lab Test</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Phase 2 🚧</td>
+<td style="padding:7px 12px">Pharmacy org portal → doctor orders obesity panel within package</td>
+<td style="padding:7px 12px">Package pricing (Phase 2)</td>
+</tr>
+<tr style="background:#f0faf5">
+<td style="padding:7px 12px; font-weight:700; color:#1a6640">Growth</td>
+<td style="padding:7px 12px">4</td>
+<td style="padding:7px 12px"><strong>Ads Customer</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Current ✅</td>
+<td style="padding:7px 12px">TikTok / Instagram / Snap → obesity program page</td>
+<td style="padding:7px 12px">Self-pay (obesity subscription)</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 ---
 
-## TYPE 1: Lab Customer (Pre or Post-Test) 🔴 PRIMARY
+## TYPE 1 🔴 PRIMARY (Phase 1 ✅): Patient Visits Lab → Gets Post-Test Consultation → Doctor Reviews Obesity Panel → Prescribes Mounjaro or Ozempic
 
-> **Note**: The obesity program link is sent to the customer in both cases — pre-test (doctor evaluates the patient before blood work and recommends the program) and post-test (doctor reviews obesity panel results and recommends Mounjaro or Ozempic). The lab sends whichever consultation type applies from the org portal.
+> **Note**: The primary flow is **post-test** — the doctor reviews the obesity panel (blood sugar, thyroid hormones, HbA1c, lipid profile) and recommends Mounjaro or Ozempic based on clinical findings. The doctor reviewing any lab panel can also identify obesity indicators and offer the program proactively. The pre-test variant follows the same steps but converts at a lower rate.
+>
+> ⚠️ **Phase 1**: The package does **NOT** include ordering a new blood test. The customer visits the lab independently and arrives with their existing results. Steps 6a/6b/6c below (doctor ordering additional tests from within the app) are a **Phase 2** feature — not yet implemented.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
@@ -35,6 +82,8 @@
 </ol>
 </div>
 
+<div style="page-break-before: always;"></div>
+
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
 | 1 | **Customer** | B2B | Visits the lab for obesity-related blood tests (fasting glucose, HbA1c, TSH, lipid panel, CBC). | — |
@@ -43,9 +92,9 @@
 | 4 | **Customer** | Tech | Clicks the link and enters the consultation chat. | — |
 | 5 | **Doctor** | Medical | Sees the new consultation in their feed and accepts it. | <small>• Patient name, phone, consultation type (pre-test or post-test), lab results PDF (if post-test)<br>• Source label: "من المختبر — [lab name]" *(to be built)*<br>• Whether patient already has an active obesity subscription *(to be built)*</small> |
 | 6 | **Doctor ↔ Customer** | Medical | Reviews the lab results together. Assesses BMI, metabolic markers, and candidacy for GLP-1 therapy. Explains Mounjaro and Ozempic. Sends the obesity program subscription link inside the chat. | — |
-| 6a *(conditional)* | **Doctor → Lab Manager** | Medical | If additional tests are needed (e.g., pre-test consultation with no panel yet): Doctor clicks "إرسال للمختبر" in the doctor app. Selects lab name + manager phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note (e.g., "يحتاج HbA1c + TSH + lipid panel")<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 6b *(conditional)* | **Lab Manager** | B2B | Receives the WhatsApp referral. Contacts the patient. Collects sample. Runs the obesity panel. Opens Labass org portal → "طلبات التحليل" tab. Finds the pending referral. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created automatically<br>• **NOT deducted** from the lab's bundle or the patient's obesity package<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed</small> |
-| 6c *(conditional)* | **Doctor** | Medical | Receives the post-test consultation in their feed. Reviews the obesity panel PDF. Can now safely assess GLP-1 candidacy and check for contraindications. | <small>• HbA1c, TSH, lipid panel results<br>• Referral source: which lab manager sent it, timestamp<br>• Any contraindication flags triggered by the results *(to be built)*</small> |
+| 6a *(🚧 Phase 2 — not in current build)* | **Doctor → Lab Manager** | Medical | If additional tests are needed: Doctor clicks "إرسال للمختبر" in the doctor app. Selects lab name + manager phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note (e.g., "يحتاج HbA1c + TSH + lipid panel")<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
+| 6b *(🚧 Phase 2 — not in current build)* | **Lab Manager** | B2B | Receives the WhatsApp referral. Contacts the patient. Collects sample. Runs the obesity panel. Opens Labass org portal → "طلبات التحليل" tab. Finds the pending referral. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created automatically<br>• **NOT deducted** from the lab's bundle or the patient's obesity package<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed</small> |
+| 6c *(🚧 Phase 2 — not in current build)* | **Doctor** | Medical | Receives the post-test consultation in their feed. Reviews the obesity panel PDF. Can now safely assess GLP-1 candidacy and check for contraindications. | <small>• HbA1c, TSH, lipid panel results<br>• Referral source: which lab manager sent it, timestamp<br>• Any contraindication flags triggered by the results *(to be built)*</small> |
 | 7 | **Doctor** | Medical | Closes the consultation. | — |
 | 8 | **System → Customer** *(to be built)* | Marketing | The moment the lab consultation closes (whether pre-test or post-test), automatically sends the patient the obesity program link via WhatsApp as a fallback (in case the doctor forgot). | <small>• Post-test message: "بناءً على نتائج تحاليلك، قد تكون مؤهلاً لبرنامج إنقاص الوزن الطبي" + obesity page link<br>• Pre-test message: "طبيبك يرشّح لك برنامج إنقاص الوزن الطبي من لاباس" + obesity page link<br>• ⚠️ Requires Meta WhatsApp template approval</small> |
 | 9 | **Customer** | Sales | Visits the obesity program page. Clicks "اشترك الآن". Fills in the medical assessment: name, phone, age, height, weight (BMI auto-calculated), city, health goals, current medications, medical history (diabetes, heart disease, thyroid, pancreatitis history). Selects a plan. Verifies phone via OTP. Pays via card or Apple Pay. | — |
@@ -59,7 +108,9 @@
 
 ---
 
-## TYPE 2: Pharmacy Referral Customer 🟡
+## TYPE 2 🔴 PRIMARY (Current ✅): Customer Walks Into Pharmacy Asking for Mounjaro/Ozempic → Pharmacy Refers to Labass → Doctor Prescribes Based on Clinical Assessment (No Lab Test)
+
+> This flow is **consultation-only**. No blood test is ordered or included. The doctor assesses the patient's medical history and health goals verbally and through the medical assessment form — then prescribes Mounjaro or Ozempic based on clinical judgment and contraindication screening without blood work. Lab testing within the pharmacy referral flow is a **Phase 2** feature — see TYPE 3 below.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
@@ -67,16 +118,16 @@
 <li>يشرح له الصيدلاني أن هذه الأدوية تستلزم وصفة طبية من طبيب متخصص</li>
 <li>الصيدلية ترسل استشارة من بوابة المنشأة (تُخصم من باقة الصيدلية)</li>
 <li>يحصل العميل على رابط الاستشارة عبر واتساب</li>
-<li>يدخل العميل الاستشارة — يقوم الدكتور بتقييم الحالة ويشرح برنامج السمنة، ثم يرسل رابط الاشتراك للعميل داخل المحادثة</li>
-<li>يدخل العميل إلى صفحة البرنامج، يكمل التقييم الطبي، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
+<li>يدخل العميل الاستشارة — يقوم الدكتور بتقييم الحالة الصحية وتاريخ المرض ويشرح برنامج السمنة، ثم يرسل رابط الاشتراك للعميل — <strong>لا يوجد تحليل دم في هذه المرحلة</strong></li>
+<li>يدخل العميل إلى صفحة البرنامج، يكمل التقييم الطبي (وزن، طول، تاريخ مرضي، أدوية حالية)، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
 <li>تصل إلى العميل رسالة تؤكد نجاح الاشتراك، وتتضمن رابطًا لطلب استشارة سمنة جديدة — <em>(مشترك)</em></li>
-<li>يدخل العميل إلى الاستشارة الجديدة — يقوم الدكتور بإصدار وصفة طبية لمونجارو أو اوزمبيك — <em>(مشترك)</em></li>
-<li><strong>(شرطي — عند الحاجة لتحاليل مخبرية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب من تطبيق الدكتور — يُسجّل النظام: اسم المختبر، رقم الجوال، وقت الإرسال، رقم الاستشارة</li>
-<li><strong>(شرطي — تابع)</strong> يُجري المختبر تحاليل السمنة — يدخل مدير المختبر إلى تبويب "طلبات التحليل" في بوابة لاباس — يرفع ملف النتيجة PDF — يضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من الباقة</strong></li>
+<li>يدخل العميل إلى الاستشارة الجديدة — يقوم الدكتور بمراجعة التقييم الطبي وإصدار وصفة طبية لمونجارو أو اوزمبيك — <em>(مشترك)</em></li>
 <li>يرسل الدكتور الوصفة مباشرة لتلك الصيدلية (مصدر الاستشارة) — <em>(مشترك)</em></li>
 <li>تصل الوصفة لمدير الصيدلية — يصرف الدواء ويشحنه للعميل — <em>(مشترك)</em></li>
 </ol>
 </div>
+
+<div style="page-break-before: always;"></div>
 
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
@@ -84,23 +135,36 @@
 | 2 | **Pharmacy — org portal** | B2B | Opens the Labass org portal. Enters the patient's phone number. Selects the appropriate consultation type. Submits. | <small>• Bundle count decreases by 1</small> |
 | 3 | **System → Customer** | Tech | Sends the patient a WhatsApp with a consultation link. | <small>• Patient receives: "صيدلية [اسم الصيدلية] وصلتك باستشارة طبيب متخصص في برنامج إنقاص الوزن" + consultation link</small> |
 | 4 | **Customer** | Tech | Clicks the link and enters the consultation chat. | — |
-| 5 | **Doctor** | Medical | Accepts the consultation. | <small>• Source: "من الصيدلية — [pharmacy name]" *(to be built)*<br>• No lab results yet (patient may need blood work first)<br>• Not yet subscribed to obesity program *(to be built)*</small> |
-| 6 | **Doctor ↔ Customer** | Medical | Assesses the patient's health status verbally. Discusses Mounjaro vs. Ozempic, program structure, pricing. If the doctor judges that blood tests are needed before prescribing, requests a lab panel. Sends the obesity program subscription link inside the chat. | — |
+| 5 | **Doctor** | Medical | Accepts the consultation. | <small>• Source: "من الصيدلية — [pharmacy name]" *(to be built)*<br>• **No lab results** — consultation-only flow<br>• Not yet subscribed to obesity program *(to be built)*</small> |
+| 6 | **Doctor ↔ Customer** | Medical | Assesses the patient's health status, medical history, and contraindications verbally. Explains the program. Sends the obesity program subscription link. **No blood test ordered.** | — |
 | 7 | **Doctor** | Medical | Closes the consultation. | — |
 | 8 | **Customer** | Sales | Visits the obesity program page. Completes the medical assessment (height, weight, BMI, medical history, current medications). Selects a plan. Verifies phone via OTP. Pays. | — |
 | 9 | **System** *(to be built)* | Tech | Payment confirmed. Subscription activated. System sends the customer a direct consultation link. | <small>• Patient receives: WhatsApp/SMS — "تم الاشتراك بنجاح! ادخل استشارتك الآن" + direct consultation link</small> |
 | 10 | **Customer** | Tech | Enters the new obesity consultation linked to their subscription. | — |
-| 11 | **Doctor** | Medical | Accepts the obesity consultation. | <small>• Source: "من الصيدلية — [pharmacy name]"<br>• Subscription plan + active status<br>• Medical assessment (BMI, history, current meds)<br>• Contraindication flags *(to be built)*</small> |
-| 11a *(conditional)* | **Doctor → Lab Manager** | Medical | If blood work is needed before prescribing GLP-1: Doctor clicks "إرسال للمختبر". Enters lab name + manager phone + note (e.g., "يحتاج HbA1c + TSH + lipid panel"). Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 11b *(conditional)* | **Lab Manager** | B2B | Receives the referral. Contacts the patient. Collects sample. Runs obesity panel. Opens Labass org portal → "طلبات التحليل" tab. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link<br>• Referral log: status → completed</small> |
-| 11c *(conditional)* | **Doctor** | Medical | Receives the post-test consultation. Reviews HbA1c, TSH, and lipid results. Checks for GLP-1 contraindications. Can now prescribe safely. | — |
+| 11 | **Doctor** | Medical | Accepts the obesity consultation. Reviews the medical assessment. Prescribes based on clinical judgment and contraindication screening — no blood work. | <small>• Source: "من الصيدلية — [pharmacy name]"<br>• Subscription plan + active status<br>• Medical assessment (BMI, history, current meds)<br>• **No lab results** — consultation-only *(to be built)*<br>• Contraindication flags from assessment *(to be built)*</small> |
 | 12 | **Doctor → Patient** | Medical | Issues a prescription for Mounjaro or Ozempic with starting dose and titration schedule. Issues meal plan and exercise guidance. | <small>• Patient receives: prescription PDF + meal plan via WhatsApp</small> |
-| 13 | **Doctor → Pharmacy** *(to be built)* | Medical | Since the patient came from this pharmacy and it dispenses GLP-1 drugs, the doctor sends the prescription directly to the source pharmacy. No admin involvement. | <small>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
+| 13 | **Doctor → Pharmacy** *(to be built)* | Medical | Since the patient came from this pharmacy, the doctor sends the prescription directly to the source pharmacy. No admin involvement. | <small>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
 | 14 | **Pharmacy Manager** | Ops | Receives the prescription. Dispenses Mounjaro or Ozempic. Ships to the patient. | — |
 
 ---
 
-## TYPE 3: Ads Customer 🟢
+## TYPE 3 🔮 Phase 2: Pharmacy Refers Patient → Doctor Orders Obesity Panel (HbA1c, TSH, Lipids) Within Package → Prescribes GLP-1 Based on Results — Not Yet Built
+
+> 🚧 **Phase 2 — Not yet implemented.** In this future flow, after the initial pharmacy referral consultation, the doctor will be able to order an obesity panel (HbA1c, TSH, lipid profile, CBC) as part of the subscription before prescribing GLP-1. The lab collects the sample (home collection via Jadar), runs the panel, and uploads results to Labass. The doctor reviews findings and prescribes with full clinical confidence. **No implementation date set.**
+
+| What changes in Phase 2 | Details |
+|------------------------|---------|
+| Package price increases to cover lab test | Obesity panel cost bundled into subscription pricing |
+| Doctor orders lab test from within the consultation | Requires "إرسال للمختبر" feature in doctor app |
+| Lab uploads results to Labass org portal | Via "طلبات التحليل" tab (built, awaiting backend) |
+| Doctor receives free post-test consultation | Not deducted from any package |
+| Prescription refined based on actual HbA1c, TSH, lipid panel | Higher safety: catches contraindications before prescribing GLP-1 |
+
+---
+
+## TYPE 4 🟢 (Current ✅): Customer Finds Ad (TikTok/Instagram) → Subscribes Directly → Doctor Prescribes Based on Medical Assessment Form (No Lab Test)
+
+> This flow is **consultation-only**. No blood test is ordered or included. The doctor prescribes based on the medical assessment form and self-reported health history.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
@@ -109,14 +173,16 @@
 <li>يقرأ عن البرنامج ويكمل التقييم الطبي، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
 <li>تصل إلى العميل رسالة تؤكد نجاح الاشتراك، وتتضمن رابطًا لطلب استشارة جديدة — <em>(مشترك)</em></li>
 <li>يطلب العميل استشارة سمنة جديدة مرتبطة بالباقة عبر الرابط المرسل — <em>(مشترك)</em></li>
-<li>يدخل العميل إلى الاستشارة — يقوم الدكتور بالتقييم وإصدار الوصفة الطبية — <em>(مشترك)</em></li>
-<li><strong>(شرطي — عند الحاجة لتحاليل مخبرية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب من تطبيق الدكتور — يُسجّل النظام: اسم المختبر، رقم الجوال، وقت الإرسال، رقم الاستشارة</li>
-<li><strong>(شرطي — تابع)</strong> يُجري المختبر تحاليل السمنة — يدخل مدير المختبر إلى تبويب "طلبات التحليل" في بوابة لاباس — يرفع ملف النتيجة PDF — يضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من الباقة</strong></li>
+<li>يدخل العميل إلى الاستشارة — يقوم الدكتور بمراجعة التقييم الطبي وإصدار الوصفة الطبية — <strong>لا يوجد تحليل دم في هذه المرحلة</strong> — <em>(مشترك)</em></li>
+<li><strong>(🚧 Phase 2 — عند الحاجة لتحاليل مخبرية في المرحلة القادمة)</strong> يرسل الدكتور معلومات المريض لمدير المختبر — هذه الخطوة غير مفعّلة حالياً</li>
+<li><strong>(🚧 Phase 2 — تابع)</strong> يُجري المختبر تحاليل السمنة ويرفع النتائج — هذه الخطوة غير مفعّلة حالياً</li>
 <li><strong>(للأدمن)</strong> تظهر قائمة بالعملاء المشتركين مع الباقات والاستشارات، ومصدر كل عميل — <em>(مشترك)</em></li>
 <li>يقوم الأدمن باختيار صيدلية شريكة لصرف الأدوية وإرسال الوصفة إليها</li>
 <li>ترسل الوصفة مباشرة لمدير الصيدلية — تُصرف الأدوية وتُشحن للعميل — <em>(مشترك)</em></li>
 </ol>
 </div>
+
+<div style="page-break-before: always;"></div>
 
 | # | Participant | Function | Action | Info Seen / Sent / Received |
 |---|-------------|----------|--------|-----------------------------|
@@ -126,9 +192,9 @@
 | 4 | **Customer** | Tech | Enters the obesity consultation linked to their subscription. | — |
 | 5 | **Doctor** | Medical | Accepts the consultation. | <small>• Source: "اشتراك مباشر"<br>• Subscription plan + active status<br>• Full medical assessment (BMI, history, current meds, health goals)<br>• Contraindication flags *(to be built)*</small> |
 | 6 | **Doctor ↔ Customer** | Medical | Reviews assessment. Checks for GLP-1 contraindications. If blood tests are needed, triggers a lab referral (see 6a–6c). Otherwise proceeds directly to prescription. | — |
-| 6a *(conditional)* | **Doctor → Lab Manager** | Medical | Doctor clicks "إرسال للمختبر". Enters lab name + manager phone + required tests (HbA1c, TSH, lipid panel, CBC). Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note with required tests<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 6b *(conditional)* | **Lab Manager** | B2B | Receives the referral. Contacts the patient. Collects sample. Runs obesity panel. Opens Labass org portal → "طلبات التحليل" tab. Finds the referral. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed</small> |
-| 6c *(conditional)* | **Doctor** | Medical | Receives the post-test consultation in their feed. Reviews the obesity panel. Confirms GLP-1 candidacy. Proceeds to prescription in the follow-up. | <small>• HbA1c, TSH, lipid panel, CBC results<br>• Any contraindication flags auto-highlighted *(to be built)*</small> |
+| 6a *(🚧 Phase 2 — not in current build)* | **Doctor → Lab Manager** | Medical | Doctor clicks "إرسال للمختبر". Enters lab name + manager phone + required tests (HbA1c, TSH, lipid panel, CBC). Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note with required tests<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
+| 6b *(🚧 Phase 2 — not in current build)* | **Lab Manager** | B2B | Receives the referral. Contacts the patient. Collects sample. Runs obesity panel. Opens Labass org portal → "طلبات التحليل" tab. Finds the referral. Uploads PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created — **NOT deducted from any package**<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log: status → completed</small> |
+| 6c *(🚧 Phase 2 — not in current build)* | **Doctor** | Medical | Receives the post-test consultation in their feed. Reviews the obesity panel. Confirms GLP-1 candidacy. Proceeds to prescription in the follow-up. | <small>• HbA1c, TSH, lipid panel, CBC results<br>• Any contraindication flags auto-highlighted *(to be built)*</small> |
 | 7 | **Doctor → Patient** | Medical | Issues the GLP-1 prescription (Mounjaro or Ozempic) with dose and titration plan, meal plan, and exercise guidance. | <small>• Patient receives: prescription PDF + meal plan via WhatsApp</small> |
 | 8 | **Admin** *(to be built)* | Ops | Opens the obesity subscriber dashboard. Finds this patient (no linked pharmacy). Selects a Labass partner pharmacy registered for GLP-1 dispensing. Sends the prescription. | <small>• All active subscribers (name, plan, **source: lab / pharmacy / direct**)<br>• Patients with no assigned pharmacy highlighted for action<br>• Pharmacy manager receives: prescription PDF via WhatsApp</small> |
 | 9 | **Pharmacy Manager** | Ops | Receives the prescription. Verifies SFDA compliance. Dispenses Mounjaro or Ozempic. Ships with cold chain packaging. | — |

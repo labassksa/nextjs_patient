@@ -2,18 +2,18 @@
 
 ## Customer Types
 
-> **Phase Rule**: **Phase 1** is exclusively for customers who **already have existing blood results** — the doctor reviews them and prescribes without ordering a new test. Vitamins cannot be responsibly prescribed without blood data, so any customer who does not arrive with existing results requires a lab test in the package (**Phase 2**).
+> **Phase Rule**: **Phase 1** is exclusively for customers who **already have existing blood results** — the doctor reviews them and prescribes without ordering a new test.
 
 > **Phase 1 customer type** (customer brings existing blood results — no lab test in package):
 > - **Lab Customer (Post-Test)** — arrives with existing blood results from their own independent lab visit. Package does not include a new test. Doctor reviews the results and prescribes.
 
-> **Phase 2 customer types** (lab test must be bundled in the package):
-> - **Ads Customer** — no existing blood results. Vitamins cannot be responsibly prescribed based on symptoms alone. Requires a lab test in the package — Phase 2.
-> - **Lab Customer (Pre-Test)** — does not have results yet. Cannot responsibly prescribe vitamins without blood data. The vitamins package for this customer type MUST include a lab test — Phase 2.
-> - **Pharmacy Referral — With Lab Test** — same logic. Package must include lab test.
+> **Current ✅ (no lab test required):**
+> - **Pharmacy Referral — No Lab Test** — pharmacy refers patient directly. Doctor prescribes vitamins based on symptoms, health goals, and clinical assessment. Viable and available now.
 
-> **Not viable** (cannot offer vitamins at all):
-> - **Pharmacy Referral — No Lab Test** — no results, no lab test in the package. Cannot prescribe vitamins.
+> **Phase 2 customer types** (lab test must be bundled in the package):
+> - **Ads Customer** — no existing blood results. Requires a lab test in the package — Phase 2.
+> - **Lab Customer (Pre-Test)** — does not have results yet. The vitamins package for this customer type MUST include a lab test — Phase 2.
+> - **Pharmacy Referral — With Lab Test** — doctor orders a home blood test within the package. Phase 2 and **highly unlikely in practice** — pharmacies rarely have the infrastructure to coordinate a bundled home test.
 
 <div style="margin:1.5em 0; overflow-x:auto">
 <table style="width:100%; border-collapse:collapse; font-size:0.8em; font-family:inherit">
@@ -52,21 +52,21 @@
 <td style="padding:7px 12px">Lab org portal — no results yet; vitamins package + lab test run → doctor prescribes</td>
 <td style="padding:7px 12px">Lab subscription bundle</td>
 </tr>
-<tr style="background:#fff8e8">
-<td style="padding:7px 12px; font-weight:700; color:#7a5500">Secondary</td>
+<tr style="background:#f0faf5">
+<td style="padding:7px 12px; font-weight:700; color:#1a6640">Growth</td>
 <td style="padding:7px 12px">4</td>
+<td style="padding:7px 12px"><strong>Pharmacy Referral — No Lab Test</strong></td>
+<td style="padding:7px 12px; white-space:nowrap">Current ✅</td>
+<td style="padding:7px 12px">Pharmacy org portal — doctor prescribes based on symptoms and health goals</td>
+<td style="padding:7px 12px">Pharmacy subscription bundle</td>
+</tr>
+<tr style="background:#f5f5f5">
+<td style="padding:7px 12px; font-weight:700; color:#666">Unlikely</td>
+<td style="padding:7px 12px">5</td>
 <td style="padding:7px 12px"><strong>Pharmacy Referral — With Lab Test</strong></td>
 <td style="padding:7px 12px; white-space:nowrap">Phase 2 🚧</td>
-<td style="padding:7px 12px">Pharmacy org portal → lab test ordered within the package</td>
+<td style="padding:7px 12px">Pharmacy org portal → home blood test bundled — highly unlikely in practice</td>
 <td style="padding:7px 12px">Package pricing (Phase 2)</td>
-</tr>
-<tr style="background:#fde8e8">
-<td style="padding:7px 12px; font-weight:700; color:#8a0000">Not Viable</td>
-<td style="padding:7px 12px">5</td>
-<td style="padding:7px 12px"><strong>Pharmacy Referral — No Lab Test</strong></td>
-<td style="padding:7px 12px">—</td>
-<td style="padding:7px 12px">Cannot prescribe vitamins without blood results and no lab test is included</td>
-<td style="padding:7px 12px">—</td>
 </tr>
 </tbody>
 </table>
@@ -84,8 +84,6 @@
 <li>يحصل العميل على استشارة post-test من لاباس — المختبر يرسلها من بوابة المنشأة بعد رفع نتائج التحاليل</li>
 <li>يدخل العميل الاستشارة عبر الرابط المرسل على واتساب</li>
 <li>يراجع الدكتور نتائج التحاليل مع العميل — عند إغلاق الاستشارة يرسل النظام تلقائياً رابط صفحة الفيتامينات إلى العميل</li>
-<li><strong>(شرطي — عند الحاجة لتحاليل إضافية)</strong> يرسل الدكتور معلومات المريض لمدير المختبر عبر الواتساب مباشرةً من تطبيق الدكتور — يُسجّل النظام تلقائياً: اسم المختبر، رقم جوال المدير، وقت الإرسال، رقم الاستشارة، واسم الدكتور</li>
-<li><strong>(شرطي — تابع)</strong> يستلم مدير المختبر رسالة الواتساب — يجري التحليل — ثم يدخل إلى تبويب "طلبات التحليل" في بوابة لاباس، يرفع ملف النتيجة PDF، ويضغط "إرسال الاستشارة للدكتور" — يتلقى الدكتور استشارة post-test جديدة <strong>لا تُخصم من باقة المختبر ولا من باقة الفيتامينات</strong></li>
 <li>يدخل العميل إلى الصفحة، ويقوم بتعبئة المعلومات المطلوبة، ثم إتمام عملية الدفع — <em>(مشترك)</em></li>
 <li>تصل إلى العميل رسالة تؤكد نجاح الاشتراك، وتتضمن رابطًا للدخول مباشرة إلى استشارة فيتامينات جديدة — <em>(مشترك)</em></li>
 <li>يدخل العميل إلى الاستشارة الجديدة مباشرة عبر الرابط (ليست الاستشارة الأصلية مع المختبر) — <em>(مشترك)</em></li>
@@ -107,9 +105,6 @@
 | 4 | **Customer** | Tech | Clicks the link and enters the consultation chat. | — |
 | 5 | **Doctor** | Medical | Sees the new consultation in their feed and accepts it. | <small>• Patient name, phone, consultation type (post-test), lab results PDF<br>• Source label: "من المختبر — [lab name]" *(to be built)*<br>• Whether patient already has an active vitamins subscription *(to be built)*</small> |
 | 6 | **Doctor ↔ Customer** | Medical | Reviews the lab results together. Discusses findings and health status. Recommends a vitamins program. | — |
-| 6a *(🚧 Phase 2 — not in current build)* | **Doctor → Lab Manager** | Medical | If additional lab tests are needed: Doctor clicks "إرسال للمختبر" in the doctor app. Selects the lab and enters the lab manager's phone number. Submits. | <small>• Lab manager receives WhatsApp: patient name, patient phone, doctor's note<br>• **System logs**: lab_referral_id, lab_name, lab_manager_phone, sent_at, consultation_id, doctor_name</small> |
-| 6b *(🚧 Phase 2 — not in current build)* | **Lab Manager** | B2B | Receives the WhatsApp referral. Contacts the patient. Collects blood sample. Runs the tests. Opens the Labass org portal → "طلبات التحليل" tab. Finds the pending referral. Uploads the lab results PDF. Clicks "إرسال الاستشارة للدكتور". | <small>• Post-test consultation created automatically<br>• **NOT deducted** from the lab's bundle or the vitamins package — it is a free post-test consultation<br>• Patient receives WhatsApp link to enter the consultation<br>• Referral log updated: status → completed, postTestConsultationId recorded</small> |
-| 6c *(🚧 Phase 2 — not in current build)* | **Doctor** | Medical | Receives the post-test consultation in their feed (same as a normal consultation). Reviews the uploaded lab results PDF. | <small>• Lab results PDF from this referral<br>• Referral source: which lab manager sent it, when<br>• Linked to the original consultation (the pre-test one)</small> |
 | 7 | **Doctor** | Medical | Closes the consultation. | — |
 | 8 | **System → Customer** | Marketing | The moment the post-test lab consultation closes, automatically sends the patient the vitamins package link via WhatsApp. | <small>• Message: "بناءً على نتائج تحاليلك، قد تحتاج لبرنامج فيتامينات مخصّص" + vitamins page link<br>• ⚠️ Requires Meta WhatsApp template approval</small> |
 | 9 | **Customer** | Sales | Visits the vitamins page. Clicks "اشترك الآن". Fills in: name, phone, age, height, weight, city, health goals. Selects a plan (289 SAR/month or 779 SAR/quarter). Verifies phone via OTP. Pays via card or Apple Pay. | — |
@@ -122,11 +117,9 @@
 
 ---
 
-## TYPE 5 🚫 NOT VIABLE: Pharmacy Refers Patient With No Blood Results — Cannot Prescribe Vitamins Without Lab Data
+## TYPE 5 🟢 (Current ✅): Pharmacy Refers Patient → Doctor Prescribes Vitamins Based on Symptoms & Health Goals (No Lab Test)
 
-> 🚫 **Not supported in Phase 1**: Vitamins cannot be prescribed without blood results. A doctor cannot responsibly select specific vitamins and dosages based on self-reported symptoms alone — the risk of over- or under-dosing is too high. Therefore, the pharmacy referral flow (no lab test) **does not lead to a vitamins subscription** in Phase 1.
->
-> 🔮 **Phase 2**: Once the vitamins package includes an integrated lab test (TYPE 4), pharmacy referrals can be offered the full vitamins program — the patient subscribes, a home blood test is ordered, results come in, and the doctor prescribes accordingly.
+> **Available now.** The pharmacy refers the patient without blood results. The doctor conducts a consultation based on the patient's symptoms, health goals, height, weight, and lifestyle. A vitamins prescription is issued using clinical judgment rather than lab data. The prescription routes back to the referring pharmacy.
 
 <div dir="rtl" style="font-size:0.85em; line-height:2; padding-right:1em">
 <ol>
@@ -180,9 +173,9 @@
 
 ---
 
-## TYPE 4 🔮 Phase 2: Pharmacy Refers Patient → Doctor Orders Home Blood Test Within Vitamins Package — Not Yet Built
+## TYPE 4 🔮 Phase 2 (Highly Unlikely): Pharmacy Refers Patient → Doctor Orders Home Blood Test Within Vitamins Package — Not Yet Built
 
-> 🚧 **Phase 2 — Not yet implemented.** In this future flow, after the initial pharmacy referral consultation, the doctor will be able to order a home blood test as part of the vitamins subscription. The lab (currently Jadar) collects the sample at home, runs the panel, and uploads results to Labass. The doctor reviews the results in a follow-up post-test consultation and refines the prescription accordingly. **No implementation date set.**
+> 🚧 **Phase 2 — Not yet implemented, and highly unlikely in practice.** In theory, after the initial pharmacy referral consultation, the doctor orders a home blood test as part of the vitamins subscription. The lab (currently Jadar) collects the sample at home, runs the panel, and uploads results to Labass. In practice, pharmacies rarely have the coordination infrastructure to support a bundled home test — most pharmacy-referred patients will follow TYPE 5 (no lab test) instead. **No implementation date set.**
 
 | What changes in Phase 2 | Details |
 |------------------------|---------|
