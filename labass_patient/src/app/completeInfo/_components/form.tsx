@@ -122,9 +122,10 @@ const PersonalInfoForm: React.FC = () => {
       }
 
       setSuccessMessage("تم إرسال المعلومات بنجاح");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
-      setErrorMessage("حدث خطأ أثناء إرسال المعلومات. يرجى المحاولة مرة أخرى.");
+      const backendMsg = error?.response?.data?.message;
+      setErrorMessage(backendMsg || "حدث خطأ أثناء إرسال المعلومات. يرجى المحاولة مرة أخرى.");
     } finally {
       setIsLoading(false);
       setShowModal(true);
@@ -143,6 +144,12 @@ const PersonalInfoForm: React.FC = () => {
 
   return (
     <>
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+          <div className="w-12 h-12 rounded-full border-4 border-white border-t-transparent animate-spin" />
+        </div>
+      )}
+
       <form
         onSubmit={handleSubmit}
         className="pt-16 flex flex-col min-h-screen m-1 bg-white"
