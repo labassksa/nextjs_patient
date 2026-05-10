@@ -129,8 +129,8 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         { bundleType: sub.bundle.type, consultationType },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (data.success && data.consultation?.id) {
-        router.push(`/chat/${data.consultation.id}`);
+      if (data.success && data.data?.consultation?.id) {
+        router.push(`/chat/${data.data.consultation.id}`);
       } else {
         setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
       }
