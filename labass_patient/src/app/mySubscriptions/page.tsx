@@ -130,7 +130,7 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success && data.data?.consultation?.id) {
-        router.push(`/chat/${data.data.consultation.id}`);
+        router.push(`/patientSelection?consultationId=${data.data.consultation.id}`);
       } else {
         setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
       }
