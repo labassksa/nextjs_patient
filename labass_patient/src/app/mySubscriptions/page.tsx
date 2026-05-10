@@ -5,6 +5,7 @@ import Header from "../../components/common/header";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchSubscriptions } from "./_controllers/fetchSubscriptions";
 import Link from "next/link";
+import axios from "axios";
 
 type SubscriptionStatus =
   | "Draft"
@@ -50,6 +51,10 @@ const STATUS: Record<
   Failed:    { ar: "فشل",     bg: "#fff0f0", fg: "#b00020", dot: "#ef4444" },
 };
 
+const BUNDLE_CONSULTATION_TYPE: Record<string, string> = {
+  "GP Consultations": "quick",
+};
+
 const fmt = (d?: string) =>
   d
     ? new Date(d).toLocaleDateString("ar-SA", {
@@ -64,7 +69,6 @@ const Ring: React.FC<{ remaining: number; total: number }> = ({
   remaining,
   total,
 }) => {
-  const used = total - remaining;
   const pct = total > 0 ? (remaining / total) * 100 : 0;
   const r = 26;
   const circ = 2 * Math.PI * r;
@@ -73,9 +77,7 @@ const Ring: React.FC<{ remaining: number; total: number }> = ({
   return (
     <div className="flex flex-col items-center gap-1" dir="rtl">
       <svg width="64" height="64" viewBox="0 0 64 64">
-        {/* track */}
         <circle cx="32" cy="32" r={r} fill="none" stroke="#e2f3f1" strokeWidth="6" />
-        {/* progress */}
         <circle
           cx="32"
           cy="32"
@@ -109,8 +111,44 @@ const Ring: React.FC<{ remaining: number; total: number }> = ({
 
 /* ── Single subscription card ── */
 const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
+  const router = useRouter();
+  const [starting, setStarting] = useState(false);
+  const [cardError, setCardError] = useState("");
   const cfg = STATUS[sub.status] ?? STATUS.Draft;
   const isActive = sub.status === "Active";
+
+  const handleStartConsultation = async () => {
+    setCardError("");
+    setStarting(true);
+    try {
+      const token = localStorage.getItem("labass_token");
+      if (!token) { router.push("/login"); return; }
+      const consultationType = BUNDLE_CONSULTATION_TYPE[sub.bundle.type] ?? "quick";
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/patient/consultations/create-from-bundle`,
+        { bundleType: sub.bundle.type, consultationType },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success && data.consultation?.id) {
+        router.push(`/chat/${data.consultation.id}`);
+      } else {
+        setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
+      }
+    } catch (err: any) {
+      const msg: string = err.response?.data?.message ?? "";
+      if (err.response?.status === 403) {
+        setCardError(
+          msg.toLowerCase().includes("remaining")
+            ? "لا توجد استشارات متبقية في هذه الباقة"
+            : "غير مصرح بإنشاء استشارة"
+        );
+      } else {
+        setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
+      }
+    } finally {
+      setStarting(false);
+    }
+  };
 
   return (
     <div
@@ -155,7 +193,6 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         <div className="flex items-start justify-between gap-4">
           {/* Left: details */}
           <div className="flex-1 space-y-2">
-            {/* Price */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">السعر</span>
               <span className="font-bold text-gray-800">
@@ -164,19 +201,16 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
               </span>
             </div>
 
-            {/* Recurring type */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">دورة الفوترة</span>
               <span className="text-gray-700">{sub.recurringType}</span>
             </div>
 
-            {/* Start date */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">تاريخ البدء</span>
               <span className="text-gray-700">{fmt(sub.createdAt)}</span>
             </div>
 
-            {/* Next billing */}
             {sub.nextBillingDate && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">الدفعة القادمة</span>
@@ -184,7 +218,6 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
               </div>
             )}
 
-            {/* Expiry */}
             {sub.expiresAt && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">ينتهي في</span>
@@ -192,7 +225,6 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
               </div>
             )}
 
-            {/* Cancelled at */}
             {sub.cancelledAt && (
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">تاريخ الإلغاء</span>
@@ -208,16 +240,22 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
           />
         </div>
 
+        {/* Error */}
+        {cardError && (
+          <p className="mt-3 text-xs text-red-500 text-center">{cardError}</p>
+        )}
+
         {/* Start consultation CTA — only for active */}
         {isActive && (
-          <Link
-            href="/payment"
-            className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white text-sm font-bold"
+          <button
+            onClick={handleStartConsultation}
+            disabled={starting}
+            className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white text-sm font-bold disabled:opacity-60"
             style={{ background: "linear-gradient(135deg, #14B8A6 0%, #0F766E 100%)" }}
           >
-            ابدأ استشارة
-            <span>←</span>
-          </Link>
+            {starting ? "جاري التحميل..." : "ابدأ استشارة"}
+            {!starting && <span>←</span>}
+          </button>
         )}
       </div>
     </div>
@@ -264,47 +302,19 @@ const EmptyState = () => (
   </div>
 );
 
-const MOCK: Subscription[] = [
-  {
-    id: 1,
-    bundle: { type: "GP Consultations", name: "standard" },
-    status: "Active",
-    remainingConsultations: 7,
-    totalConsultations: 10,
-    price: 99,
-    currency: "SAR",
-    recurringType: "Monthly",
-    nextBillingDate: "2026-06-10",
-    createdAt: "2026-05-10",
-  },
-  {
-    id: 2,
-    bundle: { type: "Vitamins", name: "basic" },
-    status: "Expired",
-    remainingConsultations: 0,
-    totalConsultations: 5,
-    price: 149,
-    currency: "SAR",
-    recurringType: "Monthly",
-    expiresAt: "2026-04-01",
-    createdAt: "2026-03-01",
-  },
-];
-
 /* ── Page ── */
 export default function MySubscriptionsPage() {
   const pathname = usePathname();
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>(MOCK);
-  const [isLoading, setIsLoading] = useState(false);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // TODO: swap MOCK for real fetch when backend is ready
-  // useEffect(() => {
-  //   fetchSubscriptions()
-  //     .then(setSubscriptions)
-  //     .catch((err) => setError(err.message))
-  //     .finally(() => setIsLoading(false));
-  // }, []);
+  useEffect(() => {
+    fetchSubscriptions()
+      .then(setSubscriptions)
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const active = subscriptions.filter((s) => s.status === "Active");
   const others = subscriptions.filter((s) => s.status !== "Active");
@@ -332,7 +342,6 @@ export default function MySubscriptionsPage() {
           <EmptyState />
         ) : (
           <>
-            {/* Active first */}
             {active.length > 0 && (
               <div>
                 <p
@@ -347,7 +356,6 @@ export default function MySubscriptionsPage() {
               </div>
             )}
 
-            {/* Others */}
             {others.length > 0 && (
               <div>
                 <p
