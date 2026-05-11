@@ -56,6 +56,12 @@ export default function GeneralPackageSubscribePage() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  // Read token from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("labass_token");
+    if (stored) setToken(stored);
+  }, []);
+
   // Fetch individual GP bundles and map to monthly / quarterly by intervalDays
   useEffect(() => {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
@@ -118,6 +124,7 @@ export default function GeneralPackageSubscribePage() {
     switch (currentStep) {
       case 1: return !!selectedPlanId;
       case 2: {
+        if (token) return !!name;
         const clean = phone.replace(/\s/g, "");
         return !!(name && /^5\d{8}$/.test(clean) && city);
       }
@@ -134,6 +141,10 @@ export default function GeneralPackageSubscribePage() {
   const nextStep = async () => {
     setApiError(null);
     if (currentStep === 2) {
+      if (token) {
+        goToStep(4);
+        return;
+      }
       setLoading(true);
       const cleanPhone = phone.replace(/\s/g, "");
       const result = await loginPatient(cleanPhone, "+966");
@@ -281,30 +292,32 @@ export default function GeneralPackageSubscribePage() {
               <input className={s.fieldInp} type="text" placeholder="أحمد بن محمد العتيبي" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
 
-            <div className={`${s.field} ${s.fieldFull}`}>
-              <label className={s.fieldLbl}>رقم الجوّال <span className={s.fieldReq}>*</span></label>
-              <div className={s.phoneWrap}>
-                <div className={s.phoneCode}>
-                  <span className={s.phoneFlag} />
-                  +٩٦٦
+            {!token && (
+              <div className={`${s.field} ${s.fieldFull}`}>
+                <label className={s.fieldLbl}>رقم الجوّال <span className={s.fieldReq}>*</span></label>
+                <div className={s.phoneWrap}>
+                  <div className={s.phoneCode}>
+                    <span className={s.phoneFlag} />
+                    +٩٦٦
+                  </div>
+                  <input
+                    className={`${s.fieldInp} ${s.phoneInp} ${phoneError ? s.fieldInpError : ""}`}
+                    type="tel"
+                    placeholder="5X XXX XXXX"
+                    value={phone}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d\s]/g, "");
+                      setPhone(val);
+                      const clean = val.replace(/\s/g, "");
+                      if (clean && !/^5/.test(clean)) setPhoneError("الرقم يجب أن يبدأ بـ 5");
+                      else if (clean && clean.length > 0 && clean.length !== 9) setPhoneError("الرقم يجب أن يكون ٩ أرقام");
+                      else setPhoneError("");
+                    }}
+                  />
                 </div>
-                <input
-                  className={`${s.fieldInp} ${s.phoneInp} ${phoneError ? s.fieldInpError : ""}`}
-                  type="tel"
-                  placeholder="5X XXX XXXX"
-                  value={phone}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/[^\d\s]/g, "");
-                    setPhone(val);
-                    const clean = val.replace(/\s/g, "");
-                    if (clean && !/^5/.test(clean)) setPhoneError("الرقم يجب أن يبدأ بـ 5");
-                    else if (clean && clean.length > 0 && clean.length !== 9) setPhoneError("الرقم يجب أن يكون ٩ أرقام");
-                    else setPhoneError("");
-                  }}
-                />
+                {phoneError && <span className={s.fieldError}>{phoneError}</span>}
               </div>
-              {phoneError && <span className={s.fieldError}>{phoneError}</span>}
-            </div>
+            )}
 
             <div className={`${s.field} ${s.fieldFull}`}>
               <label className={s.fieldLbl}>المدينة</label>
