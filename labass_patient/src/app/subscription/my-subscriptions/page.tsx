@@ -81,7 +81,7 @@ export default function MySubscriptionsPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success) {
-        router.push(`/patientSelection?consultationId=${data.data.consultation.id}`);
+        router.push(`/completeInfo?consultationId=${data.data.consultation.id}`);
       }
     } catch (err: any) {
       const status = err?.response?.status ?? 500;
