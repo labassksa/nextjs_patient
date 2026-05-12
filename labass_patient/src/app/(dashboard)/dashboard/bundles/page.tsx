@@ -143,8 +143,8 @@ export default function BundlesPage() {
 
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
-  const allBundles = Array.isArray(data) ? data : [];
-  const orgBundles = allBundles.filter((b) => b.whoSubscribes === "organization");
+  const orgActive   = (data?.active   ?? []).filter((b) => b.whoSubscribes === "organization");
+  const orgInactive = (data?.inactive ?? []).filter((b) => b.whoSubscribes === "organization");
 
   return (
     <div>
@@ -162,7 +162,14 @@ export default function BundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={orgBundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="organization-bundles" />
+      <DataTable columns={columns} data={orgActive} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="organization-bundles" />
+
+      {orgInactive.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">Inactive Bundles</h3>
+          <DataTable columns={columns} data={orgInactive} isLoading={false} searchKey="name" searchValue={search} exportFilename="organization-bundles-inactive" />
+        </div>
+      )}
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>

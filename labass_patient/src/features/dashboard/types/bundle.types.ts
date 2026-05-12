@@ -1,3 +1,8 @@
+export interface BundlesResponse {
+  active: Bundle[];
+  inactive: Bundle[];
+}
+
 export interface Bundle {
   id: number;
   name: string;

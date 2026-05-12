@@ -152,8 +152,8 @@ export default function IndividualBundlesPage() {
 
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
-  const allBundles = Array.isArray(data) ? data : [];
-  const individualBundles = allBundles.filter((b) => b.whoSubscribes === "individual");
+  const indActive   = (data?.active   ?? []).filter((b) => b.whoSubscribes === "individual");
+  const indInactive = (data?.inactive ?? []).filter((b) => b.whoSubscribes === "individual");
 
   return (
     <div>
@@ -171,7 +171,14 @@ export default function IndividualBundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={individualBundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="individual-bundles" />
+      <DataTable columns={columns} data={indActive} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="individual-bundles" />
+
+      {indInactive.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">Inactive Bundles</h3>
+          <DataTable columns={columns} data={indInactive} isLoading={false} searchKey="name" searchValue={search} exportFilename="individual-bundles-inactive" />
+        </div>
+      )}
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
