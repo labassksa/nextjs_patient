@@ -20,6 +20,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function IndividualBundlesPage() {
@@ -31,14 +32,9 @@ export default function IndividualBundlesPage() {
   const [createDialog, setCreateDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
-    name: "basic",
-    type: "Vitamins",
-    price: 0,
-    consultationCount: 1,
-    currency: "SAR",
-    recurringType: "Monthly",
-    description: "",
-    originalPrice: undefined,
+    name: "basic", type: "GP Consultations", price: 0, consultationCount: 1,
+    currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined,
+    whoSubscribes: "individual", isUnlimited: false,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -47,19 +43,22 @@ export default function IndividualBundlesPage() {
   const validateBundle = (): boolean => {
     const errors: Record<string, string> = {};
     if (!newBundle.name) errors.name = "Please select a name";
-    if (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount)) {
+    if (!newBundle.isUnlimited && (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount))) {
       errors.consultationCount = "Must be a positive integer";
     }
     if (newBundle.price < 0) errors.price = "Price must be non-negative";
+    if (newBundle.recurringType === "Custom" && (!newBundle.intervalDays || newBundle.intervalDays < 1)) {
+      errors.intervalDays = "Required for Custom recurring type";
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleCreate = async () => {
     if (!validateBundle()) return;
-    await createBundle.mutateAsync({ ...newBundle, type: "Vitamins" });
+    await createBundle.mutateAsync({ ...newBundle, whoSubscribes: "individual" });
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "Vitamins", price: 0, consultationCount: 1, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 1, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "individual", isUnlimited: false });
     setFormErrors({});
   };
 
@@ -72,14 +71,19 @@ export default function IndividualBundlesPage() {
     {
       accessorKey: "id",
       header: "ID",
-      cell: ({ row }) => (
-        <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>
-      ),
+      cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>,
     },
     {
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+    },
+    {
+      accessorKey: "type",
+      header: "Type",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="font-normal capitalize">{row.original.type}</Badge>
+      ),
     },
     {
       accessorKey: "price",
@@ -112,6 +116,15 @@ export default function IndividualBundlesPage() {
       ),
     },
     {
+      accessorKey: "isUnlimited",
+      header: "Unlimited",
+      cell: ({ row }) => (
+        <span className={row.original.isUnlimited ? "text-green-600 font-semibold" : "text-muted-foreground"}>
+          {row.original.isUnlimited ? "✓" : "No"}
+        </span>
+      ),
+    },
+    {
       accessorKey: "isActive",
       header: "Active",
       cell: ({ row }) => (
@@ -140,13 +153,13 @@ export default function IndividualBundlesPage() {
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
   const allBundles = Array.isArray(data) ? data : [];
-  const vitaminsBundles = allBundles.filter((b) => b.type === "Vitamins");
+  const individualBundles = allBundles.filter((b) => b.whoSubscribes === "individual");
 
   return (
     <div>
       <PageHeader
         title="Individual Bundles"
-        description="Manage Vitamins subscription bundles for individual patients"
+        description="Manage subscription bundles for individual patients"
         actions={
           <Button onClick={() => setCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" /> Create Bundle
@@ -158,26 +171,13 @@ export default function IndividualBundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable
-        columns={columns}
-        data={vitaminsBundles}
-        isLoading={isLoading}
-        searchKey="name"
-        searchValue={search}
-        exportFilename="individual-bundles"
-      />
+      <DataTable columns={columns} data={individualBundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="individual-bundles" />
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Vitamins Bundle</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Type</Label>
-              <Input value="Vitamins" disabled className="bg-muted text-muted-foreground" />
-            </div>
+        <DialogContent className="flex flex-col max-h-[85vh]">
+          <DialogHeader><DialogTitle>Create Individual Bundle</DialogTitle></DialogHeader>
+          <div className="space-y-4 overflow-y-auto flex-1 pr-1">
             <div className="space-y-2">
               <Label>Name</Label>
               <Select value={newBundle.name} onValueChange={(val) => setNewBundle({ ...newBundle, name: val })}>
@@ -188,42 +188,44 @@ export default function IndividualBundlesPage() {
               </Select>
               {formErrors.name && <p className="text-sm text-destructive">{formErrors.name}</p>}
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Price</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={newBundle.price}
-                  onChange={(e) => setNewBundle({ ...newBundle, price: Number(e.target.value) })}
-                />
-                {formErrors.price && <p className="text-sm text-destructive">{formErrors.price}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label>Original Price <span className="text-muted-foreground text-xs">(optional, for display)</span></Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  placeholder="e.g. 600"
-                  value={newBundle.originalPrice ?? ""}
-                  onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={newBundle.type} onValueChange={(val) => setNewBundle({ ...newBundle, type: val })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Subscriber Type</Label>
+              <Input value="Individual" disabled className="bg-muted text-muted-foreground" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Consultations</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={newBundle.consultationCount}
-                  onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })}
-                />
-                {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
+                <Label>Price</Label>
+                <Input type="number" min={0} step="0.01" value={newBundle.price} onChange={(e) => setNewBundle({ ...newBundle, price: Number(e.target.value) })} />
+                {formErrors.price && <p className="text-sm text-destructive">{formErrors.price}</p>}
               </div>
+              <div className="space-y-2">
+                <Label>Original Price <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input type="number" min={0} step="0.01" placeholder="e.g. 600" value={newBundle.originalPrice ?? ""} onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })} />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label>Unlimited Consultations</Label>
+                <p className="text-xs text-muted-foreground">Consultation count becomes irrelevant when enabled</p>
+              </div>
+              <Switch
+                checked={!!newBundle.isUnlimited}
+                onCheckedChange={(checked) => setNewBundle({ ...newBundle, isUnlimited: checked })}
+              />
+            </div>
+            <div className={`space-y-2 transition-opacity ${newBundle.isUnlimited ? "opacity-40 pointer-events-none" : ""}`}>
+              <Label>Consultations</Label>
+              <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
+              {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -237,7 +239,7 @@ export default function IndividualBundlesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Recurring Type</Label>
-                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val })}>
+                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val, intervalDays: undefined })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {RECURRING_TYPES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
@@ -245,12 +247,21 @@ export default function IndividualBundlesPage() {
                 </Select>
               </div>
             </div>
+            {newBundle.recurringType === "Custom" && (
+              <div className="space-y-2">
+                <Label>Interval Days</Label>
+                <Input
+                  type="number" min={1} step={1}
+                  placeholder="e.g. 30 for monthly, 90 for quarterly"
+                  value={newBundle.intervalDays ?? ""}
+                  onChange={(e) => setNewBundle({ ...newBundle, intervalDays: e.target.value ? Number(e.target.value) : undefined })}
+                />
+                {formErrors.intervalDays && <p className="text-sm text-destructive">{formErrors.intervalDays}</p>}
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Description</Label>
-              <Input
-                value={newBundle.description}
-                onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })}
-              />
+              <Input value={newBundle.description} onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })} />
             </div>
           </div>
           <DialogFooter>

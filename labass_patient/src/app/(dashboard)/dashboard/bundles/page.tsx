@@ -6,7 +6,6 @@ import { useBundles, useCreateBundle, useToggleBundleActive, useDeleteBundle } f
 import type { Bundle, CreateBundlePayload } from "@/features/dashboard/types/bundle.types";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
-import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { SearchInput } from "@/features/dashboard/components/shared/search-input";
 import { ConfirmDialog } from "@/features/dashboard/components/shared/confirm-dialog";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -22,7 +21,6 @@ import { Plus, Trash2 } from "lucide-react";
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
 const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
-const WHO_SUBSCRIBES = ["organization", "individual"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function BundlesPage() {
@@ -44,15 +42,11 @@ export default function BundlesPage() {
 
   const validateBundle = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!newBundle.name) {
-      errors.name = "Please select a name";
-    }
-    if (!newBundle.isUnlimited && (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount))) {
+    if (!newBundle.name) errors.name = "Please select a name";
+    if (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount)) {
       errors.consultationCount = "Must be a positive integer";
     }
-    if (newBundle.price < 0) {
-      errors.price = "Price must be non-negative";
-    }
+    if (newBundle.price < 0) errors.price = "Price must be non-negative";
     if (newBundle.recurringType === "Custom" && (!newBundle.intervalDays || newBundle.intervalDays < 1)) {
       errors.intervalDays = "Required for Custom recurring type";
     }
@@ -62,16 +56,14 @@ export default function BundlesPage() {
 
   const handleCreate = async () => {
     if (!validateBundle()) return;
-    await createBundle.mutateAsync(newBundle);
+    await createBundle.mutateAsync({ ...newBundle, whoSubscribes: "organization", isUnlimited: false });
     setCreateDialog(false);
     setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false });
     setFormErrors({});
   };
 
   const handleDelete = async () => {
-    if (deleteDialog.id) {
-      await deleteBundle.mutateAsync(deleteDialog.id);
-    }
+    if (deleteDialog.id) await deleteBundle.mutateAsync(deleteDialog.id);
     setDeleteDialog({ open: false, id: null });
   };
 
@@ -79,9 +71,7 @@ export default function BundlesPage() {
     {
       accessorKey: "id",
       header: "ID",
-      cell: ({ row }) => (
-        <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>
-      ),
+      cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>,
     },
     {
       accessorKey: "name",
@@ -126,24 +116,6 @@ export default function BundlesPage() {
       ),
     },
     {
-      accessorKey: "whoSubscribes",
-      header: "Subscriber",
-      cell: ({ row }) => (
-        <Badge variant="outline" className="font-normal capitalize">
-          {row.original.whoSubscribes === "individual" ? "Individual" : "Organization"}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "isUnlimited",
-      header: "Unlimited",
-      cell: ({ row }) => (
-        <span className={row.original.isUnlimited ? "text-green-600 font-semibold" : "text-muted-foreground"}>
-          {row.original.isUnlimited ? "✓" : "No"}
-        </span>
-      ),
-    },
-    {
       accessorKey: "isActive",
       header: "Active",
       cell: ({ row }) => (
@@ -171,13 +143,14 @@ export default function BundlesPage() {
 
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
-  const bundles = Array.isArray(data) ? data : [];
+  const allBundles = Array.isArray(data) ? data : [];
+  const orgBundles = allBundles.filter((b) => b.whoSubscribes === "organization");
 
   return (
     <div>
       <PageHeader
-        title="Bundles"
-        description="Manage consultation bundles"
+        title="Organization Bundles"
+        description="Manage subscription bundles for organizations"
         actions={
           <Button onClick={() => setCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" /> Create Bundle
@@ -189,12 +162,12 @@ export default function BundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="bundles" />
+      <DataTable columns={columns} data={orgBundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="organization-bundles" />
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
         <DialogContent className="flex flex-col max-h-[85vh]">
-          <DialogHeader><DialogTitle>Create Bundle</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Create Organization Bundle</DialogTitle></DialogHeader>
           <div className="space-y-4 overflow-y-auto flex-1 pr-1">
             <div className="space-y-2">
               <Label>Name</Label>
@@ -217,12 +190,7 @@ export default function BundlesPage() {
             </div>
             <div className="space-y-2">
               <Label>Subscriber Type</Label>
-              <Select value={newBundle.whoSubscribes} onValueChange={(val) => setNewBundle({ ...newBundle, whoSubscribes: val as "individual" | "organization" })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {WHO_SUBSCRIBES.map((w) => <SelectItem key={w} value={w} className="capitalize">{w}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <Input value="Organization" disabled className="bg-muted text-muted-foreground" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -231,26 +199,14 @@ export default function BundlesPage() {
                 {formErrors.price && <p className="text-sm text-destructive">{formErrors.price}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Original Price <span className="text-muted-foreground text-xs">(optional, for display)</span></Label>
+                <Label>Original Price <span className="text-muted-foreground text-xs">(optional)</span></Label>
                 <Input type="number" min={0} step="0.01" placeholder="e.g. 600" value={newBundle.originalPrice ?? ""} onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })} />
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="space-y-0.5">
-                <Label>Unlimited Consultations</Label>
-                <p className="text-xs text-muted-foreground">Consultation count becomes irrelevant when enabled</p>
-              </div>
-              <Switch
-                checked={!!newBundle.isUnlimited}
-                onCheckedChange={(checked) => setNewBundle({ ...newBundle, isUnlimited: checked })}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`space-y-2 transition-opacity ${newBundle.isUnlimited ? "opacity-40 pointer-events-none" : ""}`}>
-                <Label>Consultations</Label>
-                <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
-                {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
-              </div>
+            <div className="space-y-2">
+              <Label>Consultations</Label>
+              <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
+              {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -276,9 +232,7 @@ export default function BundlesPage() {
               <div className="space-y-2">
                 <Label>Interval Days</Label>
                 <Input
-                  type="number"
-                  min={1}
-                  step={1}
+                  type="number" min={1} step={1}
                   placeholder="e.g. 30 for monthly, 90 for quarterly"
                   value={newBundle.intervalDays ?? ""}
                   onChange={(e) => setNewBundle({ ...newBundle, intervalDays: e.target.value ? Number(e.target.value) : undefined })}
