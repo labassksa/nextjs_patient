@@ -397,10 +397,12 @@ export default function GeneralPackageSubscribePage() {
               <span className={s.summaryLbl}>الاسم</span>
               <span className={s.summaryVal}>{name}</span>
             </div>
-            <div className={s.summaryRow}>
-              <span className={s.summaryLbl}>رقم الجوّال</span>
-              <span className={s.summaryVal} style={{ direction: "ltr" }}>+966 {phone}</span>
-            </div>
+            {phone && (
+              <div className={s.summaryRow}>
+                <span className={s.summaryLbl}>رقم الجوّال</span>
+                <span className={s.summaryVal} style={{ direction: "ltr" }}>+966 {phone}</span>
+              </div>
+            )}
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>نوع الدفع</span>
               <span className={s.summaryVal}>دفعة واحدة</span>
