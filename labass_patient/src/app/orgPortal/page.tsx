@@ -31,6 +31,8 @@ import AvailableBundlesSection from "./_components/AvailableBundlesSection";
 import { getMySubscription } from "./_controllers/getMySubscription";
 import { createBundleConsultation } from "./_controllers/createBundleConsultation";
 import { sendMarketingMessage } from "./_controllers/sendMarketingMessage";
+import { getReferralCode } from "./_controllers/getReferralCode";
+import { generateReferralCode } from "./_controllers/generateReferralCode";
 
 
 interface OrgPatient {
@@ -94,6 +96,8 @@ const OrgPatientsPage: React.FC = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [marketingCode, setMarketingCode] = useState("");
   const [marketingSuccess, setMarketingSuccess] = useState(false);
+  const [isFetchingCode, setIsFetchingCode] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const marketerName = orgType === OrganizationTypes.Pharmacy
     ? t('pharmacist')
     : orgType === OrganizationTypes.School
@@ -210,6 +214,17 @@ const OrgPatientsPage: React.FC = () => {
   useEffect(() => {
     console.log("userData state changed:", userData);
   }, [userData]);
+
+  // Fetch referral code when Marketing type is selected
+  useEffect(() => {
+    if (doctorType !== DoctorType.Marketing) return;
+    setMarketingCode("");
+    setIsFetchingCode(true);
+    getReferralCode()
+      .then((code) => { if (code) setMarketingCode(code); })
+      .catch(() => {})
+      .finally(() => setIsFetchingCode(false));
+  }, [doctorType]);
 
   // Auto-select payment method and price based on consultation type
   useEffect(() => {
@@ -466,6 +481,18 @@ const OrgPatientsPage: React.FC = () => {
         t("unexpectedError");
       setSubmitError(errorMessage);
       setIsOpeningConsultation(false);
+    }
+  };
+
+  const handleGenerateCode = async () => {
+    setIsGeneratingCode(true);
+    try {
+      const code = await generateReferralCode();
+      if (code) setMarketingCode(code);
+    } catch (err: any) {
+      setSubmitError(err?.response?.data?.message || t("unexpectedError"));
+    } finally {
+      setIsGeneratingCode(false);
     }
   };
 
@@ -767,17 +794,30 @@ const OrgPatientsPage: React.FC = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">الرمز التسويقي للصيدلي</label>
-                        <input
-                          type="text"
-                          value={marketingCode}
-                          onChange={(e) => setMarketingCode(e.target.value.toUpperCase())}
-                          placeholder="AB3K9XZ2"
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-right font-mono tracking-widest"
-                        />
+                        {isFetchingCode ? (
+                          <div className="w-full border border-gray-200 rounded-md px-3 py-2 bg-gray-50 flex items-center justify-center">
+                            <div className="spinner" />
+                          </div>
+                        ) : marketingCode ? (
+                          <input
+                            type="text"
+                            value={marketingCode}
+                            readOnly
+                            className="w-full border border-gray-200 rounded-md px-3 py-2 text-right font-mono tracking-widest bg-gray-50 text-gray-700 cursor-default"
+                          />
+                        ) : (
+                          <button
+                            onClick={handleGenerateCode}
+                            disabled={isGeneratingCode}
+                            className="w-full border border-dashed border-custom-green text-custom-green rounded-md px-3 py-2 flex justify-center items-center hover:bg-green-50 transition-colors disabled:opacity-60"
+                          >
+                            {isGeneratingCode ? <div className="spinner" /> : "توليد الرمز"}
+                          </button>
+                        )}
                       </div>
                       <button
                         onClick={handleSendMarketing}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !marketingCode}
                         className="w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors disabled:opacity-60"
                       >
                         {isSubmitting ? <div className="spinner" /> : "إرسال رسالة تسويقية"}
