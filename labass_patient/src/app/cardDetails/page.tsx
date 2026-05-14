@@ -59,6 +59,7 @@ const CardDetailsContent: React.FC = () => {
               if (isSubscriptionFlow) {
                 localStorage.removeItem('temp_subscription_flow');
                 localStorage.removeItem('vitamin_survey_answers');
+                localStorage.removeItem('referralCode');
                 router.push("/subscription/success");
               } else {
                 router.push("/orgPortal?bundlePaymentSuccess=true");
@@ -126,6 +127,7 @@ const CardDetailsContent: React.FC = () => {
                   // Subscription flow — always has bundleId + subscriberType + isRecurring
                   const surveyRaw = localStorage.getItem("vitamin_survey_answers");
                   const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
+                  const referralCode = localStorage.getItem("referralCode") || undefined;
                   const { data } = await axios.post(
                     `${apiUrl}/execute-subscription-payment`,
                     {
@@ -137,6 +139,7 @@ const CardDetailsContent: React.FC = () => {
                       isRecurring,
                       promoCode,
                       surveyAnswers,
+                      referralCode,
                     },
                     { headers: { Authorization: `Bearer ${token}` } }
                   );

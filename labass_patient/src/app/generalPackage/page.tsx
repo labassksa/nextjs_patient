@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./generalPackage.module.css";
 
@@ -85,6 +85,14 @@ const faqs = [
 export default function GeneralConsultationPage() {
   const [selectedPlan, setSelectedPlan] = useState("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const referralCode = params.get("referralCode");
+    if (referralCode) {
+      localStorage.setItem("referralCode", referralCode);
+    }
+  }, []);
 
   return (
     <div className={styles.app} dir="rtl">

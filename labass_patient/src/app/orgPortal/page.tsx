@@ -30,6 +30,7 @@ import BundleSection from "./_components/BundleSection";
 import AvailableBundlesSection from "./_components/AvailableBundlesSection";
 import { getMySubscription } from "./_controllers/getMySubscription";
 import { createBundleConsultation } from "./_controllers/createBundleConsultation";
+import { sendMarketingMessage } from "./_controllers/sendMarketingMessage";
 
 
 interface OrgPatient {
@@ -91,6 +92,8 @@ const OrgPatientsPage: React.FC = () => {
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
   const [subscription, setSubscription] = useState<any>(null);
+  const [marketingCode, setMarketingCode] = useState("");
+  const [marketingSuccess, setMarketingSuccess] = useState(false);
   const marketerName = orgType === OrganizationTypes.Pharmacy
     ? t('pharmacist')
     : orgType === OrganizationTypes.School
@@ -466,6 +469,32 @@ const OrgPatientsPage: React.FC = () => {
     }
   };
 
+  const handleSendMarketing = async () => {
+    setSubmitError("");
+    if (!phone || !marketingCode.trim()) {
+      setSubmitError("يرجى إدخال رقم الجوال والرمز التسويقي");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const formattedPhone = phone.startsWith("0") ? `+966${phone.slice(1)}` : `+966${phone}`;
+      await sendMarketingMessage(formattedPhone, marketingCode.trim());
+      setMarketingSuccess(true);
+      setPhone("");
+      setMarketingCode("");
+    } catch (err: any) {
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message || err?.message;
+      if (status === 400) setSubmitError(msg || "بيانات غير صحيحة أو الرمز غير نشط");
+      else if (status === 403) setSubmitError("هذا الرمز لا ينتمي لحسابك");
+      else if (status === 404) setSubmitError("الرمز التسويقي غير موجود");
+      else if (status === 500) setSubmitError("فشل إرسال الرسالة، يرجى المحاولة مجدداً");
+      else setSubmitError(msg || t("unexpectedError"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
@@ -718,101 +747,121 @@ const OrgPatientsPage: React.FC = () => {
                   {/* Consultation type selector at the TOP */}
                   <DoctorTypeSection
                     doctorType={doctorType}
-                    setDoctorType={setDoctorType}
+                    setDoctorType={(type) => { setDoctorType(type); setMarketingSuccess(false); setSubmitError(""); }}
                     hasSubscription={!!subscription}
                   />
-                  <OrgUserRegistrationForm
-                    orgType={orgType}
-                    doctorType={doctorType}
-                    name={name}
-                    setName={setName}
-                    phone={phone}
-                    setPhone={setPhone}
-                    age={age}
-                    setAge={setAge}
-                    dateOfBirth={dateOfBirth}
-                    setDateOfBirth={setDateOfBirth}
-                    nationality={nationality}
-                    setNationality={setNationality}
-                    gender={gender}
-                    setGender={setGender}
-                    nationalId={nationalId}
-                    setNationalId={setNationalId}
-                    pdfFiles={pdfFiles}
-                    setPdfFiles={setPdfFiles}
-                  />
-                  <TestTypeSection
-                    orgType={orgType}
-                    testType={testType}
-                    setTestType={settestType}
-                    pdfFiles={pdfFiles}
-                    setPdfFiles={setPdfFiles}
-                  />
 
-                  {/* Payment method section — shown for revenue share orgs or when subscription exists */}
-                  {(dealType.includes(DealType.REVENUE_SHARE) || dealType.includes(DealType.SUBSCRIPTION) || subscription) && (
-                    <>
-                      <PaymentMethodSection
-                        paymentMethod={paymentMethod}
-                        setPaymentMethod={setPaymentMethod}
-                        possiblePaymentMethods={possiblePaymentMethods}
-                        cashPrice={cashPrice}
-                        setCashPrice={setCashPrice}
-                        subscription={subscription}
-                      />
-                      {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
-                        <ConsultationPriceSection
-                          selectedPrice={selectedPrice}
-                          onChange={(price) => setSelectedPrice(price)}
-                          possiblePrices={possiblePrices}
+                  {doctorType === DoctorType.Marketing ? (
+                    /* ── Marketing SMS form ── */
+                    <div className="max-w-xl mx-auto mt-4 space-y-4" dir="rtl">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">رقم جوال المريض</label>
+                        <input
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/[^\d]/g, ""))}
+                          placeholder="05xxxxxxxx"
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-right"
+                          dir="ltr"
                         />
-                      )}
-                    </>
-                  )}
-
-                  {/* Bottom Buttons for Web (not fixed) */}
-                  {orgType === OrganizationTypes.School ? (
-                    /* School: Two buttons with confirmations */
-                    <div className="flex gap-3 mt-4" dir="rtl">
-                      {/* Send Consultation Button (Green) */}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">الرمز التسويقي للصيدلي</label>
+                        <input
+                          type="text"
+                          value={marketingCode}
+                          onChange={(e) => setMarketingCode(e.target.value.toUpperCase())}
+                          placeholder="AB3K9XZ2"
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-right font-mono tracking-widest"
+                        />
+                      </div>
                       <button
-                        onClick={handleSendConsultationClick}
-                        className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
-                        disabled={isSubmitting || isOpeningConsultation}
+                        onClick={handleSendMarketing}
+                        disabled={isSubmitting}
+                        className="w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors disabled:opacity-60"
                       >
-                        {isSubmitting ? (
-                          <div className="spinner" />
-                        ) : (
-                          t('sendConsultation')
-                        )}
-                      </button>
-
-                      {/* Open Consultation Button (Blue) - Only for schools */}
-                      <button
-                        onClick={handleOpenConsultationClick}
-                        className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
-                        disabled={isSubmitting || isOpeningConsultation}
-                      >
-                        {isOpeningConsultation ? (
-                          <div className="spinner" />
-                        ) : (
-                          "فتح الاستشارة"
-                        )}
+                        {isSubmitting ? <div className="spinner" /> : "إرسال رسالة تسويقية"}
                       </button>
                     </div>
                   ) : (
-                    /* Pharmacy/Lab: Single button without confirmation */
-                    <button
-                      onClick={handleSendConsultation}
-                      className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? (
-                        <div className="spinner" />
-                      ) : (
-                        t('sendConsultation')
+                    <>
+                      <OrgUserRegistrationForm
+                        orgType={orgType}
+                        doctorType={doctorType}
+                        name={name}
+                        setName={setName}
+                        phone={phone}
+                        setPhone={setPhone}
+                        age={age}
+                        setAge={setAge}
+                        dateOfBirth={dateOfBirth}
+                        setDateOfBirth={setDateOfBirth}
+                        nationality={nationality}
+                        setNationality={setNationality}
+                        gender={gender}
+                        setGender={setGender}
+                        nationalId={nationalId}
+                        setNationalId={setNationalId}
+                        pdfFiles={pdfFiles}
+                        setPdfFiles={setPdfFiles}
+                      />
+                      <TestTypeSection
+                        orgType={orgType}
+                        testType={testType}
+                        setTestType={settestType}
+                        pdfFiles={pdfFiles}
+                        setPdfFiles={setPdfFiles}
+                      />
+
+                      {/* Payment method section — shown for revenue share orgs or when subscription exists */}
+                      {(dealType.includes(DealType.REVENUE_SHARE) || dealType.includes(DealType.SUBSCRIPTION) || subscription) && (
+                        <>
+                          <PaymentMethodSection
+                            paymentMethod={paymentMethod}
+                            setPaymentMethod={setPaymentMethod}
+                            possiblePaymentMethods={possiblePaymentMethods}
+                            cashPrice={cashPrice}
+                            setCashPrice={setCashPrice}
+                            subscription={subscription}
+                          />
+                          {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
+                            <ConsultationPriceSection
+                              selectedPrice={selectedPrice}
+                              onChange={(price) => setSelectedPrice(price)}
+                              possiblePrices={possiblePrices}
+                            />
+                          )}
+                        </>
                       )}
-                    </button>
+
+                      {/* Bottom Buttons for Web (not fixed) */}
+                      {orgType === OrganizationTypes.School ? (
+                        <div className="flex gap-3 mt-4" dir="rtl">
+                          <button
+                            onClick={handleSendConsultationClick}
+                            className="flex-1 bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                            disabled={isSubmitting || isOpeningConsultation}
+                          >
+                            {isSubmitting ? <div className="spinner" /> : t('sendConsultation')}
+                          </button>
+                          <button
+                            onClick={handleOpenConsultationClick}
+                            className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-blue-600 transition-colors"
+                            disabled={isSubmitting || isOpeningConsultation}
+                          >
+                            {isOpeningConsultation ? <div className="spinner" /> : "فتح الاستشارة"}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={handleSendConsultation}
+                          className="mt-4 w-full bg-custom-green text-white py-3 px-4 rounded-md flex justify-center items-center hover:bg-green-600 transition-colors"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? <div className="spinner" /> : t('sendConsultation')}
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
               )}
