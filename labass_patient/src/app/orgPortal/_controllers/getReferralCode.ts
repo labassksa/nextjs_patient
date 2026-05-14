@@ -7,5 +7,8 @@ export const getReferralCode = async (): Promise<string | null> => {
   const { data } = await axios.get(`${apiUrl}/my-referral-codes`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  if (Array.isArray(data?.data)) {
+    return data.data[0]?.code ?? null;
+  }
   return data?.data?.code ?? null;
 };
