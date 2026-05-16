@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios";
 import styles from "./generalPackage.module.css";
 
 const monthlyFeatures = [
@@ -19,11 +20,10 @@ const quarterlyFeatures = [
   "أولوية في الرد",
 ];
 
-const plans = [
+const plansMeta = [
   {
     id: "monthly",
     name: "شهري",
-    price: "٩٩",
     cur: "ريال",
     period: "/ شهرياً",
     badge: null,
@@ -33,7 +33,6 @@ const plans = [
   {
     id: "quarterly",
     name: "كل ٣ أشهر",
-    price: "٢٤٩",
     cur: "ريال",
     period: "/ كل ٣ أشهر",
     badge: "وفّر ١٦٪",
@@ -85,6 +84,22 @@ const faqs = [
 export default function GeneralConsultationPage() {
   const [selectedPlan, setSelectedPlan] = useState("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [prices, setPrices] = useState<Record<string, number | null>>({ monthly: null, quarterly: null });
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const gp = list.filter((b: any) => b.type === "GP Consultations" && b.whoSubscribes === "individual");
+        const monthly   = gp.find((b: any) => b.intervalDays === 30);
+        const quarterly = gp.find((b: any) => b.intervalDays === 90);
+        setPrices({
+          monthly:   monthly   ? Number(monthly.price)   : null,
+          quarterly: quarterly ? Number(quarterly.price) : null,
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -292,8 +307,9 @@ export default function GeneralConsultationPage() {
         <p className={styles.secSub}>استشارة طبية 24/7 مع طبيب أسرة مرخّص — ابدأ اليوم</p>
 
         <div className={styles.plansRow}>
-          {plans.map((plan) => {
+          {plansMeta.map((plan) => {
             const isSelected = selectedPlan === plan.id;
+            const price = prices[plan.id];
             return (
               <div
                 key={plan.id}
@@ -311,7 +327,9 @@ export default function GeneralConsultationPage() {
 
                 <p className={styles.planName}>{plan.name}</p>
                 <div className={styles.planPrice}>
-                  <span className={styles.planNum}>{plan.price}</span>
+                  <span className={styles.planNum}>
+                    {price !== null ? price.toLocaleString("ar-SA") : "—"}
+                  </span>
                   <span className={styles.planCur}>{plan.cur}</span>
                 </div>
                 <p className={styles.planPeriod}>{plan.period}</p>

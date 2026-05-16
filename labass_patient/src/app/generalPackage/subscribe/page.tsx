@@ -10,10 +10,6 @@ import s from "./subscribe.module.css";
 
 const TOTAL_STEPS = 4;
 
-const cityOptions = [
-  { value: "riyadh", label: "الرياض" },
-];
-
 const planMeta: Record<string, { period: string; popular: boolean; fallbackLabel: string }> = {
   monthly:   { period: "/ شهرياً",      popular: false, fallbackLabel: "شهري"       },
   quarterly: { period: "/ كل ٣ أشهر", popular: true,  fallbackLabel: "كل ٣ أشهر" },
@@ -40,9 +36,7 @@ export default function GeneralPackageSubscribePage() {
   const planLabel = selectedBundle?.description || planMeta[selectedPlanId].fallbackLabel;
 
   // Personal info
-  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("riyadh");
   const [phoneError, setPhoneError] = useState("");
 
   // OTP
@@ -124,14 +118,14 @@ export default function GeneralPackageSubscribePage() {
     switch (currentStep) {
       case 1: return !!selectedPlanId;
       case 2: {
-        if (token) return !!name;
+        if (token) return true;
         const clean = phone.replace(/\s/g, "");
-        return !!(name && /^5\d{8}$/.test(clean) && city);
+        return /^5\d{8}$/.test(clean);
       }
       case 3: return otp.every((d) => d !== "");
       default: return true;
     }
-  }, [currentStep, selectedPlanId, name, phone, city, otp]);
+  }, [currentStep, selectedPlanId, phone, otp, token]);
 
   const goToStep = (n: number) => {
     setCurrentStep(n);
@@ -287,11 +281,6 @@ export default function GeneralPackageSubscribePage() {
           <p className={s.pageSub}>هذه البيانات تصل مباشرة لطبيبك ولن تُشارَك مع أي طرف آخر. محمية بمعايير PDPL السعودية.</p>
 
           <div className={s.formGrid}>
-            <div className={`${s.field} ${s.fieldFull}`}>
-              <label className={s.fieldLbl}>الاسم الكامل <span className={s.fieldReq}>*</span></label>
-              <input className={s.fieldInp} type="text" placeholder="أحمد بن محمد العتيبي" value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-
             {!token && (
               <div className={`${s.field} ${s.fieldFull}`}>
                 <label className={s.fieldLbl}>رقم الجوّال <span className={s.fieldReq}>*</span></label>
@@ -318,17 +307,6 @@ export default function GeneralPackageSubscribePage() {
                 {phoneError && <span className={s.fieldError}>{phoneError}</span>}
               </div>
             )}
-
-            <div className={`${s.field} ${s.fieldFull}`}>
-              <label className={s.fieldLbl}>المدينة</label>
-              <div className={s.selectWrap}>
-                <select className={s.fieldInp} value={city} onChange={(e) => setCity(e.target.value)} style={{ appearance: "none" }}>
-                  {cityOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
           </div>
 
           <div className={s.privacyNote}>
@@ -392,10 +370,6 @@ export default function GeneralPackageSubscribePage() {
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الباقة</span>
               <span className={s.summaryVal}>{planLabel}</span>
-            </div>
-            <div className={s.summaryRow}>
-              <span className={s.summaryLbl}>الاسم</span>
-              <span className={s.summaryVal}>{name}</span>
             </div>
             {phone && (
               <div className={s.summaryRow}>

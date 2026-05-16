@@ -11,6 +11,7 @@ import PaymentMethod from "./_components/payment/paymentMethod";
 import PaymentSummary from "./_components/payment/paymentSummary";
 import PaymentButton from "./_components/payment/paymentButton";
 import PromoCode from "./_components/payment/promoCodeInput";
+import ReferralCodeInput from "./_components/payment/referralCodeInput";
 
 import { PaymentMethodEnum } from "@/types/paymentMethods";
 import { getMagicLink } from "./_controllers/getMagicLink";
@@ -43,6 +44,7 @@ const SubscriptionPaymentClient: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState(PaymentMethodEnum.ApplePay);
   const [discountedPrice, setDiscountedPrice] = useState(priceParam ? Number(priceParam) : 0);
   const [promoCode, setPromoCode] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [bundle, setBundle] = useState<Bundle | null>(null);
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
 
@@ -105,6 +107,9 @@ const SubscriptionPaymentClient: React.FC = () => {
             selectedPaymentMethod={paymentMethod}
           />
 
+          {/* Referral code */}
+          <ReferralCodeInput setReferralCode={setReferralCode} />
+
           {/* Order summary */}
           <PaymentSummary discountedPrice={discountedPrice} />
 
@@ -140,6 +145,7 @@ const SubscriptionPaymentClient: React.FC = () => {
           method={paymentMethod}
           discountedPrice={discountedPrice}
           promoCode={promoCode}
+          referralCode={referralCode || undefined}
           bundleId={bundleId}
           subscriberType={subscriberType}
           isRecurring={isRecurring}

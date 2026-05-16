@@ -10,6 +10,7 @@ interface PaymentButtonProps {
   method: string;
   discountedPrice: number;
   promoCode: string;
+  referralCode?: string;
   bundleId?: number | null;
   subscriberType?: "patient" | "organization";
   isRecurring?: boolean;
@@ -32,6 +33,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
   method,
   discountedPrice,
   promoCode,
+  referralCode,
   bundleId,
   subscriberType = "patient",
   isRecurring = false,
@@ -102,7 +104,6 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
     try {
       const surveyRaw = localStorage.getItem("vitamin_survey_answers");
       const surveyAnswers = surveyRaw ? JSON.parse(surveyRaw) : undefined;
-      const referralCode = localStorage.getItem("referralCode") || undefined;
       const { data } = await axios.post(
         `${apiUrl}/execute-subscription-payment`,
         {
@@ -115,7 +116,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
           isRecurring,
           promoCode,
           surveyAnswers,
-          referralCode,
+          ...(referralCode ? { referralCode } : {}),
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );

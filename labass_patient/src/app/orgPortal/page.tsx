@@ -508,7 +508,6 @@ const OrgPatientsPage: React.FC = () => {
       await sendMarketingMessage(formattedPhone, marketingCode.trim());
       setMarketingSuccess(true);
       setPhone("");
-      setMarketingCode("");
     } catch (err: any) {
       const status = err?.response?.status;
       const msg = err?.response?.data?.message || err?.message;

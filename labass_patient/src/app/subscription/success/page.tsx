@@ -78,7 +78,7 @@ export default function SubscriptionSuccessPage() {
         </p>
 
         <button
-          onClick={() => router.push("/subscription/my-subscriptions")}
+          onClick={() => { window.location.href = "https://app.test.labass.sa/mySubscriptions"; }}
           style={{
             width: "100%",
             padding: "15px 24px",
