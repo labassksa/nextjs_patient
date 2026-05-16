@@ -10,7 +10,6 @@ import PaymentIntro from "./_components/payment/paymentIntro";
 import PaymentMethod from "./_components/payment/paymentMethod";
 import PaymentSummary from "./_components/payment/paymentSummary";
 import PaymentButton from "./_components/payment/paymentButton";
-import PromoCode from "./_components/payment/promoCodeInput";
 import ReferralCodeInput from "./_components/payment/referralCodeInput";
 
 import { PaymentMethodEnum } from "@/types/paymentMethods";
@@ -99,13 +98,6 @@ const SubscriptionPaymentClient: React.FC = () => {
 
           {/* Payment method selector */}
           <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
-
-          {/* Promo code */}
-          <PromoCode
-            setDiscountedPrice={setDiscountedPrice}
-            setPromoCode={setPromoCode}
-            selectedPaymentMethod={paymentMethod}
-          />
 
           {/* Referral code */}
           <ReferralCodeInput setReferralCode={setReferralCode} />
