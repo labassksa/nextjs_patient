@@ -13,7 +13,7 @@ const PersonalInfoForm = dynamic(() => import("./_components/form"), {
 
 const PersonalInfo = () => {
   return (
-    <div className="flex flex-col bg-gray-100 min-h-screen">
+    <div className="flex flex-col bg-gray-50 min-h-screen">
       <Header title="أدخل المعلومات الشخصية" showBackButton />
       <div className="pt-16 w-full">
         <PersonalInfoForm />

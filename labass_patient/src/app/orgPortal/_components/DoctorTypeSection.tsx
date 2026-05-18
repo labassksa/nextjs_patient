@@ -33,7 +33,7 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
     },
     {
       type: DoctorType.Marketing,
-      label: "ارسال رسالة تسويقية",
+      label: "ارسال رابط الاشتراك في خدمة لاباس",
       disabled: false,
       note: null,
       badge: null,

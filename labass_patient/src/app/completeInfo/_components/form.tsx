@@ -10,9 +10,10 @@ const PersonalInfoForm: React.FC = () => {
     lastName: "",
     idNumber: "",
     dob: "",
-    gender: "male",
+    gender: "",
   });
 
+  const [isViewOnly, setIsViewOnly] = useState(false);
   const [idError, setIdError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
@@ -23,7 +24,6 @@ const PersonalInfoForm: React.FC = () => {
   const searchParams = useSearchParams();
   const consultationId = searchParams?.get("consultationId");
 
-  // Pre-fill form with existing user data from DB
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -34,13 +34,17 @@ const PersonalInfoForm: React.FC = () => {
 
         if (response.status === 200) {
           const u = response.data;
-          setFormData({
+          const data = {
             firstName: u.firstName || "",
             lastName: u.lastName || "",
             idNumber: u.nationalId || "",
             dob: u.dateOfBirth ? u.dateOfBirth.split("T")[0] : "",
-            gender: u.gender || "male",
-          });
+            gender: u.gender || "",
+          };
+          setFormData(data);
+          const allFilled =
+            data.firstName && data.lastName && data.idNumber && data.dob && data.gender;
+          setIsViewOnly(!!allFilled);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -87,7 +91,6 @@ const PersonalInfoForm: React.FC = () => {
       const headers = { Authorization: `Bearer ${token}` };
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-      // 1. Update user info
       await axios.post(
         `${apiUrl}/CompleteUserProfile`,
         {
@@ -100,19 +103,16 @@ const PersonalInfoForm: React.FC = () => {
         { headers }
       );
 
-      // 2. Ensure patientProfile exists
       let patientProfileId: number | null = null;
       const patientRes = await axios.get(`${apiUrl}/getPatient`, { headers });
 
       if (patientRes.data?.exists) {
         patientProfileId = patientRes.data.profile.id;
       } else {
-        // Create patientProfile if it doesn't exist
         const createRes = await axios.post(`${apiUrl}/createPatient`, {}, { headers });
         patientProfileId = createRes.data.id;
       }
 
-      // 3. Link patientProfile to consultation
       if (patientProfileId && consultationId) {
         await axios.post(
           `${apiUrl}/select-patient/${consultationId}`,
@@ -136,8 +136,82 @@ const PersonalInfoForm: React.FC = () => {
 
   if (isFetching) {
     return (
-      <div className="pt-16 flex justify-center items-center min-h-screen">
-        <div className="spinner" />
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="w-10 h-10 rounded-full border-4 border-custom-green border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (isViewOnly) {
+    const genderLabel = formData.gender === "male" ? "ذكر" : "أنثى";
+    const dobFormatted = formData.dob
+      ? new Date(formData.dob).toLocaleDateString("ar-SA")
+      : formData.dob;
+
+    return (
+      <div className="flex flex-col min-h-screen bg-gray-50 pb-24" dir="rtl">
+        <div className="px-4 pt-4 space-y-4">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-green-600 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p className="text-sm text-green-700">معلوماتك الشخصية مكتملة</p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <p className="text-sm font-semibold text-gray-700">المعلومات الشخصية</p>
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              <div className="flex justify-between items-center px-4 py-3">
+                <span className="text-sm text-gray-800 font-medium">
+                  {formData.firstName} {formData.lastName}
+                </span>
+                <span className="text-xs text-gray-400">الاسم الكامل</span>
+              </div>
+              <div className="flex justify-between items-center px-4 py-3">
+                <span className="text-sm text-gray-800 font-medium">{formData.idNumber}</span>
+                <span className="text-xs text-gray-400">رقم الهوية</span>
+              </div>
+              <div className="flex justify-between items-center px-4 py-3">
+                <span className="text-sm text-gray-800 font-medium">{dobFormatted}</span>
+                <span className="text-xs text-gray-400">تاريخ الميلاد</span>
+              </div>
+              <div className="flex justify-between items-center px-4 py-3">
+                <span
+                  className={`text-xs font-medium px-3 py-1 rounded-full ${
+                    formData.gender === "male"
+                      ? "bg-blue-50 text-blue-700"
+                      : "bg-pink-50 text-pink-700"
+                  }`}
+                >
+                  {genderLabel}
+                </span>
+                <span className="text-xs text-gray-400">الجنس</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
+          <button
+            onClick={handleSuccessConfirmation}
+            className="w-full bg-custom-green py-3 text-white rounded-2xl text-sm font-medium"
+          >
+            المتابعة
+          </button>
+        </div>
       </div>
     );
   }
@@ -152,104 +226,184 @@ const PersonalInfoForm: React.FC = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="pt-16 flex flex-col min-h-screen m-1 bg-white"
+        className="flex flex-col min-h-screen bg-gray-50 pb-24"
+        dir="rtl"
       >
-        <div className="space-y-4 p-2 flex-grow text-black">
-          {/* Gender Selection */}
-          <div className="flex flex-col justify-between text-xs" dir="rtl">
-            <div className=""> هل أنت</div>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                onChange={handleChange}
-                checked={formData.gender === "male"}
-              />{" "}
-              ذكر
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                onChange={handleChange}
-                checked={formData.gender === "female"}
-              />{" "}
-              أنثى
-            </label>
+        <div className="px-4 pt-4 space-y-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-amber-500 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.538-1.333-3.308 0L3.732 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <p className="text-sm text-amber-700">يرجى إكمال معلوماتك الشخصية</p>
           </div>
 
-          <input
-            type="text"
-            name="firstName"
-            placeholder="الاسم الأول"
-            onChange={handleChange}
-            value={formData.firstName}
-            className="w-full p-3 border rounded text-right focus:outline-none focus:border-custom-green text-xs"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="اسم العائلة"
-            onChange={handleChange}
-            value={formData.lastName}
-            className="w-full p-3 border rounded text-right focus:outline-none focus:border-custom-green text-xs"
-            required
-          />
-          <div className="flex flex-col">
-            <input
-              type="tel"
-              name="idNumber"
-              placeholder="رقم الهوية أو الإقامة"
-              onChange={handleChange}
-              value={formData.idNumber}
-              className="w-full p-3 border rounded text-right focus:outline-none focus:border-custom-green text-xs"
-              required
-            />
-            {idError && (
-              <div className="text-red-500 mt-2 text-right text-xs">{idError}</div>
-            )}
-          </div>
-          <div>
-            <div className="text-xs m-2 text-gray-500" dir="rtl">
-              أدخل تاريخ الميلاد
+          <div className="bg-white rounded-2xl shadow-sm p-4 space-y-5">
+            <p className="text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">
+              المعلومات الشخصية
+            </p>
+
+            {/* Gender */}
+            <div className="space-y-2">
+              <label className="text-xs text-gray-500">الجنس</label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, gender: "male" })}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${
+                    formData.gender === "male"
+                      ? "bg-custom-green text-white border-custom-green"
+                      : "bg-white text-gray-600 border-gray-200"
+                  }`}
+                >
+                  ذكر
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, gender: "female" })}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium border transition-colors ${
+                    formData.gender === "female"
+                      ? "bg-custom-green text-white border-custom-green"
+                      : "bg-white text-gray-600 border-gray-200"
+                  }`}
+                >
+                  أنثى
+                </button>
+              </div>
             </div>
-            <input
-              className="w-full p-3 border rounded text-right text-black appearance-none text-xs"
-              type="date"
-              name="dob"
-              onChange={handleChange}
-              value={formData.dob}
-              required
-            />
+
+            {/* First name */}
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500">الاسم الأول</label>
+              <input
+                type="text"
+                name="firstName"
+                placeholder="أدخل الاسم الأول"
+                onChange={handleChange}
+                value={formData.firstName}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-right text-sm focus:outline-none focus:border-custom-green bg-gray-50"
+                required
+              />
+            </div>
+
+            {/* Last name */}
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500">اسم العائلة</label>
+              <input
+                type="text"
+                name="lastName"
+                placeholder="أدخل اسم العائلة"
+                onChange={handleChange}
+                value={formData.lastName}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-right text-sm focus:outline-none focus:border-custom-green bg-gray-50"
+                required
+              />
+            </div>
+
+            {/* ID number */}
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500">رقم الهوية أو الإقامة</label>
+              <input
+                type="tel"
+                name="idNumber"
+                placeholder="أدخل رقم الهوية (10 أرقام)"
+                onChange={handleChange}
+                value={formData.idNumber}
+                className={`w-full px-4 py-3 border rounded-xl text-right text-sm focus:outline-none bg-gray-50 ${
+                  idError
+                    ? "border-red-400 focus:border-red-400"
+                    : "border-gray-200 focus:border-custom-green"
+                }`}
+                required
+              />
+              {idError && <p className="text-red-500 text-xs">{idError}</p>}
+            </div>
+
+            {/* Date of birth */}
+            <div className="space-y-1.5">
+              <label className="text-xs text-gray-500">تاريخ الميلاد</label>
+              <input
+                type="date"
+                name="dob"
+                onChange={handleChange}
+                value={formData.dob}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-right text-sm text-black appearance-none focus:outline-none focus:border-custom-green bg-gray-50"
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="fixed left-1/2 transform -translate-x-1/2 bottom-0 w-3/4 bg-custom-green p-2 text-white rounded-2xl text-xs"
-          style={{ bottom: "10px" }}
-          disabled={isLoading}
-        >
-          {isLoading ? "جارٍ الإرسال..." : "إرسال"}
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100">
+          <button
+            type="submit"
+            className="w-full bg-custom-green py-3 text-white rounded-2xl text-sm font-medium disabled:opacity-60"
+            disabled={isLoading}
+          >
+            {isLoading ? "جارٍ الإرسال..." : "حفظ المعلومات"}
+          </button>
+        </div>
       </form>
 
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-80">
-            {successMessage ? (
-              <div className="text-green-600 text-center mb-4">{successMessage}</div>
-            ) : (
-              <div className="text-red-600 text-center mb-4">{errorMessage}</div>
-            )}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" dir="rtl">
+            <div
+              className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                successMessage ? "bg-green-100" : "bg-red-100"
+              }`}
+            >
+              {successMessage ? (
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            </div>
+            <p
+              className={`text-center text-sm mb-5 ${
+                successMessage ? "text-green-700" : "text-red-600"
+              }`}
+            >
+              {successMessage || errorMessage}
+            </p>
             <button
               onClick={successMessage ? handleSuccessConfirmation : closeModal}
-              className="bg-custom-green text-white px-4 py-2 rounded-full w-full"
+              className="w-full bg-custom-green text-white py-3 rounded-2xl text-sm font-medium"
             >
-              {successMessage ? "انتقل إلى الدردشة" : "تأكيد"}
+              {successMessage ? "المتابعة للدردشة" : "حسناً"}
             </button>
           </div>
         </div>
