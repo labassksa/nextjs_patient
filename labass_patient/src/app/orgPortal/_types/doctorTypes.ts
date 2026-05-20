@@ -3,5 +3,6 @@ export enum DoctorType {
   Psychiatrist = "psychiatrist",
   Obesity = "obesity",
   SickLeave = "sickLeave",
-  PsychiatricRefill = "psychiatricRefill"
+  PsychiatricRefill = "psychiatricRefill",
+  Marketing = "marketing",
 }

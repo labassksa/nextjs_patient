@@ -6,7 +6,6 @@ import { useBundles, useCreateBundle, useToggleBundleActive, useDeleteBundle } f
 import type { Bundle, CreateBundlePayload } from "@/features/dashboard/types/bundle.types";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
-import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { SearchInput } from "@/features/dashboard/components/shared/search-input";
 import { ConfirmDialog } from "@/features/dashboard/components/shared/confirm-dialog";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -21,7 +20,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function BundlesPage() {
@@ -34,7 +33,8 @@ export default function BundlesPage() {
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
     name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
-    currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined,
+    currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined,
+    whoSubscribes: "organization", isUnlimited: false,
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -42,14 +42,13 @@ export default function BundlesPage() {
 
   const validateBundle = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!newBundle.name) {
-      errors.name = "Please select a name";
-    }
+    if (!newBundle.name) errors.name = "Please select a name";
     if (!newBundle.consultationCount || newBundle.consultationCount < 1 || !Number.isInteger(newBundle.consultationCount)) {
       errors.consultationCount = "Must be a positive integer";
     }
-    if (newBundle.price < 0) {
-      errors.price = "Price must be non-negative";
+    if (newBundle.price < 0) errors.price = "Price must be non-negative";
+    if (newBundle.recurringType === "Custom" && (!newBundle.intervalDays || newBundle.intervalDays < 1)) {
+      errors.intervalDays = "Required for Custom recurring type";
     }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -57,16 +56,14 @@ export default function BundlesPage() {
 
   const handleCreate = async () => {
     if (!validateBundle()) return;
-    await createBundle.mutateAsync(newBundle);
+    await createBundle.mutateAsync({ ...newBundle, whoSubscribes: "organization", isUnlimited: false });
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", description: "", originalPrice: undefined });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 0, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false });
     setFormErrors({});
   };
 
   const handleDelete = async () => {
-    if (deleteDialog.id) {
-      await deleteBundle.mutateAsync(deleteDialog.id);
-    }
+    if (deleteDialog.id) await deleteBundle.mutateAsync(deleteDialog.id);
     setDeleteDialog({ open: false, id: null });
   };
 
@@ -74,9 +71,7 @@ export default function BundlesPage() {
     {
       accessorKey: "id",
       header: "ID",
-      cell: ({ row }) => (
-        <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>
-      ),
+      cell: ({ row }) => <span className="text-xs font-mono text-muted-foreground">#{row.original.id}</span>,
     },
     {
       accessorKey: "name",
@@ -148,13 +143,14 @@ export default function BundlesPage() {
 
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
-  const bundles = Array.isArray(data) ? data : [];
+  const orgActive   = (data?.active   ?? []).filter((b) => b.whoSubscribes === "organization");
+  const orgInactive = (data?.inactive ?? []).filter((b) => b.whoSubscribes === "organization");
 
   return (
     <div>
       <PageHeader
-        title="Bundles"
-        description="Manage consultation bundles"
+        title="Organization Bundles"
+        description="Manage subscription bundles for organizations"
         actions={
           <Button onClick={() => setCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" /> Create Bundle
@@ -166,13 +162,20 @@ export default function BundlesPage() {
         <SearchInput placeholder="Search bundles..." onChange={handleSearch} className="max-w-sm" />
       </div>
 
-      <DataTable columns={columns} data={bundles} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="bundles" />
+      <DataTable columns={columns} data={orgActive} isLoading={isLoading} searchKey="name" searchValue={search} exportFilename="organization-bundles" />
+
+      {orgInactive.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">Inactive Bundles</h3>
+          <DataTable columns={columns} data={orgInactive} isLoading={false} searchKey="name" searchValue={search} exportFilename="organization-bundles-inactive" />
+        </div>
+      )}
 
       {/* Create Bundle Dialog */}
       <Dialog open={createDialog} onOpenChange={(open) => { setCreateDialog(open); if (!open) setFormErrors({}); }}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Create Bundle</DialogTitle></DialogHeader>
-          <div className="space-y-4">
+        <DialogContent className="flex flex-col max-h-[85vh]">
+          <DialogHeader><DialogTitle>Create Organization Bundle</DialogTitle></DialogHeader>
+          <div className="space-y-4 overflow-y-auto flex-1 pr-1">
             <div className="space-y-2">
               <Label>Name</Label>
               <Select value={newBundle.name} onValueChange={(val) => setNewBundle({ ...newBundle, name: val })}>
@@ -192,6 +195,10 @@ export default function BundlesPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Subscriber Type</Label>
+              <Input value="Organization" disabled className="bg-muted text-muted-foreground" />
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Price</Label>
@@ -199,16 +206,14 @@ export default function BundlesPage() {
                 {formErrors.price && <p className="text-sm text-destructive">{formErrors.price}</p>}
               </div>
               <div className="space-y-2">
-                <Label>Original Price <span className="text-muted-foreground text-xs">(optional, for display)</span></Label>
+                <Label>Original Price <span className="text-muted-foreground text-xs">(optional)</span></Label>
                 <Input type="number" min={0} step="0.01" placeholder="e.g. 600" value={newBundle.originalPrice ?? ""} onChange={(e) => setNewBundle({ ...newBundle, originalPrice: e.target.value ? Number(e.target.value) : undefined })} />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Consultations</Label>
-                <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
-                {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
-              </div>
+            <div className="space-y-2">
+              <Label>Consultations</Label>
+              <Input type="number" min={1} step={1} value={newBundle.consultationCount} onChange={(e) => setNewBundle({ ...newBundle, consultationCount: Number(e.target.value) })} />
+              {formErrors.consultationCount && <p className="text-sm text-destructive">{formErrors.consultationCount}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -222,7 +227,7 @@ export default function BundlesPage() {
               </div>
               <div className="space-y-2">
                 <Label>Recurring Type</Label>
-                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val })}>
+                <Select value={newBundle.recurringType} onValueChange={(val) => setNewBundle({ ...newBundle, recurringType: val, intervalDays: undefined })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {RECURRING_TYPES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
@@ -230,6 +235,18 @@ export default function BundlesPage() {
                 </Select>
               </div>
             </div>
+            {newBundle.recurringType === "Custom" && (
+              <div className="space-y-2">
+                <Label>Interval Days</Label>
+                <Input
+                  type="number" min={1} step={1}
+                  placeholder="e.g. 30 for monthly, 90 for quarterly"
+                  value={newBundle.intervalDays ?? ""}
+                  onChange={(e) => setNewBundle({ ...newBundle, intervalDays: e.target.value ? Number(e.target.value) : undefined })}
+                />
+                {formErrors.intervalDays && <p className="text-sm text-destructive">{formErrors.intervalDays}</p>}
+              </div>
+            )}
             <div className="space-y-2">
               <Label>Description</Label>
               <Input value={newBundle.description} onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })} />

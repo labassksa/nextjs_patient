@@ -14,7 +14,6 @@ export default function ObesityProgram() {
   const planFeatures = [
     "تقييم طبّي شامل (٢٦ سؤالاً)",
     "أدوية طبّية بوصفة طبّية",
-    "فحص دم من مختبر معتمد بأعلى معايير الجودة",
     "خطّة غذائية ورياضية مخصّصة",
     "استشر الطبيب 24/7",
     "توصيل مجاني",
@@ -23,7 +22,7 @@ export default function ObesityProgram() {
   const faqItems = [
     {
       q: "ما الفرق بين لاباس وبرامج الحمية الأخرى؟",
-      a: "برامج الحمية التقليدية تعتمد على قوائم طعام عامّة. لاباس يبدأ بتحاليل دم شاملة، يقرأها طبيب مختصّ، ويصمّم خطّة تعالج السبب الحقيقي للوزن الزائد.",
+      a: "برامج الحمية التقليدية تعتمد على قوائم طعام عامّة. لاباس يبدأ بتقييم طبّي متخصّص يقرأه طبيب مختصّ، ويصمّم خطّة دوائية وغذائية تعالج السبب الحقيقي للوزن الزائد.",
     },
     {
       q: "كيف يمكنني استشارة طبيبي؟",
@@ -339,20 +338,13 @@ export default function ObesityProgram() {
           </div>
           <div className={s.howStep}>
             <div className={s.howStepNum}>٢</div>
-            <h3 className={s.howStepTtl}>تحاليل دم منزلية</h3>
+            <h3 className={s.howStepTtl}>خطّة طبّية مخصّصة</h3>
             <p className={s.howStepDesc}>
-              فريقنا يزورك في المنزل لسحب عيّنة الدم — من مختبر طبّي معتمد بجودة عالية. النتائج خلال ٤٨ ساعة.
+              طبيبك يراجع تقييمك ويصف لك الدواء والجرعة المناسبة تماماً لحالتك.
             </p>
           </div>
           <div className={s.howStep}>
             <div className={s.howStepNum}>٣</div>
-            <h3 className={s.howStepTtl}>خطّة طبّية مخصّصة</h3>
-            <p className={s.howStepDesc}>
-              طبيبك يراجع نتائجك ويصف لك الدواء والجرعة المناسبة تماماً لحالتك.
-            </p>
-          </div>
-          <div className={s.howStep}>
-            <div className={s.howStepNum}>٤</div>
             <h3 className={s.howStepTtl}>متابعة مستمرّة</h3>
             <p className={s.howStepDesc}>
               تواصل مع طبيبك في أي وقت، تتبّع تقدّمك، وعدّل خطّتك حسب النتائج.
@@ -374,7 +366,7 @@ export default function ObesityProgram() {
         </p>
 
         <div className={s.pillarsGrid}>
-          {/* 1 - تحاليل طبّية شاملة */}
+          {/* 1 - تقييم طبّي شامل */}
           <div className={s.pillar}>
             <div className={s.pillarIc} style={{ background: "#FAEEDA" }}>
               <svg viewBox="0 0 28 28" fill="none">
@@ -393,9 +385,9 @@ export default function ObesityProgram() {
                 />
               </svg>
             </div>
-            <h3 className={s.pillarTtl}>تحاليل طبّية شاملة</h3>
+            <h3 className={s.pillarTtl}>تقييم طبّي شامل</h3>
             <p className={s.pillarDesc}>
-              تحاليل دم منزلية من مختبر طبّي معتمد بجودة عالية — تشمل الغدة الدرقية، السكّر التراكمي، الدهون، والفيتامينات. تُقرأ من طبيب مختصّ.
+              تقييم طبّي متخصّص يغطّي ٢٦ سؤالاً عن تاريخك الصحّي ونمط حياتك — يقرأه طبيب مختصّ ويصمّم خطّتك بناءً عليه.
             </p>
           </div>
 
@@ -541,7 +533,7 @@ export default function ObesityProgram() {
         </div>
         <h2 className={s.secTtl}>اختر الباقة المناسبة لك</h2>
         <p className={s.secSub}>
-          جميع الباقات تشمل التقييم الطبّي، الأدوية، التحاليل، والمتابعة — الفرق
+          جميع الباقات تشمل التقييم الطبّي، الأدوية، والمتابعة — الفرق
           فقط في المدّة والتوفير.
         </p>
 
@@ -598,7 +590,7 @@ export default function ObesityProgram() {
               ))}
               <li className={s.planFeat}>
                 <span className={s.planCk}>&#10003;</span>
-                إعادة تحليل بعد ٩٠ يوماً — من مختبر معتمد
+                إعادة تقييم طبّي بعد ٩٠ يوماً
               </li>
             </ul>
             <Link href="/obesityProgram/subscribe" className={s.planCta}>

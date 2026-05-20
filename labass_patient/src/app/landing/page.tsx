@@ -4,33 +4,39 @@ import Link from "next/link";
 import Image from "next/image";
 import s from "./landing.module.css";
 
-/* ─── ATOM ICON (inline SVG) ─── */
-const AtomIcon = ({ size = 26, opacity = 0.6 }: { size?: number; opacity?: number }) => (
-  <svg viewBox="0 0 40 40" width={size} height={size} style={{ opacity }} aria-hidden="true">
-    <ellipse cx="20" cy="20" rx="17" ry="6.5" fill="none" stroke="#173404" strokeWidth="1.8" />
-    <ellipse cx="20" cy="20" rx="17" ry="6.5" fill="none" stroke="#173404" strokeWidth="1.8" transform="rotate(60 20 20)" />
-    <ellipse cx="20" cy="20" rx="17" ry="6.5" fill="none" stroke="#173404" strokeWidth="1.8" transform="rotate(120 20 20)" />
-    <circle cx="20" cy="20" r="2.5" fill="#173404" />
-  </svg>
-);
-
 /* ─── B2C PACKAGES ─── */
 const packages = [
   {
     id: "vitamins",
     name: "فيتامينات ومعادن",
-    hook: "تعب مستمر؟ تساقط شعر؟ بشرة باهتة؟",
-    desc: "اكتشف السبب بفحص دم واحد — واحصل على مكملات مخصّصة لاحتياجك",
+    hook: "تعب مستمر؟ تساقط شعر؟",
+    desc: "جسمك يرسل لك إشارات — طبيب مختص يقيّم حالتك ويختار مكملاتك المناسبة",
+    price: "٢٨٩ ريال",
+    priceSub: "/ شهر",
+    features: [
+      "طبيب مختص يقيّم حالتك الصحية",
+      "مكملات مخصصة بناءً على احتياجاتك",
+      "مكملات توصل لبيتك مجاناً",
+      "استشارة طبيب 24/7",
+    ],
+    cta: "اشترك الآن",
     href: "/vitaminsPackages",
     icon: "/icons/widgets/icon-lab.svg",
     gradient: "pkgGradVit",
   },
   {
     id: "obesity",
-    name: "برنامج السمنة",
-    hook: "حاولت كل الطرق ولا نتيجة؟",
-    desc: "أدوية معتمدة من FDA مع خطة غذائية ومتابعة طبيب — نتائج حقيقية",
+    name: "برنامج إنقاص الوزن",
+    hook: "اخسر وزنك بإشراف طبّي",
+    desc: "مع مونجارو و اوزمبيك — أدوية موصوفة، خطة غذائية، ومتابعة مستمرة",
     badge: "معتمد من FDA",
+    features: [
+      "أدوية سمنة معتمدة من FDA",
+      "خطة غذائية مخصصة",
+      "متابعة دورية مع الطبيب",
+      "توصيل الأدوية لبيتك",
+    ],
+    cta: "ابدأ الآن",
     href: "/obesityProgram",
     icon: "/icons/widgets/icon-fat.svg",
     gradient: "pkgGradOb",
@@ -38,11 +44,36 @@ const packages = [
   {
     id: "sexual",
     name: "الصحة الجنسية",
-    hook: "موضوع خاص يستحق رعاية خاصة",
-    desc: "تحدّث مع طبيب مختص بسرّية تامة — علاج فعّال يوصلك لبيتك",
+    hook: "علاج فعّال بسرية تامة وخصوصية",
+    desc: "علاج متكامل بوصفة طبيب — بدون عيادة، مع طبيب مختص يتابعك",
+    features: [
+      "سرية تامة مع طبيب مختص",
+      "تشخيص ووصفة طبية معتمدة",
+      "علاج يوصل مباشرة لبيتك",
+      "لا حاجة لزيارة عيادة",
+    ],
+    cta: "تحدث مع طبيب",
     href: "/sexualHealth",
     icon: "/icons/widgets/icon-sex.svg",
     gradient: "pkgGradSex",
+  },
+  {
+    id: "general",
+    name: "استشارة طبية عامة",
+    hook: "طبيبك دائماً متاح",
+    desc: "استشارة فورية مع طبيب أسرة وإعادة صرف وصفاتك — بدون انتظار وبدون عيادة",
+    price: "٩٩ ريال",
+    priceSub: "/ شهر",
+    features: [
+      "استشارة طبية 24/7 مع طبيب أسرة",
+      "إعادة صرف الوصفات الدائمة",
+      "وصفة إلكترونية معتمدة",
+      "تواصل مباشر مع الطبيب",
+    ],
+    cta: "اشترك الآن",
+    href: "/generalPackage",
+    icon: "/icons/widgets/icon-doctor.svg",
+    gradient: "pkgGradGen",
   },
 ];
 
@@ -134,7 +165,10 @@ export default function LandingPage() {
             <a href="#b2b" className={s.navLink}>للمنشآت</a>
             <a href="#partners" className={s.navLink}>شركاؤنا</a>
           </div>
-          <a href="#b2b" className={s.navCta}>للمنشآت</a>
+          <div className={s.navAuth}>
+            <Link href="/home" className={s.navAuthInd}>تسجيل الدخول</Link>
+            <Link href="/orgPortal" className={s.navAuthOrg}>بوابة المنشآت</Link>
+          </div>
         </nav>
       </div>
 
@@ -154,87 +188,103 @@ export default function LandingPage() {
               مرخّصة من وزارة الصحة
             </div>
             <h1 className={s.heroH1}>
-              صحتك تبدأ
+              برامج صحية مخصصة
               <br />
-              من هنا
+              تبدأ من منزلك
             </h1>
             <p className={s.heroSub}>
-              رعاية صحية متكاملة — فحص، تشخيص، علاج، وتوصيل لبيتك
+              فيتامينات · سمنة · صحة جنسية — طبيب مرخّص يتابعك من الأول للآخر
             </p>
             <p className={s.heroDesc}>
-              طبيب مرخّص يقرأ تحاليلك ويحدد علاجك، وأدوية ومكملات توصلك لبيتك — واستشر طبيبك 24/7.
+              فحص، تشخيص، وصفة، وتوصيل لبيتك — بدون زيارة عيادة. استشر طبيبك 24/7.
             </p>
             <a href="#b2c" className={s.heroBtn}>
-              استكشف خدماتنا
+              اكتشف الباقات
               <span className={s.heroBtnArr}>←</span>
             </a>
             <div className={s.heroTrust}>
               <div className={s.trustItem}><div className={s.trustCheck}>✓</div> طبيب مرخّص</div>
-              <div className={s.trustItem}><div className={s.trustCheck}>✓</div> توصيل مجاني للفيتامينات والأدوية</div>
+              <div className={s.trustItem}><div className={s.trustCheck}>✓</div> توصيل مجاني</div>
               <div className={s.trustItem}><div className={s.trustCheck}>✓</div> 24/7</div>
+              <div className={s.trustItem}><div className={s.trustCheck}>✓</div> بدون زيارة عيادة</div>
             </div>
           </div>
 
-          {/* ─── PILL VISUAL with ATOMS ─── */}
+          {/* ─── PILL VISUAL with FLOATING CHIPS ─── */}
           <div className={s.heroVisual}>
             <div className={s.ring1} />
             <div className={s.ring2} />
             <div className={s.pillShadow} />
 
-            {/* Dark green atoms scattered around the pill */}
-            <div className={`${s.atom} ${s.atom1}`}><AtomIcon size={30} opacity={0.55} /></div>
-            <div className={`${s.atom} ${s.atom2}`}><AtomIcon size={22} opacity={0.38} /></div>
-            <div className={`${s.atom} ${s.atom3}`}><AtomIcon size={34} opacity={0.48} /></div>
-            <div className={`${s.atom} ${s.atom4}`}><AtomIcon size={20} opacity={0.32} /></div>
-            <div className={`${s.atom} ${s.atom5}`}><AtomIcon size={26} opacity={0.42} /></div>
-            <div className={`${s.atom} ${s.atom6}`}><AtomIcon size={18} opacity={0.28} /></div>
-
             <div className={s.pillWrap}>
               <div className={s.pillTilt}>
-                <svg viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg" className={s.pill}>
-                  <defs>
-                    <radialGradient id="lp-sph" cx="0.38" cy="0.32" r="0.72">
-                      <stop offset="0" stopColor="#c0f090"/>
-                      <stop offset="0.42" stopColor="#7ED957"/>
-                      <stop offset="0.76" stopColor="#3b7a1a"/>
-                      <stop offset="1" stopColor="#1b4806"/>
-                    </radialGradient>
-                    <filter id="lp-grain" x="-5%" y="-5%" width="110%" height="110%">
-                      <feTurbulence type="fractalNoise" baseFrequency="2.1" numOctaves={2} seed="5" stitchTiles="stitch" result="fine"/>
-                      <feColorMatrix in="fine" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.28 -0.12" result="mask"/>
-                      <feComposite in="mask" in2="SourceGraphic" operator="in"/>
-                    </filter>
-                    <filter id="lp-dark" x="-5%" y="-5%" width="110%" height="110%">
-                      <feTurbulence type="fractalNoise" baseFrequency="2.7" numOctaves={1} seed="31" result="noise"/>
-                      <feColorMatrix in="noise" values="0 0 0 0 0.09  0 0 0 0 0.2  0 0 0 0 0.015  0 0 0 2.2 -1.05" result="thresh"/>
-                      <feComposite in="thresh" in2="SourceGraphic" operator="in"/>
-                    </filter>
-                    <filter id="lp-bright" x="-5%" y="-5%" width="110%" height="110%">
-                      <feTurbulence type="fractalNoise" baseFrequency="3.0" numOctaves={1} seed="77" result="noise"/>
-                      <feColorMatrix in="noise" values="0 0 0 0 0.48  0 0 0 0 0.85  0 0 0 0 0.22  0 0 0 2.0 -1.0" result="thresh"/>
-                      <feComposite in="thresh" in2="SourceGraphic" operator="in"/>
-                    </filter>
-                    <filter id="lp-inner" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
-                      <feOffset in="blur" dx="2" dy="3" result="offset"/>
-                      <feComposite in="offset" in2="SourceAlpha" operator="out" result="cut"/>
-                      <feGaussianBlur in="cut" stdDeviation="1.5" result="soft"/>
-                      <feFlood floodColor="#173404" floodOpacity="0.65" result="col"/>
-                      <feComposite in="col" in2="soft" operator="in" result="shadow"/>
-                      <feComposite in="shadow" in2="SourceGraphic" operator="in"/>
-                    </filter>
-                  </defs>
-                  <circle cx="180" cy="180" r="140" fill="url(#lp-sph)"/>
-                  <circle cx="180" cy="180" r="140" fill="#7ED957" filter="url(#lp-grain)" opacity="0.65"/>
-                  <circle cx="180" cy="180" r="140" fill="#173404" filter="url(#lp-dark)" opacity="0.85"/>
-                  <circle cx="180" cy="180" r="140" fill="#a8e87c" filter="url(#lp-bright)" opacity="0.6"/>
-                  <ellipse cx="140" cy="126" rx="50" ry="38" fill="white" opacity="0.12"/>
-                  <text x="182" y="202" fill="#173404" fontFamily="Tajawal, system-ui, sans-serif" fontSize="62" fontWeight="800" textAnchor="middle" letterSpacing="-1.5" opacity="0.11">لاباس</text>
-                  <text x="182" y="202" fontFamily="Tajawal, system-ui, sans-serif" fontSize="62" fontWeight="800" textAnchor="middle" letterSpacing="-1.5" filter="url(#lp-inner)" fill="white" opacity="0.88">لاباس</text>
-                </svg>
+                <div className={s.pill}>
+                  <div className={s.pillSpec} />
+                  <div className={s.pillText}>labass</div>
+                </div>
               </div>
             </div>
+
           </div>
+        </div>
+      </section>
+
+      {/* ─── SHOP / EDITORIAL PACKAGE SHOWCASE ─── */}
+      <section id="shop" className={s.shopSec}>
+        <div className={s.shopHead}>
+            <h2 className={s.shopTtl}>اختر برنامجك</h2>
+          <p className={s.shopSub}>
+            ثلاثة برامج — كل واحد يبدأ بفحص أو استشارة ويوصلك لعلاج مخصّص مع طبيب مرخّص
+          </p>
+        </div>
+        <div className={s.shopCards}>
+
+          <Link href="/vitaminsPackages" className={`${s.shopCard} ${s.shopVit}`}>
+            <div className={s.shopCardTop}>
+              <span className={s.shopCat}>فيتامينات ومعادن</span>
+              <p className={s.shopConcern}>تعب مستمر؟<br />جسمك يرسل لك إشارات</p>
+              <div className={s.shopViz}>
+                <Image src="/icons/widgets/icon-lab-clear.svg" alt="فيتامينات" width={84} height={84} className={s.shopIcon} />
+              </div>
+            </div>
+            <div className={s.shopCardBot}>
+              <p className={s.shopBenefit}>طبيب مختص يقيّم حالتك، مكملات مخصصة توصل لبيتك</p>
+              <p className={s.shopPrice}>من <strong>٢٨٩ ريال</strong> / شهر</p>
+              <span className={s.shopBtn}>اشترك الآن</span>
+            </div>
+          </Link>
+
+          <Link href="/obesityProgram" className={`${s.shopCard} ${s.shopOb}`}>
+            <div className={s.shopCardTop}>
+              <span className={s.shopCat}>برنامج إنقاص الوزن</span>
+              <p className={s.shopConcern}>اخسر وزنك<br />بإشراف طبّي</p>
+              <span className={s.shopBadge}>معتمد من FDA</span>
+              <div className={s.shopViz}>
+                <Image src="/icons/widgets/icon-fat-clear.svg" alt="سمنة" width={84} height={84} className={s.shopIcon} />
+              </div>
+            </div>
+            <div className={s.shopCardBot}>
+              <p className={s.shopBenefit}>أدوية معتمدة من FDA مع خطة غذائية ومتابعة طبيب مستمرة</p>
+              <p className={s.shopPrice}>من <strong>٣٥٧ ريال</strong> / شهر</p>
+              <span className={s.shopBtn}>ابدأ الآن</span>
+            </div>
+          </Link>
+
+          <Link href="/sexualHealth" className={`${s.shopCard} ${s.shopSex}`}>
+            <div className={s.shopCardTop}>
+              <span className={s.shopCat}>الصحة الجنسية</span>
+              <p className={s.shopConcern}>علاج فعّال<br />بسرية تامة وخصوصية</p>
+              <div className={s.shopViz}>
+                <Image src="/icons/widgets/icon-sex-clear.svg" alt="صحة جنسية" width={84} height={84} className={s.shopIcon} />
+              </div>
+            </div>
+            <div className={s.shopCardBot}>
+              <p className={s.shopBenefit}>طبيب مختص بسرية تامة، علاج فعّال، توصيل مضمون لبيتك</p>
+              <p className={s.shopPrice}>من <strong>١٤٩ ريال</strong> / شهر</p>
+              <span className={s.shopBtn}>تحدث مع طبيب</span>
+            </div>
+          </Link>
+
         </div>
       </section>
 
@@ -279,6 +329,16 @@ export default function LandingPage() {
                       <Image src="/icons/widgets/icon-fat-clear.svg" alt={pkg.name} width={52} height={52} />
                     </div>
                   </div>
+                ) : pkg.id === "general" ? (
+                  <div className={s.genViz}>
+                    <div className={s.genRing} />
+                    <div className={s.genRing2} />
+                    <div className={s.genOrbitTrack}><div className={s.genDot} /></div>
+                    <div className={s.genOrbitTrack2}><div className={s.genDot2} /></div>
+                    <div className={s.genIconFloat}>
+                      <Image src="/icons/widgets/icon-doctor.svg" alt={pkg.name} width={52} height={52} />
+                    </div>
+                  </div>
                 ) : (
                   <div className={s.sexViz}>
                     <div className={s.sexRing} />
@@ -295,9 +355,22 @@ export default function LandingPage() {
               <div className={s.pkgBody}>
                 <h3 className={s.pkgName}>{pkg.name}</h3>
                 <p className={s.pkgHook}>{pkg.hook}</p>
-                <p className={s.pkgDesc}>{pkg.desc}</p>
+                {"price" in pkg && pkg.price && (
+                  <p className={s.pkgPrice}>
+                    {pkg.price}
+                    <span className={s.pkgPriceSub}>{pkg.priceSub}</span>
+                  </p>
+                )}
+                <ul className={s.pkgFeats}>
+                  {pkg.features.map((f, i) => (
+                    <li key={i} className={s.pkgFeat}>
+                      <span className={s.pkgFeatDot} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
                 <span className={s.pkgCta}>
-                  اكتشف المزيد
+                  {pkg.cta}
                   <span className={s.pkgCtaArr}>←</span>
                 </span>
               </div>

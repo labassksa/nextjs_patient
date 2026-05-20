@@ -3,6 +3,7 @@ import {
   Home as HomeIcon,
   AccountCircle as UserIcon,
   ChatBubble as ChatBubbleIcon,
+  CardMembership as CardMembershipIcon,
 } from "@mui/icons-material";
 
 import NavLink from "./NavLink";
@@ -21,6 +22,12 @@ const BottomNavBar: React.FC<BottomNavBarProps> = ({ currentPath }) => {
         icon={UserIcon}
         label="المزيد"
         active={isActive("/profile")}
+      />
+      <NavLink
+        href="/mySubscriptions"
+        icon={CardMembershipIcon}
+        label="باقاتي"
+        active={isActive("/mySubscriptions")}
       />
       <NavLink
         href="/myConsultations"

@@ -31,6 +31,13 @@ const DoctorTypeSection: React.FC<DoctorTypeSectionProps> = ({
       note: "سيتم إرسال رابط دفع 49 ريال للمريض",
       badge: "غير متاحة",
     },
+    {
+      type: DoctorType.Marketing,
+      label: "ارسال رابط الاشتراك في خدمة لاباس",
+      disabled: false,
+      note: null,
+      badge: null,
+    },
   ];
 
   return (

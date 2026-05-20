@@ -1,3 +1,8 @@
+export interface BundlesResponse {
+  active: Bundle[];
+  inactive: Bundle[];
+}
+
 export interface Bundle {
   id: number;
   name: string;
@@ -10,6 +15,8 @@ export interface Bundle {
   isActive: boolean;
   description: string;
   createdAt: string;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }
 
 export interface CreateBundlePayload {
@@ -20,7 +27,10 @@ export interface CreateBundlePayload {
   consultationCount: number;
   currency: string;
   recurringType: string;
+  intervalDays?: number;
   description: string;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }
 
 export interface UpdateBundlePayload {
@@ -31,4 +41,7 @@ export interface UpdateBundlePayload {
   name?: string;
   type?: string;
   recurringType?: string;
+  intervalDays?: number;
+  whoSubscribes?: "individual" | "organization";
+  isUnlimited?: boolean;
 }

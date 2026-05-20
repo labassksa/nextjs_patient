@@ -1,9 +1,12 @@
 import { apiClient } from "@/lib/api/client";
-import type { Bundle, CreateBundlePayload, UpdateBundlePayload } from "../types/bundle.types";
+import type { Bundle, BundlesResponse, CreateBundlePayload, UpdateBundlePayload } from "../types/bundle.types";
 
-export async function getBundles(): Promise<Bundle[]> {
+export async function getBundles(): Promise<BundlesResponse> {
   const { data } = await apiClient.get("/bundles");
-  return data?.data ?? data;
+  return {
+    active: data?.data ?? [],
+    inactive: data?.inactive ?? [],
+  };
 }
 
 export async function createBundle(payload: CreateBundlePayload) {

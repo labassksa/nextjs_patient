@@ -10,9 +10,9 @@ const SchoolsButton: React.FC = () => {
 
   const navigateToOrgPortal = () => {
     if (isAuthenticated()) {
-      router.push("/orgPortal");
+      router.push("/schoolPortal");
     } else {
-      router.push("/login");
+      router.push("/schoolLogin");
     }
   };
 
