@@ -35,6 +35,21 @@ import { getReferralCode } from "./_controllers/getReferralCode";
 import { generateReferralCode } from "./_controllers/generateReferralCode";
 
 
+const isSpecialistDoctorType = (type: DoctorType) =>
+  type === DoctorType.Obesity || type === DoctorType.Psychiatrist || type === DoctorType.SickLeave;
+
+const getRelevantSubscription = (subs: any[], type: DoctorType) => {
+  if (!subs || subs.length === 0) return null;
+  const specialist = isSpecialistDoctorType(type);
+  return (
+    subs.find((s) =>
+      specialist
+        ? s.bundle?.type === "Specialist Consultations"
+        : s.bundle?.type !== "Specialist Consultations"
+    ) || null
+  );
+};
+
 interface OrgPatient {
   id: number;
   phoneNumber: string;
@@ -93,7 +108,7 @@ const OrgPatientsPage: React.FC = () => {
   const [marketers, setMarketers] = useState<string[]>([]);
   const [selectedMarketer, setSelectedMarketer] = useState<string>();
   const [doctorType, setDoctorType] = useState<DoctorType>(DoctorType.General);
-  const [subscription, setSubscription] = useState<any>(null);
+  const [subscription, setSubscription] = useState<any[]>([]);
   const [marketingCode, setMarketingCode] = useState("");
   const [marketingSuccess, setMarketingSuccess] = useState(false);
   const [isFetchingCode, setIsFetchingCode] = useState(false);
@@ -108,8 +123,8 @@ const OrgPatientsPage: React.FC = () => {
       ? [49]
       : [80, 70, 50, 35, 25, 15];
 
-  const isSpecialistSubscription = subscription?.bundle?.type === "Specialist Consultations";
-  const showCashMethod = !subscription || (isSpecialistSubscription && doctorType === DoctorType.General);
+  const relevantSubscription = getRelevantSubscription(subscription, doctorType);
+  const showCashMethod = !relevantSubscription;
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
     doctorType === DoctorType.SickLeave || doctorType === DoctorType.Obesity || doctorType === DoctorType.Psychiatrist
@@ -161,11 +176,11 @@ const OrgPatientsPage: React.FC = () => {
         setSubscription(subscriptionResponse.data);
       } else if (subscriptionResponse.noSubscription) {
         console.log("No active subscription found");
-        setSubscription(null);
+        setSubscription([]);
       }
     } catch (err: any) {
       console.error("Error fetching subscription:", err);
-      setSubscription(null);
+      setSubscription([]);
     }
   };
 
@@ -229,10 +244,10 @@ const OrgPatientsPage: React.FC = () => {
   // Auto-select payment method and price based on consultation type
   useEffect(() => {
     if (doctorType === DoctorType.SickLeave || doctorType === DoctorType.Psychiatrist) {
-      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(relevantSubscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(49);
     } else if (doctorType === DoctorType.Obesity) {
-      setPaymentMethod(subscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
+      setPaymentMethod(relevantSubscription ? PaymentMethodEnum.USE_SUBSCRIPTION : PaymentMethodEnum.THROUGH_LABASS);
       setSelectedPrice(89);
     } else {
       setSelectedPrice(null);
@@ -352,7 +367,7 @@ const OrgPatientsPage: React.FC = () => {
     try {
       if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
         // Subscription (bundle) flow
-        if (!subscription || subscription.remainingConsultations === 0) {
+        if (!relevantSubscription || relevantSubscription.remainingConsultations === 0) {
           setSubmitError("ليس لديك استشارات متبقية، قم بتجديد اشتراكك");
           setIsSubmitting(false);
           return;
@@ -369,10 +384,13 @@ const OrgPatientsPage: React.FC = () => {
 
         if (result.success && result.data) {
           const resultData = result.data;
-          setSubscription((prev: any) => ({
-            ...prev,
-            remainingConsultations: resultData.remainingConsultations,
-          }));
+          setSubscription((prev: any[]) =>
+            prev.map((s) =>
+              s.id === relevantSubscription.id
+                ? { ...s, remainingConsultations: resultData.remainingConsultations }
+                : s
+            )
+          );
           alert(`تم إرسال الاستشارة وتبقى لديك ${resultData.remainingConsultations} استشارة`);
         }
       } else {
@@ -433,7 +451,7 @@ const OrgPatientsPage: React.FC = () => {
     try {
       if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
         // Subscription (bundle) flow
-        if (!subscription || subscription.remainingConsultations === 0) {
+        if (!relevantSubscription || relevantSubscription.remainingConsultations === 0) {
           setSubmitError("ليس لديك استشارات متبقية، قم بتجديد اشتراكك");
           setIsOpeningConsultation(false);
           return;
@@ -451,10 +469,13 @@ const OrgPatientsPage: React.FC = () => {
 
         if (result.success && result.data) {
           const resultData = result.data;
-          setSubscription((prev: any) => ({
-            ...prev,
-            remainingConsultations: resultData.remainingConsultations,
-          }));
+          setSubscription((prev: any[]) =>
+            prev.map((s) =>
+              s.id === relevantSubscription.id
+                ? { ...s, remainingConsultations: resultData.remainingConsultations }
+                : s
+            )
+          );
           window.location.href = resultData.magicLink;
         }
       } else {
@@ -606,12 +627,16 @@ const OrgPatientsPage: React.FC = () => {
         )}
 
         {/* Bundle remaining consultations - shown under personal info */}
-        {subscription && currentView !== "subscription" && (
-          <div className="px-4 pb-2 flex justify-end" dir="rtl">
-            <div className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
-              <span className="text-xs font-medium opacity-90">الاستشارات المتبقية</span>
-              <span className="text-xl font-bold">{subscription.remainingConsultations}</span>
-            </div>
+        {subscription.length > 0 && currentView !== "subscription" && (
+          <div className="px-4 pb-2 flex flex-wrap gap-2 justify-end" dir="rtl">
+            {subscription.map((sub: any) => (
+              <div key={sub.id} className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
+                <span className="text-xs font-medium opacity-90">
+                  {sub.bundle?.type === "Specialist Consultations" ? "تخصصية" : "عامة"}
+                </span>
+                <span className="text-xl font-bold">{sub.remainingConsultations}</span>
+              </div>
+            ))}
           </div>
         )}
 
@@ -753,9 +778,9 @@ const OrgPatientsPage: React.FC = () => {
               ) : currentView === "subscription" ? (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
                   {/* Show active subscription or available bundles */}
-                  {subscription ? (
+                  {subscription.length > 0 ? (
                     <BundleSection
-                      subscription={subscription}
+                      subscriptions={subscription}
                       useBundle={false}
                       setUseBundle={() => {}}
                     />
@@ -774,7 +799,7 @@ const OrgPatientsPage: React.FC = () => {
                   <DoctorTypeSection
                     doctorType={doctorType}
                     setDoctorType={(type) => { setDoctorType(type); setMarketingSuccess(false); setSubmitError(""); }}
-                    hasSubscription={!!subscription}
+                    hasSubscription={subscription.length > 0}
                   />
 
                   {doctorType === DoctorType.Marketing ? (
@@ -853,7 +878,7 @@ const OrgPatientsPage: React.FC = () => {
                       />
 
                       {/* Payment method section — shown for revenue share orgs or when subscription exists */}
-                      {(dealType.includes(DealType.REVENUE_SHARE) || dealType.includes(DealType.SUBSCRIPTION) || subscription) && (
+                      {(dealType.includes(DealType.REVENUE_SHARE) || dealType.includes(DealType.SUBSCRIPTION) || subscription.length > 0) && (
                         <>
                           <PaymentMethodSection
                             paymentMethod={paymentMethod}
@@ -861,7 +886,7 @@ const OrgPatientsPage: React.FC = () => {
                             possiblePaymentMethods={possiblePaymentMethods}
                             cashPrice={cashPrice}
                             setCashPrice={setCashPrice}
-                            subscription={subscription}
+                            subscription={relevantSubscription}
                           />
                           {paymentMethod !== PaymentMethodEnum.USE_SUBSCRIPTION && doctorType !== DoctorType.Obesity && doctorType !== DoctorType.Psychiatrist && doctorType !== DoctorType.SickLeave && (
                             <ConsultationPriceSection
