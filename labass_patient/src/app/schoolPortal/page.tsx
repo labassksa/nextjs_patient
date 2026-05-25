@@ -263,7 +263,6 @@ export default function SchoolPortal() {
           orgType: "school",
           dealType: "REVENUE_SHARE",
           consultationPrice: null,
-          testType: "",
           consultationType: "general",
           sendSMS: true,
         });
