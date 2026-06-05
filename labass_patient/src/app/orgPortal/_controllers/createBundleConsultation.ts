@@ -16,7 +16,7 @@ interface CreateBundleConsultationData {
     email?: string;
   };
   consultationType: string;
-  labConsultationType?: LabtestType;
+  testType?: LabtestType;
   pdfFiles?: File[];
   sendSMS?: boolean;
 }
@@ -49,8 +49,8 @@ export const createBundleConsultation = async (
     formData.append("patientInfo", JSON.stringify(data.patientInfo));
     formData.append("consultationType", data.consultationType);
 
-    if (data.labConsultationType) {
-      formData.append("labConsultationType", data.labConsultationType);
+    if (data.testType) {
+      formData.append("testType", data.testType);
     }
 
 
@@ -60,7 +60,7 @@ export const createBundleConsultation = async (
 
     // Append the files if the testType is PostTest
     if (
-      data.labConsultationType === LabtestType.PostTest &&
+      data.testType === LabtestType.PostTest &&
       data.pdfFiles &&
       data.pdfFiles.length > 0
     ) {

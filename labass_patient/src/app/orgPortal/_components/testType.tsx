@@ -9,7 +9,7 @@ import { OrganizationTypes } from "../_types/organizationTypes";
 
 interface TestTypeSectionProps {
   orgType: OrganizationTypes.Pharmacy | OrganizationTypes.Laboratory | OrganizationTypes.School | "";
-  testType?: LabtestType | "";
+  testType?: LabtestType;
   setTestType: (type: LabtestType) => void;
   pdfFiles: File[];
   setPdfFiles: (files: File[]) => void;

@@ -19,7 +19,7 @@ interface CreateMagicLinkData {
   orgType: string;
   dealType: string;
   consultationPrice: number | null;
-  testType: LabtestType | "";
+  testType?: LabtestType;
   consultationType: string;
   pdfFiles?: File[];
   sendSMS?: boolean;
@@ -53,7 +53,7 @@ export const createMagicLink = async (data: CreateMagicLinkData): Promise<Create
       "consultationPrice",
       data.consultationPrice?.toString() || ""
     );
-    if (data.testType != "") {
+    if (data.testType) {
       formData.append("testType", data.testType);
     }
     if (data.consultationType) {
