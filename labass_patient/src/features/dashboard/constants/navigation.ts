@@ -9,6 +9,7 @@ import {
   CreditCard,
   Ticket,
   ClipboardList,
+  Layers,
 } from "lucide-react";
 
 export const sidebarNavigation = [
@@ -22,4 +23,5 @@ export const sidebarNavigation = [
   { label: "Individual Bundles", href: "/dashboard/individual-bundles", icon: Pill },
   { label: "Subscriptions", href: "/dashboard/subscriptions", icon: CreditCard },
   { label: "Promo Codes", href: "/dashboard/promo-codes", icon: Ticket },
+  { label: "Bundle Consultations", href: "/dashboard/bundle-consultations", icon: Layers },
 ];

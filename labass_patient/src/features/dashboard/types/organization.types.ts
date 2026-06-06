@@ -43,6 +43,31 @@ export interface OrgReportResponse {
   total: number;
 }
 
+export interface SubscriptionConsultation {
+  id: number;
+  type: string;
+  status: string;
+  createdAt: string;
+  subscription: {
+    id: number;
+    remainingConsultations: number;
+    totalConsultations: number;
+    bundle: { type: string };
+  };
+  patient: { user: { firstName: string; phoneNumber: string } };
+  doctor: { user: { firstName: string; lastName: string } };
+}
+
+export interface SubscriptionConsultationsResponse {
+  consultations: SubscriptionConsultation[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 export interface UpdateOrganizationPayload {
   organizationId: number;
   name?: string;

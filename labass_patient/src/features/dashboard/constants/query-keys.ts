@@ -22,6 +22,8 @@ export const queryKeys = {
     detail: (id: number) => ["organizations", "detail", id] as const,
     consultations: (orgId: number) => ["organizations", "consultations", orgId] as const,
     report: (orgId: number, fromDate: string, toDate: string) => ["organizations", "report", orgId, fromDate, toDate] as const,
+    subscriptionConsultations: (orgId: number, bundleType?: string, subscriptionId?: number, fromDate?: string, toDate?: string, page?: number, limit?: number) =>
+      ["organizations", "subscriptionConsultations", orgId, bundleType, subscriptionId, fromDate, toDate, page, limit] as const,
   },
   consultations: {
     all: ["consultations"] as const,
