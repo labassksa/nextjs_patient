@@ -45,7 +45,10 @@ export default function OrganizationDetailPage() {
     const XLSX = await import("xlsx");
     const rows = (reportData?.consultations ?? []).map((c) => ({
       ID: c.id,
+      Source: c.subscription ? "Bundle" : "Promo",
       Status: c.status,
+      "Bundle Type": c.subscription?.bundleType ?? "—",
+      Remaining: c.subscription?.remainingConsultations ?? "—",
       Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
       Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
       Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
@@ -405,7 +408,10 @@ export default function OrganizationDetailPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
+                    <TableHead>Source</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Bundle Type</TableHead>
+                    <TableHead>Remaining</TableHead>
                     <TableHead>Patient</TableHead>
                     <TableHead>Marketer</TableHead>
                     <TableHead>Doctor</TableHead>
@@ -417,7 +423,14 @@ export default function OrganizationDetailPage() {
                   {consultationsList.map((c) => (
                     <TableRow key={c.id}>
                       <TableCell className="font-mono text-xs">#{c.id}</TableCell>
+                      <TableCell>
+                        {c.subscription
+                          ? <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs">Bundle</Badge>
+                          : <Badge variant="outline" className="text-xs">Promo</Badge>}
+                      </TableCell>
                       <TableCell><StatusBadge status={c.status} /></TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{c.subscription?.bundleType ?? "—"}</TableCell>
+                      <TableCell className="font-mono text-xs">{c.subscription?.remainingConsultations ?? "—"}</TableCell>
                       <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
                       <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>
                       <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>

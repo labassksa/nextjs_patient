@@ -36,6 +36,7 @@ export interface OrgReportConsultation {
   marketer: { phoneNumber?: string; firstName: string | null; lastName: string | null; orgName?: string };
   patient: { id?: number; phoneNumber?: string; firstName?: string; lastName?: string };
   doctor: { phoneNumber?: string; firstName?: string; lastName?: string };
+  subscription?: { id: number; bundleType: string; remainingConsultations: number };
 }
 
 export interface OrgReportResponse {
