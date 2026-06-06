@@ -47,6 +47,7 @@ export default function OrganizationDetailPage() {
       ID: c.id,
       Source: c.subscription ? "Bundle" : "Promo",
       Status: c.status,
+      "Subscription ID": c.subscription?.id ?? "—",
       "Bundle Type": c.subscription?.bundleType ?? "—",
       Remaining: c.subscription?.remainingConsultations ?? "—",
       Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
@@ -410,6 +411,7 @@ export default function OrganizationDetailPage() {
                     <TableHead>ID</TableHead>
                     <TableHead>Source</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Subscription</TableHead>
                     <TableHead>Bundle Type</TableHead>
                     <TableHead>Remaining</TableHead>
                     <TableHead>Patient</TableHead>
@@ -429,6 +431,11 @@ export default function OrganizationDetailPage() {
                           : <Badge variant="outline" className="text-xs">Promo</Badge>}
                       </TableCell>
                       <TableCell><StatusBadge status={c.status} /></TableCell>
+                      <TableCell>
+                        {c.subscription?.id
+                          ? <button onClick={() => router.push(`/dashboard/subscriptions/${c.subscription!.id}`)} className="font-mono text-xs text-blue-600 hover:underline">#{c.subscription.id}</button>
+                          : <span className="text-xs text-muted-foreground">—</span>}
+                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{c.subscription?.bundleType ?? "—"}</TableCell>
                       <TableCell className="font-mono text-xs">{c.subscription?.remainingConsultations ?? "—"}</TableCell>
                       <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>

@@ -69,8 +69,17 @@ export default function CreateMarketerPage() {
       } else {
         router.push("/dashboard/marketers");
       }
-    } catch {
-      // handled
+    } catch (err: any) {
+      const res = err?.response?.data;
+      if (res?.errors && Array.isArray(res.errors)) {
+        res.errors.forEach((e: { field: string; message: string }) => {
+          form.setError(e.field as keyof FormValues, { message: e.message });
+        });
+      } else {
+        form.setError("root", {
+          message: res?.message || "An unexpected error occurred. Please try again.",
+        });
+      }
     }
   };
 
@@ -196,6 +205,10 @@ export default function CreateMarketerPage() {
                   </FormItem>
                 )} />
               </div>
+
+              {form.formState.errors.root && (
+                <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
+              )}
 
               <div className="flex gap-3 pt-4">
                 <Button type="submit" disabled={createMarketer.isPending}>
