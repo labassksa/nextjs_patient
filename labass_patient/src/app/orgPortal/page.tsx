@@ -97,7 +97,7 @@ const OrgPatientsPage: React.FC = () => {
   const [nationality, setNationality] = useState("");
   const [gender, setGender] = useState(Gender.Male);
   const [nationalId, setNationalId] = useState("");
-  const [testType, settestType] = useState<LabtestType | "">("");
+  const [testType, settestType] = useState<LabtestType | undefined>(undefined);
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodEnum>(
     PaymentMethodEnum.THROUGH_ORGANIZATION
@@ -377,7 +377,7 @@ const OrgPatientsPage: React.FC = () => {
         const bundleData = {
           patientInfo,
           consultationType: getConsultationType(doctorType),
-          labConsultationType: testType || undefined,
+          testType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
         };
 
@@ -461,7 +461,7 @@ const OrgPatientsPage: React.FC = () => {
         const bundleData = {
           patientInfo,
           consultationType: getConsultationType(doctorType),
-          labConsultationType: testType || undefined,
+          testType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
           sendSMS: false,
         };

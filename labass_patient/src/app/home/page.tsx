@@ -22,6 +22,9 @@ import React from "react";
 const Home = () => {
   return (
     <div className="bg-custom-background h-screen overflow-hidden flex flex-col">
+      <div className="w-full bg-blue-600 text-white text-center py-2 font-bold">
+        pushed from Termius
+      </div>
       <TopBanner />
       <BottomBanner />
       <div className="pt-[28vh] overflow-auto px-4 flex-grow pb-32">
