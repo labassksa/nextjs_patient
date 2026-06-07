@@ -2,6 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useOrganizations, useUpdateOrganization, useOrgConsultationsReport } from "@/features/dashboard/hooks/use-organizations";
+import { useSubscriptions, useCreateSubscription } from "@/features/dashboard/hooks/use-subscriptions";
+import { useBundles } from "@/features/dashboard/hooks/use-bundles";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -13,8 +15,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
-import { Plus, Eye, Building2, MapPin, GitBranch, Banknote, Calendar, Phone, User, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useState, useEffect, useMemo } from "react";
+import { Plus, Eye, Building2, MapPin, GitBranch, Banknote, Calendar, Phone, User, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CreditCard } from "lucide-react";
 
 const ORG_TYPES = ["pharmacy", "laboratory", "home care", "school"] as const;
 const DEAL_TYPES = ["SUBSCRIPTION", "REVENUE_SHARE"] as const;
@@ -32,6 +35,41 @@ export default function OrganizationDetailPage() {
   const orgId = Number(params.id);
   const { data: orgs, isLoading, error, refetch } = useOrganizations();
   const updateOrg = useUpdateOrganization();
+  const createSubscription = useCreateSubscription();
+  const { data: allSubscriptions, refetch: refetchSubscriptions } = useSubscriptions();
+  const { data: bundlesData } = useBundles();
+
+  const orgSubscriptions = useMemo(() => {
+    const list = Array.isArray(allSubscriptions) ? allSubscriptions : [];
+    return list.filter((s: any) => s.organization?.id === orgId);
+  }, [allSubscriptions, orgId]);
+
+  const orgBundles = useMemo(() => {
+    const active = bundlesData?.active ?? [];
+    return active.filter((b) => b.whoSubscribes === "organization");
+  }, [bundlesData]);
+
+  const [addSubOpen, setAddSubOpen] = useState(false);
+  const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
+  const [addSubError, setAddSubError] = useState("");
+  const [addSubSuccess, setAddSubSuccess] = useState(false);
+
+  const selectedBundle = orgBundles.find((b) => b.id === selectedBundleId) ?? null;
+
+  const handleAddSubscription = async () => {
+    if (!selectedBundleId) { setAddSubError("Please select a bundle."); return; }
+    setAddSubError("");
+    try {
+      await createSubscription.mutateAsync({ organizationId: orgId, bundleId: selectedBundleId });
+      await refetchSubscriptions();
+      setAddSubSuccess(true);
+      setSelectedBundleId(null);
+      setTimeout(() => { setAddSubOpen(false); setAddSubSuccess(false); }, 1200);
+    } catch (err: any) {
+      setAddSubError(err?.response?.data?.message || "Failed to create subscription.");
+    }
+  };
+
   const today = new Date();
   const weekAgo = new Date(today);
   weekAgo.setDate(today.getDate() - 7);
@@ -376,6 +414,120 @@ export default function OrganizationDetailPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Subscriptions */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            Subscriptions
+            <Badge variant="secondary" className="font-mono">{orgSubscriptions.length}</Badge>
+          </CardTitle>
+          <Button size="sm" onClick={() => { setSelectedBundleId(null); setAddSubError(""); setAddSubSuccess(false); setAddSubOpen(true); }}>
+            <Plus className="h-4 w-4 mr-1" /> Add Subscription
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {orgSubscriptions.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Bundle</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Remaining / Total</TableHead>
+                  <TableHead>Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orgSubscriptions.map((s: any) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-mono text-xs">#{s.id}</TableCell>
+                    <TableCell className="font-medium">{s.bundle?.name ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{s.bundle?.type ?? "—"}</TableCell>
+                    <TableCell><StatusBadge status={s.status} /></TableCell>
+                    <TableCell className="font-mono text-sm">{s.remainingConsultations} / {s.totalConsultations}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No subscriptions yet. Click &quot;Add Subscription&quot; to create one.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Add Subscription Dialog */}
+      <Dialog open={addSubOpen} onOpenChange={(open) => { setAddSubOpen(open); if (!open) { setSelectedBundleId(null); setAddSubError(""); setAddSubSuccess(false); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Subscription</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Bundle</Label>
+              <Select
+                value={selectedBundleId ? String(selectedBundleId) : ""}
+                onValueChange={(val) => { setSelectedBundleId(Number(val)); setAddSubError(""); }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a bundle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {orgBundles.length === 0 ? (
+                    <SelectItem value="none" disabled>No organization bundles available</SelectItem>
+                  ) : (
+                    orgBundles.map((b) => (
+                      <SelectItem key={b.id} value={String(b.id)}>
+                        {b.name} — {b.type}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedBundle && (
+              <div className="rounded-lg border bg-muted/40 p-3 space-y-1.5 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Type</span>
+                  <span className="font-medium">{selectedBundle.type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Consultations</span>
+                  <span className="font-medium font-mono">{selectedBundle.isUnlimited ? "Unlimited" : selectedBundle.consultationCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Price</span>
+                  <span className="font-medium font-mono">{selectedBundle.price} {selectedBundle.currency}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Billing</span>
+                  <span className="font-medium">{selectedBundle.recurringType}</span>
+                </div>
+              </div>
+            )}
+
+            {addSubError && <p className="text-sm text-destructive">{addSubError}</p>}
+            {addSubSuccess && <p className="text-sm text-green-600 font-medium">Subscription created successfully.</p>}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddSubOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleAddSubscription}
+              disabled={createSubscription.isPending || !selectedBundleId || addSubSuccess}
+            >
+              {createSubscription.isPending ? "Creating..." : "Create Subscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Consultations */}
       <Card>
