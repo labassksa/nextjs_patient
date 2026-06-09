@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAuthToken } from "@/utils/safeStorage";
+import { captureAxiosError } from "./captureApiError";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,7 @@ apiClient.interceptors.response.use(
         window.location.href = "/dashboard/login";
       }
     }
+    captureAxiosError(error);
     return Promise.reject(error);
   }
 );

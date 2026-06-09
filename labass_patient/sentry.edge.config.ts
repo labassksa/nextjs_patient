@@ -14,7 +14,9 @@ Sentry.init({
   // Enable logs to be sent to Sentry
   enableLogs: true,
 
-  // Enable sending user PII (Personally Identifiable Information)
+  // Do NOT send PII. This is a patient (healthcare) app, so request/response
+  // bodies, cookies, headers and IPs may contain personal/medical data that must
+  // not be forwarded to Sentry.
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  sendDefaultPii: false,
 });

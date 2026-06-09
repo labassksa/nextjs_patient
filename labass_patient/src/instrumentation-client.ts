@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { registerGlobalAxiosErrorCapture } from "@/lib/api/captureApiError";
 
 Sentry.init({
   dsn: "https://308ee30882963474a796597239f77210@o4509283207217152.ingest.de.sentry.io/4509283209117776",
@@ -23,9 +24,14 @@ Sentry.init({
   // Define how likely Replay events are sampled when an error occurs.
   replaysOnErrorSampleRate: 1.0,
 
-  // Enable sending user PII (Personally Identifiable Information)
+  // Do NOT send PII. This is a patient (healthcare) app, so request/response
+  // bodies, cookies, headers and IPs may contain personal/medical data that must
+  // not be forwarded to Sentry.
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  sendDefaultPii: false,
 });
+
+// Report failed API calls made through the default axios instance to Sentry.
+registerGlobalAxiosErrorCapture();
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
