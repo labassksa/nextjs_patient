@@ -149,3 +149,20 @@
   .nav, .svPage, .actions, .progWrap { padding-left: 22px; padding-right: 22px; }
   .otpDigit { width: 44px; height: 54px; font-size: 20px; }
 }
+
+.plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.plan { background: #ffffff; border: 0.5px solid rgba(23,52,4,0.12); border-radius: 14px; padding: 20px 18px; cursor: pointer; transition: all 0.3s cubic-bezier(0.37,0,0.63,1); position: relative; overflow: hidden; }
+.plan:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(23,52,4,0.1); border-color: rgba(99,153,34,0.3); }
+.planSelected { border-color: #173404; border-width: 2px; padding: 19px 17px; box-shadow: 0 12px 28px rgba(23,52,4,0.12); background: #f7fbf0; }
+.planPopular { border-color: #639922; border-width: 2px; padding: 19px 17px; }
+.planSelected.planPopular { border-color: #173404; }
+.planRadio { position: absolute; top: 14px; left: 14px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(23,52,4,0.2); background: #ffffff; display: grid; place-items: center; transition: all 0.2s; }
+.planRadio::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #173404; transform: scale(0); transition: transform 0.2s; }
+.planSelected .planRadio { border-color: #173404; }
+.planSelected .planRadio::after { transform: scale(1); }
+.planPop { position: absolute; top: 10px; left: 12px; padding: 3px 9px; background: #173404; color: #7ed957; border-radius: 999px; font-size: 10px; font-weight: 800; }
+.planName { font-size: 14px; font-weight: 500; color: rgba(23,52,4,0.6); margin: 0 0 10px; }
+.planPrice { display: flex; align-items: baseline; gap: 6px; margin: 0 0 4px; }
+.planNum { font-size: 36px; font-weight: 800; color: #0d2002; letter-spacing: -1px; line-height: 1; }
+.planCur { font-size: 14px; font-weight: 500; color: rgba(23,52,4,0.6); }
+.planPeriod { font-size: 11.5px; color: rgba(23,52,4,0.55); margin: 0 0 16px; }
