@@ -2,6 +2,10 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
+import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
 import s from "./subscribe.module.css";
 
 const TOTAL_PROGRESS_STEPS = 8;
@@ -172,9 +176,13 @@ export default function ObesitySubscribePage() {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const plan = "quarterly";
-  const price = 1017;
+  const router = useRouter();
+  const [bundleId, setBundleId] = useState<number | null>(null);
+  const [price, setPrice] = useState<number>(0);
   const planLabel = "كل ٣ أشهر";
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   /* OTP timer */
   useEffect(() => {
@@ -185,6 +193,28 @@ export default function ObesitySubscribePage() {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [otpTimer]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("labass_token");
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const bundle = list.find(
+          (b: any) => b.type === "Obesity Program"
+            && b.whoSubscribes === "individual"
+            && b.intervalDays === 90
+        );
+        if (bundle) {
+          setBundleId(bundle.id);
+          setPrice(Number(bundle.price));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const startOtpTimer = () => {
     setOtpTimer(30);
@@ -245,6 +275,7 @@ export default function ObesitySubscribePage() {
       case 6:
         return ["q24", "q25", "q26"].every((k) => answers[k]);
       case 7: {
+        if (token) return true;
         const clean = phone.replace(/\s/g, "");
         return /^5\d{8}$/.test(clean);
       }
@@ -256,8 +287,40 @@ export default function ObesitySubscribePage() {
   }, [currentStep, answers, phone, otp]);
 
   /* navigation */
-  const goNext = () => {
-    if (currentStep === 7) startOtpTimer();
+  const goNext = async () => {
+    setApiError(null);
+    if (currentStep === 7) {
+      if (token) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(answers));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+        return;
+      }
+      setLoading(true);
+      const cleanPhone = phone.replace(/\s/g, "");
+      const result = await loginPatient(cleanPhone, "+966");
+      setLoading(false);
+      if (result.success) {
+        startOtpTimer();
+        setCurrentStep(8);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError(result.message || "فشل إرسال رمز التحقق");
+      }
+      return;
+    }
+    if (currentStep === 8) {
+      setLoading(true);
+      const fullPhone = "+966" + phone.replace(/\s/g, "");
+      const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
+      setLoading(false);
+      if (result && result.success) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(answers));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+      } else {
+        setApiError((result && result.message) || "حدث خطأ ، حاول مرة أخرى");
+      }
+      return;
+    }
     if (currentStep < 9) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -298,8 +361,8 @@ export default function ObesitySubscribePage() {
   /* button label */
   const btnLabel = () => {
     if (currentStep === 9) return "تمّ · العودة للرئيسية";
-    if (currentStep === 8) return "تأكيد وإكمال الاشتراك";
-    if (currentStep === 7) return "إرسال رمز التحقّق";
+    if (currentStep === 8) return loading ? "جاري التحقّق..." : "تأكيد وإكمال الاشتراك";
+    if (currentStep === 7) return loading ? "جاري الإرسال..." : token ? "الانتقال للدفع" : "إرسال رمز التحقّق";
     if (currentStep === 6) return "متابعة للتحقّق";
     return "متابعة";
   };
@@ -816,12 +879,18 @@ export default function ObesitySubscribePage() {
       )}
 
       {/* ACTIONS BAR */}
+      {apiError && (
+        <div style={{ color: "red", textAlign: "center", padding: "8px 16px", fontSize: 14 }}>
+          {apiError}
+        </div>
+      )}
       <div className={s.actions}>
         <button
           className={`${s.btnBack} ${
             currentStep === 1 || currentStep === 9 ? s.btnBackHidden : ""
           }`}
           onClick={goBack}
+          disabled={loading}
         >
           السابق
         </button>
@@ -833,11 +902,11 @@ export default function ObesitySubscribePage() {
         ) : (
           <button
             className={s.btnNext}
-            disabled={!isStepValid()}
+            disabled={!isStepValid() || loading}
             onClick={goNext}
           >
             {btnLabel()}
-            {currentStep < 9 && <div className={s.btnNextArr}>←</div>}
+            {!loading && currentStep < 9 && <div className={s.btnNextArr}>←</div>}
           </button>
         )}
       </div>

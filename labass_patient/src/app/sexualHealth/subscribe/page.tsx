@@ -2,6 +2,10 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
+import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
 import s from "./subscribe.module.css";
 
 const TOTAL_PROGRESS_STEPS = 7;
@@ -191,9 +195,13 @@ export default function SexualHealthSubscribePage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const qRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const plan = "quarterly";
-  const price = PLANS[plan].price;
-  const planLabel = PLANS[plan].label;
+  const router = useRouter();
+  const [bundleId, setBundleId] = useState<number | null>(null);
+  const [price, setPrice] = useState<number>(0);
+  const planLabel = "كل ٣ أشهر";
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   /* OTP timer */
   useEffect(() => {
@@ -204,6 +212,28 @@ export default function SexualHealthSubscribePage() {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [otpTimer]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("labass_token");
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const bundle = list.find(
+          (b: any) => b.type === "Sexual Health"
+            && b.whoSubscribes === "individual"
+            && b.intervalDays === 90
+        );
+        if (bundle) {
+          setBundleId(bundle.id);
+          setPrice(Number(bundle.price));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const startOtpTimer = () => {
     setOtpTimer(30);
@@ -300,6 +330,7 @@ export default function SexualHealthSubscribePage() {
       case 5:
         return ["q22", "q23", "q24", "q25", "q26"].every((k) => answers[k]);
       case 6: {
+        if (token) return true;
         const clean = phone.replace(/\s/g, "");
         return /^5\d{8}$/.test(clean);
       }
@@ -311,8 +342,40 @@ export default function SexualHealthSubscribePage() {
   }, [currentStep, answers, phone, otp]);
 
   /* navigation */
-  const goNext = () => {
-    if (currentStep === 6) startOtpTimer();
+  const goNext = async () => {
+    setApiError(null);
+    if (currentStep === 6) {
+      if (token) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(answers));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+        return;
+      }
+      setLoading(true);
+      const cleanPhone = phone.replace(/\s/g, "");
+      const result = await loginPatient(cleanPhone, "+966");
+      setLoading(false);
+      if (result.success) {
+        startOtpTimer();
+        setCurrentStep(7);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError(result.message || "فشل إرسال رمز التحقق");
+      }
+      return;
+    }
+    if (currentStep === 7) {
+      setLoading(true);
+      const fullPhone = "+966" + phone.replace(/\s/g, "");
+      const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
+      setLoading(false);
+      if (result && result.success) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(answers));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+      } else {
+        setApiError((result && result.message) || "حدث خطأ ، حاول مرة أخرى");
+      }
+      return;
+    }
     if (currentStep < 8) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -353,8 +416,8 @@ export default function SexualHealthSubscribePage() {
   /* button label */
   const btnLabel = () => {
     if (currentStep <= 5) return "متابعة";
-    if (currentStep === 6) return "إرسال رمز التحقّق";
-    if (currentStep === 7) return "تأكيد";
+    if (currentStep === 6) return loading ? "جاري الإرسال..." : token ? "الانتقال للدفع" : "إرسال رمز التحقّق";
+    if (currentStep === 7) return loading ? "جاري التحقّق..." : "تأكيد";
     return "";
   };
 
@@ -865,25 +928,33 @@ export default function SexualHealthSubscribePage() {
 
       {/* ACTIONS BAR */}
       {currentStep <= 7 && (
-        <div className={s.actions}>
-          <button
-            className={`${s.btnBack} ${
-              currentStep === 1 ? s.btnBackHidden : ""
-            }`}
-            onClick={goBack}
-          >
-            السابق
-          </button>
+        <>
+          {apiError && (
+            <div style={{ color: "red", textAlign: "center", padding: "8px 16px", fontSize: 14 }}>
+              {apiError}
+            </div>
+          )}
+          <div className={s.actions}>
+            <button
+              className={`${s.btnBack} ${
+                currentStep === 1 ? s.btnBackHidden : ""
+              }`}
+              onClick={goBack}
+              disabled={loading}
+            >
+              السابق
+            </button>
 
-          <button
-            className={s.btnNext}
-            disabled={!isStepValid()}
-            onClick={goNext}
-          >
-            {btnLabel()}
-            <div className={s.btnNextArr}>←</div>
-          </button>
-        </div>
+            <button
+              className={s.btnNext}
+              disabled={!isStepValid() || loading}
+              onClick={goNext}
+            >
+              {btnLabel()}
+              {!loading && <div className={s.btnNextArr}>←</div>}
+            </button>
+          </div>
+        </>
       )}
 
       {/* Confirmation: link back */}
