@@ -160,6 +160,7 @@
 .planSelected .planRadio { border-color: #173404; }
 .planSelected .planRadio::after { transform: scale(1); }
 .planPop { position: absolute; top: 10px; left: 12px; padding: 3px 9px; background: #173404; color: #7ed957; border-radius: 999px; font-size: 10px; font-weight: 800; }
+.planSaveBadge { position: absolute; top: 10px; left: 12px; padding: 3px 9px; background: #7ED957; color: #173404; border-radius: 999px; font-size: 10px; font-weight: 800; }
 .planName { font-size: 14px; font-weight: 500; color: rgba(23,52,4,0.6); margin: 0 0 10px; }
 .planPrice { display: flex; align-items: baseline; gap: 6px; margin: 0 0 4px; }
 .planNum { font-size: 36px; font-weight: 800; color: #0d2002; letter-spacing: -1px; line-height: 1; }

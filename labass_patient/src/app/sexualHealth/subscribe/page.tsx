@@ -26,6 +26,8 @@ const stepLabels = [
   "التحقّق",
 ];
 
+interface BundleOption { id: number; price: number; intervalDays: number; }
+
 /* ── Sub-components (defined outside to avoid remount on every render) ── */
 
 const QuestionBlock = ({
@@ -190,13 +192,47 @@ export default function SexualHealthSubscribePage() {
   const qRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const router = useRouter();
-  const [selectedInterval, setSelectedInterval] = useState<"monthly" | "quarterly">("quarterly");
-  const [monthlyBundle, setMonthlyBundle] = useState<{ id: number; price: number } | null>(null);
-  const [quarterlyBundle, setQuarterlyBundle] = useState<{ id: number; price: number } | null>(null);
-  const selectedBundle = selectedInterval === "monthly" ? monthlyBundle : quarterlyBundle;
-  const bundleId = selectedBundle?.id ?? null;
+
+  const [bundles, setBundles] = useState<BundleOption[]>([]);
+  const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
+  const selectedBundle = bundles.find((b) => b.id === selectedBundleId) ?? null;
+  const bundleId = selectedBundleId;
   const price = selectedBundle?.price ?? 0;
-  const planLabel = selectedInterval === "monthly" ? "شهري" : "كل ٣ أشهر";
+
+  const getPlanLabel = (b: BundleOption | null): string => {
+    if (!b) return "—";
+    const sameInterval = bundles.filter((x) => x.intervalDays === b.intervalDays);
+    if (b.intervalDays === 30) return "شهري";
+    if (b.intervalDays === 365) return "سنوي";
+    if (sameInterval.length > 1) {
+      const minPrice = Math.min(...sameInterval.map((x) => x.price));
+      return b.price === minPrice ? "كل ٣ أشهر" : "٣ أشهر · شباب";
+    }
+    return "كل ٣ أشهر";
+  };
+  const planLabel = getPlanLabel(selectedBundle);
+
+  const getBadge = (b: BundleOption): { text: string; type: "pop" | "save" } | null => {
+    const sameInterval = bundles.filter((x) => x.intervalDays === b.intervalDays);
+    if (b.intervalDays === 365) return { text: "وفّر ٣٠٪", type: "save" };
+    if (b.intervalDays === 90) {
+      if (sameInterval.length > 1) {
+        const minPrice = Math.min(...sameInterval.map((x) => x.price));
+        return b.price === minPrice
+          ? { text: "الأكثر طلباً", type: "pop" }
+          : { text: "لأقل من ٤٠ سنة", type: "save" };
+      }
+      return { text: "الأكثر طلباً", type: "pop" };
+    }
+    return null;
+  };
+
+  const getPeriodText = (intervalDays: number): string => {
+    if (intervalDays === 30) return "/ شهر";
+    if (intervalDays === 90) return "/ ٩٠ يوم";
+    if (intervalDays === 365) return "/ سنة";
+    return `/ ${intervalDays} يوم`;
+  };
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -220,13 +256,13 @@ export default function SexualHealthSubscribePage() {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
-        const filtered = list.filter(
-          (b: any) => b.type === "Sexual Health" && b.whoSubscribes === "individual"
-        );
-        const monthly = filtered.find((b: any) => b.intervalDays === 30);
-        const quarterly = filtered.find((b: any) => b.intervalDays === 90);
-        if (monthly) setMonthlyBundle({ id: monthly.id, price: Number(monthly.price) });
-        if (quarterly) setQuarterlyBundle({ id: quarterly.id, price: Number(quarterly.price) });
+        const filtered = list
+          .filter((b: any) => b.type === "Sexual Health" && b.whoSubscribes === "individual" && b.isActive !== false)
+          .slice(0, 4)
+          .map((b: any) => ({ id: b.id, price: Number(b.price), intervalDays: b.intervalDays }));
+        setBundles(filtered);
+        const defaultBundle = filtered.find((b) => b.intervalDays === 90) ?? filtered[0];
+        if (defaultBundle) setSelectedBundleId(defaultBundle.id);
       })
       .catch(() => {});
   }, []);
@@ -283,7 +319,7 @@ export default function SexualHealthSubscribePage() {
   const isStepValid = useCallback(() => {
     switch (currentStep) {
       case 1:
-        return !!selectedInterval;
+        return !!selectedBundleId;
       case 2: {
         const name = (answers.q1 as string) || "";
         const age = (answers.q2 as string) || "";
@@ -336,7 +372,7 @@ export default function SexualHealthSubscribePage() {
       default:
         return true;
     }
-  }, [currentStep, answers, phone, otp, token, selectedInterval]);
+  }, [currentStep, answers, phone, otp, token, selectedBundleId]);
 
   const buildSurveyAnswers = () => {
     const map: Record<string, string> = {
@@ -516,32 +552,27 @@ export default function SexualHealthSubscribePage() {
           </p>
 
           <div className={s.plans}>
-            <div
-              className={`${s.plan} ${selectedInterval === "quarterly" ? s.planSelected : ""}`}
-              onClick={() => setSelectedInterval("quarterly")}
-            >
-              <div className={s.planPop}>الأوفر</div>
-              <input type="radio" className={s.planRadio} checked={selectedInterval === "quarterly"} readOnly />
-              <div className={s.planName}>كل ٣ أشهر</div>
-              <div className={s.planPrice}>
-                <span className={s.planNum}>{quarterlyBundle?.price ?? "—"}</span>
-                <span className={s.planCur}>ريال</span>
-                <span className={s.planPeriod}> / ٩٠ يوم</span>
-              </div>
-            </div>
-
-            <div
-              className={`${s.plan} ${selectedInterval === "monthly" ? s.planSelected : ""}`}
-              onClick={() => setSelectedInterval("monthly")}
-            >
-              <input type="radio" className={s.planRadio} checked={selectedInterval === "monthly"} readOnly />
-              <div className={s.planName}>شهري</div>
-              <div className={s.planPrice}>
-                <span className={s.planNum}>{monthlyBundle?.price ?? "—"}</span>
-                <span className={s.planCur}>ريال</span>
-                <span className={s.planPeriod}> / شهر</span>
-              </div>
-            </div>
+            {bundles.map((bundle) => {
+              const badge = getBadge(bundle);
+              const isSelected = selectedBundleId === bundle.id;
+              return (
+                <div
+                  key={bundle.id}
+                  className={`${s.plan} ${isSelected ? s.planSelected : ""}`}
+                  onClick={() => setSelectedBundleId(bundle.id)}
+                >
+                  {badge?.type === "pop" && <div className={s.planPop}>{badge.text}</div>}
+                  {badge?.type === "save" && <div className={s.planSaveBadge}>{badge.text}</div>}
+                  <input type="radio" className={s.planRadio} checked={isSelected} readOnly />
+                  <div className={s.planName}>{getPlanLabel(bundle)}</div>
+                  <div className={s.planPrice}>
+                    <span className={s.planNum}>{bundle.price}</span>
+                    <span className={s.planCur}>ريال</span>
+                    <span className={s.planPeriod}> {getPeriodText(bundle.intervalDays)}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
