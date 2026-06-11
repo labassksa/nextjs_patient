@@ -52,7 +52,11 @@ const STATUS: Record<
 };
 
 const BUNDLE_CONSULTATION_TYPE: Record<string, string> = {
-  "GP Consultations": "quick",
+  "GP Consultations":         "quick",
+  "Specialist Consultations": "specialist",
+  "Vitamins":                 "vitamins",
+  "Obesity Program":          "obesity",
+  "Sexual Health":            "sexualHealth",
 };
 
 const fmt = (d?: string) =>

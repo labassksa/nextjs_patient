@@ -6,7 +6,11 @@ import axios from "axios";
 import s from "./my-subscriptions.module.css";
 
 const bundleConsultationTypeMap: Record<string, string> = {
-  "GP Consultations": "quick",
+  "GP Consultations":         "quick",
+  "Specialist Consultations": "specialist",
+  "Vitamins":                 "vitamins",
+  "Obesity Program":          "obesity",
+  "Sexual Health":            "sexualHealth",
 };
 
 interface MySubscription {
