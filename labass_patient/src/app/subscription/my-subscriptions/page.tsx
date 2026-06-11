@@ -85,7 +85,9 @@ export default function MySubscriptionsPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success) {
-        router.push(`/completeInfo?consultationId=${data.data.consultation.id}`);
+        const cid = data.data.consultation.id;
+        localStorage.setItem(`subscription_consultation_${cid}`, "1");
+        router.push(`/completeInfo?consultationId=${cid}`);
       }
     } catch (err: any) {
       const status = err?.response?.status ?? 500;
