@@ -20,7 +20,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins", "Obesity Program", "Sexual Health"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function IndividualBundlesPage() {
