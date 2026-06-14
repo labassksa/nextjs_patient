@@ -126,7 +126,11 @@ const ChatPage: React.FC = () => {
 
       if (consultationData && consultationData.status) {
         // Redirect to obesity survey if not yet submitted (handles pharmacy/subscription flow)
-        if (consultationData.type === "obesity" && !consultationData.obesitySurvey) {
+        const isFromSubscription = !!localStorage.getItem(`subscription_consultation_${consultationId}`);
+        if (isFromSubscription) {
+          localStorage.removeItem(`subscription_consultation_${consultationId}`);
+        }
+        if (consultationData.type === "obesity" && !consultationData.obesitySurvey && !isFromSubscription) {
           router.push(`/obesitySurvey?consultationId=${consultationId}`);
           return;
         }

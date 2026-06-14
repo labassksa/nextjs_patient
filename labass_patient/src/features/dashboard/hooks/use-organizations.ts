@@ -5,6 +5,7 @@ import {
   createOrganization,
   updateOrganization,
   getOrgConsultationsReport,
+  getOrgSubscriptionConsultations,
 } from "../api/organizations.api";
 import type { CreateOrganizationPayload, UpdateOrganizationPayload } from "../types/organization.types";
 
@@ -20,6 +21,25 @@ export function useOrgConsultationsReport(orgId: number, fromDate: string, toDat
     queryKey: [...queryKeys.organizations.report(orgId, fromDate, toDate), page, limit],
     queryFn: () => getOrgConsultationsReport(orgId, fromDate, toDate, page, limit),
     enabled: !!orgId && !!fromDate && !!toDate,
+  });
+}
+
+export function useOrgSubscriptionConsultations(
+  orgId: number,
+  params: { bundleType?: string; subscriptionId?: number; fromDate?: string; toDate?: string; page?: number; limit?: number }
+) {
+  return useQuery({
+    queryKey: queryKeys.organizations.subscriptionConsultations(
+      orgId,
+      params.bundleType,
+      params.subscriptionId,
+      params.fromDate,
+      params.toDate,
+      params.page,
+      params.limit
+    ),
+    queryFn: () => getOrgSubscriptionConsultations(orgId, params),
+    enabled: !!orgId,
   });
 }
 

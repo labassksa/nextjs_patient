@@ -2,15 +2,13 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
+import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
 import s from "./subscribe.module.css";
 
-const TOTAL_PROGRESS_STEPS = 7;
-
-const PLANS: Record<string, { price: number; label: string }> = {
-  monthly: { price: 149, label: "شهرياً" },
-  quarterly: { price: 357, label: "كل ٣ أشهر" },
-  annual: { price: 1250, label: "سنوياً" },
-};
+const TOTAL_PROGRESS_STEPS = 8;
 
 const PREF_LABEL: Record<string, string> = {
   asneeded: "عند الحاجة — سريع المفعول",
@@ -18,6 +16,7 @@ const PREF_LABEL: Record<string, string> = {
 };
 
 const stepLabels = [
+  "اختر الباقة",
   "عنك",
   "الأعراض",
   "الصحة العامة",
@@ -26,6 +25,8 @@ const stepLabels = [
   "الجوّال",
   "التحقّق",
 ];
+
+interface BundleOption { id: number; price: number; intervalDays: number; }
 
 /* ── Sub-components (defined outside to avoid remount on every render) ── */
 
@@ -186,14 +187,55 @@ export default function SexualHealthSubscribePage() {
   const [phoneError, setPhoneError] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [otpSent, setOtpSent] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const qRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const plan = "quarterly";
-  const price = PLANS[plan].price;
-  const planLabel = PLANS[plan].label;
+  const router = useRouter();
+
+  const [bundles, setBundles] = useState<BundleOption[]>([]);
+  const [selectedBundleId, setSelectedBundleId] = useState<number | null>(null);
+  const selectedBundle = bundles.find((b) => b.id === selectedBundleId) ?? null;
+  const bundleId = selectedBundleId;
+  const price = selectedBundle?.price ?? 0;
+
+  const getPlanLabel = (b: BundleOption | null): string => {
+    if (!b) return "—";
+    const sameInterval = bundles.filter((x) => x.intervalDays === b.intervalDays);
+    if (b.intervalDays === 30) return "شهري";
+    if (b.intervalDays === 365) return "سنوي";
+    if (sameInterval.length > 1) {
+      const minPrice = Math.min(...sameInterval.map((x) => x.price));
+      return b.price === minPrice ? "كل ٣ أشهر" : "٣ أشهر · شباب";
+    }
+    return "كل ٣ أشهر";
+  };
+  const planLabel = getPlanLabel(selectedBundle);
+
+  const getBadge = (b: BundleOption): { text: string; type: "pop" | "save" } | null => {
+    const sameInterval = bundles.filter((x) => x.intervalDays === b.intervalDays);
+    if (b.intervalDays === 365) return { text: "وفّر ٣٠٪", type: "save" };
+    if (b.intervalDays === 90) {
+      if (sameInterval.length > 1) {
+        const minPrice = Math.min(...sameInterval.map((x) => x.price));
+        return b.price === minPrice
+          ? { text: "الأكثر طلباً", type: "pop" }
+          : { text: "لأقل من ٤٠ سنة", type: "save" };
+      }
+      return { text: "الأكثر طلباً", type: "pop" };
+    }
+    return null;
+  };
+
+  const getPeriodText = (intervalDays: number): string => {
+    if (intervalDays === 30) return "/ شهر";
+    if (intervalDays === 90) return "/ ٩٠ يوم";
+    if (intervalDays === 365) return "/ سنة";
+    return `/ ${intervalDays} يوم`;
+  };
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   /* OTP timer */
   useEffect(() => {
@@ -205,9 +247,28 @@ export default function SexualHealthSubscribePage() {
     };
   }, [otpTimer]);
 
+  useEffect(() => {
+    const stored = localStorage.getItem("labass_token");
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const filtered = list
+          .filter((b: any) => b.type === "Sexual Health" && b.whoSubscribes === "individual" && b.isActive !== false)
+          .slice(0, 4)
+          .map((b: any) => ({ id: b.id, price: Number(b.price), intervalDays: b.intervalDays }));
+        setBundles(filtered);
+        const defaultBundle = filtered.find((b) => b.intervalDays === 90) ?? filtered[0];
+        if (defaultBundle) setSelectedBundleId(defaultBundle.id);
+      })
+      .catch(() => {});
+  }, []);
+
   const startOtpTimer = () => {
     setOtpTimer(30);
-    setOtpSent(true);
     setOtp(["", "", "", ""]);
     setTimeout(() => otpRefs.current[0]?.focus(), 200);
   };
@@ -257,7 +318,9 @@ export default function SexualHealthSubscribePage() {
   /* validation */
   const isStepValid = useCallback(() => {
     switch (currentStep) {
-      case 1: {
+      case 1:
+        return !!selectedBundleId;
+      case 2: {
         const name = (answers.q1 as string) || "";
         const age = (answers.q2 as string) || "";
         const height = (answers.q3 as string) || "";
@@ -271,11 +334,11 @@ export default function SexualHealthSubscribePage() {
           city.length > 0
         );
       }
-      case 2:
+      case 3:
         return ["q5", "q6", "q7", "q8", "q9", "q10", "q11"].every(
           (k) => answers[k]
         );
-      case 3: {
+      case 4: {
         const q12 = answers.q12;
         return !!(
           Array.isArray(q12) &&
@@ -287,7 +350,7 @@ export default function SexualHealthSubscribePage() {
           answers.q17
         );
       }
-      case 4: {
+      case 5: {
         const q18 = answers.q18;
         return !!(
           Array.isArray(q18) &&
@@ -297,23 +360,99 @@ export default function SexualHealthSubscribePage() {
           answers.q21
         );
       }
-      case 5:
+      case 6:
         return ["q22", "q23", "q24", "q25", "q26"].every((k) => answers[k]);
-      case 6: {
+      case 7: {
+        if (token) return true;
         const clean = phone.replace(/\s/g, "");
         return /^5\d{8}$/.test(clean);
       }
-      case 7:
+      case 8:
         return otp.every((d) => d !== "");
       default:
         return true;
     }
-  }, [currentStep, answers, phone, otp]);
+  }, [currentStep, answers, phone, otp, token, selectedBundleId]);
+
+  const buildSurveyAnswers = () => {
+    const map: Record<string, string> = {
+      q1:    "What is the patient's full name?",
+      q2:    "What is the patient's age? (years)",
+      q3:    "What is the patient's height? (cm)",
+      q4:    "What is the patient's weight? (kg)",
+      qCity: "What is the patient's city?",
+      q5:    "How confident are you in your ability to achieve and maintain an erection? (IIEF-5 Q1)",
+      q6:    "When aroused, how often was your erection firm enough for penetration? (IIEF-5 Q2)",
+      q7:    "During intercourse, how often were you able to maintain your erection after penetration? (IIEF-5 Q3)",
+      q8:    "How difficult was it to maintain your erection until completion of intercourse? (IIEF-5 Q4)",
+      q9:    "When you attempted intercourse, how often was it satisfactory for you? (IIEF-5 Q5)",
+      q10:   "When did the problem first start?",
+      q11:   "Do you notice spontaneous erections in the morning or during sleep?",
+      q12:   "Have you been diagnosed with any of the following conditions?",
+      q13:   "Have you had a heart attack or stroke in the past six months?",
+      q14:   "Do you experience chest pain during exertion or intercourse?",
+      q15:   "Is there a family history of early cardiac death?",
+      q16:   "Have you had surgery on the genitourinary system or prostate?",
+      q17:   "Do you have retinitis pigmentosa?",
+      q18:   "Are you currently taking any of the following medications?",
+      q19:   "Have you tried Viagra or Cialis before?",
+      q20:   "Have you experienced side effects with previous ED medication?",
+      q21:   "Do you have any known drug allergies?",
+      q22:   "Do you smoke?",
+      q23:   "How many times per week do you exercise?",
+      q24:   "How would you rate your current stress level?",
+      q25:   "Do you experience anxiety before or during intercourse?",
+      q26:   "Which treatment preference suits you better?",
+    };
+    return Object.entries(map)
+      .filter(([key]) => {
+        const v = answers[key];
+        return v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0);
+      })
+      .map(([key, question]) => ({ question, answer: answers[key] as string | string[] }));
+  };
 
   /* navigation */
-  const goNext = () => {
-    if (currentStep === 6) startOtpTimer();
-    if (currentStep < 8) {
+  const goNext = async () => {
+    setApiError(null);
+    if (currentStep === 7) {
+      if (token) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(buildSurveyAnswers()));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+        return;
+      }
+      setLoading(true);
+      const cleanPhone = phone.replace(/\s/g, "");
+      const result = await loginPatient(cleanPhone, "+966");
+      setLoading(false);
+      if (result.success) {
+        startOtpTimer();
+        setCurrentStep(8);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError(result.message || "فشل إرسال رمز التحقق");
+      }
+      return;
+    }
+    if (currentStep === 8) {
+      setLoading(true);
+      const fullPhone = "+966" + phone.replace(/\s/g, "");
+      const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
+      setLoading(false);
+      if (result && result.success) {
+        setCurrentStep(9);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError((result && result.message) || "حدث خطأ ، حاول مرة أخرى");
+      }
+      return;
+    }
+    if (currentStep === 9) {
+      localStorage.setItem("vitamin_survey_answers", JSON.stringify(buildSurveyAnswers()));
+      router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+      return;
+    }
+    if (currentStep < 10) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -352,9 +491,10 @@ export default function SexualHealthSubscribePage() {
 
   /* button label */
   const btnLabel = () => {
-    if (currentStep <= 5) return "متابعة";
-    if (currentStep === 6) return "إرسال رمز التحقّق";
-    if (currentStep === 7) return "تأكيد";
+    if (currentStep === 9) return "الانتقال للدفع";
+    if (currentStep <= 6) return "متابعة";
+    if (currentStep === 7) return loading ? "جاري الإرسال..." : token ? "الانتقال للدفع" : "إرسال رمز التحقّق";
+    if (currentStep === 8) return loading ? "جاري التحقّق..." : "تأكيد وإكمال الاشتراك";
     return "";
   };
 
@@ -399,8 +539,46 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 1: عنك ═══ */}
+      {/* ═══ STEP 1: اختر الباقة ═══ */}
       {currentStep === 1 && (
+        <div className={s.svPage}>
+          <div className={s.svEyebrow}>
+            <div className={s.svEyeDot} />
+            اختر باقتك
+          </div>
+          <h2 className={s.svTtl}>ابدأ رحلة صحّتك الجنسية</h2>
+          <p className={s.svSub}>
+            اختر الباقة التي تناسبك — يمكنك التغيير لاحقاً.
+          </p>
+
+          <div className={s.plans}>
+            {bundles.map((bundle) => {
+              const badge = getBadge(bundle);
+              const isSelected = selectedBundleId === bundle.id;
+              return (
+                <div
+                  key={bundle.id}
+                  className={`${s.plan} ${isSelected ? s.planSelected : ""}`}
+                  onClick={() => setSelectedBundleId(bundle.id)}
+                >
+                  {badge?.type === "pop" && <div className={s.planPop}>{badge.text}</div>}
+                  {badge?.type === "save" && <div className={s.planSaveBadge}>{badge.text}</div>}
+                  <input type="radio" className={s.planRadio} checked={isSelected} readOnly />
+                  <div className={s.planName}>{getPlanLabel(bundle)}</div>
+                  <div className={s.planPrice}>
+                    <span className={s.planNum}>{bundle.price}</span>
+                    <span className={s.planCur}>ريال</span>
+                    <span className={s.planPeriod}> {getPeriodText(bundle.intervalDays)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ═══ STEP 2: عنك ═══ */}
+      {currentStep === 2 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -432,8 +610,8 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 2: الأعراض ═══ */}
-      {currentStep === 2 && (
+      {/* ═══ STEP 3: الأعراض ═══ */}
+      {currentStep === 3 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -510,8 +688,8 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 3: الصحة العامة ═══ */}
-      {currentStep === 3 && (
+      {/* ═══ STEP 4: الصحة العامة ═══ */}
+      {currentStep === 4 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -558,8 +736,8 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 4: الأدوية الحالية ═══ */}
-      {currentStep === 4 && (
+      {/* ═══ STEP 5: الأدوية الحالية ═══ */}
+      {currentStep === 5 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -609,8 +787,8 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 5: نمط الحياة والتفضيلات ═══ */}
-      {currentStep === 5 && (
+      {/* ═══ STEP 6: نمط الحياة والتفضيلات ═══ */}
+      {currentStep === 6 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -671,12 +849,12 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 6: رقم الجوّال ═══ */}
-      {currentStep === 6 && (
+      {/* ═══ STEP 7: رقم الجوّال ═══ */}
+      {currentStep === 7 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
-            الخطوة ٦ من ٧ · رقم الجوّال
+            الخطوة ٧ من ٨ · رقم الجوّال
           </div>
           <h2 className={s.svTtl}>رقم جوّالك للتواصل</h2>
           <p className={s.svSub}>
@@ -734,12 +912,12 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 7: التحقّق ═══ */}
-      {currentStep === 7 && (
+      {/* ═══ STEP 8: التحقّق ═══ */}
+      {currentStep === 8 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
-            الخطوة ٧ من ٧ · التحقّق من الرقم
+            الخطوة ٨ من ٨ · التحقّق من الرقم
           </div>
           <h2 className={s.svTtl}>أدخل رمز التحقّق</h2>
           <p className={s.svSub}>
@@ -783,8 +961,9 @@ export default function SexualHealthSubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 8: التأكيد ═══ */}
-      {currentStep === 8 && (
+
+      {/* ═══ STEP 9: التأكيد ═══ */}
+      {currentStep === 9 && (
         <div className={s.svPage}>
           <div className={s.confirmIconWrap}>
             <div className={s.confirmCircle}>
@@ -792,11 +971,10 @@ export default function SexualHealthSubscribePage() {
             </div>
           </div>
           <h1 className={s.confirmTtl}>
-            تمّ الاشتراك بنجاح، {firstName()}
+            تمّ التحقّق بنجاح، {firstName()}
           </h1>
           <p className={s.confirmSub}>
-            بياناتك الآن تحت مراجعة طبيبك. سيراجع ملفّك ويصف لك العلاج المناسب
-            خلال ٢٤ ساعة.
+            بياناتك الآن جاهزة. راجع ملخّص اشتراكك وانتقل للدفع.
           </p>
 
           <div className={s.summary}>
@@ -827,74 +1005,33 @@ export default function SexualHealthSubscribePage() {
               </span>
             </div>
           </div>
-
-          <div className={s.nextSteps}>
-            <p className={s.nextTtl}>الخطوات القادمة</p>
-            <ul className={s.nextList}>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>١</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٢٤ ساعة:</strong> طبيبك يراجع ملفّك ويختار
-                  الدواء والجرعة المناسبة.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٢</div>
-                <div className={s.nextTxt}>
-                  <strong>تأكيد الوصفة:</strong> يصلك إشعار بقبول الوصفة
-                  وتفاصيل التوصيل.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٣</div>
-                <div className={s.nextTxt}>
-                  <strong>٤٨-٧٢ ساعة:</strong> الطلبية توصلك لبابك.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٤</div>
-                <div className={s.nextTxt}>
-                  <strong>تواصل متى شئت:</strong> طبيبك متاح عبر المحادثة لأي
-                  سؤال — بدون رسوم.
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
       )}
 
       {/* ACTIONS BAR */}
-      {currentStep <= 7 && (
-        <div className={s.actions}>
-          <button
-            className={`${s.btnBack} ${
-              currentStep === 1 ? s.btnBackHidden : ""
-            }`}
-            onClick={goBack}
-          >
-            السابق
-          </button>
-
-          <button
-            className={s.btnNext}
-            disabled={!isStepValid()}
-            onClick={goNext}
-          >
-            {btnLabel()}
-            <div className={s.btnNextArr}>←</div>
-          </button>
+      {apiError && (
+        <div style={{ color: "red", textAlign: "center", padding: "8px 16px", fontSize: 14 }}>
+          {apiError}
         </div>
       )}
+      <div className={s.actions}>
+        <button
+          className={`${s.btnBack} ${currentStep === 1 ? s.btnBackHidden : ""}`}
+          onClick={goBack}
+          disabled={loading}
+        >
+          السابق
+        </button>
 
-      {/* Confirmation: link back */}
-      {currentStep === 8 && (
-        <div className={s.actions}>
-          <div />
-          <Link href="/sexualHealth" className={s.btnNext}>
-            تمّ · العودة للرئيسية
-          </Link>
-        </div>
-      )}
+        <button
+          className={s.btnNext}
+          disabled={!isStepValid() || loading}
+          onClick={goNext}
+        >
+          {btnLabel()}
+          {!loading && currentStep < 7 && <div className={s.btnNextArr}>←</div>}
+        </button>
+      </div>
     </div>
   );
 }

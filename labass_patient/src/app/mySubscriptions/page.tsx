@@ -52,7 +52,11 @@ const STATUS: Record<
 };
 
 const BUNDLE_CONSULTATION_TYPE: Record<string, string> = {
-  "GP Consultations": "quick",
+  "GP Consultations":         "quick",
+  "Specialist Consultations": "specialist",
+  "Vitamins":                 "vitamins",
+  "Obesity Program":          "obesity",
+  "Sexual Health":            "sexualHealth",
 };
 
 const fmt = (d?: string) =>
@@ -130,7 +134,9 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success && data.data?.consultation?.id) {
-        router.push(`/completeInfo?consultationId=${data.data.consultation.id}`);
+        const cid = data.data.consultation.id;
+        localStorage.setItem(`subscription_consultation_${cid}`, "1");
+        router.push(`/completeInfo?consultationId=${cid}`);
       } else {
         setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
       }

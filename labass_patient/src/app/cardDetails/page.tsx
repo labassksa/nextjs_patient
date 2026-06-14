@@ -133,8 +133,9 @@ const CardDetailsContent: React.FC = () => {
                     {
                       bundleId: Number(bundleId),
                       sessionId: newSessionId,
-                      callBackUrl: "https://www.labass.sa/subscription/success",
-                      errorUrl: "https://www.labass.sa/subscription/error",
+                      invoiceAmount: parseFloat(discountedPrice),
+                      callBackUrl: `${window.location.origin}/subscription/success`,
+                      errorUrl: `${window.location.origin}/subscription/error`,
                       subscriberType,
                       isRecurring,
                       promoCode,

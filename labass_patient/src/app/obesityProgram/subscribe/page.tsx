@@ -2,9 +2,13 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { loginPatient } from "@/app/login/_controllers/sendOTP.Controller";
+import { verifyOTPandLogin } from "@/app/otp/_controllers/verifyOTPandLogin";
 import s from "./subscribe.module.css";
 
-const TOTAL_PROGRESS_STEPS = 8;
+const TOTAL_PROGRESS_STEPS = 9;
 
 const goalLabels: Record<string, string> = {
   lose: "إنقاص وزن",
@@ -14,6 +18,7 @@ const goalLabels: Record<string, string> = {
 };
 
 const stepLabels = [
+  "اختر الباقة",
   "قياسات الجسم",
   "عادات الأكل",
   "النشاط البدني",
@@ -168,13 +173,20 @@ export default function ObesitySubscribePage() {
   const [phoneError, setPhoneError] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [otpTimer, setOtpTimer] = useState(0);
-  const [otpSent, setOtpSent] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const plan = "quarterly";
-  const price = 1017;
-  const planLabel = "كل ٣ أشهر";
+  const router = useRouter();
+  const [selectedInterval, setSelectedInterval] = useState<"monthly" | "quarterly">("quarterly");
+  const [monthlyBundle, setMonthlyBundle] = useState<{ id: number; price: number } | null>(null);
+  const [quarterlyBundle, setQuarterlyBundle] = useState<{ id: number; price: number } | null>(null);
+  const selectedBundle = selectedInterval === "monthly" ? monthlyBundle : quarterlyBundle;
+  const bundleId = selectedBundle?.id ?? null;
+  const price = selectedBundle?.price ?? 0;
+  const planLabel = selectedInterval === "monthly" ? "شهري" : "كل ٣ أشهر";
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   /* OTP timer */
   useEffect(() => {
@@ -186,9 +198,28 @@ export default function ObesitySubscribePage() {
     };
   }, [otpTimer]);
 
+  useEffect(() => {
+    const stored = localStorage.getItem("labass_token");
+    if (stored) setToken(stored);
+  }, []);
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const filtered = list.filter(
+          (b: any) => b.type === "Obesity Program" && b.whoSubscribes === "individual"
+        );
+        const monthly = filtered.find((b: any) => b.intervalDays === 30);
+        const quarterly = filtered.find((b: any) => b.intervalDays === 90);
+        if (monthly) setMonthlyBundle({ id: monthly.id, price: Number(monthly.price) });
+        if (quarterly) setQuarterlyBundle({ id: quarterly.id, price: Number(quarterly.price) });
+      })
+      .catch(() => {});
+  }, []);
+
   const startOtpTimer = () => {
     setOtpTimer(30);
-    setOtpSent(true);
     setOtp(["", "", "", ""]);
     setTimeout(() => otpRefs.current[0]?.focus(), 200);
   };
@@ -214,12 +245,14 @@ export default function ObesitySubscribePage() {
   const isStepValid = useCallback(() => {
     switch (currentStep) {
       case 1:
-        return !!(answers.q1 && answers.q2 && answers.q3 && answers.qCity);
+        return !!selectedInterval;
       case 2:
+        return !!(answers.q1 && answers.q2 && answers.q3 && answers.qCity);
+      case 3:
         return ["q4", "q5", "q6", "q7", "q8", "q9", "q10"].every(
           (k) => answers[k]
         );
-      case 3: {
+      case 4: {
         const q12 = answers.q12;
         return !!(
           answers.q11 &&
@@ -229,9 +262,9 @@ export default function ObesitySubscribePage() {
           answers.q14
         );
       }
-      case 4:
+      case 5:
         return ["q15", "q16", "q17", "q18"].every((k) => answers[k]);
-      case 5: {
+      case 6: {
         const q19 = answers.q19;
         return !!(
           Array.isArray(q19) &&
@@ -242,23 +275,99 @@ export default function ObesitySubscribePage() {
           answers.q23
         );
       }
-      case 6:
+      case 7:
         return ["q24", "q25", "q26"].every((k) => answers[k]);
-      case 7: {
+      case 8: {
+        if (token) return true;
         const clean = phone.replace(/\s/g, "");
         return /^5\d{8}$/.test(clean);
       }
-      case 8:
+      case 9:
         return otp.every((d) => d !== "");
       default:
         return true;
     }
-  }, [currentStep, answers, phone, otp]);
+  }, [currentStep, answers, phone, otp, token, selectedInterval]);
+
+  const buildSurveyAnswers = () => {
+    const map: Record<string, string> = {
+      q1:    "What is your current weight? (kg)",
+      q2:    "What is your height? (cm)",
+      q3:    "What is your waist circumference? (cm)",
+      qCity: "What is your city?",
+      q4:    "How many main meals do you eat per day?",
+      q5:    "Do you eat snacks between meals?",
+      q6:    "How many cups of water do you drink per day?",
+      q7:    "Do you drink sugary sodas or sweetened juices?",
+      q8:    "Do you eat fast food?",
+      q9:    "Do you eat until completely full?",
+      q10:   "Do you eat while watching TV or on your phone?",
+      q11:   "How many times per week do you exercise?",
+      q12:   "What types of physical activity do you do?",
+      q13:   "How many hours per day do you sit?",
+      q14:   "Do you use a car for short distances?",
+      q15:   "How many hours do you sleep per day?",
+      q16:   "Do you have sleep problems?",
+      q17:   "Do you smoke?",
+      q18:   "How would you rate your stress level?",
+      q19:   "Have you been diagnosed with any of the following?",
+      q20:   "Is there a family history of obesity?",
+      q21:   "Do you take any medications that may affect your weight?",
+      q22:   "Have you followed a diet before?",
+      q23:   "Have you had weight loss surgery before?",
+      q24:   "Do you eat when feeling stressed or sad?",
+      q25:   "Are you satisfied with your current weight?",
+      q26:   "What is your primary goal?",
+    };
+    return Object.entries(map)
+      .filter(([key]) => {
+        const v = answers[key];
+        return v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0);
+      })
+      .map(([key, question]) => ({ question, answer: answers[key] as string | string[] }));
+  };
 
   /* navigation */
-  const goNext = () => {
-    if (currentStep === 7) startOtpTimer();
-    if (currentStep < 9) {
+  const goNext = async () => {
+    setApiError(null);
+    if (currentStep === 8) {
+      if (token) {
+        localStorage.setItem("vitamin_survey_answers", JSON.stringify(buildSurveyAnswers()));
+        router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+        return;
+      }
+      setLoading(true);
+      const cleanPhone = phone.replace(/\s/g, "");
+      const result = await loginPatient(cleanPhone, "+966");
+      setLoading(false);
+      if (result.success) {
+        startOtpTimer();
+        setCurrentStep(9);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError(result.message || "فشل إرسال رمز التحقق");
+      }
+      return;
+    }
+    if (currentStep === 9) {
+      setLoading(true);
+      const fullPhone = "+966" + phone.replace(/\s/g, "");
+      const result = await verifyOTPandLogin("patient", fullPhone, otp.join(""));
+      setLoading(false);
+      if (result && result.success) {
+        setCurrentStep(10);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        setApiError((result && result.message) || "حدث خطأ ، حاول مرة أخرى");
+      }
+      return;
+    }
+    if (currentStep === 10) {
+      localStorage.setItem("vitamin_survey_answers", JSON.stringify(buildSurveyAnswers()));
+      router.push(`/subscription/payment?bundleId=${bundleId}&discountedPrice=${price}&subscriberType=patient&isRecurring=false`);
+      return;
+    }
+    if (currentStep < 11) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -297,10 +406,10 @@ export default function ObesitySubscribePage() {
 
   /* button label */
   const btnLabel = () => {
-    if (currentStep === 9) return "تمّ · العودة للرئيسية";
-    if (currentStep === 8) return "تأكيد وإكمال الاشتراك";
-    if (currentStep === 7) return "إرسال رمز التحقّق";
-    if (currentStep === 6) return "متابعة للتحقّق";
+    if (currentStep === 10) return "الانتقال للدفع";
+    if (currentStep === 9) return loading ? "جاري التحقّق..." : "تأكيد وإكمال الاشتراك";
+    if (currentStep === 8) return loading ? "جاري الإرسال..." : token ? "الانتقال للدفع" : "إرسال رمز التحقّق";
+    if (currentStep === 7) return "متابعة للتحقّق";
     return "متابعة";
   };
 
@@ -347,8 +456,51 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 1: قياسات الجسم ═══ */}
+      {/* ═══ STEP 1: اختر الباقة ═══ */}
       {currentStep === 1 && (
+        <div className={s.svPage}>
+          <div className={s.svEyebrow}>
+            <div className={s.svEyeDot} />
+            اختر باقتك
+          </div>
+          <h2 className={s.svTtl}>ابدأ رحلة إدارة وزنك</h2>
+          <p className={s.svSub}>
+            اختر الباقة التي تناسبك — يمكنك التغيير لاحقاً.
+          </p>
+
+          <div className={s.plans}>
+            <div
+              className={`${s.plan} ${selectedInterval === "quarterly" ? s.planSelected : ""}`}
+              onClick={() => setSelectedInterval("quarterly")}
+            >
+              <div className={s.planPop}>الأوفر</div>
+              <input type="radio" className={s.planRadio} checked={selectedInterval === "quarterly"} readOnly />
+              <div className={s.planName}>كل ٣ أشهر</div>
+              <div className={s.planPrice}>
+                <span className={s.planNum}>{quarterlyBundle?.price ?? "—"}</span>
+                <span className={s.planCur}>ريال</span>
+                <span className={s.planPeriod}> / ٩٠ يوم</span>
+              </div>
+            </div>
+
+            <div
+              className={`${s.plan} ${selectedInterval === "monthly" ? s.planSelected : ""}`}
+              onClick={() => setSelectedInterval("monthly")}
+            >
+              <input type="radio" className={s.planRadio} checked={selectedInterval === "monthly"} readOnly />
+              <div className={s.planName}>شهري</div>
+              <div className={s.planPrice}>
+                <span className={s.planNum}>{monthlyBundle?.price ?? "—"}</span>
+                <span className={s.planCur}>ريال</span>
+                <span className={s.planPeriod}> / شهر</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ STEP 2: قياسات الجسم ═══ */}
+      {currentStep === 2 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -377,8 +529,8 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 2: عادات الأكل ═══ */}
-      {currentStep === 2 && (
+      {/* ═══ STEP 3: عادات الأكل ═══ */}
+      {currentStep === 3 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -449,8 +601,8 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 3: النشاط البدني ═══ */}
-      {currentStep === 3 && (
+      {/* ═══ STEP 4: النشاط البدني ═══ */}
+      {currentStep === 4 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -495,8 +647,8 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 4: النوم ونمط الحياة ═══ */}
-      {currentStep === 4 && (
+      {/* ═══ STEP 5: النوم ونمط الحياة ═══ */}
+      {currentStep === 5 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -539,8 +691,8 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 5: التاريخ الطبّي ═══ */}
-      {currentStep === 5 && (
+      {/* ═══ STEP 6: التاريخ الطبّي ═══ */}
+      {currentStep === 6 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -584,8 +736,8 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 6: الحالة النفسية والأهداف ═══ */}
-      {currentStep === 6 && (
+      {/* ═══ STEP 7: الحالة النفسية والأهداف ═══ */}
+      {currentStep === 7 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
@@ -621,12 +773,12 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 7: رقم الجوّال ═══ */}
-      {currentStep === 7 && (
+      {/* ═══ STEP 8: رقم الجوّال ═══ */}
+      {currentStep === 8 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
-            الخطوة ٧ من ٨ · رقم الجوّال
+            الخطوة ٨ من ٩ · رقم الجوّال
           </div>
           <h2 className={s.svTtl}>رقم جوّالك للتواصل</h2>
           <p className={s.svSub}>
@@ -684,12 +836,12 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 8: التحقّق ═══ */}
-      {currentStep === 8 && (
+      {/* ═══ STEP 9: التحقّق ═══ */}
+      {currentStep === 9 && (
         <div className={s.svPage}>
           <div className={s.svEyebrow}>
             <div className={s.svEyeDot} />
-            الخطوة ٨ من ٨ · التحقّق من الرقم
+            الخطوة ٩ من ٩ · التحقّق من الرقم
           </div>
           <h2 className={s.svTtl}>أدخل رمز التحقّق</h2>
           <p className={s.svSub}>
@@ -733,18 +885,18 @@ export default function ObesitySubscribePage() {
         </div>
       )}
 
-      {/* ═══ STEP 9: التأكيد ═══ */}
-      {currentStep === 9 && (
+
+      {/* ═══ STEP 10: التأكيد ═══ */}
+      {currentStep === 10 && (
         <div className={s.svPage}>
           <div className={s.confirmIconWrap}>
             <div className={s.confirmCircle}>
               <div className={s.confirmCheck}>✓</div>
             </div>
           </div>
-          <h1 className={s.confirmTtl}>اكتمل اشتراكك بنجاح</h1>
+          <h1 className={s.confirmTtl}>اكتمل التحقّق بنجاح</h1>
           <p className={s.confirmSub}>
-            سيتواصل معك فريقنا خلال ٢٤ ساعة على جوّالك لتحديد موعد زيارة
-            الممرّض. بياناتك الآن محفوظة بأمان ويراجعها طبيبك.
+            راجع ملخّص اشتراكك أدناه ثم انتقل للدفع لإكمال التسجيل.
           </p>
 
           <div className={s.summary}>
@@ -763,9 +915,7 @@ export default function ObesitySubscribePage() {
             </div>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الوزن الحالي</span>
-              <span className={s.summaryVal}>
-                {(answers.q1 as string) || "—"} كجم
-              </span>
+              <span className={s.summaryVal}>{(answers.q1 as string) || "—"} كجم</span>
             </div>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>مؤشّر كتلة الجسم</span>
@@ -773,9 +923,7 @@ export default function ObesitySubscribePage() {
             </div>
             <div className={s.summaryRow}>
               <span className={s.summaryLbl}>الهدف الأساسي</span>
-              <span className={s.summaryVal}>
-                {goalLabels[(answers.q26 as string)] || "—"}
-              </span>
+              <span className={s.summaryVal}>{goalLabels[(answers.q26 as string)] || "—"}</span>
             </div>
             <div className={`${s.summaryRow} ${s.summaryRowTotal}`}>
               <span className={s.summaryLbl}>المبلغ المستحقّ</span>
@@ -785,61 +933,32 @@ export default function ObesitySubscribePage() {
               </span>
             </div>
           </div>
-
-          <div className={s.nextSteps}>
-            <p className={s.nextTtl}>ماذا يحدث الآن؟</p>
-            <ul className={s.nextList}>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>١</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٢٤ ساعة:</strong> يراجع طبيبك تقييمك الطبّي ويصمّم
-                  خطّة إدارة الوزن المخصّصة لك.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٢</div>
-                <div className={s.nextTxt}>
-                  <strong>خلال ٤٨ ساعة:</strong> تصلك وصفتك الطبية والأدوية
-                  مباشرة لبيتك مجاناً.
-                </div>
-              </li>
-              <li className={s.nextItem}>
-                <div className={s.nextNum}>٣</div>
-                <div className={s.nextTxt}>
-                  <strong>استشر الطبيب 24/7:</strong> متى ما احتجت، عبر المحادثة أو
-                  مكالمة فيديو مباشرة — بدون حجز موعد.
-                </div>
-              </li>
-            </ul>
-          </div>
         </div>
       )}
 
       {/* ACTIONS BAR */}
+      {apiError && (
+        <div style={{ color: "red", textAlign: "center", padding: "8px 16px", fontSize: 14 }}>
+          {apiError}
+        </div>
+      )}
       <div className={s.actions}>
         <button
-          className={`${s.btnBack} ${
-            currentStep === 1 || currentStep === 9 ? s.btnBackHidden : ""
-          }`}
+          className={`${s.btnBack} ${currentStep === 1 ? s.btnBackHidden : ""}`}
           onClick={goBack}
+          disabled={loading}
         >
           السابق
         </button>
 
-        {currentStep === 9 ? (
-          <Link href="/obesityProgram" className={s.btnNext}>
-            {btnLabel()}
-          </Link>
-        ) : (
-          <button
-            className={s.btnNext}
-            disabled={!isStepValid()}
-            onClick={goNext}
-          >
-            {btnLabel()}
-            {currentStep < 9 && <div className={s.btnNextArr}>←</div>}
-          </button>
-        )}
+        <button
+          className={s.btnNext}
+          disabled={!isStepValid() || loading}
+          onClick={goNext}
+        >
+          {btnLabel()}
+          {!loading && currentStep < 8 && <div className={s.btnNextArr}>←</div>}
+        </button>
       </div>
     </div>
   );

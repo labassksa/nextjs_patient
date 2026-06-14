@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api/client";
-import type { Organization, CreateOrganizationPayload, UpdateOrganizationPayload, OrgReportResponse } from "../types/organization.types";
+import type { Organization, CreateOrganizationPayload, UpdateOrganizationPayload, OrgReportResponse, SubscriptionConsultationsResponse } from "../types/organization.types";
 
 export async function getOrganizations(): Promise<Organization[]> {
   const { data } = await apiClient.get("/organizations/with-marketers");
@@ -14,6 +14,21 @@ export async function createOrganization(payload: CreateOrganizationPayload) {
 export async function updateOrganization(payload: UpdateOrganizationPayload) {
   const { data } = await apiClient.put("/organizations", payload);
   return data;
+}
+
+export async function getOrgSubscriptionConsultations(
+  organizationId: number,
+  params: { bundleType?: string; subscriptionId?: number; fromDate?: string; toDate?: string; page?: number; limit?: number }
+): Promise<SubscriptionConsultationsResponse> {
+  const { bundleType, subscriptionId, fromDate, toDate, page = 1, limit = 20 } = params;
+  const qs = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (bundleType) qs.set("bundleType", bundleType);
+  if (subscriptionId) qs.set("subscriptionId", String(subscriptionId));
+  if (fromDate && toDate) { qs.set("fromDate", fromDate); qs.set("toDate", toDate); }
+  const { data } = await apiClient.get(
+    `/admin/organizations/${organizationId}/subscription-consultations?${qs}`
+  );
+  return data.data;
 }
 
 export async function getOrgConsultationsReport(

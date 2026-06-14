@@ -36,11 +36,37 @@ export interface OrgReportConsultation {
   marketer: { phoneNumber?: string; firstName: string | null; lastName: string | null; orgName?: string };
   patient: { id?: number; phoneNumber?: string; firstName?: string; lastName?: string };
   doctor: { phoneNumber?: string; firstName?: string; lastName?: string };
+  subscription?: { id: number; bundleType: string; remainingConsultations: number };
 }
 
 export interface OrgReportResponse {
   consultations: OrgReportConsultation[];
   total: number;
+}
+
+export interface SubscriptionConsultation {
+  id: number;
+  type: string;
+  status: string;
+  createdAt: string;
+  subscription: {
+    id: number;
+    remainingConsultations: number;
+    totalConsultations: number;
+    bundle: { type: string };
+  };
+  patient: { user: { firstName: string; phoneNumber: string } };
+  doctor: { user: { firstName: string; lastName: string } };
+}
+
+export interface SubscriptionConsultationsResponse {
+  consultations: SubscriptionConsultation[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface UpdateOrganizationPayload {

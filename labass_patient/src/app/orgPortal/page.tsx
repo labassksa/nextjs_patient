@@ -173,7 +173,8 @@ const OrgPatientsPage: React.FC = () => {
       console.log("Subscription Response:", subscriptionResponse);
       if (subscriptionResponse.success && subscriptionResponse.data) {
         console.log("Subscription Data:", subscriptionResponse.data);
-        setSubscription(subscriptionResponse.data);
+        const data = subscriptionResponse.data;
+        setSubscription(Array.isArray(data) ? data : [data]);
       } else if (subscriptionResponse.noSubscription) {
         console.log("No active subscription found");
         setSubscription([]);
