@@ -156,13 +156,17 @@ const testimonials = [
 export default function LandingPage() {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const loggedIn = isAuthenticated();
+  const [loggedIn, setLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoggedIn(isAuthenticated());
+  }, []);
 
   const goToQuickConsult = () =>
-    router.push(isAuthenticated() ? "/payment" : "/login");
+    router.push(loggedIn ? "/payment" : "/login");
 
   const goToObesity = () =>
-    router.push(isAuthenticated() ? "/obesitySurvey" : "/login");
+    router.push(loggedIn ? "/obesitySurvey" : "/login");
 
   const closeDrawer = () => setDrawerOpen(false);
 
