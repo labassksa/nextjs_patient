@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -154,6 +155,7 @@ const testimonials = [
 
 export default function LandingPage() {
   const router = useRouter();
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const goToQuickConsult = () =>
     router.push(isAuthenticated() ? "/payment" : "/login");
@@ -161,26 +163,59 @@ export default function LandingPage() {
   const goToObesity = () =>
     router.push(isAuthenticated() ? "/obesitySurvey" : "/login");
 
+  const closeDrawer = () => setDrawerOpen(false);
+
   return (
     <>
-      {/* ─── FIXED TOP HEADER ─── */}
-      <div className={s.navOuter} dir="rtl">
-        <nav className={s.nav}>
+      {/* ─── FLOATING HAMBURGER ─── */}
+      <button
+        className={s.fabMenu}
+        onClick={() => setDrawerOpen(true)}
+        aria-label="القائمة"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+      </button>
+
+      {/* ─── DRAWER BACKDROP ─── */}
+      {drawerOpen && (
+        <div className={s.drawerBackdrop} onClick={closeDrawer} />
+      )}
+
+      {/* ─── DRAWER PANEL ─── */}
+      <div dir="rtl" className={`${s.drawer} ${drawerOpen ? s.drawerOpen : ""}`}>
+        {/* Header */}
+        <div className={s.drawerHead}>
           <div className={s.brand}>
             <div className={s.mark} />
             <span className={s.bname}>لاباس</span>
           </div>
-          <div className={s.navLinks}>
-            <a href="#b2c" className={s.navLink}>للأفراد</a>
-            <a href="#b2b" className={s.navLink}>للمنشآت</a>
-            <a href="#partners" className={s.navLink}>شركاؤنا</a>
-          </div>
-          <div className={s.navAuth}>
-            <Link href="/login" className={s.navAuthInd}>تسجيل الدخول</Link>
-            <Link href="/orgPortal" className={s.navAuthOrg}>دخول المنشآت</Link>
-            <Link href="/schoolLogin" className={s.navAuthSchool}>دخول المدارس</Link>
-          </div>
+          <button className={s.drawerClose} onClick={closeDrawer} aria-label="إغلاق">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Section links */}
+        <nav className={s.drawerNav}>
+          <p className={s.drawerSection}>تصفّح</p>
+          <a href="#b2c" className={s.drawerLink} onClick={closeDrawer}>للأفراد</a>
+          <a href="#b2b" className={s.drawerLink} onClick={closeDrawer}>للمنشآت</a>
+          <a href="#partners" className={s.drawerLink} onClick={closeDrawer}>شركاؤنا</a>
+
+          <div className={s.drawerDivider} />
+
+          <p className={s.drawerSection}>الدخول</p>
+          <Link href="/login" className={s.drawerLink} onClick={closeDrawer}>تسجيل الدخول</Link>
+          <Link href="/orgPortal" className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
+          <Link href="/schoolLogin" className={s.drawerLinkBlue} onClick={closeDrawer}>دخول المدارس</Link>
         </nav>
+
+        <div className={s.drawerFoot}>
+          <p className={s.drawerFootTxt}>شركة معالم التطوير · مرخّصة من وزارة الصحة</p>
+        </div>
       </div>
 
     <div dir="rtl" className={s.app}>

@@ -1,26 +1,43 @@
-.app { max-width: 1060px; margin: 0 auto; background: #fdfcf7; overflow: clip; font-family: 'Tajawal', system-ui, sans-serif; padding-top: 60px; }
+.app { max-width: 1060px; margin: 0 auto; background: #fdfcf7; overflow: clip; font-family: 'Tajawal', system-ui, sans-serif; }
 .app, .app * { box-sizing: border-box; }
 
 /* LICENSE BAR */
 .licBar { background: #f2faed; border-bottom: 0.5px solid rgba(23,52,4,0.08); padding: 8px 48px; text-align: center; font-size: 12px; font-weight: 600; color: #27500A; letter-spacing: 0.2px; }
 
-/* NAV */
-.navOuter { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(253,252,247,0.96); border-bottom: 0.5px solid rgba(23,52,4,0.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.nav { max-width: 1060px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 14px 36px; }
-.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+/* FLOATING HAMBURGER BUTTON */
+.fabMenu { position: fixed; top: 16px; right: 16px; z-index: 200; width: 44px; height: 44px; border-radius: 50%; background: rgba(253,252,247,0.95); border: 1px solid rgba(23,52,4,0.12); box-shadow: 0 4px 16px rgba(23,52,4,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: box-shadow 0.2s, transform 0.2s; }
+.fabMenu:hover { box-shadow: 0 6px 20px rgba(23,52,4,0.22); transform: scale(1.05); }
+
+/* DRAWER BACKDROP */
+.drawerBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; }
+
+/* DRAWER PANEL */
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: #fdfcf7; z-index: 400; box-shadow: -8px 0 40px rgba(23,52,4,0.18); display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+.drawerOpen { transform: translateX(0); }
+
+/* Drawer header */
+.drawerHead { display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 16px; border-bottom: 1px solid rgba(23,52,4,0.08); }
+.brand { display: flex; align-items: center; gap: 10px; }
 .mark { width: 30px; height: 30px; border-radius: 50%; background: #173404; position: relative; flex-shrink: 0; }
 .mark::after { content: ""; position: absolute; top: 8px; right: 8px; width: 14px; height: 14px; border-radius: 50%; background: #7ED957; }
-.bname { font-size: 21px; font-weight: 800; color: #173404; letter-spacing: -0.3px; }
-.navLinks { display: flex; gap: 24px; font-size: 13px; font-weight: 500; color: #27500A; }
-.navLink { cursor: pointer; opacity: 0.8; transition: opacity 0.2s; text-decoration: none; color: inherit; }
-.navLink:hover { opacity: 1; }
-.navCta { padding: 9px 20px; background: #173404; color: #EAF3DE; border-radius: 999px; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; border: none; }
-.navCta:hover { background: #0d2002; }
-.navAuth { display: flex; align-items: center; gap: 8px; }
-.navAuthInd { padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(23,52,4,0.25); font-size: 12px; font-weight: 500; color: #27500A; text-decoration: none; transition: all 0.2s; background: transparent; }
-.navAuthInd:hover { border-color: #27500A; background: rgba(23,52,4,0.04); }
-.navAuthOrg { padding: 8px 16px; border-radius: 999px; background: #173404; font-size: 12px; font-weight: 500; color: #EAF3DE; text-decoration: none; transition: background 0.2s; }
-.navAuthOrg:hover { background: #0d2002; }
+.bname { font-size: 20px; font-weight: 800; color: #173404; letter-spacing: -0.3px; }
+.drawerClose { width: 32px; height: 32px; border-radius: 50%; background: rgba(23,52,4,0.06); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+.drawerClose:hover { background: rgba(23,52,4,0.12); }
+
+/* Drawer nav */
+.drawerNav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.drawerSection { font-size: 10.5px; font-weight: 700; color: rgba(23,52,4,0.35); letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 12px 4px; }
+.drawerLink { display: block; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 500; color: #173404; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.drawerLink:hover { background: rgba(23,52,4,0.06); }
+.drawerLinkGreen { display: block; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 700; color: #173404; text-decoration: none; background: rgba(126,217,87,0.12); border: 1px solid rgba(126,217,87,0.25); transition: background 0.15s; }
+.drawerLinkGreen:hover { background: rgba(126,217,87,0.22); }
+.drawerLinkBlue { display: block; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 700; color: #1e4db7; text-decoration: none; background: rgba(30,77,183,0.07); border: 1px solid rgba(30,77,183,0.18); transition: background 0.15s; margin-top: 4px; }
+.drawerLinkBlue:hover { background: rgba(30,77,183,0.14); }
+.drawerDivider { height: 1px; background: rgba(23,52,4,0.08); margin: 8px 4px; }
+
+/* Drawer footer */
+.drawerFoot { padding: 14px 20px; border-top: 1px solid rgba(23,52,4,0.07); }
+.drawerFootTxt { font-size: 11px; color: rgba(23,52,4,0.35); text-align: center; }
 
 /* HERO */
 .hero { position: relative; background: linear-gradient(135deg, #7ED957 0%, #97C459 100%); padding: 56px 36px 64px; overflow: hidden; isolation: isolate; }
@@ -267,9 +284,6 @@
 .shopSex .shopBtn { background: #7ED957; color: #0d2002; }
 .shopSex .shopBtn:hover { background: #a0e87a; }
 
-/* NAV — SCHOOL BUTTON */
-.navAuthSchool { padding: 8px 16px; border-radius: 999px; background: #1e4db7; font-size: 12px; font-weight: 500; color: #ffffff; text-decoration: none; transition: background 0.2s; }
-.navAuthSchool:hover { background: #1a3fa0; }
 
 /* QUICK ACTIONS SECTION */
 .quickSec { padding: 56px 36px; background: #ffffff; }
@@ -318,12 +332,6 @@
   .quickCardInner { padding: 22px 20px 20px; }
 }
 
-/* ── Nav responsive (mobile — hide links, keep auth) ── */
-@media (max-width: 720px) {
-  .navLinks { display: none; }
-  .navAuthSchool { display: none; }
-  .navAuth { gap: 6px; }
-}
 
 /* KEYFRAMES */
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
