@@ -3,7 +3,7 @@ import { PushNotificationProvider } from "@/components/PushNotificationProvider"
 import { IncomingCallNotification } from "@/components/IncomingCallNotification";
 
 export const metadata = {
-  title: "لباس - منصة الاستشارات الطبية",
+  title: "لاباس - منصة الاستشارات الطبية",
   description: "منصة الاستشارات الطبية والمكالمات المرئية",
   manifest: "/manifest.json",
 };

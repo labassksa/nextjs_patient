@@ -66,7 +66,24 @@
 }
 .navBack:hover { background: rgba(23, 52, 4, 0.05); border-color: rgba(23,52,4,0.35); }
 
-/* ── Scroll area ─────────────────────────────────────────────── */
+/* ── Page body (wraps both columns) ─────────────────────────── */
+.pageBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Plan column (mobile: above form; desktop: left sticky) ─── */
+.colPlan { display: flex; flex-direction: column; }
+.colPlanTrust { display: none; } /* hidden on mobile — shown in form column */
+
+/* ── Form column ─────────────────────────────────────────────── */
+.colForm { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+.colFormScroll { flex: 1; overflow-y: auto; }
+.colFormTrustMobile { display: block; } /* shown on mobile */
+
+/* ── Scroll area (legacy alias) ──────────────────────────────── */
 .scroll {
   flex: 1;
   overflow-y: auto;
@@ -605,14 +622,75 @@
 
 /* ── Responsive ──────────────────────────────────────────────── */
 
-/* Center on wide screens like a mobile shell */
-@media (min-width: 640px) {
+/* Tablet: mild centering */
+@media (min-width: 540px) and (max-width: 899px) {
   .app {
-    max-width: 520px;
+    max-width: 540px;
     margin: 0 auto;
-    min-height: 100dvh;
     box-shadow: 0 0 0 1px rgba(23,52,4,0.06), 0 20px 60px rgba(23,52,4,0.08);
   }
+}
+
+/* Desktop: proper 2-column layout */
+@media (min-width: 900px) {
+  .app {
+    max-width: 1000px;
+    margin: 0 auto;
+    box-shadow: 0 0 0 1px rgba(23,52,4,0.06), 0 20px 80px rgba(23,52,4,0.08);
+    border-radius: 0 0 20px 20px;
+  }
+
+  .pageBody {
+    flex-direction: row;
+    overflow: visible;
+    align-items: stretch;
+  }
+
+  /* Plan column: fixed width, sticky */
+  .colPlan {
+    width: 420px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 60px;
+    align-self: flex-start;
+    max-height: calc(100dvh - 60px);
+    overflow: hidden;
+  }
+
+  /* Show trust strip inside plan column on desktop */
+  .colPlanTrust {
+    display: block;
+    padding: 0 0 20px;
+    background: #f2f5ee;
+  }
+  .colFormTrustMobile { display: none; }
+
+  /* Plan card takes full column height */
+  .planCard {
+    border-radius: 0;
+    min-height: 320px;
+  }
+
+  /* Form column: scrollable independently */
+  .colForm {
+    flex: 1;
+    min-width: 0;
+    border-right: 1px solid rgba(23,52,4,0.06);
+    overflow: hidden;
+  }
+
+  .colFormScroll {
+    overflow-y: auto;
+    max-height: calc(100dvh - 120px);
+  }
+
+  /* Footer stays at bottom of form column */
+  .footer {
+    position: sticky;
+    bottom: 0;
+  }
+
+  .planFeats { grid-template-columns: 1fr; gap: 10px; }
 }
 
 @media (max-width: 400px) {

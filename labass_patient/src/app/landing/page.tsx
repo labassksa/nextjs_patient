@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "../../utils/auth";
 import s from "./landing.module.css";
 
 /* ─── B2C PACKAGES ─── */
@@ -151,6 +153,14 @@ const testimonials = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
+
+  const goToQuickConsult = () =>
+    router.push(isAuthenticated() ? "/payment" : "/login");
+
+  const goToObesity = () =>
+    router.push(isAuthenticated() ? "/obesitySurvey" : "/login");
+
   return (
     <>
       {/* ─── FIXED TOP HEADER ─── */}
@@ -166,8 +176,9 @@ export default function LandingPage() {
             <a href="#partners" className={s.navLink}>شركاؤنا</a>
           </div>
           <div className={s.navAuth}>
-            <Link href="/home" className={s.navAuthInd}>تسجيل الدخول</Link>
-            <Link href="/orgPortal" className={s.navAuthOrg}>بوابة المنشآت</Link>
+            <Link href="/login" className={s.navAuthInd}>تسجيل الدخول</Link>
+            <Link href="/orgPortal" className={s.navAuthOrg}>دخول المنشآت</Link>
+            <Link href="/schoolLogin" className={s.navAuthSchool}>دخول المدارس</Link>
           </div>
         </nav>
       </div>
@@ -226,6 +237,62 @@ export default function LandingPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* ─── QUICK ACTIONS ─── */}
+      <section className={s.quickSec}>
+        <div className={s.quickHead}>
+          <h2 className={s.quickTtl}>ابدأ الآن بدون اشتراك</h2>
+          <p className={s.quickSub}>استشارة فورية أو رحلة صحية — اختر ما يناسبك</p>
+        </div>
+
+        <div className={s.quickGrid}>
+          {/* Quick consultation */}
+          <button onClick={goToQuickConsult} className={`${s.quickCard} ${s.quickCardGreen}`}>
+            <div className={s.quickCardInner}>
+              <div className={s.quickTop}>
+                <span className={s.quickBadge}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                  </svg>
+                  أقل من دقيقة
+                </span>
+                <h3 className={s.quickCardTitle}>استشارة طبية فورية</h3>
+                <p className={s.quickCardSub}>تحدث مع طبيب مرخّص مباشرةً</p>
+              </div>
+              <ul className={s.quickFeats}>
+                <li className={s.quickFeat}><span className={s.quickDot}/> وصفة طبية معتمدة</li>
+                <li className={s.quickFeat}><span className={s.quickDot}/> قراءة نتائج التحاليل</li>
+                <li className={s.quickFeat}><span className={s.quickDot}/> إعادة صرف الأدوية</li>
+              </ul>
+              <span className={s.quickCta}>
+                ابدأ الاستشارة
+                <span className={s.quickCtaArr}>←</span>
+              </span>
+            </div>
+          </button>
+
+          {/* Obesity program */}
+          <button onClick={goToObesity} className={`${s.quickCard} ${s.quickCardOb}`}>
+            <div className={s.quickCardInner}>
+              <div className={s.quickTop}>
+                <span className={s.quickBadgeDark}>استشارة السمنة</span>
+                <h3 className={s.quickCardTitleDark}>برنامج إنقاص الوزن</h3>
+                <p className={s.quickCardSubDark}>خطة مخصصة تحت إشراف طبي متكامل</p>
+              </div>
+              <ul className={s.quickFeats}>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> أدوية سمنة معتمدة من FDA</li>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> برامج غذائية مخصصة</li>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> متابعة مستمرة مع الطبيب</li>
+              </ul>
+              <span className={s.quickCtaDark}>
+                ابدأ رحلتك الآن
+                <span className={s.quickCtaArrDark}>←</span>
+              </span>
+            </div>
+          </button>
         </div>
       </section>
 

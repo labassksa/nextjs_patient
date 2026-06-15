@@ -267,6 +267,64 @@
 .shopSex .shopBtn { background: #7ED957; color: #0d2002; }
 .shopSex .shopBtn:hover { background: #a0e87a; }
 
+/* NAV — SCHOOL BUTTON */
+.navAuthSchool { padding: 8px 16px; border-radius: 999px; background: #1e4db7; font-size: 12px; font-weight: 500; color: #ffffff; text-decoration: none; transition: background 0.2s; }
+.navAuthSchool:hover { background: #1a3fa0; }
+
+/* QUICK ACTIONS SECTION */
+.quickSec { padding: 56px 36px; background: #ffffff; }
+.quickHead { text-align: center; margin-bottom: 36px; }
+.quickTtl { font-size: 28px; font-weight: 800; color: #0d2002; margin: 0 0 10px; letter-spacing: -0.5px; }
+.quickSub { font-size: 14px; color: #6b7280; line-height: 1.7; margin: 0; }
+
+.quickGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 860px; margin: 0 auto; }
+
+.quickCard { border-radius: 24px; border: none; cursor: pointer; text-align: right; transition: transform 0.25s ease, box-shadow 0.25s ease; width: 100%; display: block; padding: 0; font-family: inherit; }
+.quickCard:hover { transform: translateY(-5px); box-shadow: 0 20px 48px rgba(23,52,4,0.18); }
+
+.quickCardInner { padding: 28px 26px 24px; height: 100%; display: flex; flex-direction: column; gap: 16px; }
+
+/* Green card — quick consultation */
+.quickCardGreen { background: linear-gradient(145deg, #7ED957 0%, #5db93a 100%); }
+.quickTop { display: flex; flex-direction: column; gap: 8px; }
+.quickBadge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(23,52,4,0.12); border-radius: 999px; font-size: 11.5px; font-weight: 600; color: #173404; align-self: flex-start; }
+.quickCardTitle { font-size: 22px; font-weight: 800; color: #0d2002; margin: 0; letter-spacing: -0.4px; }
+.quickCardSub { font-size: 13px; color: rgba(23,52,4,0.7); margin: 0; line-height: 1.6; }
+
+.quickFeats { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.quickFeat { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #173404; }
+.quickDot { width: 6px; height: 6px; border-radius: 50%; background: #173404; flex-shrink: 0; }
+
+.quickCta { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: #173404; color: #EAF3DE; border-radius: 999px; font-size: 14px; font-weight: 600; align-self: flex-start; margin-top: auto; transition: background 0.2s; }
+.quickCard:hover .quickCta { background: #0d2002; }
+.quickCtaArr { width: 20px; height: 20px; border-radius: 50%; background: #7ED957; display: grid; place-items: center; font-size: 11px; color: #173404; font-weight: 800; flex-shrink: 0; }
+
+/* Dark card — obesity program */
+.quickCardOb { background: linear-gradient(145deg, #1e3f09 0%, #0d2002 100%); }
+.quickBadgeDark { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; background: rgba(126,217,87,0.15); border: 1px solid rgba(126,217,87,0.25); border-radius: 999px; font-size: 11.5px; font-weight: 600; color: #7ED957; align-self: flex-start; }
+.quickCardTitleDark { font-size: 22px; font-weight: 800; color: #EAF3DE; margin: 0; letter-spacing: -0.4px; }
+.quickCardSubDark { font-size: 13px; color: rgba(234,243,222,0.6); margin: 0; line-height: 1.6; }
+.quickFeatDark { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(234,243,222,0.8); }
+.quickDotDark { width: 6px; height: 6px; border-radius: 50%; background: #7ED957; flex-shrink: 0; }
+.quickCtaDark { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; background: #7ED957; color: #173404; border-radius: 999px; font-size: 14px; font-weight: 600; align-self: flex-start; margin-top: auto; transition: background 0.2s; }
+.quickCard:hover .quickCtaDark { background: #a0e87a; }
+.quickCtaArrDark { width: 20px; height: 20px; border-radius: 50%; background: #173404; display: grid; place-items: center; font-size: 11px; color: #7ED957; font-weight: 800; flex-shrink: 0; }
+
+/* ── Quick section responsive ── */
+@media (max-width: 640px) {
+  .quickSec { padding: 40px 20px; }
+  .quickGrid { grid-template-columns: 1fr; gap: 14px; }
+  .quickCardTitle, .quickCardTitleDark { font-size: 19px; }
+  .quickCardInner { padding: 22px 20px 20px; }
+}
+
+/* ── Nav responsive (mobile — hide links, keep auth) ── */
+@media (max-width: 720px) {
+  .navLinks { display: none; }
+  .navAuthSchool { display: none; }
+  .navAuth { gap: 6px; }
+}
+
 /* KEYFRAMES */
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 @keyframes lift { 0%, 100% { transform: translateY(6px); } 50% { transform: translateY(-20px); } }
