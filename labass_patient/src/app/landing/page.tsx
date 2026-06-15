@@ -167,16 +167,23 @@ export default function LandingPage() {
 
   return (
     <>
-      {/* ─── FLOATING HAMBURGER ─── */}
-      <button
-        className={s.fabMenu}
-        onClick={() => setDrawerOpen(true)}
-        aria-label="القائمة"
-      >
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M4 12h16M4 18h16" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
-        </svg>
-      </button>
+      {/* ─── FIXED TOP BAR ─── */}
+      <div className={s.topBar} dir="rtl">
+        <button
+          className={s.topBarMenu}
+          onClick={() => setDrawerOpen(true)}
+          aria-label="القائمة"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
+          </svg>
+        </button>
+
+        <div className={s.topBarActions}>
+          <Link href="/orgPortal" className={s.topBarBtnGreen}>دخول المنشآت</Link>
+          <Link href="/schoolLogin" className={s.topBarBtnBlue}>دخول المدارس</Link>
+        </div>
+      </div>
 
       {/* ─── DRAWER BACKDROP ─── */}
       {drawerOpen && (

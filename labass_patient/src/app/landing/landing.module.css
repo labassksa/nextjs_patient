@@ -1,12 +1,18 @@
-.app { max-width: 1060px; margin: 0 auto; background: #fdfcf7; overflow: clip; font-family: 'Tajawal', system-ui, sans-serif; }
+.app { max-width: 1060px; margin: 0 auto; background: #fdfcf7; overflow: clip; font-family: 'Tajawal', system-ui, sans-serif; padding-top: 60px; }
 .app, .app * { box-sizing: border-box; }
 
 /* LICENSE BAR */
 .licBar { background: #f2faed; border-bottom: 0.5px solid rgba(23,52,4,0.08); padding: 8px 48px; text-align: center; font-size: 12px; font-weight: 600; color: #27500A; letter-spacing: 0.2px; }
 
-/* FLOATING HAMBURGER BUTTON */
-.fabMenu { position: fixed; top: 16px; right: 16px; z-index: 200; width: 44px; height: 44px; border-radius: 50%; background: rgba(253,252,247,0.95); border: 1px solid rgba(23,52,4,0.12); box-shadow: 0 4px 16px rgba(23,52,4,0.15); cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: box-shadow 0.2s, transform 0.2s; }
-.fabMenu:hover { box-shadow: 0 6px 20px rgba(23,52,4,0.22); transform: scale(1.05); }
+/* FIXED TOP BAR */
+.topBar { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(253,252,247,0.92); border-bottom: 0.5px solid rgba(23,52,4,0.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.topBarMenu { width: 40px; height: 40px; border-radius: 50%; background: rgba(23,52,4,0.06); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+.topBarMenu:hover { background: rgba(23,52,4,0.12); }
+.topBarActions { display: flex; align-items: center; gap: 8px; }
+.topBarBtnGreen { padding: 8px 16px; border-radius: 999px; background: #173404; font-size: 12.5px; font-weight: 600; color: #EAF3DE; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+.topBarBtnGreen:hover { background: #0d2002; }
+.topBarBtnBlue { padding: 8px 16px; border-radius: 999px; background: #1e4db7; font-size: 12.5px; font-weight: 600; color: #ffffff; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
+.topBarBtnBlue:hover { background: #1a3fa0; }
 
 /* DRAWER BACKDROP */
 .drawerBackdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; }
