@@ -156,6 +156,7 @@ const testimonials = [
 export default function LandingPage() {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const loggedIn = isAuthenticated();
 
   const goToQuickConsult = () =>
     router.push(isAuthenticated() ? "/payment" : "/login");
@@ -180,6 +181,9 @@ export default function LandingPage() {
         </button>
 
         <div className={s.topBarActions}>
+          {!loggedIn && (
+            <Link href="/login" className={s.topBarBtnLogin}>تسجيل الدخول</Link>
+          )}
           <Link href="/orgPortal" className={s.topBarBtnGreen}>دخول المنشآت</Link>
           <Link href="/schoolLogin" className={s.topBarBtnBlue}>دخول المدارس</Link>
         </div>
@@ -207,16 +211,30 @@ export default function LandingPage() {
 
         {/* Section links */}
         <nav className={s.drawerNav}>
-          <p className={s.drawerSection}>تصفّح</p>
-          <a href="#b2c" className={s.drawerLink} onClick={closeDrawer}>للأفراد</a>
-          <a href="#b2b" className={s.drawerLink} onClick={closeDrawer}>للمنشآت</a>
-          <a href="#partners" className={s.drawerLink} onClick={closeDrawer}>شركاؤنا</a>
+          {/* App navigation — mirrors the old bottom nav */}
+          <p className={s.drawerSection}>القائمة</p>
+          <Link href="/landing"          className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            الرئيسية
+          </Link>
+          <Link href="/myConsultations"  className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            الاستشارات
+          </Link>
+          <Link href="/mySubscriptions"  className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8"/><path d="M2 10h20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            باقاتي
+          </Link>
+          <Link href="/profile"          className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            المزيد
+          </Link>
 
           <div className={s.drawerDivider} />
 
-          <p className={s.drawerSection}>الدخول</p>
-          <Link href="/login" className={s.drawerLink} onClick={closeDrawer}>تسجيل الدخول</Link>
-          <Link href="/orgPortal" className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
+          {/* Portal access */}
+          <p className={s.drawerSection}>بوابات المنشآت</p>
+          <Link href="/orgPortal"  className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
           <Link href="/schoolLogin" className={s.drawerLinkBlue} onClick={closeDrawer}>دخول المدارس</Link>
         </nav>
 

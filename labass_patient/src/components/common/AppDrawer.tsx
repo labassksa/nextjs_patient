@@ -15,7 +15,7 @@ interface AppDrawerProps {
 }
 
 const navItems = [
-  { href: "/home",            label: "الرئيسية",   icon: HomeIcon },
+  { href: "/landing",         label: "الرئيسية",   icon: HomeIcon },
   { href: "/myConsultations", label: "الاستشارات",  icon: ChatBubbleIcon },
   { href: "/mySubscriptions", label: "باقاتي",      icon: CardMembershipIcon },
   { href: "/profile",         label: "المزيد",      icon: UserIcon },

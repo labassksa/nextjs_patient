@@ -9,6 +9,8 @@
 .topBarMenu { width: 40px; height: 40px; border-radius: 50%; background: rgba(23,52,4,0.06); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
 .topBarMenu:hover { background: rgba(23,52,4,0.12); }
 .topBarActions { display: flex; align-items: center; gap: 8px; }
+.topBarBtnLogin { padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(23,52,4,0.25); font-size: 12.5px; font-weight: 500; color: #173404; text-decoration: none; transition: all 0.2s; white-space: nowrap; background: transparent; }
+.topBarBtnLogin:hover { background: rgba(23,52,4,0.05); border-color: #173404; }
 .topBarBtnGreen { padding: 8px 16px; border-radius: 999px; background: #173404; font-size: 12.5px; font-weight: 600; color: #EAF3DE; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
 .topBarBtnGreen:hover { background: #0d2002; }
 .topBarBtnBlue { padding: 8px 16px; border-radius: 999px; background: #1e4db7; font-size: 12.5px; font-weight: 600; color: #ffffff; text-decoration: none; transition: background 0.2s; white-space: nowrap; }
@@ -40,6 +42,12 @@
 .drawerLinkBlue { display: block; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 700; color: #1e4db7; text-decoration: none; background: rgba(30,77,183,0.07); border: 1px solid rgba(30,77,183,0.18); transition: background 0.15s; margin-top: 4px; }
 .drawerLinkBlue:hover { background: rgba(30,77,183,0.14); }
 .drawerDivider { height: 1px; background: rgba(23,52,4,0.08); margin: 8px 4px; }
+
+/* Drawer nav items (app navigation style) */
+.drawerNavItem { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; font-size: 15px; font-weight: 500; color: #173404; text-decoration: none; transition: background 0.15s; }
+.drawerNavItem:hover { background: rgba(23,52,4,0.06); }
+.drawerNavItem svg { flex-shrink: 0; color: #6b7280; }
+.drawerNavItem:hover svg { color: #173404; }
 
 /* Drawer footer */
 .drawerFoot { padding: 14px 20px; border-top: 1px solid rgba(23,52,4,0.07); }
