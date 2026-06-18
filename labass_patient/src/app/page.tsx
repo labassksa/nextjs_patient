@@ -1,1 +1,5 @@
-export { default } from "./home/page";
+import { redirect } from "next/navigation";
+
+export default function RootPage() {
+  redirect("/landing");
+}

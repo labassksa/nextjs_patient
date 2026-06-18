@@ -2,7 +2,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import ConsultationCard from "./_components/myConsultation/card"; // Adjust the import path based on your structure
-import BottomNavBar from "../../components/common/BottomNavBar";
+import AppDrawer from "../../components/common/AppDrawer";
 import Header from "../../components/common/header";
 import { usePathname } from "next/navigation";
 import { fetchConsultations } from "./_controllers/myConsultations"; // Adjust the path as necessary
@@ -62,7 +62,7 @@ const MyConsultationsPage = () => {
           ))
         )}
       </div>
-      <BottomNavBar currentPath={pathname} />
+      <AppDrawer currentPath={pathname} />
     </div>
   );
 };

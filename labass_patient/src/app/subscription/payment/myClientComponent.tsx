@@ -82,66 +82,70 @@ const SubscriptionPaymentClient: React.FC = () => {
     apply();
   }, [tokenUUIDParam, promoCodeParam]);
 
+  const trustStrip = (
+    <div className={s.trustCard}>
+      <div className={s.trustRow}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2Z" stroke="#639922" strokeWidth="1.8" strokeLinejoin="round"/>
+          <path d="M9 12l2 2 4-4" stroke="#639922" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span className={s.trustTxt}>مدفوع بأمان عبر MyFatoorah · SSL مشفّر</span>
+      </div>
+      <div className={s.trustLogos}>
+        {[
+          { src: "/icons/visa.svg",      alt: "Visa",       w: 38 },
+          { src: "/icons/mada.svg",      alt: "Mada",       w: 38 },
+          { src: "/icons/mc.svg",        alt: "Mastercard", w: 30 },
+          { src: "/icons/apple_pay.svg", alt: "Apple Pay",  w: 46 },
+        ].map((logo) => (
+          <div key={logo.alt} className={s.trustLogoBox}>
+            <Image src={logo.src} alt={logo.alt} width={logo.w} height={20} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const payBtn = (
+    <PaymentButton
+      method={paymentMethod}
+      discountedPrice={discountedPrice}
+      promoCode={promoCode}
+      referralCode={referralCode || undefined}
+      bundleId={bundleId}
+      subscriberType={subscriberType}
+      isRecurring={isRecurring}
+    />
+  );
+
   return (
     <div dir="rtl" className={s.app}>
 
       {/* ── Sticky nav ── */}
       <PaymentHeader onBack={() => router.back()} />
 
-      {/* ── Scrollable content ── */}
-      <div className={s.scroll}>
+      {/* ── Desktop: 2-col grid / Mobile: single column ── */}
+      <div className={s.pageBody}>
 
-        {/* Bundle banner */}
-        <PaymentIntro bundle={bundle} price={discountedPrice} />
+        {/* Left column — plan card (sticks on desktop) */}
+        <div className={s.colPlan}>
+          <PaymentIntro bundle={bundle} price={discountedPrice} />
+          <div className={s.colPlanTrust}>{trustStrip}</div>
+        </div>
 
-        <div className={s.body}>
-
-          {/* Payment method selector */}
-          <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
-
-          {/* Referral code */}
-          <ReferralCodeInput setReferralCode={setReferralCode} />
-
-          {/* Order summary */}
-          <PaymentSummary discountedPrice={discountedPrice} />
-
-          {/* Trust strip */}
-          <div className={s.trustCard}>
-            <div className={s.trustRow}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L4 6v6c0 5.25 3.5 10.15 8 11.35C16.5 22.15 20 17.25 20 12V6L12 2Z" stroke="#639922" strokeWidth="1.8" strokeLinejoin="round"/>
-                <path d="M9 12l2 2 4-4" stroke="#639922" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className={s.trustTxt}>مدفوع بأمان عبر MyFatoorah · SSL مشفّر</span>
-            </div>
-            <div className={s.trustLogos}>
-              {[
-                { src: "/icons/visa.svg",      alt: "Visa",       w: 38 },
-                { src: "/icons/mada.svg",      alt: "Mada",       w: 38 },
-                { src: "/icons/mc.svg",        alt: "Mastercard", w: 30 },
-                { src: "/icons/apple_pay.svg", alt: "Apple Pay",  w: 46 },
-              ].map((logo) => (
-                <div key={logo.alt} className={s.trustLogoBox}>
-                  <Image src={logo.src} alt={logo.alt} width={logo.w} height={20} />
-                </div>
-              ))}
+        {/* Right column — payment form + pay button */}
+        <div className={s.colForm}>
+          <div className={s.colFormScroll}>
+            <div className={s.body}>
+              <PaymentMethod method={paymentMethod} setMethod={setPaymentMethod} />
+              <ReferralCodeInput setReferralCode={setReferralCode} />
+              <PaymentSummary discountedPrice={discountedPrice} />
+              <div className={s.colFormTrustMobile}>{trustStrip}</div>
             </div>
           </div>
-
+          <div className={s.footer}>{payBtn}</div>
         </div>
-      </div>
 
-      {/* ── Sticky pay footer ── */}
-      <div className={s.footer}>
-        <PaymentButton
-          method={paymentMethod}
-          discountedPrice={discountedPrice}
-          promoCode={promoCode}
-          referralCode={referralCode || undefined}
-          bundleId={bundleId}
-          subscriberType={subscriberType}
-          isRecurring={isRecurring}
-        />
       </div>
 
       {/* ── Magic-link loading overlay ── */}

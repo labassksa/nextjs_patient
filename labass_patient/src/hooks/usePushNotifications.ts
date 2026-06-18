@@ -290,7 +290,7 @@ export function usePushNotifications(): PushNotificationHookReturn {
 
       // Show notification even when app is in foreground
       if (payload.notification) {
-        const notificationTitle = payload.notification.title || 'لباس';
+        const notificationTitle = payload.notification.title || 'لاباس';
         const notificationOptions: NotificationOptions = {
           body: payload.notification.body || '',
           icon: '/icons/icon-192x192.png',

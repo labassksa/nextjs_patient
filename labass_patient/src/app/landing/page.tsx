@@ -1,7 +1,10 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { isAuthenticated } from "../../utils/auth";
 import s from "./landing.module.css";
 
 /* ─── B2C PACKAGES ─── */
@@ -151,25 +154,97 @@ const testimonials = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [loggedIn, setLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    setLoggedIn(isAuthenticated());
+  }, []);
+
+  const goToQuickConsult = () =>
+    router.push(loggedIn ? "/payment" : "/login");
+
+  const goToObesity = () =>
+    router.push(loggedIn ? "/obesitySurvey" : "/login");
+
+  const closeDrawer = () => setDrawerOpen(false);
+
   return (
     <>
-      {/* ─── FIXED TOP HEADER ─── */}
-      <div className={s.navOuter} dir="rtl">
-        <nav className={s.nav}>
+      {/* ─── FIXED TOP BAR ─── */}
+      <div className={s.topBar} dir="rtl">
+        <button
+          className={s.topBarMenu}
+          onClick={() => setDrawerOpen(true)}
+          aria-label="القائمة"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6h16M4 12h16M4 18h16" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
+          </svg>
+        </button>
+
+        <div className={s.topBarActions}>
+          {!loggedIn && (
+            <Link href="/login" className={s.topBarBtnLogin}>تسجيل الدخول</Link>
+          )}
+          <Link href="/orgPortal" className={s.topBarBtnGreen}>دخول المنشآت</Link>
+          <Link href="/schoolLogin" className={s.topBarBtnBlue}>دخول المدارس</Link>
+        </div>
+      </div>
+
+      {/* ─── DRAWER BACKDROP ─── */}
+      {drawerOpen && (
+        <div className={s.drawerBackdrop} onClick={closeDrawer} />
+      )}
+
+      {/* ─── DRAWER PANEL ─── */}
+      <div dir="rtl" className={`${s.drawer} ${drawerOpen ? s.drawerOpen : ""}`}>
+        {/* Header */}
+        <div className={s.drawerHead}>
           <div className={s.brand}>
             <div className={s.mark} />
             <span className={s.bname}>لاباس</span>
           </div>
-          <div className={s.navLinks}>
-            <a href="#b2c" className={s.navLink}>للأفراد</a>
-            <a href="#b2b" className={s.navLink}>للمنشآت</a>
-            <a href="#partners" className={s.navLink}>شركاؤنا</a>
-          </div>
-          <div className={s.navAuth}>
-            <Link href="/home" className={s.navAuthInd}>تسجيل الدخول</Link>
-            <Link href="/orgPortal" className={s.navAuthOrg}>بوابة المنشآت</Link>
-          </div>
+          <button className={s.drawerClose} onClick={closeDrawer} aria-label="إغلاق">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M18 6L6 18M6 6l12 12" stroke="#173404" strokeWidth="2.2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Section links */}
+        <nav className={s.drawerNav}>
+          {/* App navigation — mirrors the old bottom nav */}
+          <p className={s.drawerSection}>القائمة</p>
+          <Link href="/landing"          className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            الرئيسية
+          </Link>
+          <Link href="/myConsultations"  className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            الاستشارات
+          </Link>
+          <Link href="/mySubscriptions"  className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8"/><path d="M2 10h20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            باقاتي
+          </Link>
+          <Link href="/profile"          className={s.drawerNavItem} onClick={closeDrawer}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+            المزيد
+          </Link>
+
+          <div className={s.drawerDivider} />
+
+          {/* Portal access */}
+          <p className={s.drawerSection}>بوابات المنشآت</p>
+          <Link href="/orgPortal"  className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
+          <Link href="/schoolLogin" className={s.drawerLinkBlue} onClick={closeDrawer}>دخول المدارس</Link>
         </nav>
+
+        <div className={s.drawerFoot}>
+          <p className={s.drawerFootTxt}>شركة معالم التطوير · مرخّصة من وزارة الصحة</p>
+        </div>
       </div>
 
     <div dir="rtl" className={s.app}>
@@ -226,6 +301,62 @@ export default function LandingPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* ─── QUICK ACTIONS ─── */}
+      <section className={s.quickSec}>
+        <div className={s.quickHead}>
+          <h2 className={s.quickTtl}>ابدأ الآن بدون اشتراك</h2>
+          <p className={s.quickSub}>استشارة فورية أو رحلة صحية — اختر ما يناسبك</p>
+        </div>
+
+        <div className={s.quickGrid}>
+          {/* Quick consultation */}
+          <button onClick={goToQuickConsult} className={`${s.quickCard} ${s.quickCardGreen}`}>
+            <div className={s.quickCardInner}>
+              <div className={s.quickTop}>
+                <span className={s.quickBadge}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                  </svg>
+                  أقل من دقيقة
+                </span>
+                <h3 className={s.quickCardTitle}>استشارة طبية فورية</h3>
+                <p className={s.quickCardSub}>تحدث مع طبيب مرخّص مباشرةً</p>
+              </div>
+              <ul className={s.quickFeats}>
+                <li className={s.quickFeat}><span className={s.quickDot}/> وصفة طبية معتمدة</li>
+                <li className={s.quickFeat}><span className={s.quickDot}/> قراءة نتائج التحاليل</li>
+                <li className={s.quickFeat}><span className={s.quickDot}/> إعادة صرف الأدوية</li>
+              </ul>
+              <span className={s.quickCta}>
+                ابدأ الاستشارة
+                <span className={s.quickCtaArr}>←</span>
+              </span>
+            </div>
+          </button>
+
+          {/* Obesity program */}
+          <button onClick={goToObesity} className={`${s.quickCard} ${s.quickCardOb}`}>
+            <div className={s.quickCardInner}>
+              <div className={s.quickTop}>
+                <span className={s.quickBadgeDark}>استشارة السمنة</span>
+                <h3 className={s.quickCardTitleDark}>برنامج إنقاص الوزن</h3>
+                <p className={s.quickCardSubDark}>خطة مخصصة تحت إشراف طبي متكامل</p>
+              </div>
+              <ul className={s.quickFeats}>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> أدوية سمنة معتمدة من FDA</li>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> برامج غذائية مخصصة</li>
+                <li className={s.quickFeatDark}><span className={s.quickDotDark}/> متابعة مستمرة مع الطبيب</li>
+              </ul>
+              <span className={s.quickCtaDark}>
+                ابدأ رحلتك الآن
+                <span className={s.quickCtaArrDark}>←</span>
+              </span>
+            </div>
+          </button>
         </div>
       </section>
 

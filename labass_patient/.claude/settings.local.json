@@ -4,7 +4,8 @@
       "Bash(xargs grep *)",
       "Bash(npm run *)",
       "Bash(Get-ChildItem -Path \"D:\\\\Labass\\\\nextjs_patient\\\\labass_patient\" -Recurse -Filter \"*completeInfo*\" -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object -ExpandProperty FullName)"
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "WebFetch(domain:labass.sa)"
     ]
   }
 }

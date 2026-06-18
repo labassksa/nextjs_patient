@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import BottomNavBar from "../../components/common/BottomNavBar";
+import AppDrawer from "../../components/common/AppDrawer";
 import Header from "../../components/common/header";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchSubscriptions } from "./_controllers/fetchSubscriptions";
@@ -379,7 +379,7 @@ export default function MySubscriptionsPage() {
         )}
       </div>
 
-      <BottomNavBar currentPath={pathname} />
+      <AppDrawer currentPath={pathname} />
     </div>
   );
 }
