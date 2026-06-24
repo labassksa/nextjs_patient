@@ -6,8 +6,9 @@ import {
   updateSubscription,
   toggleSubscriptionStatus,
   cancelSubscription,
+  getReferralReport,
 } from "../api/subscriptions.api";
-import type { CreateSubscriptionPayload, UpdateSubscriptionPayload } from "../types/subscription.types";
+import type { CreateSubscriptionPayload, UpdateSubscriptionPayload, ReferralReportParams } from "../types/subscription.types";
 
 export function useSubscriptions() {
   return useQuery({
@@ -54,5 +55,13 @@ export function useCancelSubscription() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.subscriptions.all });
     },
+  });
+}
+
+export function useReferralReport(params: ReferralReportParams) {
+  return useQuery({
+    queryKey: queryKeys.subscriptions.referralReport(params as Record<string, unknown>),
+    queryFn: () => getReferralReport(params),
+    enabled: !!(params.organizationId || params.marketerId),
   });
 }

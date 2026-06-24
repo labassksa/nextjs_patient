@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useOrganizations, useUpdateOrganization, useOrgConsultationsReport } from "@/features/dashboard/hooks/use-organizations";
 import { getOrgConsultationsReport } from "@/features/dashboard/api/organizations.api";
-import { useSubscriptions, useCreateSubscription } from "@/features/dashboard/hooks/use-subscriptions";
+import { useSubscriptions, useCreateSubscription, useReferralReport } from "@/features/dashboard/hooks/use-subscriptions";
 import { useBundles } from "@/features/dashboard/hooks/use-bundles";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useState, useEffect, useMemo } from "react";
 import { Plus, Eye, Building2, MapPin, GitBranch, Banknote, Calendar, Phone, User, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, CreditCard } from "lucide-react";
+import Link from "next/link";
 
 const ORG_TYPES = ["pharmacy", "laboratory", "home care", "school"] as const;
 const DEAL_TYPES = ["SUBSCRIPTION", "REVENUE_SHARE"] as const;
@@ -79,6 +80,20 @@ export default function OrganizationDetailPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const { data: reportData, isLoading: consultationsLoading } = useOrgConsultationsReport(orgId, fromDate, toDate, page, limit);
+
+  const monthAgo = new Date(today);
+  monthAgo.setMonth(today.getMonth() - 1);
+  const [refFromDate, setRefFromDate] = useState(monthAgo.toISOString().split("T")[0]);
+  const [refToDate, setRefToDate] = useState(today.toISOString().split("T")[0]);
+  const [refPage, setRefPage] = useState(1);
+  const [refLimit] = useState(10);
+  const { data: referralData, isLoading: referralLoading } = useReferralReport({
+    organizationId: orgId,
+    fromDate: refFromDate,
+    toDate: refToDate,
+    page: refPage,
+    limit: refLimit,
+  });
 
   const [exportConsultDialogOpen, setExportConsultDialogOpen] = useState(false);
   const [exportConsultFilename, setExportConsultFilename] = useState(`consultations-org-${orgId}`);
@@ -689,6 +704,105 @@ export default function OrganizationDetailPage() {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(Math.ceil((reportData?.total ?? consultationsList.length) / limit))} disabled={page >= Math.ceil((reportData?.total ?? consultationsList.length) / limit)}>
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Marketing Linked Subscriptions */}
+      <Card>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle>
+            Marketing Linked Subscriptions{" "}
+            {referralData && (
+              <Badge variant="secondary" className="ml-2 font-mono">{referralData.total}</Badge>
+            )}
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+              <Input type="date" lang="en" value={refFromDate} onChange={(e) => { setRefFromDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={refToDate} />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+              <Input type="date" lang="en" value={refToDate} onChange={(e) => { setRefToDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" min={refFromDate} max={today.toISOString().split("T")[0]} />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {referralLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Loading subscriptions...</p>
+          ) : (referralData?.data ?? []).length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Referral Code</TableHead>
+                    <TableHead>Marketer</TableHead>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Bundle</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(referralData?.data ?? []).map((s) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-mono text-xs">#{s.id}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.referralCode?.code ?? "—"}</TableCell>
+                      <TableCell>
+                        {s.marketer ? (
+                          <Link href={`/dashboard/marketers/${s.marketer.id}`} className="text-custom-green hover:underline">
+                            {s.marketer.user?.firstName} {s.marketer.user?.lastName}
+                          </Link>
+                        ) : "—"}
+                      </TableCell>
+                      <TableCell>{s.patient?.user?.firstName} {s.patient?.user?.lastName}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{s.bundle?.name ?? "—"}</TableCell>
+                      <TableCell><StatusBadge status={s.status} /></TableCell>
+                      <TableCell className="font-mono text-xs">{s.price} {s.currency ?? ""}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No marketing linked subscriptions found for this date range.
+            </p>
+          )}
+
+          {/* Pagination */}
+          {(referralData?.total ?? 0) > refLimit && (
+            <div className="flex items-center justify-between px-1 py-4">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-medium text-foreground">{(refPage - 1) * refLimit + 1}</span>
+                {" "}to{" "}
+                <span className="font-medium text-foreground">{Math.min(refPage * refLimit, referralData?.total ?? 0)}</span>
+                {" "}of{" "}
+                <span className="font-medium text-foreground">{referralData?.total}</span>
+              </p>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground mr-2">
+                  Page {refPage} of {Math.ceil((referralData?.total ?? 0) / refLimit) || 1}
+                </span>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage(1)} disabled={refPage === 1}>
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage((p) => p - 1)} disabled={refPage === 1}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage((p) => p + 1)} disabled={refPage >= Math.ceil((referralData?.total ?? 0) / refLimit)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage(Math.ceil((referralData?.total ?? 0) / refLimit))} disabled={refPage >= Math.ceil((referralData?.total ?? 0) / refLimit)}>
                   <ChevronsRight className="h-4 w-4" />
                 </Button>
               </div>

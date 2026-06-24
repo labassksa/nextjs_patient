@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useMarketers, useUpdateMarketer, useSendMessageToMarketer, useSendPromoCodesToMarketer, useMarketerConsultations } from "@/features/dashboard/hooks/use-marketers";
 import { useGeneratePromoCode, useTogglePromoCode, useResetMarketerPromoUsage } from "@/features/dashboard/hooks/use-promo-codes";
+import { useReferralReport } from "@/features/dashboard/hooks/use-subscriptions";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -18,7 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe } from "lucide-react";
+import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import Link from "next/link";
 
 export default function MarketerDetailPage() {
@@ -81,6 +82,14 @@ export default function MarketerDetailPage() {
   const marketerUserId = marketer?.userId ?? 0;
   const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
   const consultationsList = consultData?.consultations ?? [];
+
+  const [refPage, setRefPage] = useState(1);
+  const refLimit = 10;
+  const { data: referralData, isLoading: referralLoading } = useReferralReport({
+    marketerId: marketerId,
+    page: refPage,
+    limit: refLimit,
+  });
 
   if (isLoading) return <FormSkeleton fields={4} />;
   if (error) return <ErrorState onRetry={() => refetch()} />;
@@ -419,6 +428,87 @@ export default function MarketerDetailPage() {
             <p className="text-sm text-muted-foreground text-center py-6">
               No consultations found for this date range.
             </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Marketing Linked Subscriptions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Marketing Linked Subscriptions{" "}
+            {referralData && (
+              <Badge variant="secondary" className="ml-2 font-mono">{referralData.total}</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {referralLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-6">Loading subscriptions...</p>
+          ) : (referralData?.data ?? []).length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Referral Code</TableHead>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Bundle</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Created</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(referralData?.data ?? []).map((s) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-mono text-xs">#{s.id}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.referralCode?.code ?? "—"}</TableCell>
+                      <TableCell>{s.patient?.user?.firstName} {s.patient?.user?.lastName}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{s.bundle?.name ?? "—"}</TableCell>
+                      <TableCell><StatusBadge status={s.status} /></TableCell>
+                      <TableCell className="font-mono text-xs">{s.price} {s.currency ?? ""}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No marketing linked subscriptions found.
+            </p>
+          )}
+
+          {/* Pagination */}
+          {(referralData?.total ?? 0) > refLimit && (
+            <div className="flex items-center justify-between px-1 py-4">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                <span className="font-medium text-foreground">{(refPage - 1) * refLimit + 1}</span>
+                {" "}to{" "}
+                <span className="font-medium text-foreground">{Math.min(refPage * refLimit, referralData?.total ?? 0)}</span>
+                {" "}of{" "}
+                <span className="font-medium text-foreground">{referralData?.total}</span>
+              </p>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground mr-2">
+                  Page {refPage} of {Math.ceil((referralData?.total ?? 0) / refLimit) || 1}
+                </span>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage(1)} disabled={refPage === 1}>
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage((p) => p - 1)} disabled={refPage === 1}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage((p) => p + 1)} disabled={refPage >= Math.ceil((referralData?.total ?? 0) / refLimit)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setRefPage(Math.ceil((referralData?.total ?? 0) / refLimit))} disabled={refPage >= Math.ceil((referralData?.total ?? 0) / refLimit)}>
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
