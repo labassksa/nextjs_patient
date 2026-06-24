@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useOrganizations, useUpdateOrganization, useOrgConsultationsReport } from "@/features/dashboard/hooks/use-organizations";
+import { getOrgConsultationsReport } from "@/features/dashboard/api/organizations.api";
 import { useSubscriptions, useCreateSubscription } from "@/features/dashboard/hooks/use-subscriptions";
 import { useBundles } from "@/features/dashboard/hooks/use-bundles";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
@@ -79,25 +80,41 @@ export default function OrganizationDetailPage() {
   const [limit, setLimit] = useState(10);
   const { data: reportData, isLoading: consultationsLoading } = useOrgConsultationsReport(orgId, fromDate, toDate, page, limit);
 
+  const [exportConsultDialogOpen, setExportConsultDialogOpen] = useState(false);
+  const [exportConsultFilename, setExportConsultFilename] = useState(`consultations-org-${orgId}`);
+  const [isExportingConsult, setIsExportingConsult] = useState(false);
+
+  const openExportConsultDialog = () => {
+    setExportConsultFilename(`consultations-org-${orgId}`);
+    setExportConsultDialogOpen(true);
+  };
+
   const handleExportConsultations = async () => {
-    const XLSX = await import("xlsx");
-    const rows = (reportData?.consultations ?? []).map((c) => ({
-      ID: c.id,
-      Source: c.subscription ? "Bundle" : "Promo",
-      Status: c.status,
-      "Subscription ID": c.subscription?.id ?? "—",
-      "Bundle Type": c.subscription?.bundleType ?? "—",
-      Remaining: c.subscription?.remainingConsultations ?? "—",
-      Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-      Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-      Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-      Created: new Date(c.createdAt).toLocaleDateString(),
-      Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Consultations");
-    XLSX.writeFile(wb, `consultations-org-${orgId}.xlsx`);
+    setExportConsultDialogOpen(false);
+    setIsExportingConsult(true);
+    try {
+      const XLSX = await import("xlsx");
+      const allData = await getOrgConsultationsReport(orgId, fromDate, toDate, 1, reportData?.total || 10000);
+      const rows = (allData.consultations ?? []).map((c) => ({
+        ID: c.id,
+        Source: c.subscription ? "Bundle" : "Promo",
+        Status: c.status,
+        "Subscription ID": c.subscription?.id ?? "—",
+        "Bundle Type": c.subscription?.bundleType ?? "—",
+        Remaining: c.subscription?.remainingConsultations ?? "—",
+        Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
+        Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
+        Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
+        Created: new Date(c.createdAt).toLocaleDateString(),
+        Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Consultations");
+      XLSX.writeFile(wb, `${exportConsultFilename || `consultations-org-${orgId}`}.xlsx`);
+    } finally {
+      setIsExportingConsult(false);
+    }
   };
 
   const org = Array.isArray(orgs) ? orgs.find((o) => o.id === orgId) : undefined;
@@ -548,9 +565,34 @@ export default function OrganizationDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Export filename dialog */}
+          <Dialog open={exportConsultDialogOpen} onOpenChange={setExportConsultDialogOpen}>
+            <DialogContent className="sm:max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Export to Excel</DialogTitle>
+              </DialogHeader>
+              <div className="py-2">
+                <Input
+                  value={exportConsultFilename}
+                  onChange={(e) => setExportConsultFilename(e.target.value)}
+                  placeholder="File name"
+                  onKeyDown={(e) => { if (e.key === "Enter") handleExportConsultations(); }}
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setExportConsultDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleExportConsultations} disabled={!exportConsultFilename.trim() || isExportingConsult}>
+                  {isExportingConsult ? "Exporting..." : "Export"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <div className="flex justify-end mb-3">
-            <Button variant="outline" size="sm" onClick={handleExportConsultations} disabled={consultationsList.length === 0 || consultationsLoading}>
-              <Download className="h-4 w-4 mr-2" /> Export to Excel
+            <Button variant="outline" size="sm" onClick={openExportConsultDialog} disabled={consultationsList.length === 0 || consultationsLoading || isExportingConsult}>
+              <Download className="h-4 w-4 mr-2" /> {isExportingConsult ? "Exporting..." : "Export to Excel"}
             </Button>
           </div>
           {consultationsLoading ? (

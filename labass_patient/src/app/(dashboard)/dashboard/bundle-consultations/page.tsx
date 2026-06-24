@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { useOrganizations } from "@/features/dashboard/hooks/use-organizations";
 import { useOrgSubscriptionConsultations } from "@/features/dashboard/hooks/use-organizations";
 import { useSubscriptions } from "@/features/dashboard/hooks/use-subscriptions";
+import { getOrgSubscriptionConsultations } from "@/features/dashboard/api/organizations.api";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -13,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
@@ -83,24 +85,47 @@ export default function BundleConsultationsPage() {
     setPage(1);
   };
 
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFilename, setExportFilename] = useState(`bundle-consultations-org${orgId}`);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const openExportDialog = () => {
+    setExportFilename(`bundle-consultations-org${orgId}`);
+    setExportDialogOpen(true);
+  };
+
   const handleExport = async () => {
-    const XLSX = await import("xlsx");
-    const rows = (data?.consultations ?? []).map((c) => ({
-      "Consultation ID": c.id,
-      Type: c.type,
-      Status: c.status,
-      "Bundle Type": c.subscription?.bundle?.type ?? "",
-      "Subscription ID": c.subscription?.id ?? "",
-      "Remaining / Total": `${c.subscription?.remainingConsultations} / ${c.subscription?.totalConsultations}`,
-      "Patient Name": c.patient?.user?.firstName ?? "",
-      "Patient Phone": c.patient?.user?.phoneNumber ?? "",
-      "Doctor Name": `${c.doctor?.user?.firstName ?? ""} ${c.doctor?.user?.lastName ?? ""}`.trim(),
-      Created: new Date(c.createdAt).toLocaleDateString(),
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Bundle Consultations");
-    XLSX.writeFile(wb, `bundle-consultations-org${orgId}.xlsx`);
+    setExportDialogOpen(false);
+    setIsExporting(true);
+    try {
+      const XLSX = await import("xlsx");
+      const allData = await getOrgSubscriptionConsultations(orgId ?? 0, {
+        bundleType: bundleType !== "ALL" ? bundleType : undefined,
+        subscriptionId: subscriptionId ?? undefined,
+        fromDate,
+        toDate,
+        page: 1,
+        limit: data?.total || 10000,
+      });
+      const rows = (allData.consultations ?? []).map((c) => ({
+        "Consultation ID": c.id,
+        Type: c.type,
+        Status: c.status,
+        "Bundle Type": c.subscription?.bundle?.type ?? "",
+        "Subscription ID": c.subscription?.id ?? "",
+        "Remaining / Total": `${c.subscription?.remainingConsultations} / ${c.subscription?.totalConsultations}`,
+        "Patient Name": c.patient?.user?.firstName ?? "",
+        "Patient Phone": c.patient?.user?.phoneNumber ?? "",
+        "Doctor Name": `${c.doctor?.user?.firstName ?? ""} ${c.doctor?.user?.lastName ?? ""}`.trim(),
+        Created: new Date(c.createdAt).toLocaleDateString(),
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Bundle Consultations");
+      XLSX.writeFile(wb, `${exportFilename || "bundle-consultations"}.xlsx`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const consultations = data?.consultations ?? [];
@@ -220,12 +245,37 @@ export default function BundleConsultationsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleExport}
-            disabled={!orgId || consultations.length === 0 || isLoading}
+            onClick={openExportDialog}
+            disabled={!orgId || consultations.length === 0 || isLoading || isExporting}
           >
-            <Download className="h-4 w-4 mr-2" /> Export to Excel
+            <Download className="h-4 w-4 mr-2" /> {isExporting ? "Exporting..." : "Export to Excel"}
           </Button>
         </CardHeader>
+
+        {/* Export filename dialog */}
+        <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Export to Excel</DialogTitle>
+            </DialogHeader>
+            <div className="py-2">
+              <Input
+                value={exportFilename}
+                onChange={(e) => setExportFilename(e.target.value)}
+                placeholder="File name"
+                onKeyDown={(e) => { if (e.key === "Enter") handleExport(); }}
+                autoFocus
+              />
+              <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setExportDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleExport} disabled={!exportFilename.trim() || isExporting}>
+                {isExporting ? "Exporting..." : "Export"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <CardContent>
           {!orgId ? (
             <p className="text-sm text-muted-foreground text-center py-10">
