@@ -120,12 +120,17 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      if (data.success) {
+      const paymentUrl = data.data?.paymentURL ?? data.Data?.PaymentURL ?? null;
+      if (paymentUrl) {
+        await axios.get(paymentUrl);
+      }
+      if (data.success || paymentUrl) {
         localStorage.removeItem("vitamin_survey_answers");
         localStorage.removeItem("referralCode");
         router.push("/subscription/success");
       } else {
         console.error("Payment failed:", data);
+        router.push("/subscription/error");
       }
     } catch (err) {
       console.error("executeSubscriptionPayment error:", err);
