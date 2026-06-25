@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useConsultationsReport } from "@/features/dashboard/hooks/use-consultations";
 import { useSendFollowUp } from "@/features/dashboard/hooks/use-consultations";
+import { getConsultationsReport } from "@/features/dashboard/api/consultations.api";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -34,6 +35,9 @@ export default function ConsultationsPage() {
     consultationId: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("Through Labass Platform");
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exportFilename, setExportFilename] = useState(`consultations-${fromDate}-to-${toDate}`);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleSendFollowUp = async () => {
     await sendFollowUp.mutateAsync({
@@ -43,21 +47,33 @@ export default function ConsultationsPage() {
     setFollowUpDialog({ open: false, consultationId: "" });
   };
 
+  const openExportDialog = () => {
+    setExportFilename(`consultations-${fromDate}-to-${toDate}`);
+    setExportDialogOpen(true);
+  };
+
   const handleExport = async () => {
-    const XLSX = await import("xlsx");
-    const rows = (reportData?.consultations ?? []).map((c) => ({
-      ID: c.id,
-      Status: c.status,
-      Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-      Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-      Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-      Created: new Date(c.createdAt).toLocaleDateString(),
-      Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Consultations");
-    XLSX.writeFile(wb, `consultations-${fromDate}-to-${toDate}.xlsx`);
+    setExportDialogOpen(false);
+    setIsExporting(true);
+    try {
+      const XLSX = await import("xlsx");
+      const allData = await getConsultationsReport(fromDate, toDate, 1, reportData?.total || 10000);
+      const rows = (allData.consultations ?? []).map((c) => ({
+        ID: c.id,
+        Status: c.status,
+        Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
+        Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
+        Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
+        Created: new Date(c.createdAt).toLocaleDateString(),
+        Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Consultations");
+      XLSX.writeFile(wb, `${exportFilename || "consultations"}.xlsx`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   if (error) return <ErrorState onRetry={() => refetch()} />;
@@ -88,9 +104,34 @@ export default function ConsultationsPage() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Export filename dialog */}
+          <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+            <DialogContent className="sm:max-w-sm">
+              <DialogHeader>
+                <DialogTitle>Export to Excel</DialogTitle>
+              </DialogHeader>
+              <div className="py-2">
+                <Input
+                  value={exportFilename}
+                  onChange={(e) => setExportFilename(e.target.value)}
+                  placeholder="File name"
+                  onKeyDown={(e) => { if (e.key === "Enter") handleExport(); }}
+                  autoFocus
+                />
+                <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setExportDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleExport} disabled={!exportFilename.trim() || isExporting}>
+                  {isExporting ? "Exporting..." : "Export"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <div className="flex justify-end mb-3">
-            <Button variant="outline" size="sm" onClick={handleExport} disabled={consultationsList.length === 0 || isLoading}>
-              <Download className="h-4 w-4 mr-2" /> Export to Excel
+            <Button variant="outline" size="sm" onClick={openExportDialog} disabled={consultationsList.length === 0 || isLoading || isExporting}>
+              <Download className="h-4 w-4 mr-2" /> {isExporting ? "Exporting..." : "Export to Excel"}
             </Button>
           </div>
 

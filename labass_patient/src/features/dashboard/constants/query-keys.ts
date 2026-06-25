@@ -38,6 +38,7 @@ export const queryKeys = {
   subscriptions: {
     all: ["subscriptions"] as const,
     list: (filters?: Record<string, unknown>) => ["subscriptions", "list", filters] as const,
+    referralReport: (params: Record<string, unknown>) => ["subscriptions", "referralReport", params] as const,
   },
   promoCodes: {
     all: ["promoCodes"] as const,
