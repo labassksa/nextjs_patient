@@ -14,8 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 const BUNDLE_TYPES = [
@@ -85,21 +83,18 @@ export default function BundleConsultationsPage() {
     setPage(1);
   };
 
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [exportFilename, setExportFilename] = useState(`bundle-consultations-org${orgId}`);
   const [isExporting, setIsExporting] = useState(false);
 
-  const openExportDialog = () => {
-    setExportFilename(`bundle-consultations-org${orgId}`);
-    setExportDialogOpen(true);
-  };
-
   const handleExport = async () => {
-    setExportDialogOpen(false);
+    if (!orgId) return;
+    const orgName = orgList.find((o) => o.id === orgId)?.name ?? `org${orgId}`;
+    const filename = `الاستشارات الطبية - ${orgName}`;
+    const titleText = `الاستشارات الطبية لصيدليات ${orgName} من الفترة ${fromDate} الي ${toDate}`;
+
     setIsExporting(true);
     try {
-      const XLSX = await import("xlsx");
-      const allData = await getOrgSubscriptionConsultations(orgId ?? 0, {
+      const ExcelJS = (await import("exceljs")).default;
+      const allData = await getOrgSubscriptionConsultations(orgId, {
         bundleType: bundleType !== "ALL" ? bundleType : undefined,
         subscriptionId: subscriptionId ?? undefined,
         fromDate,
@@ -107,22 +102,65 @@ export default function BundleConsultationsPage() {
         page: 1,
         limit: data?.total || 10000,
       });
-      const rows = (allData.consultations ?? []).map((c) => ({
-        "Consultation ID": c.id,
-        Type: c.type,
-        Status: c.status,
-        "Bundle Type": c.subscription?.bundle?.type ?? "",
-        "Subscription ID": c.subscription?.id ?? "",
-        "Remaining / Total": `${c.subscription?.remainingConsultations} / ${c.subscription?.totalConsultations}`,
-        "Patient Name": c.patient?.user?.firstName ?? "",
-        "Patient Phone": c.patient?.user?.phoneNumber ?? "",
-        "Doctor Name": `${c.doctor?.user?.firstName ?? ""} ${c.doctor?.user?.lastName ?? ""}`.trim(),
-        Created: new Date(c.createdAt).toLocaleDateString(),
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Bundle Consultations");
-      XLSX.writeFile(wb, `${exportFilename || "bundle-consultations"}.xlsx`);
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Bundle Consultations");
+
+      const HEADERS = [
+        "Consultation ID", "Type", "Status", "Bundle Type",
+        "Subscription ID", "Remaining / Total",
+        "Patient Name", "Patient Phone", "Doctor Name", "Created",
+      ];
+
+      // Title row (merged, bold, large)
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+
+      // Blank spacer row
+      worksheet.addRow([]);
+
+      // Header row (bold)
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      });
+
+      // Data rows
+      for (const c of allData.consultations ?? []) {
+        worksheet.addRow([
+          c.id,
+          c.type,
+          c.status,
+          c.subscription?.bundle?.type ?? "",
+          c.subscription?.id ?? "",
+          `${c.subscription?.remainingConsultations} / ${c.subscription?.totalConsultations}`,
+          c.patient?.user?.firstName ?? "",
+          c.patient?.user?.phoneNumber ?? "",
+          `${c.doctor?.user?.firstName ?? ""} ${c.doctor?.user?.lastName ?? ""}`.trim(),
+          new Date(c.createdAt).toLocaleDateString(),
+        ]);
+      }
+
+      // Auto-width columns
+      HEADERS.forEach((_, i) => {
+        worksheet.getColumn(i + 1).width = 18;
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } finally {
       setIsExporting(false);
     }
@@ -245,37 +283,12 @@ export default function BundleConsultationsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={openExportDialog}
+            onClick={handleExport}
             disabled={!orgId || consultations.length === 0 || isLoading || isExporting}
           >
             <Download className="h-4 w-4 mr-2" /> {isExporting ? "Exporting..." : "Export to Excel"}
           </Button>
         </CardHeader>
-
-        {/* Export filename dialog */}
-        <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-          <DialogContent className="sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Export to Excel</DialogTitle>
-            </DialogHeader>
-            <div className="py-2">
-              <Input
-                value={exportFilename}
-                onChange={(e) => setExportFilename(e.target.value)}
-                placeholder="File name"
-                onKeyDown={(e) => { if (e.key === "Enter") handleExport(); }}
-                autoFocus
-              />
-              <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setExportDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleExport} disabled={!exportFilename.trim() || isExporting}>
-                {isExporting ? "Exporting..." : "Export"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
         <CardContent>
           {!orgId ? (
             <p className="text-sm text-muted-foreground text-center py-10">
