@@ -203,7 +203,7 @@ export default function OrganizationDetailPage() {
       });
 
       for (const s of allData.data ?? []) {
-        const marketer = s.referralCode?.marketer;
+        const marketer = s.marketer;
         worksheet.addRow([
           s.id,
           s.referralCode?.code ?? "",
