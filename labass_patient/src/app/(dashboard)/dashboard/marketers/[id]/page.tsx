@@ -87,10 +87,16 @@ export default function MarketerDetailPage() {
   const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
   const consultationsList = consultData?.consultations ?? [];
 
+  const monthAgoDate = new Date(todayDate);
+  monthAgoDate.setMonth(todayDate.getMonth() - 1);
+  const [refFromDate, setRefFromDate] = useState(monthAgoDate.toISOString().split("T")[0]);
+  const [refToDate, setRefToDate] = useState(todayDate.toISOString().split("T")[0]);
   const [refPage, setRefPage] = useState(1);
   const refLimit = 10;
   const { data: referralData, isLoading: referralLoading } = useReferralReport({
     marketerId: marketerId,
+    fromDate: refFromDate,
+    toDate: refToDate,
     page: refPage,
     limit: refLimit,
   });
@@ -150,7 +156,7 @@ export default function MarketerDetailPage() {
     setIsExportingReferral(true);
     try {
       const ExcelJS = (await import("exceljs")).default;
-      const allData = await getReferralReport({ marketerId, page: 1, limit: referralData?.total || 10000 });
+      const allData = await getReferralReport({ marketerId, fromDate: refFromDate, toDate: refToDate, page: 1, limit: referralData?.total || 10000 });
       const HEADERS = ["ID", "Referral Code", "Patient", "Bundle", "Status", "Price", "Created"];
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Marketing Subscriptions");
@@ -546,14 +552,24 @@ export default function MarketerDetailPage() {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle>
-            Marketing Linked Subscriptions{" "}
+            Marketing Link Subscriptions{" "}
             {referralData && (
               <Badge variant="secondary" className="ml-2 font-mono">{referralData.total}</Badge>
             )}
           </CardTitle>
-          <Button variant="outline" size="sm" onClick={handleExportReferral} disabled={!referralData?.data?.length || referralLoading || isExportingReferral}>
-            <Download className="h-4 w-4 mr-2" /> {isExportingReferral ? "Exporting..." : "Export to Excel"}
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
+              <Input type="date" lang="en" value={refFromDate} onChange={(e) => { setRefFromDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={refToDate} />
+            </div>
+            <div className="flex items-center gap-1">
+              <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
+              <Input type="date" lang="en" value={refToDate} onChange={(e) => { setRefToDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" min={refFromDate} max={todayDate.toISOString().split("T")[0]} />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportReferral} disabled={(referralData?.data ?? []).length === 0 || referralLoading || isExportingReferral}>
+              <Download className="h-4 w-4 mr-2" /> {isExportingReferral ? "Exporting..." : "Export to Excel"}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {referralLoading ? (
@@ -563,12 +579,11 @@ export default function MarketerDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead>Subscription ID</TableHead>
                     <TableHead>Referral Code</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Bundle</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Price</TableHead>
+                    <TableHead>Patient ID</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Bundle ID</TableHead>
                     <TableHead>Created</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -577,10 +592,9 @@ export default function MarketerDetailPage() {
                     <TableRow key={s.id}>
                       <TableCell className="font-mono text-xs">#{s.id}</TableCell>
                       <TableCell className="font-mono text-xs">{s.referralCode?.code ?? "—"}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.patient?.id ? `#${s.patient.id}` : "—"}</TableCell>
                       <TableCell>{s.patient?.user?.firstName} {s.patient?.user?.lastName}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{s.bundle?.name ?? "—"}</TableCell>
-                      <TableCell><StatusBadge status={s.status} /></TableCell>
-                      <TableCell className="font-mono text-xs">{s.price} {s.currency ?? ""}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.bundle?.id ? `#${s.bundle.id}` : "—"}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
                     </TableRow>
                   ))}
@@ -589,7 +603,7 @@ export default function MarketerDetailPage() {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-6">
-              No marketing linked subscriptions found.
+              No marketing linked subscriptions found for this date range.
             </p>
           )}
 
