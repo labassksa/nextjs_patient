@@ -30,6 +30,7 @@ export default function MarketersPage() {
     },
     {
       id: "name",
+      accessorFn: (row) => `${row.user?.firstName ?? row.firstName ?? ""} ${row.user?.lastName ?? row.lastName ?? ""}`.trim(),
       header: "Name",
       cell: ({ row }) => {
         const m = row.original;
@@ -123,6 +124,7 @@ export default function MarketersPage() {
         columns={columns}
         data={marketers}
         isLoading={isLoading}
+        searchKey="name"
         searchValue={search}
         exportFilename="marketers"
       />
