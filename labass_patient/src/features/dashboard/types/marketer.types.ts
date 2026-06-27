@@ -71,6 +71,7 @@ export interface UpdateMarketerPayload {
     gender?: string;
     nationalId?: string;
     dateOfBirth?: string;
+    phoneNumber?: string;
   };
 }
 

@@ -33,8 +33,11 @@ export interface ReferralSubscription {
   currency?: string;
   bundle?: { id: number; name: string; type?: string };
   patient?: { id: number; user?: { firstName?: string; lastName?: string; phoneNumber?: string } };
-  referralCode?: { id: number; code: string };
-  marketer?: { id: number; user?: { firstName?: string; lastName?: string } };
+  referralCode?: {
+    id: number;
+    code: string;
+    marketer?: { id: number; user?: { firstName?: string; lastName?: string } };
+  };
   organization?: { id: number; name: string };
 }
 

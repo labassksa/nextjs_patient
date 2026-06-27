@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useOrganizations, useUpdateOrganization, useOrgConsultationsReport } from "@/features/dashboard/hooks/use-organizations";
 import { getOrgConsultationsReport } from "@/features/dashboard/api/organizations.api";
 import { useSubscriptions, useCreateSubscription, useReferralReport } from "@/features/dashboard/hooks/use-subscriptions";
+import { getReferralReport } from "@/features/dashboard/api/subscriptions.api";
 import { useBundles } from "@/features/dashboard/hooks/use-bundles";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
@@ -95,44 +96,140 @@ export default function OrganizationDetailPage() {
     limit: refLimit,
   });
 
-  const [exportConsultDialogOpen, setExportConsultDialogOpen] = useState(false);
-  const [exportConsultFilename, setExportConsultFilename] = useState(`consultations-org-${orgId}`);
   const [isExportingConsult, setIsExportingConsult] = useState(false);
-
-  const openExportConsultDialog = () => {
-    setExportConsultFilename(`consultations-org-${orgId}`);
-    setExportConsultDialogOpen(true);
-  };
+  const [isExportingReferral, setIsExportingReferral] = useState(false);
 
   const handleExportConsultations = async () => {
-    setExportConsultDialogOpen(false);
+    const orgName = org?.name ?? `org${orgId}`;
+    const filename = `الاستشارات الطبية - ${orgName}`;
+    const titleText = `الاستشارات الطبية لصيدليات ${orgName} من الفترة ${fromDate} الي ${toDate}`;
+
     setIsExportingConsult(true);
     try {
-      const XLSX = await import("xlsx");
+      const ExcelJS = (await import("exceljs")).default;
       const allData = await getOrgConsultationsReport(orgId, fromDate, toDate, 1, reportData?.total || 10000);
-      const rows = (allData.consultations ?? []).map((c) => ({
-        ID: c.id,
-        Source: c.subscription ? "Bundle" : "Promo",
-        Status: c.status,
-        "Subscription ID": c.subscription?.id ?? "—",
-        "Bundle Type": c.subscription?.bundleType ?? "—",
-        Remaining: c.subscription?.remainingConsultations ?? "—",
-        Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-        Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-        Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-        Created: new Date(c.createdAt).toLocaleDateString(),
-        Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Consultations");
-      XLSX.writeFile(wb, `${exportConsultFilename || `consultations-org-${orgId}`}.xlsx`);
+
+      const HEADERS = ["ID", "Source", "Status", "Subscription ID", "Bundle Type", "Remaining", "Patient", "Marketer", "Doctor", "Created", "Closed"];
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Consultations");
+
+      // Bold title row
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+
+      // Spacer
+      worksheet.addRow([]);
+
+      // Header row
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      });
+
+      // Data rows
+      for (const c of allData.consultations ?? []) {
+        worksheet.addRow([
+          c.id,
+          c.subscription ? "Bundle" : "Promo",
+          c.status,
+          c.subscription?.id ?? "—",
+          c.subscription?.bundleType ?? "—",
+          c.subscription?.remainingConsultations ?? "—",
+          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
+          `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
+          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
+          new Date(c.createdAt).toLocaleDateString(),
+          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
+        ]);
+      }
+
+      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } finally {
       setIsExportingConsult(false);
     }
   };
 
   const org = Array.isArray(orgs) ? orgs.find((o) => o.id === orgId) : undefined;
+
+  const handleExportReferral = async () => {
+    const orgName = org?.name ?? `org${orgId}`;
+    const filename = `اشتراكات روابط التسويق - ${orgName}`;
+    const titleText = `اشتراكات روابط التسويق لـ ${orgName} من الفترة ${refFromDate} الي ${refToDate}`;
+
+    setIsExportingReferral(true);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const allData = await getReferralReport({
+        organizationId: orgId,
+        fromDate: refFromDate,
+        toDate: refToDate,
+        page: 1,
+        limit: referralData?.total || 10000,
+      });
+
+      const HEADERS = ["Subscription ID", "Referral Code", "Marketer ID", "Marketer Name", "Patient ID", "Patient Name", "Bundle ID", "Created"];
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Marketing Subscriptions");
+
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+
+      worksheet.addRow([]);
+
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      });
+
+      for (const s of allData.data ?? []) {
+        const marketer = s.referralCode?.marketer;
+        worksheet.addRow([
+          s.id,
+          s.referralCode?.code ?? "",
+          marketer?.id ?? "",
+          `${marketer?.user?.firstName ?? ""} ${marketer?.user?.lastName ?? ""}`.trim(),
+          s.patient?.id ?? "",
+          `${s.patient?.user?.firstName ?? ""} ${s.patient?.user?.lastName ?? ""}`.trim(),
+          s.bundle?.id ?? "",
+          new Date(s.createdAt).toLocaleDateString(),
+        ]);
+      }
+
+      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 20; });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExportingReferral(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: "",
@@ -580,33 +677,8 @@ export default function OrganizationDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Export filename dialog */}
-          <Dialog open={exportConsultDialogOpen} onOpenChange={setExportConsultDialogOpen}>
-            <DialogContent className="sm:max-w-sm">
-              <DialogHeader>
-                <DialogTitle>Export to Excel</DialogTitle>
-              </DialogHeader>
-              <div className="py-2">
-                <Input
-                  value={exportConsultFilename}
-                  onChange={(e) => setExportConsultFilename(e.target.value)}
-                  placeholder="File name"
-                  onKeyDown={(e) => { if (e.key === "Enter") handleExportConsultations(); }}
-                  autoFocus
-                />
-                <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setExportConsultDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleExportConsultations} disabled={!exportConsultFilename.trim() || isExportingConsult}>
-                  {isExportingConsult ? "Exporting..." : "Export"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
           <div className="flex justify-end mb-3">
-            <Button variant="outline" size="sm" onClick={openExportConsultDialog} disabled={consultationsList.length === 0 || consultationsLoading || isExportingConsult}>
+            <Button variant="outline" size="sm" onClick={handleExportConsultations} disabled={consultationsList.length === 0 || consultationsLoading || isExportingConsult}>
               <Download className="h-4 w-4 mr-2" /> {isExportingConsult ? "Exporting..." : "Export to Excel"}
             </Button>
           </div>
@@ -716,12 +788,12 @@ export default function OrganizationDetailPage() {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle>
-            Marketing Linked Subscriptions{" "}
+            Marketing Link Subscriptions {org?.name ? `— ${org.name}` : ""}{" "}
             {referralData && (
               <Badge variant="secondary" className="ml-2 font-mono">{referralData.total}</Badge>
             )}
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
               <Input type="date" lang="en" value={refFromDate} onChange={(e) => { setRefFromDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={refToDate} />
@@ -730,6 +802,9 @@ export default function OrganizationDetailPage() {
               <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
               <Input type="date" lang="en" value={refToDate} onChange={(e) => { setRefToDate(e.target.value); setRefPage(1); }} className="h-8 w-auto text-sm" dir="ltr" min={refFromDate} max={today.toISOString().split("T")[0]} />
             </div>
+            <Button variant="outline" size="sm" onClick={handleExportReferral} disabled={(referralData?.data ?? []).length === 0 || referralLoading || isExportingReferral}>
+              <Download className="h-4 w-4 mr-2" /> {isExportingReferral ? "Exporting..." : "Export to Excel"}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -740,35 +815,38 @@ export default function OrganizationDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead>Subscription ID</TableHead>
                     <TableHead>Referral Code</TableHead>
-                    <TableHead>Marketer</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Bundle</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Price</TableHead>
+                    <TableHead>Marketer ID</TableHead>
+                    <TableHead>Marketer Name</TableHead>
+                    <TableHead>Patient ID</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>Bundle ID</TableHead>
                     <TableHead>Created</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(referralData?.data ?? []).map((s) => (
+                  {(referralData?.data ?? []).map((s) => {
+                    const marketer = s.referralCode?.marketer;
+                    return (
                     <TableRow key={s.id}>
                       <TableCell className="font-mono text-xs">#{s.id}</TableCell>
                       <TableCell className="font-mono text-xs">{s.referralCode?.code ?? "—"}</TableCell>
+                      <TableCell className="font-mono text-xs">{marketer?.id ? `#${marketer.id}` : "—"}</TableCell>
                       <TableCell>
-                        {s.marketer ? (
-                          <Link href={`/dashboard/marketers/${s.marketer.id}`} className="text-custom-green hover:underline">
-                            {s.marketer.user?.firstName} {s.marketer.user?.lastName}
+                        {marketer ? (
+                          <Link href={`/dashboard/marketers/${marketer.id}`} className="text-custom-green hover:underline">
+                            {marketer.user?.firstName} {marketer.user?.lastName}
                           </Link>
                         ) : "—"}
                       </TableCell>
+                      <TableCell className="font-mono text-xs">{s.patient?.id ? `#${s.patient.id}` : "—"}</TableCell>
                       <TableCell>{s.patient?.user?.firstName} {s.patient?.user?.lastName}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{s.bundle?.name ?? "—"}</TableCell>
-                      <TableCell><StatusBadge status={s.status} /></TableCell>
-                      <TableCell className="font-mono text-xs">{s.price} {s.currency ?? ""}</TableCell>
+                      <TableCell className="font-mono text-xs">{s.bundle?.id ? `#${s.bundle.id}` : "—"}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
