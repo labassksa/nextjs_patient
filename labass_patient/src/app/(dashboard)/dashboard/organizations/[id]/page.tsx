@@ -827,7 +827,7 @@ export default function OrganizationDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {(referralData?.data ?? []).map((s) => {
-                    const marketer = s.referralCode?.marketer;
+                    const marketer = s.marketer;
                     return (
                     <TableRow key={s.id}>
                       <TableCell className="font-mono text-xs">#{s.id}</TableCell>
