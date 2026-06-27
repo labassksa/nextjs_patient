@@ -21,10 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from "lucide-react";
 import { TableSkeleton } from "./loading-skeleton";
@@ -59,8 +57,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [customFilename, setCustomFilename] = useState(exportFilename ?? "export");
+  const [isExporting, setIsExporting] = useState(false);
 
   const table = useReactTable({
     data,
@@ -91,42 +88,41 @@ export function DataTable<TData, TValue>({
     }
   }, [searchKey, searchValue, table]);
 
-  const openExportDialog = () => {
-    setCustomFilename(exportFilename ?? "export");
-    setExportDialogOpen(true);
-  };
-
   const handleExport = async () => {
-    setExportDialogOpen(false);
-    const XLSX = await import("xlsx");
-    const filteredRows = table.getFilteredRowModel().rows;
-    const headerLabels = table.getHeaderGroups()[0]?.headers
-      .map((h) => getHeaderLabel(h))
-      .filter((label) => label && label !== "actions" && label !== "toggle") ?? [];
+    setIsExporting(true);
+    try {
+      const XLSX = await import("xlsx");
+      const filteredRows = table.getFilteredRowModel().rows;
+      const headerLabels = table.getHeaderGroups()[0]?.headers
+        .map((h) => getHeaderLabel(h))
+        .filter((label) => label && label !== "actions" && label !== "toggle") ?? [];
 
-    const rows = filteredRows.map((row) =>
-      Object.fromEntries(
-        row.getVisibleCells()
-          .filter((cell) => {
-            const label = getHeaderLabel(
-              table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
-            );
-            return label && label !== "actions" && label !== "toggle";
-          })
-          .map((cell) => {
-            const label = getHeaderLabel(
-              table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
-            );
-            const value = cell.getValue();
-            return [label, value ?? ""];
-          })
-      )
-    );
+      const rows = filteredRows.map((row) =>
+        Object.fromEntries(
+          row.getVisibleCells()
+            .filter((cell) => {
+              const label = getHeaderLabel(
+                table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
+              );
+              return label && label !== "actions" && label !== "toggle";
+            })
+            .map((cell) => {
+              const label = getHeaderLabel(
+                table.getHeaderGroups()[0]?.headers.find((h) => h.id === cell.column.id)!
+              );
+              const value = cell.getValue();
+              return [label, value ?? ""];
+            })
+        )
+      );
 
-    const worksheet = XLSX.utils.json_to_sheet(rows, { header: headerLabels });
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    XLSX.writeFile(workbook, `${customFilename || exportFilename || "export"}.xlsx`);
+      const worksheet = XLSX.utils.json_to_sheet(rows, { header: headerLabels });
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+      XLSX.writeFile(workbook, `${exportFilename || "export"}.xlsx`);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   if (isLoading) {
@@ -142,35 +138,12 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      {/* Export dialog */}
-      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Export to Excel</DialogTitle>
-          </DialogHeader>
-          <div className="py-2">
-            <Input
-              value={customFilename}
-              onChange={(e) => setCustomFilename(e.target.value)}
-              placeholder="File name"
-              onKeyDown={(e) => { if (e.key === "Enter") handleExport(); }}
-              autoFocus
-            />
-            <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setExportDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleExport} disabled={!customFilename.trim()}>Export</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       {/* Export button */}
       {exportFilename && (
         <div className="flex justify-end mb-3">
-          <Button variant="outline" size="sm" onClick={openExportDialog}>
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={isExporting}>
             <Download className="h-4 w-4 mr-2" />
-            Export to Excel
+            {isExporting ? "Exporting..." : "Export to Excel"}
           </Button>
         </div>
       )}

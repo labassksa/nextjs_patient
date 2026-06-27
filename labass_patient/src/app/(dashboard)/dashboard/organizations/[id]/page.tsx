@@ -203,7 +203,7 @@ export default function OrganizationDetailPage() {
       });
 
       for (const s of allData.data ?? []) {
-        const marketer = s.marketer;
+        const marketer = s.referralCode?.marketer;
         worksheet.addRow([
           s.id,
           s.referralCode?.code ?? "",
@@ -827,7 +827,7 @@ export default function OrganizationDetailPage() {
                 </TableHeader>
                 <TableBody>
                   {(referralData?.data ?? []).map((s) => {
-                    const marketer = s.marketer;
+                    const marketer = s.referralCode?.marketer;
                     return (
                     <TableRow key={s.id}>
                       <TableCell className="font-mono text-xs">#{s.id}</TableCell>

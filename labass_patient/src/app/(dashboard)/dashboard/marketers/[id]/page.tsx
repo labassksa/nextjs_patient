@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useMarketers, useUpdateMarketer, useSendMessageToMarketer, useSendPromoCodesToMarketer, useMarketerConsultations } from "@/features/dashboard/hooks/use-marketers";
 import { useGeneratePromoCode, useTogglePromoCode, useResetMarketerPromoUsage } from "@/features/dashboard/hooks/use-promo-codes";
 import { useReferralReport } from "@/features/dashboard/hooks/use-subscriptions";
+import { getReferralReport } from "@/features/dashboard/api/subscriptions.api";
+import { getMarketerConsultations } from "@/features/dashboard/api/marketers.api";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -19,7 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from "lucide-react";
 import Link from "next/link";
 
 export default function MarketerDetailPage() {
@@ -39,6 +41,7 @@ export default function MarketerDetailPage() {
     firstName: "",
     lastName: "",
     email: "",
+    phoneNumber: "",
     gender: "",
     nationalId: "",
     dateOfBirth: "",
@@ -65,6 +68,7 @@ export default function MarketerDetailPage() {
         firstName: marketer.user?.firstName ?? marketer.firstName ?? "",
         lastName: marketer.user?.lastName ?? marketer.lastName ?? "",
         email: marketer.user?.email ?? marketer.email ?? "",
+        phoneNumber: marketer.user?.phoneNumber ?? marketer.phoneNumber ?? "",
         gender: marketer.gender ?? "",
         nationalId: marketer.nationalId ?? "",
         dateOfBirth: marketer.dateOfBirth ? marketer.dateOfBirth.split("T")[0] : "",
@@ -91,6 +95,100 @@ export default function MarketerDetailPage() {
     limit: refLimit,
   });
 
+  const [isExportingConsult, setIsExportingConsult] = useState(false);
+  const [isExportingReferral, setIsExportingReferral] = useState(false);
+
+  const handleExportConsultations = async () => {
+    const marketerName = `${marketer?.user?.firstName ?? marketer?.firstName ?? ""} ${marketer?.user?.lastName ?? marketer?.lastName ?? ""}`.trim();
+    const filename = `الاستشارات الطبية - ${marketerName}`;
+    const titleText = `الاستشارات الطبية للمسوّق ${marketerName} من الفترة ${consultFromDate} الي ${consultToDate}`;
+    setIsExportingConsult(true);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const allData = await getMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
+      const HEADERS = ["ID", "Status", "Patient", "Doctor", "Created", "Closed"];
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Consultations");
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+      worksheet.addRow([]);
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => { cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } }; });
+      for (const c of allData.consultations ?? []) {
+        worksheet.addRow([
+          c.id,
+          c.status,
+          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
+          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
+          new Date(c.createdAt).toLocaleDateString(),
+          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
+        ]);
+      }
+      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExportingConsult(false);
+    }
+  };
+
+  const handleExportReferral = async () => {
+    const marketerName = `${marketer?.user?.firstName ?? marketer?.firstName ?? ""} ${marketer?.user?.lastName ?? marketer?.lastName ?? ""}`.trim();
+    const filename = `اشتراكات روابط التسويق - ${marketerName}`;
+    const titleText = `اشتراكات روابط التسويق للمسوّق ${marketerName}`;
+    setIsExportingReferral(true);
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const allData = await getReferralReport({ marketerId, page: 1, limit: referralData?.total || 10000 });
+      const HEADERS = ["ID", "Referral Code", "Patient", "Bundle", "Status", "Price", "Created"];
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Marketing Subscriptions");
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+      worksheet.addRow([]);
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => { cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } }; });
+      for (const s of allData.data ?? []) {
+        worksheet.addRow([
+          s.id,
+          s.referralCode?.code ?? "",
+          `${s.patient?.user?.firstName ?? ""} ${s.patient?.user?.lastName ?? ""}`.trim(),
+          s.bundle?.name ?? "",
+          s.status,
+          `${s.price} ${s.currency ?? ""}`.trim(),
+          new Date(s.createdAt).toLocaleDateString(),
+        ]);
+      }
+      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 20; });
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setIsExportingReferral(false);
+    }
+  };
+
   if (isLoading) return <FormSkeleton fields={4} />;
   if (error) return <ErrorState onRetry={() => refetch()} />;
   if (!marketer) return <ErrorState title="Not found" message="Marketer not found" />;
@@ -113,6 +211,7 @@ export default function MarketerDetailPage() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
+        phoneNumber: formData.phoneNumber,
         gender: formData.gender,
         nationalId: formData.nationalId,
         dateOfBirth: formData.dateOfBirth,
@@ -281,6 +380,14 @@ export default function MarketerDetailPage() {
               {editErrors.email && <p className="text-sm text-destructive">{editErrors.email}</p>}
             </div>
             <div className="space-y-2">
+              <Label>Phone Number</Label>
+              <Input value={formData.phoneNumber} onChange={(e) => updateField("phoneNumber", e.target.value)} dir="ltr" placeholder="+966..." />
+              {editErrors.phoneNumber && <p className="text-sm text-destructive">{editErrors.phoneNumber}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label>Gender</Label>
               <Select value={formData.gender} onValueChange={(val) => updateField("gender", val)}>
                 <SelectTrigger>
@@ -384,6 +491,9 @@ export default function MarketerDetailPage() {
             <Badge variant="secondary" className="ml-2 font-mono">{consultData?.total ?? consultationsList.length}</Badge>
           </CardTitle>
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportConsultations} disabled={consultationsList.length === 0 || consultLoading || isExportingConsult}>
+              <Download className="h-4 w-4 mr-2" /> {isExportingConsult ? "Exporting..." : "Export to Excel"}
+            </Button>
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
               <Input type="date" lang="en" value={consultFromDate} onChange={(e) => setConsultFromDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" max={consultToDate} />
@@ -434,13 +544,16 @@ export default function MarketerDetailPage() {
 
       {/* Marketing Linked Subscriptions */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle>
             Marketing Linked Subscriptions{" "}
             {referralData && (
               <Badge variant="secondary" className="ml-2 font-mono">{referralData.total}</Badge>
             )}
           </CardTitle>
+          <Button variant="outline" size="sm" onClick={handleExportReferral} disabled={!referralData?.data?.length || referralLoading || isExportingReferral}>
+            <Download className="h-4 w-4 mr-2" /> {isExportingReferral ? "Exporting..." : "Export to Excel"}
+          </Button>
         </CardHeader>
         <CardContent>
           {referralLoading ? (

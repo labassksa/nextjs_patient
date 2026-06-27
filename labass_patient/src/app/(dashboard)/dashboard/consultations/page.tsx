@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Send, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 export default function ConsultationsPage() {
@@ -35,8 +34,6 @@ export default function ConsultationsPage() {
     consultationId: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("Through Labass Platform");
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [exportFilename, setExportFilename] = useState(`consultations-${fromDate}-to-${toDate}`);
   const [isExporting, setIsExporting] = useState(false);
 
   const handleSendFollowUp = async () => {
@@ -47,30 +44,55 @@ export default function ConsultationsPage() {
     setFollowUpDialog({ open: false, consultationId: "" });
   };
 
-  const openExportDialog = () => {
-    setExportFilename(`consultations-${fromDate}-to-${toDate}`);
-    setExportDialogOpen(true);
-  };
-
   const handleExport = async () => {
-    setExportDialogOpen(false);
+    const filename = `الاستشارات الطبية - ${fromDate} - ${toDate}`;
+    const titleText = `الاستشارات الطبية من الفترة ${fromDate} الي ${toDate}`;
     setIsExporting(true);
     try {
-      const XLSX = await import("xlsx");
+      const ExcelJS = (await import("exceljs")).default;
       const allData = await getConsultationsReport(fromDate, toDate, 1, reportData?.total || 10000);
-      const rows = (allData.consultations ?? []).map((c) => ({
-        ID: c.id,
-        Status: c.status,
-        Patient: `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-        Marketer: `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-        Doctor: `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-        Created: new Date(c.createdAt).toLocaleDateString(),
-        Closed: c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-      }));
-      const ws = XLSX.utils.json_to_sheet(rows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Consultations");
-      XLSX.writeFile(wb, `${exportFilename || "consultations"}.xlsx`);
+
+      const HEADERS = ["ID", "Status", "Patient", "Marketer", "Doctor", "Created", "Closed"];
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Consultations");
+
+      worksheet.mergeCells(1, 1, 1, HEADERS.length);
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = titleText;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
+      worksheet.getRow(1).height = 28;
+
+      worksheet.addRow([]);
+
+      const headerRow = worksheet.addRow(HEADERS);
+      headerRow.font = { bold: true };
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      });
+
+      for (const c of allData.consultations ?? []) {
+        worksheet.addRow([
+          c.id,
+          c.status,
+          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
+          `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
+          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
+          new Date(c.createdAt).toLocaleDateString(),
+          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
+        ]);
+      }
+
+      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${filename}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } finally {
       setIsExporting(false);
     }
@@ -104,33 +126,8 @@ export default function ConsultationsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {/* Export filename dialog */}
-          <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
-            <DialogContent className="sm:max-w-sm">
-              <DialogHeader>
-                <DialogTitle>Export to Excel</DialogTitle>
-              </DialogHeader>
-              <div className="py-2">
-                <Input
-                  value={exportFilename}
-                  onChange={(e) => setExportFilename(e.target.value)}
-                  placeholder="File name"
-                  onKeyDown={(e) => { if (e.key === "Enter") handleExport(); }}
-                  autoFocus
-                />
-                <p className="text-xs text-muted-foreground mt-1">.xlsx will be appended automatically</p>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setExportDialogOpen(false)}>Cancel</Button>
-                <Button onClick={handleExport} disabled={!exportFilename.trim() || isExporting}>
-                  {isExporting ? "Exporting..." : "Export"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
           <div className="flex justify-end mb-3">
-            <Button variant="outline" size="sm" onClick={openExportDialog} disabled={consultationsList.length === 0 || isLoading || isExporting}>
+            <Button variant="outline" size="sm" onClick={handleExport} disabled={consultationsList.length === 0 || isLoading || isExporting}>
               <Download className="h-4 w-4 mr-2" /> {isExporting ? "Exporting..." : "Export to Excel"}
             </Button>
           </div>
