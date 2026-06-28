@@ -1,7 +1,7 @@
 export interface Subscription {
   id: number;
   organization: { id: number; name: string; type?: string; city?: string };
-  bundle: { id: number; name: string; type?: string; consultationCount?: number };
+  bundle: { id: number; name: string; type?: string; consultationCount?: number; whoSubscribes?: "individual" | "organization" };
   status: string;
   remainingConsultations: number;
   totalConsultations: number;
