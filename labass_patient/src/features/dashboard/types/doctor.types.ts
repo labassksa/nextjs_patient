@@ -1,6 +1,7 @@
 export interface Doctor {
   id: number;
   userId: number;
+  consultationCount?: number;
   firstName: string;
   lastName: string;
   phoneNumber: string;

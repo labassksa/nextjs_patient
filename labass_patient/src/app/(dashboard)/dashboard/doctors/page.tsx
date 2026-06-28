@@ -71,7 +71,7 @@ export default function DoctorsPage() {
           variant="ghost"
           size="sm"
           className="text-muted-foreground hover:text-foreground"
-          onClick={() => router.push(`/dashboard/doctors/${row.original.userId || row.original.id}`)}
+          onClick={() => router.push(`/dashboard/doctors/${row.original.userId ?? row.original.id}`)}
         >
           <Eye className="h-4 w-4 mr-1" /> View
         </Button>
