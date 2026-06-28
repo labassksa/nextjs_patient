@@ -50,6 +50,9 @@ export default function IndividualsSubscriptionsPage() {
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>(DEFAULT_BUNDLE);
   const [bundleErrors, setBundleErrors] = useState<Record<string, string>>({});
 
+  const handleSubSearch = useCallback((v: string) => setSubSearch(v), []);
+  const handleBundleSearch = useCallback((v: string) => setBundleSearch(v), []);
+
   const handleCancel = async () => {
     if (cancelDialog.id) await cancelSub.mutateAsync(cancelDialog.id);
     setCancelDialog({ open: false, id: null });
@@ -245,7 +248,7 @@ export default function IndividualsSubscriptionsPage() {
           </div>
         </div>
         <div className="mb-4">
-          <SearchInput placeholder="Search subscriptions..." onChange={useCallback((v: string) => setSubSearch(v), [])} className="max-w-sm" />
+          <SearchInput placeholder="Search subscriptions..." onChange={handleSubSearch} className="max-w-sm" />
         </div>
         <DataTable columns={subColumns} data={indSubs} isLoading={subsLoading} searchKey="bundle" searchValue={subSearch} exportFilename="individual-subscriptions" />
       </div>
@@ -262,7 +265,7 @@ export default function IndividualsSubscriptionsPage() {
           </Button>
         </div>
         <div className="mb-4">
-          <SearchInput placeholder="Search bundles..." onChange={useCallback((v: string) => setBundleSearch(v), [])} className="max-w-sm" />
+          <SearchInput placeholder="Search bundles..." onChange={handleBundleSearch} className="max-w-sm" />
         </div>
         <DataTable columns={bundleColumns} data={active} isLoading={bundlesLoading} searchKey="name" searchValue={bundleSearch} exportFilename="individual-bundles" />
         {inactive.length > 0 && (

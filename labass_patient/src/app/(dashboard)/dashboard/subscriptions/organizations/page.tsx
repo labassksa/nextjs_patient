@@ -54,6 +54,9 @@ export default function OrganizationsSubscriptionsPage() {
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>(DEFAULT_BUNDLE);
   const [bundleErrors, setBundleErrors] = useState<Record<string, string>>({});
 
+  const handleSubSearch = useCallback((v: string) => setSubSearch(v), []);
+  const handleBundleSearch = useCallback((v: string) => setBundleSearch(v), []);
+
   const handleCreateSub = async () => {
     const errors: Record<string, string> = {};
     if (!newSub.organizationId || newSub.organizationId < 1) errors.organizationId = "Organization ID is required";
@@ -259,7 +262,7 @@ export default function OrganizationsSubscriptionsPage() {
           </Button>
         </div>
         <div className="mb-4">
-          <SearchInput placeholder="Search subscriptions..." onChange={useCallback((v: string) => setSubSearch(v), [])} className="max-w-sm" />
+          <SearchInput placeholder="Search subscriptions..." onChange={handleSubSearch} className="max-w-sm" />
         </div>
         <DataTable columns={subColumns} data={orgSubs} isLoading={subsLoading} searchKey="organization" searchValue={subSearch} exportFilename="org-subscriptions" />
       </div>
@@ -276,7 +279,7 @@ export default function OrganizationsSubscriptionsPage() {
           </Button>
         </div>
         <div className="mb-4">
-          <SearchInput placeholder="Search bundles..." onChange={useCallback((v: string) => setBundleSearch(v), [])} className="max-w-sm" />
+          <SearchInput placeholder="Search bundles..." onChange={handleBundleSearch} className="max-w-sm" />
         </div>
         <DataTable columns={bundleColumns} data={active} isLoading={bundlesLoading} searchKey="name" searchValue={bundleSearch} exportFilename="organization-bundles" />
         {inactive.length > 0 && (
