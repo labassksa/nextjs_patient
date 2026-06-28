@@ -1,6 +1,6 @@
 export interface Subscription {
   id: number;
-  organization: { id: number; name: string; type?: string; city?: string };
+  organization?: { id: number; name: string; type?: string; city?: string };
   bundle: { id: number; name: string; type?: string; consultationCount?: number; whoSubscribes?: "individual" | "organization" };
   status: string;
   remainingConsultations: number;
@@ -10,6 +10,19 @@ export interface Subscription {
   nextBillingDate: string | null;
   recurringType?: string;
   createdAt: string;
+  patient?: {
+    id: number;
+    user?: {
+      id?: number;
+      firstName?: string;
+      lastName?: string;
+      phoneNumber?: string;
+      email?: string;
+      dateOfBirth?: string;
+      gender?: string;
+      city?: string;
+    };
+  };
 }
 
 export interface CreateSubscriptionPayload {

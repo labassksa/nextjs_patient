@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Ban, Trash2 } from "lucide-react";
+import { Plus, Ban, Trash2, Eye } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
@@ -42,6 +42,7 @@ export default function IndividualsSubscriptionsPage() {
   const deleteBundle = useDeleteBundle();
 
   const [subSearch, setSubSearch] = useState("");
+  const [viewSub, setViewSub] = useState<Subscription | null>(null);
   const [cancelDialog, setCancelDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
 
   const [bundleSearch, setBundleSearch] = useState("");
@@ -136,6 +137,18 @@ export default function IndividualsSubscriptionsPage() {
           checked={row.original.status?.toLowerCase() === "active"}
           onCheckedChange={() => toggleStatus.mutate(row.original.id)}
         />
+      ),
+    },
+    {
+      id: "view",
+      header: "",
+      cell: ({ row }) => (
+        <Button
+          variant="ghost" size="sm"
+          onClick={() => setViewSub(row.original)}
+        >
+          <Eye className="h-4 w-4 mr-1" /> View
+        </Button>
       ),
     },
     {
@@ -275,6 +288,53 @@ export default function IndividualsSubscriptionsPage() {
           </div>
         )}
       </div>
+
+      {/* View Subscription Details */}
+      <Dialog open={viewSub !== null} onOpenChange={(open) => { if (!open) setViewSub(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Subscription Details</DialogTitle></DialogHeader>
+          {viewSub && (
+            <div className="space-y-6 text-sm">
+              <div>
+                <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wide mb-2">Subscription</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><span className="text-muted-foreground">ID</span><p className="font-mono font-medium">#{viewSub.id}</p></div>
+                  <div><span className="text-muted-foreground">Status</span><p className="font-medium capitalize">{viewSub.status}</p></div>
+                  <div><span className="text-muted-foreground">Price</span><p className="font-mono font-medium">{viewSub.price} {viewSub.currency || "SAR"}</p></div>
+                  <div><span className="text-muted-foreground">Consultations</span><p className="font-mono font-medium">{viewSub.remainingConsultations} / {viewSub.totalConsultations}</p></div>
+                  <div><span className="text-muted-foreground">Recurring</span><p>{viewSub.recurringType || "—"}</p></div>
+                  <div><span className="text-muted-foreground">Next Billing</span><p>{viewSub.nextBillingDate ? new Date(viewSub.nextBillingDate).toLocaleDateString() : "—"}</p></div>
+                  <div className="col-span-2"><span className="text-muted-foreground">Created</span><p>{viewSub.createdAt ? new Date(viewSub.createdAt).toLocaleString() : "—"}</p></div>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wide mb-2">Bundle</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div><span className="text-muted-foreground">Name</span><p className="font-medium capitalize">{viewSub.bundle?.name || "—"}</p></div>
+                  <div><span className="text-muted-foreground">Type</span><p>{viewSub.bundle?.type || "—"}</p></div>
+                </div>
+              </div>
+              {viewSub.patient && (
+                <div>
+                  <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wide mb-2">Patient</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><span className="text-muted-foreground">Patient ID</span><p className="font-mono font-medium">#{viewSub.patient.id}</p></div>
+                    <div><span className="text-muted-foreground">Name</span><p className="font-medium">{[viewSub.patient.user?.firstName, viewSub.patient.user?.lastName].filter(Boolean).join(" ") || "—"}</p></div>
+                    <div><span className="text-muted-foreground">Phone</span><p className="font-mono">{viewSub.patient.user?.phoneNumber || "—"}</p></div>
+                    <div><span className="text-muted-foreground">Email</span><p>{viewSub.patient.user?.email || "—"}</p></div>
+                    <div><span className="text-muted-foreground">Gender</span><p className="capitalize">{viewSub.patient.user?.gender || "—"}</p></div>
+                    <div><span className="text-muted-foreground">Date of Birth</span><p>{viewSub.patient.user?.dateOfBirth ? new Date(viewSub.patient.user.dateOfBirth).toLocaleDateString() : "—"}</p></div>
+                    <div><span className="text-muted-foreground">City</span><p>{viewSub.patient.user?.city || "—"}</p></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewSub(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Cancel Subscription */}
       <ConfirmDialog
