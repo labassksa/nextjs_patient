@@ -10,6 +10,7 @@ export interface Bundle {
   currency: string;
   recurringType: string;
   isActive: boolean;
+  whoSubscribes?: string;
   description?: string;
 }
 
