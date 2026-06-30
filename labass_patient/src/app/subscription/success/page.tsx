@@ -1,10 +1,20 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function SubscriptionSuccessPage() {
+function SuccessContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const subscriberType = searchParams.get("subscriberType");
+
+  const handleContinue = () => {
+    if (subscriberType === "organization") {
+      router.push("/orgPortal?view=subscription");
+    } else {
+      router.push("/mySubscriptions");
+    }
+  };
 
   return (
     <div
@@ -78,7 +88,7 @@ export default function SubscriptionSuccessPage() {
         </p>
 
         <button
-          onClick={() => router.push("/mySubscriptions")}
+          onClick={handleContinue}
           style={{
             width: "100%",
             padding: "15px 24px",
@@ -92,9 +102,17 @@ export default function SubscriptionSuccessPage() {
             fontFamily: "inherit",
           }}
         >
-          عرض اشتراكاتي
+          {subscriberType === "organization" ? "العودة للبوابة" : "عرض اشتراكاتي"}
         </button>
       </div>
     </div>
+  );
+}
+
+export default function SubscriptionSuccessPage() {
+  return (
+    <Suspense>
+      <SuccessContent />
+    </Suspense>
   );
 }

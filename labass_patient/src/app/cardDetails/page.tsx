@@ -60,7 +60,7 @@ const CardDetailsContent: React.FC = () => {
                 localStorage.removeItem('temp_subscription_flow');
                 localStorage.removeItem('vitamin_survey_answers');
                 localStorage.removeItem('referralCode');
-                router.push("/subscription/success");
+                router.push(`/subscription/success?subscriberType=${subscriberType || ""}`);
               } else {
                 router.push("/orgPortal?bundlePaymentSuccess=true");
               }

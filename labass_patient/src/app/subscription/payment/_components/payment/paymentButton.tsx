@@ -110,7 +110,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
           bundleId: bundleId ?? undefined,
           sessionId,
           invoiceAmount: discountedPrice,
-          callBackUrl: `${window.location.origin}/subscription/success`,
+          callBackUrl: `${window.location.origin}/subscription/success?subscriberType=${subscriberType}`,
           errorUrl: `${window.location.origin}/subscription/error`,
           subscriberType,
           isRecurring,
@@ -127,7 +127,7 @@ const SubscriptionPaymentButton: React.FC<PaymentButtonProps> = ({
       if (data.success || paymentUrl) {
         localStorage.removeItem("vitamin_survey_answers");
         localStorage.removeItem("referralCode");
-        router.push("/subscription/success");
+        router.push(`/subscription/success?subscriberType=${subscriberType}`);
       } else {
         console.error("Payment failed:", data);
         router.push("/subscription/error");
