@@ -546,7 +546,7 @@ export default function ObesityProgram() {
             <div className={s.planRadio} />
             <p className={s.planName}>الباقة الشهرية</p>
             <div className={s.planPrice}>
-              <span className={s.planNum}>٣٩٩</span>
+              <span className={s.planNum}>٨٩</span>
               <span className={s.planCur}>ريال / شهرياً</span>
             </div>
             <p className={s.planPeriod}>
@@ -575,11 +575,11 @@ export default function ObesityProgram() {
             <span className={s.planPopBadge}>الأكثر طلباً &middot; وفّر ١٥٪</span>
             <p className={s.planName}>باقة ٣ أشهر</p>
             <div className={s.planPrice}>
-              <span className={s.planNum}>١٬٠١٧</span>
+              <span className={s.planNum}>١٦٩</span>
               <span className={s.planCur}>ريال / كل ٣ أشهر</span>
             </div>
             <p className={s.planPeriod}>
-              ~٣٣٩ ريال شهرياً &middot; توفّر ١٨٠ ريال
+              ~  &middot;
             </p>
             <ul className={s.planFeats}>
               {planFeatures.map((f, i) => (
