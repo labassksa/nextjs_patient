@@ -1,30 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import s from "./obesity.module.css";
 
 export default function ObesityProgram() {
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly">("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showFdaPopup, setShowFdaPopup] = useState(false);
-  const [prices, setPrices] = useState<Record<string, number | null>>({ monthly: null, quarterly: null });
-
-  useEffect(() => {
-    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
-      .then(({ data }) => {
-        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
-        const op = list.filter((b: any) => b.type === "obesityProgram" && b.whoSubscribes === "individual");
-        const monthly   = op.find((b: any) => b.intervalDays === 30);
-        const quarterly = op.find((b: any) => b.intervalDays === 90);
-        setPrices({
-          monthly:   monthly   ? Number(monthly.price)   : null,
-          quarterly: quarterly ? Number(quarterly.price) : null,
-        });
-      })
-      .catch(() => {});
-  }, []);
 
   const toggleFaq = (i: number) => setOpenFaq(openFaq === i ? null : i);
 
@@ -563,7 +546,7 @@ export default function ObesityProgram() {
             <div className={s.planRadio} />
             <p className={s.planName}>الباقة الشهرية</p>
             <div className={s.planPrice}>
-              <span className={s.planNum}>{prices.monthly !== null ? prices.monthly.toLocaleString("ar-SA") : "—"}</span>
+              <span className={s.planNum}>٨٩</span>
               <span className={s.planCur}>ريال / شهرياً</span>
             </div>
             <p className={s.planPeriod}>
@@ -592,11 +575,11 @@ export default function ObesityProgram() {
             <span className={s.planPopBadge}>الأكثر طلباً &middot; وفّر ١٥٪</span>
             <p className={s.planName}>باقة ٣ أشهر</p>
             <div className={s.planPrice}>
-              <span className={s.planNum}>{prices.quarterly !== null ? prices.quarterly.toLocaleString("ar-SA") : "—"}</span>
+              <span className={s.planNum}>١٦٩</span>
               <span className={s.planCur}>ريال / كل ٣ أشهر</span>
             </div>
             <p className={s.planPeriod}>
-              ~  &middot;
+              ~   &middot;   
             </p>
             <ul className={s.planFeats}>
               {planFeatures.map((f, i) => (
