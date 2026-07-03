@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getBundles, Bundle } from "../_controllers/getBundles";
 import { useRouter } from "next/navigation";
+import { labelForBundleType } from "@/utils/bundleType";
 
 interface AvailableBundlesSectionProps {
   onSubscribe?: (bundleId: number) => void;
@@ -30,7 +31,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
           const activeBundles = response.data.filter(
             (bundle) =>
               bundle.isActive &&
-              bundle.type !== "Vitamins" &&
+              bundle.type !== "vitamins" &&
               bundle.whoSubscribes === "organization"
           );
           setBundles(activeBundles);
@@ -81,16 +82,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
     }
   };
 
-  const getBundleTypeLabel = (type: string) => {
-    switch (type) {
-      case "GP Consultations":
-        return t('subscription.bundleTypes.gpConsultations');
-      case "Specialist Consultations":
-        return t('subscription.bundleTypes.specialistConsultations');
-      default:
-        return type;
-    }
-  };
+  const getBundleTypeLabel = (type: string) => labelForBundleType(type);
 
   if (isLoading) {
     return (

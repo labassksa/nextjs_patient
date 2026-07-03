@@ -6,6 +6,7 @@ import { getOrgConsultationsReport } from "@/features/dashboard/api/organization
 import { useSubscriptions, useCreateSubscription, useReferralReport } from "@/features/dashboard/hooks/use-subscriptions";
 import { getReferralReport } from "@/features/dashboard/api/subscriptions.api";
 import { useBundles } from "@/features/dashboard/hooks/use-bundles";
+import { labelForBundleType } from "@/utils/bundleType";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -139,7 +140,7 @@ export default function OrganizationDetailPage() {
           c.subscription ? "Bundle" : "Promo",
           c.status,
           c.subscription?.id ?? "—",
-          c.subscription?.bundleType ?? "—",
+          c.subscription?.bundleType ? labelForBundleType(c.subscription.bundleType, "en") : "—",
           c.subscription?.remainingConsultations ?? "—",
           `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
           `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
@@ -574,7 +575,7 @@ export default function OrganizationDetailPage() {
                   <TableRow key={s.id}>
                     <TableCell className="font-mono text-xs">#{s.id}</TableCell>
                     <TableCell className="font-medium">{s.bundle?.name ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{s.bundle?.type ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{s.bundle?.type ? labelForBundleType(s.bundle.type, "en") : "—"}</TableCell>
                     <TableCell><StatusBadge status={s.status} /></TableCell>
                     <TableCell className="font-mono text-sm">{s.remainingConsultations} / {s.totalConsultations}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{new Date(s.createdAt).toLocaleDateString()}</TableCell>
@@ -613,7 +614,7 @@ export default function OrganizationDetailPage() {
                   ) : (
                     orgBundles.map((b) => (
                       <SelectItem key={b.id} value={String(b.id)}>
-                        {b.name} — {b.type}
+                        {b.name} — {labelForBundleType(b.type, "en")}
                       </SelectItem>
                     ))
                   )}
@@ -625,7 +626,7 @@ export default function OrganizationDetailPage() {
               <div className="rounded-lg border bg-muted/40 p-3 space-y-1.5 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Type</span>
-                  <span className="font-medium">{selectedBundle.type}</span>
+                  <span className="font-medium">{labelForBundleType(selectedBundle.type, "en")}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Consultations</span>
@@ -717,7 +718,7 @@ export default function OrganizationDetailPage() {
                           ? <button onClick={() => router.push(`/dashboard/subscriptions/${c.subscription!.id}`)} className="font-mono text-xs text-blue-600 hover:underline">#{c.subscription.id}</button>
                           : <span className="text-xs text-muted-foreground">—</span>}
                       </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{c.subscription?.bundleType ?? "—"}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{c.subscription?.bundleType ? labelForBundleType(c.subscription.bundleType, "en") : "—"}</TableCell>
                       <TableCell className="font-mono text-xs">{c.subscription?.remainingConsultations ?? "—"}</TableCell>
                       <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
                       <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>

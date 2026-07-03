@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import s from "./my-subscriptions.module.css";
+import { labelForBundleType } from "@/utils/bundleType";
 
 const bundleConsultationTypeMap: Record<string, string> = {
   "gpConsultations":         "quick",
@@ -141,7 +142,7 @@ export default function MySubscriptionsPage() {
           <div key={sub.id} className={s.card}>
             <div className={s.cardHeader}>
               <span className={s.badge}>نشط</span>
-              <span className={s.bundleType}>{sub.bundle.type}</span>
+              <span className={s.bundleType}>{labelForBundleType(sub.bundle.type)}</span>
             </div>
 
             <div className={s.cardRow}>

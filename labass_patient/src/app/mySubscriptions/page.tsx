@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { fetchSubscriptions } from "./_controllers/fetchSubscriptions";
 import Link from "next/link";
 import axios from "axios";
+import { labelForBundleType } from "@/utils/bundleType";
 
 type SubscriptionStatus =
   | "Draft"
@@ -186,7 +187,7 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         </span>
         <div className="text-right">
           <p className="text-white font-extrabold text-base leading-tight">
-            {sub.bundle?.type ?? "باقة"}
+            {sub.bundle?.type ? labelForBundleType(sub.bundle.type) : "باقة"}
           </p>
           {sub.bundle?.name && (
             <p className="text-white/70 text-xs">{sub.bundle.name}</p>
