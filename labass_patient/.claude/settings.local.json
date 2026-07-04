@@ -6,7 +6,14 @@
       "Bash(Get-ChildItem -Path \"D:\\\\Labass\\\\nextjs_patient\\\\labass_patient\" -Recurse -Filter \"*completeInfo*\" -ErrorAction SilentlyContinue)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "WebFetch(domain:labass.sa)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(git show *)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter pub *)",
+      "Bash(dart analyze *)",
+      "Bash(xcrun simctl *)",
+      "Bash(mkdir -p ~/Desktop/appstore-screenshots)",
+      "Read(//Users/mostafayassin/Desktop/appstore-screenshots/**)"
     ]
   }
 }
