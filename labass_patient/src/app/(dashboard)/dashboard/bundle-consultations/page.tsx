@@ -16,11 +16,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { labelForBundleType } from "@/utils/bundleType";
 
 const BUNDLE_TYPES = [
   { value: "ALL", label: "All Bundle Types" },
-  { value: "GP_CONSULTATIONS", label: "GP Consultations" },
-  { value: "SPECIALIST_CONSULTATIONS", label: "Specialist Consultations" },
+  { value: "gpConsultations", label: labelForBundleType("gpConsultations", "en") },
+  { value: "specialistConsultations", label: labelForBundleType("specialistConsultations", "en") },
 ];
 
 export default function BundleConsultationsPage() {
@@ -137,7 +138,7 @@ export default function BundleConsultationsPage() {
           c.id,
           c.type,
           c.status,
-          c.subscription?.bundle?.type ?? "",
+          c.subscription?.bundle?.type ? labelForBundleType(c.subscription.bundle.type, "en") : "",
           c.subscription?.id ?? "",
           `${c.subscription?.remainingConsultations} / ${c.subscription?.totalConsultations}`,
           c.patient?.user?.firstName ?? "",
@@ -233,7 +234,7 @@ export default function BundleConsultationsPage() {
                   <SelectItem value="ALL">All subscriptions</SelectItem>
                   {orgSubscriptions.map((s: any) => (
                     <SelectItem key={s.id} value={String(s.id)}>
-                      #{s.id} — {s.bundle?.type ?? "Unknown"} ({new Date(s.createdAt).toLocaleDateString()})
+                      #{s.id} — {s.bundle?.type ? labelForBundleType(s.bundle.type, "en") : "Unknown"} ({new Date(s.createdAt).toLocaleDateString()})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -331,7 +332,7 @@ export default function BundleConsultationsPage() {
                         <StatusBadge status={c.status} />
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {c.subscription?.bundle?.type ?? "—"}
+                        {c.subscription?.bundle?.type ? labelForBundleType(c.subscription.bundle.type, "en") : "—"}
                       </TableCell>
                       <TableCell className="font-mono text-xs">
                         {c.subscription?.id ? `#${c.subscription.id}` : "—"}

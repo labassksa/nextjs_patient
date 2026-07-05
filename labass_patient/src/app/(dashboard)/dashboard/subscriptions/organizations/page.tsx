@@ -6,6 +6,7 @@ import { useSubscriptions, useCreateSubscription, useToggleSubscriptionStatus, u
 import { useBundles, useCreateBundle, useToggleBundleActive, useDeleteBundle } from "@/features/dashboard/hooks/use-bundles";
 import type { Subscription } from "@/features/dashboard/types/subscription.types";
 import type { Bundle, CreateBundlePayload } from "@/features/dashboard/types/bundle.types";
+import { labelForBundleType } from "@/utils/bundleType";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
@@ -23,11 +24,11 @@ import { Plus, Ban, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins"] as const;
+const BUNDLE_TYPES = ["gpConsultations", "specialistConsultations", "vitamins"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 const DEFAULT_BUNDLE: CreateBundlePayload = {
-  name: "basic", type: "GP Consultations", price: 0, consultationCount: 0,
+  name: "basic", type: "gpConsultations", price: 0, consultationCount: 0,
   currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "",
   originalPrice: undefined, whoSubscribes: "organization", isUnlimited: false,
 };
@@ -187,7 +188,7 @@ export default function OrganizationsSubscriptionsPage() {
     {
       accessorKey: "type",
       header: "Type",
-      cell: ({ row }) => <Badge variant="outline" className="font-normal capitalize">{row.original.type}</Badge>,
+      cell: ({ row }) => <Badge variant="outline" className="font-normal">{labelForBundleType(row.original.type, "en")}</Badge>,
     },
     {
       accessorKey: "price",
@@ -344,7 +345,7 @@ export default function OrganizationsSubscriptionsPage() {
               <Label>Type</Label>
               <Select value={newBundle.type} onValueChange={(val) => setNewBundle({ ...newBundle, type: val })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                <SelectContent>{BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{labelForBundleType(t, "en")}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">

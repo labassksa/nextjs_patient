@@ -257,7 +257,7 @@ export default function SexualHealthSubscribePage() {
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
         const filtered = list
-          .filter((b: any) => b.type === "Sexual Health" && b.whoSubscribes === "individual" && b.isActive !== false)
+          .filter((b: any) => b.type === "sexualHealth" && b.whoSubscribes === "individual" && b.isActive !== false)
           .slice(0, 4)
           .map((b: any) => ({ id: b.id, price: Number(b.price), intervalDays: b.intervalDays }));
         setBundles(filtered);

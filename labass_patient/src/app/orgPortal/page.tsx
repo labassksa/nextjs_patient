@@ -44,8 +44,8 @@ const getRelevantSubscription = (subs: any[], type: DoctorType) => {
   return (
     subs.find((s) =>
       specialist
-        ? s.bundle?.type === "Specialist Consultations"
-        : s.bundle?.type !== "Specialist Consultations"
+        ? s.bundle?.type === "specialistConsultations"
+        : s.bundle?.type !== "specialistConsultations"
     ) || null
   );
 };
@@ -633,7 +633,7 @@ const OrgPatientsPage: React.FC = () => {
             {subscription.map((sub: any) => (
               <div key={sub.id} className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
                 <span className="text-xs font-medium opacity-90">
-                  {sub.bundle?.type === "Specialist Consultations" ? "تخصصية" : "عامة"}
+                  {sub.bundle?.type === "specialistConsultations" ? "تخصصية" : "عامة"}
                 </span>
                 <span className="text-xl font-bold">{sub.remainingConsultations}</span>
               </div>

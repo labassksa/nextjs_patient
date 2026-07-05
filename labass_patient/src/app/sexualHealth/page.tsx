@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import axios from "axios";
 import styles from "./sexualHealth.module.css";
 
 const blogArticles = [
@@ -98,6 +99,31 @@ export default function SexualHealth() {
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "quarterly" | "annual" | "youth">("quarterly");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [openArticle, setOpenArticle] = useState<number | null>(null);
+  const [prices, setPrices] = useState<Record<string, number | null>>({
+    monthly: null,
+    quarterly: null,
+    annual: null,
+    youth: null,
+  });
+
+  useEffect(() => {
+    axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
+      .then(({ data }) => {
+        const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
+        const sh = list.filter((b: any) => b.type === "sexualHealth" && b.whoSubscribes === "individual");
+        const monthly   = sh.find((b: any) => b.intervalDays === 30);
+        const quarterly = sh.find((b: any) => b.intervalDays === 90);
+        const annual    = sh.find((b: any) => b.intervalDays === 365);
+        const youth     = sh.find((b: any) => b.intervalDays === 91);
+        setPrices({
+          monthly:   monthly   ? Number(monthly.price)   : null,
+          quarterly: quarterly ? Number(quarterly.price) : null,
+          annual:    annual    ? Number(annual.price)    : null,
+          youth:     youth     ? Number(youth.price)     : null,
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleFaq = (i: number) => setOpenFaq(openFaq === i ? null : i);
 
@@ -713,7 +739,7 @@ export default function SexualHealth() {
             <div className={styles.planRadio} />
             <p className={styles.planName}>شهري</p>
             <div className={styles.planPrice}>
-              <span className={styles.planNum}>١٤٩</span>
+              <span className={styles.planNum}>{prices.monthly !== null ? prices.monthly.toLocaleString("ar-SA") : "—"}</span>
               <span className={styles.planCur}>ريال / شهرياً</span>
             </div>
             <p className={styles.planPeriod}>
@@ -742,7 +768,7 @@ export default function SexualHealth() {
             <span className={styles.planPopBadge}>الأكثر طلباً &middot; وفّر ٢٠٪</span>
             <p className={styles.planName}>كل ٣ أشهر</p>
             <div className={styles.planPrice}>
-              <span className={styles.planNum}>٣٥٧</span>
+              <span className={styles.planNum}>{prices.quarterly !== null ? prices.quarterly.toLocaleString("ar-SA") : "—"}</span>
               <span className={styles.planCur}>ريال / كل ٣ أشهر</span>
             </div>
             <p className={styles.planPeriod}>
@@ -771,7 +797,7 @@ export default function SexualHealth() {
             <span className={styles.planSaveBadge}>وفّر ٣٠٪</span>
             <p className={styles.planName}>سنوي</p>
             <div className={styles.planPrice}>
-              <span className={styles.planNum}>١٬٢٥٠</span>
+              <span className={styles.planNum}>{prices.annual !== null ? prices.annual.toLocaleString("ar-SA") : "—"}</span>
               <span className={styles.planCur}>ريال / سنوياً</span>
             </div>
             <p className={styles.planPeriod}>
@@ -800,7 +826,7 @@ export default function SexualHealth() {
             <span className={styles.planSaveBadge}>لأقل من ٤٠ سنة</span>
             <p className={styles.planName}>٣ أشهر · شباب</p>
             <div className={styles.planPrice}>
-              <span className={styles.planNum}>٤٤٩</span>
+              <span className={styles.planNum}>{prices.youth !== null ? prices.youth.toLocaleString("ar-SA") : "—"}</span>
               <span className={styles.planCur}>ريال / كل ٣ أشهر</span>
             </div>
             <p className={styles.planPeriod}>

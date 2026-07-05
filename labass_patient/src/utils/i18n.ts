@@ -175,10 +175,6 @@ const resources = {
           standard: "Standard Package",
           premium: "Premium Package"
         },
-        bundleTypes: {
-          gpConsultations: "GP Consultations",
-          specialistConsultations: "Specialist Consultations"
-        },
         recurringTypes: {
           monthly: "Monthly",
           weekly: "Weekly",
@@ -361,10 +357,6 @@ const resources = {
           basic: "الباقة الأساسية",
           standard: "الباقة المتوسطة",
           premium: "الباقة المميزة"
-        },
-        bundleTypes: {
-          gpConsultations: "استشارات طبيب عام",
-          specialistConsultations: "استشارات أخصائي"
         },
         recurringTypes: {
           monthly: "شهري",

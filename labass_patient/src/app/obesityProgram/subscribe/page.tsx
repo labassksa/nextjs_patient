@@ -208,7 +208,7 @@ export default function ObesitySubscribePage() {
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
         const filtered = list.filter(
-          (b: any) => b.type === "Obesity Program" && b.whoSubscribes === "individual"
+          (b: any) => b.type === "obesityProgram" && b.whoSubscribes === "individual"
         );
         const monthly = filtered.find((b: any) => b.intervalDays === 30);
         const quarterly = filtered.find((b: any) => b.intervalDays === 90);

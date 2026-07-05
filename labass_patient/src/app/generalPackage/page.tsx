@@ -90,7 +90,7 @@ export default function GeneralConsultationPage() {
     axios.get(`${process.env.NEXT_PUBLIC_API_URL}/bundles`)
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
-        const gp = list.filter((b: any) => b.type === "GP Consultations" && b.whoSubscribes === "individual");
+        const gp = list.filter((b: any) => b.type === "gpConsultations" && b.whoSubscribes === "individual");
         const monthly   = gp.find((b: any) => b.intervalDays === 30);
         const quarterly = gp.find((b: any) => b.intervalDays === 90);
         setPrices({

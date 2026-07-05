@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import { labelForBundleType } from "@/utils/bundleType";
 
 // Static mock data for bundles
 const mockBundles = [
   {
     id: 1,
     name: "basic",
-    type: "GP Consultations",
+    type: "gpConsultations",
     price: 500,
     consultationCount: 50,
     currency: "SAR",
@@ -18,7 +19,7 @@ const mockBundles = [
   {
     id: 2,
     name: "standard",
-    type: "GP Consultations",
+    type: "gpConsultations",
     price: 1200,
     consultationCount: 150,
     currency: "SAR",
@@ -29,7 +30,7 @@ const mockBundles = [
   {
     id: 3,
     name: "premium",
-    type: "Specialist Consultations",
+    type: "specialistConsultations",
     price: 2500,
     consultationCount: 300,
     currency: "SAR",
@@ -82,16 +83,7 @@ const getBundleNameLabel = (name: string) => {
   }
 };
 
-const getBundleTypeLabel = (type: string) => {
-  switch (type) {
-    case "GP Consultations":
-      return "استشارات طبيب عام";
-    case "Specialist Consultations":
-      return "استشارات أخصائي";
-    default:
-      return type;
-  }
-};
+const getBundleTypeLabel = (type: string) => labelForBundleType(type);
 
 const TestSubscriptionPage: React.FC = () => {
   const [showActiveSubscription, setShowActiveSubscription] = React.useState(false);

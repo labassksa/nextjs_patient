@@ -166,7 +166,7 @@ export default function LandingPage() {
     router.push(loggedIn ? "/payment" : "/login");
 
   const goToObesity = () =>
-    router.push(loggedIn ? "/obesitySurvey" : "/login");
+    router.push(loggedIn ? "/obesityProgram" : "/login");
 
   const closeDrawer = () => setDrawerOpen(false);
 

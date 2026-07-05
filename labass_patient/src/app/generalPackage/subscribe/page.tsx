@@ -62,7 +62,7 @@ export default function GeneralPackageSubscribePage() {
       .then(({ data }) => {
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
         const individualGP = list.filter(
-          (b: any) => b.type === "GP Consultations" && b.whoSubscribes === "individual"
+          (b: any) => b.type === "gpConsultations" && b.whoSubscribes === "individual"
         );
         const monthly   = individualGP.find((b: any) => b.intervalDays === 30);
         const quarterly = individualGP.find((b: any) => b.intervalDays === 90);
