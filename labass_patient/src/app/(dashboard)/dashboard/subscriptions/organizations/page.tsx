@@ -10,6 +10,7 @@ import { labelForBundleType } from "@/utils/bundleType";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
+import { SubscriptionConsultationsTable } from "@/features/dashboard/components/shared/subscription-consultations-table";
 import { SearchInput } from "@/features/dashboard/components/shared/search-input";
 import { ConfirmDialog } from "@/features/dashboard/components/shared/confirm-dialog";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -266,6 +267,15 @@ export default function OrganizationsSubscriptionsPage() {
           <SearchInput placeholder="Search subscriptions..." onChange={handleSubSearch} className="max-w-sm" />
         </div>
         <DataTable columns={subColumns} data={orgSubs} isLoading={subsLoading} searchKey="organization" searchValue={subSearch} exportFilename="org-subscriptions" />
+      </div>
+
+      {/* Subscription Consultations */}
+      <div>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Consultations</h2>
+          <p className="text-sm text-muted-foreground">Consultations created by marketers from organization bundles</p>
+        </div>
+        <SubscriptionConsultationsTable variant="organizations" />
       </div>
 
       {/* Bundles */}
