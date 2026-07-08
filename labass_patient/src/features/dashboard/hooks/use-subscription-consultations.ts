@@ -11,7 +11,7 @@ export function useSubscriptionConsultations(
   params: SubscriptionConsultationsParams
 ) {
   return useQuery({
-    queryKey: queryKeys.subscriptionConsultations.list(variant, params),
+    queryKey: queryKeys.subscriptionConsultations.list(variant, params as Record<string, unknown>),
     queryFn: () => getSubscriptionConsultations(variant, params),
     // Keep the current page visible while the next one loads (smoother paging).
     placeholderData: keepPreviousData,
