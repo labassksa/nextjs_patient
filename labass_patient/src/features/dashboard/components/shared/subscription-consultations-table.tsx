@@ -30,7 +30,8 @@ export function SubscriptionConsultationsTable({
   variant: SubscriptionConsultationsVariant;
 }) {
   const isOrg = variant === "organizations";
-  const today = new Date().toISOString().split("T")[0];
+  // Local calendar date (en-CA => YYYY-MM-DD); avoids UTC skew that would block "today" in UTC+ zones.
+  const today = new Date().toLocaleDateString("en-CA");
 
   const [bundleType, setBundleType] = useState("ALL");
   const [subscriptionId, setSubscriptionId] = useState("");
@@ -103,7 +104,7 @@ export function SubscriptionConsultationsTable({
               fullName(c.marketer?.user),
               fullName(c.patient?.user),
               bundleLabel,
-              c.type,
+              c.labConsultationType || c.type,
               c.status,
               created,
             ]
@@ -111,7 +112,7 @@ export function SubscriptionConsultationsTable({
               c.id,
               fullName(c.patient?.user),
               bundleLabel,
-              c.type,
+              c.labConsultationType || c.type,
               c.status,
               created,
             ];
@@ -322,10 +323,10 @@ export function SubscriptionConsultationsTable({
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => p + 1)} disabled={!data?.hasNextPage}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(totalPages)} disabled={!data?.hasNextPage}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(totalPages)} disabled={page >= totalPages}>
                 <ChevronsRight className="h-4 w-4" />
               </Button>
             </div>
