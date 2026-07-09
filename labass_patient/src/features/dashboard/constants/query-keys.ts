@@ -31,6 +31,11 @@ export const queryKeys = {
     detail: (id: number) => ["consultations", "detail", id] as const,
     report: (fromDate: string, toDate: string) => ["consultations", "report", fromDate, toDate] as const,
   },
+  subscriptionConsultations: {
+    all: ["subscriptionConsultations"] as const,
+    list: (variant: string, params: Record<string, unknown>) =>
+      ["subscriptionConsultations", variant, params] as const,
+  },
   bundles: {
     all: ["bundles"] as const,
     list: (filters?: Record<string, unknown>) => ["bundles", "list", filters] as const,
