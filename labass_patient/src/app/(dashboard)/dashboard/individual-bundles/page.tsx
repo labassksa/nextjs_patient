@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import { type ColumnDef } from "@tanstack/react-table";
 import { useBundles, useCreateBundle, useToggleBundleActive, useDeleteBundle } from "@/features/dashboard/hooks/use-bundles";
 import type { Bundle, CreateBundlePayload } from "@/features/dashboard/types/bundle.types";
-import { labelForBundleType } from "@/utils/bundleType";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { SearchInput } from "@/features/dashboard/components/shared/search-input";
@@ -21,7 +20,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["gpConsultations", "specialistConsultations", "vitamins", "obesityProgram", "sexualHealth"] as const;
+const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins", "obesityProgram", "Sexual Health"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 export default function IndividualBundlesPage() {
@@ -33,7 +32,7 @@ export default function IndividualBundlesPage() {
   const [createDialog, setCreateDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [newBundle, setNewBundle] = useState<CreateBundlePayload>({
-    name: "basic", type: "gpConsultations", price: 0, consultationCount: 1,
+    name: "basic", type: "GP Consultations", price: 0, consultationCount: 1,
     currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined,
     whoSubscribes: "individual", isUnlimited: false,
   });
@@ -59,7 +58,7 @@ export default function IndividualBundlesPage() {
     if (!validateBundle()) return;
     await createBundle.mutateAsync({ ...newBundle, whoSubscribes: "individual" });
     setCreateDialog(false);
-    setNewBundle({ name: "basic", type: "gpConsultations", price: 0, consultationCount: 1, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "individual", isUnlimited: false });
+    setNewBundle({ name: "basic", type: "GP Consultations", price: 0, consultationCount: 1, currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "", originalPrice: undefined, whoSubscribes: "individual", isUnlimited: false });
     setFormErrors({});
   };
 
@@ -83,7 +82,7 @@ export default function IndividualBundlesPage() {
       accessorKey: "type",
       header: "Type",
       cell: ({ row }) => (
-        <Badge variant="outline" className="font-normal">{labelForBundleType(row.original.type, "en")}</Badge>
+        <Badge variant="outline" className="font-normal capitalize">{row.original.type}</Badge>
       ),
     },
     {
@@ -201,7 +200,7 @@ export default function IndividualBundlesPage() {
               <Select value={newBundle.type} onValueChange={(val) => setNewBundle({ ...newBundle, type: val })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{labelForBundleType(t, "en")}</SelectItem>)}
+                  {BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
