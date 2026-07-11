@@ -11,6 +11,8 @@ import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
 import { FormSkeleton } from "@/features/dashboard/components/shared/loading-skeleton";
+import { ConsultationReportTable } from "@/features/dashboard/components/shared/consultation-report-table";
+import { exportConsultationReportToExcel } from "@/features/dashboard/utils/consultation-report";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +63,8 @@ export default function MarketerDetailPage() {
   weekAgoDate.setDate(todayDate.getDate() - 7);
   const [consultFromDate, setConsultFromDate] = useState(weekAgoDate.toISOString().split("T")[0]);
   const [consultToDate, setConsultToDate] = useState(todayDate.toISOString().split("T")[0]);
+  const [consultPage, setConsultPage] = useState(1);
+  const [consultLimit, setConsultLimit] = useState(10);
 
   useEffect(() => {
     if (marketer) {
@@ -83,8 +87,7 @@ export default function MarketerDetailPage() {
     setEditErrors({});
   };
 
-  const marketerUserId = marketer?.userId ?? 0;
-  const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
+  const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerId, consultFromDate, consultToDate, consultPage, consultLimit);
   const consultationsList = consultData?.consultations ?? [];
 
   const monthAgoDate = new Date(todayDate);
@@ -110,40 +113,12 @@ export default function MarketerDetailPage() {
     const titleText = `الاستشارات الطبية للمسوّق ${marketerName} من الفترة ${consultFromDate} الي ${consultToDate}`;
     setIsExportingConsult(true);
     try {
-      const ExcelJS = (await import("exceljs")).default;
-      const allData = await getMarketerConsultations(marketerUserId, consultFromDate, consultToDate);
-      const HEADERS = ["ID", "Status", "Patient", "Doctor", "Created", "Closed"];
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Consultations");
-      worksheet.mergeCells(1, 1, 1, HEADERS.length);
-      const titleCell = worksheet.getCell("A1");
-      titleCell.value = titleText;
-      titleCell.font = { bold: true, size: 14 };
-      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
-      worksheet.getRow(1).height = 28;
-      worksheet.addRow([]);
-      const headerRow = worksheet.addRow(HEADERS);
-      headerRow.font = { bold: true };
-      headerRow.eachCell((cell) => { cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } }; });
-      for (const c of allData.consultations ?? []) {
-        worksheet.addRow([
-          c.id,
-          c.status,
-          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-          new Date(c.createdAt).toLocaleDateString(),
-          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-        ]);
-      }
-      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${filename}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const allData = await getMarketerConsultations(marketerId, consultFromDate, consultToDate, 1, consultData?.total || consultLimit);
+      await exportConsultationReportToExcel({
+        filename,
+        titleText,
+        rows: allData.consultations ?? [],
+      });
     } finally {
       setIsExportingConsult(false);
     }
@@ -502,49 +477,23 @@ export default function MarketerDetailPage() {
             </Button>
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
-              <Input type="date" lang="en" value={consultFromDate} onChange={(e) => setConsultFromDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" max={consultToDate} />
+              <Input type="date" lang="en" value={consultFromDate} onChange={(e) => { setConsultFromDate(e.target.value); setConsultPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={consultToDate} />
             </div>
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
-              <Input type="date" lang="en" value={consultToDate} onChange={(e) => setConsultToDate(e.target.value)} className="h-8 w-auto text-sm" dir="ltr" min={consultFromDate} max={todayDate.toISOString().split("T")[0]} />
+              <Input type="date" lang="en" value={consultToDate} onChange={(e) => { setConsultToDate(e.target.value); setConsultPage(1); }} className="h-8 w-auto text-sm" dir="ltr" min={consultFromDate} max={todayDate.toISOString().split("T")[0]} />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {consultLoading ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
-          ) : consultationsList.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Closed</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {consultationsList.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
-                      <TableCell><StatusBadge status={c.status} /></TableCell>
-                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
-                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No consultations found for this date range.
-            </p>
-          )}
+          <ConsultationReportTable
+            data={consultData}
+            isLoading={consultLoading}
+            page={consultPage}
+            limit={consultLimit}
+            onPageChange={setConsultPage}
+            onLimitChange={setConsultLimit}
+          />
         </CardContent>
       </Card>
 

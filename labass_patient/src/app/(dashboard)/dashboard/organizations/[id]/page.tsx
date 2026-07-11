@@ -11,6 +11,8 @@ import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
 import { FormSkeleton } from "@/features/dashboard/components/shared/loading-skeleton";
+import { ConsultationReportTable } from "@/features/dashboard/components/shared/consultation-report-table";
+import { exportConsultationReportToExcel } from "@/features/dashboard/utils/consultation-report";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -107,59 +109,12 @@ export default function OrganizationDetailPage() {
 
     setIsExportingConsult(true);
     try {
-      const ExcelJS = (await import("exceljs")).default;
-      const allData = await getOrgConsultationsReport(orgId, fromDate, toDate, 1, reportData?.total || 10000);
-
-      const HEADERS = ["ID", "Source", "Status", "Subscription ID", "Bundle Type", "Remaining", "Patient", "Marketer", "Doctor", "Created", "Closed"];
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Consultations");
-
-      // Bold title row
-      worksheet.mergeCells(1, 1, 1, HEADERS.length);
-      const titleCell = worksheet.getCell("A1");
-      titleCell.value = titleText;
-      titleCell.font = { bold: true, size: 14 };
-      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
-      worksheet.getRow(1).height = 28;
-
-      // Spacer
-      worksheet.addRow([]);
-
-      // Header row
-      const headerRow = worksheet.addRow(HEADERS);
-      headerRow.font = { bold: true };
-      headerRow.eachCell((cell) => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      const allData = await getOrgConsultationsReport(orgId, fromDate, toDate, 1, reportData?.total || limit);
+      await exportConsultationReportToExcel({
+        filename,
+        titleText,
+        rows: allData.consultations ?? [],
       });
-
-      // Data rows
-      for (const c of allData.consultations ?? []) {
-        worksheet.addRow([
-          c.id,
-          c.subscription ? "Bundle" : "Promo",
-          c.status,
-          c.subscription?.id ?? "—",
-          c.subscription?.bundleType ? labelForBundleType(c.subscription.bundleType, "en") : "—",
-          c.subscription?.remainingConsultations ?? "—",
-          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-          `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-          new Date(c.createdAt).toLocaleDateString(),
-          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-        ]);
-      }
-
-      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${filename}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
     } finally {
       setIsExportingConsult(false);
     }
@@ -683,105 +638,14 @@ export default function OrganizationDetailPage() {
               <Download className="h-4 w-4 mr-2" /> {isExportingConsult ? "Exporting..." : "Export to Excel"}
             </Button>
           </div>
-          {consultationsLoading ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
-          ) : consultationsList.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Subscription</TableHead>
-                    <TableHead>Bundle Type</TableHead>
-                    <TableHead>Remaining</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Marketer</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Closed</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {consultationsList.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
-                      <TableCell>
-                        {c.subscription
-                          ? <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 text-xs">Bundle</Badge>
-                          : <Badge variant="outline" className="text-xs">Promo</Badge>}
-                      </TableCell>
-                      <TableCell><StatusBadge status={c.status} /></TableCell>
-                      <TableCell>
-                        {c.subscription?.id
-                          ? <button onClick={() => router.push(`/dashboard/subscriptions/${c.subscription!.id}`)} className="font-mono text-xs text-blue-600 hover:underline">#{c.subscription.id}</button>
-                          : <span className="text-xs text-muted-foreground">—</span>}
-                      </TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{c.subscription?.bundleType ? labelForBundleType(c.subscription.bundleType, "en") : "—"}</TableCell>
-                      <TableCell className="font-mono text-xs">{c.subscription?.remainingConsultations ?? "—"}</TableCell>
-                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
-                      <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>
-                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No consultations found for this date range.
-            </p>
-          )}
-
-          {/* Pagination */}
-          {consultationsList.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1 py-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <p className="text-sm text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-medium text-foreground">{(page - 1) * limit + 1}</span>
-                  {" "}to{" "}
-                  <span className="font-medium text-foreground">{Math.min(page * limit, reportData?.total ?? consultationsList.length)}</span>
-                  {" "}of{" "}
-                  <span className="font-medium text-foreground">{reportData?.total ?? consultationsList.length}</span>
-                  {" "}results
-                </p>
-                <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Rows per page</span>
-                  <Select value={String(limit)} onValueChange={(val) => { setLimit(Number(val)); setPage(1); }}>
-                    <SelectTrigger className="h-8 w-[70px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[10, 20, 30, 50].map((size) => (
-                        <SelectItem key={size} value={String(size)}>{size}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-sm text-muted-foreground mr-2">
-                  Page {page} of {Math.ceil((reportData?.total ?? consultationsList.length) / limit) || 1}
-                </span>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(1)} disabled={page === 1}>
-                  <ChevronsLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => p + 1)} disabled={page >= Math.ceil((reportData?.total ?? consultationsList.length) / limit)}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(Math.ceil((reportData?.total ?? consultationsList.length) / limit))} disabled={page >= Math.ceil((reportData?.total ?? consultationsList.length) / limit)}>
-                  <ChevronsRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <ConsultationReportTable
+            data={reportData}
+            isLoading={consultationsLoading}
+            page={page}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+          />
         </CardContent>
       </Card>
 
