@@ -4,27 +4,27 @@ import { labelForBundleType } from "@/utils/bundleType";
 export const EMPTY_REPORT_VALUE = "—";
 
 export const CONSULTATION_REPORT_EXPORT_HEADERS = [
-  "Consultation ID",
-  "Created date/time",
-  "Status",
-  "Paid at",
-  "Closed at",
-  "Doctor joined at",
-  "Patient joined at",
-  "Price",
-  "Payment method",
-  "Prescription PDF link",
-  "Marketer name",
-  "Marketer phone",
-  "Marketer organization",
-  "Patient ID",
-  "Patient name",
-  "Patient phone",
-  "Doctor name",
-  "Doctor phone",
-  "Subscription ID",
-  "Bundle type",
-  "Remaining consultations",
+  "رقم الاستشارة",
+  "تاريخ ووقت الإنشاء",
+  "الحالة",
+  "تاريخ الدفع",
+  "تاريخ الإغلاق",
+  "وقت دخول الطبيب",
+  "وقت دخول المريض",
+  "السعر",
+  "طريقة الدفع",
+  "رابط الوصفة الطبية",
+  "اسم الصيدلي",
+  "رقم الصيدلي",
+  "الصيدلية",
+  "رقم المريض",
+  "اسم المريض",
+  "رقم جوال المريض",
+  "اسم الطبيب",
+  "رقم جوال الطبيب",
+  "رقم الاشتراك",
+  "نوع الباقة",
+  "الاستشارات المتبقية",
 ] as const;
 
 export function formatReportValue(value: unknown): string {
@@ -112,6 +112,7 @@ export async function exportConsultationReportToExcel(options: {
 
   const headerRow = worksheet.addRow([...CONSULTATION_REPORT_EXPORT_HEADERS]);
   headerRow.font = { bold: true };
+  headerRow.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
   headerRow.eachCell((cell) => {
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
   });
