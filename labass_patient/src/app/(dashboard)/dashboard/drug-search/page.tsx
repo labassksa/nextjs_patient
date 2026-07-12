@@ -146,24 +146,25 @@ function ConsultationResultCard({ consultation, search }: { consultation: DrugSe
           </div>
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-2">
-          <div>
-            <SectionTitle icon={User} title="Patient" />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <DetailItem label="Name" value={formatReportName(consultation.patient?.user)} />
-              <DetailItem label="Phone" value={formatReportValue(consultation.patient?.user?.phoneNumber)} dir="ltr" />
-            </div>
-          </div>
-          <div>
-            <SectionTitle icon={Stethoscope} title="Doctor" />
-            <div className="grid gap-3 sm:grid-cols-2">
-              <DetailItem label="Name" value={formatReportName(consultation.doctor?.user)} />
-              <DetailItem label="Phone" value={formatReportValue(consultation.doctor?.user?.phoneNumber)} dir="ltr" />
-            </div>
+        <section className="border-t pt-4">
+          <SectionTitle icon={User} title="Patient information" />
+          <div className="grid gap-3 sm:grid-cols-3">
+            <DetailItem label="Patient ID" value={consultation.patient?.id ? `#${consultation.patient.id}` : EMPTY_REPORT_VALUE} />
+            <DetailItem label="Name" value={formatReportName(consultation.patient?.user)} />
+            <DetailItem label="Phone" value={formatReportValue(consultation.patient?.user?.phoneNumber)} dir="ltr" />
           </div>
         </section>
 
-        <section>
+        <section className="border-t pt-4">
+          <SectionTitle icon={Stethoscope} title="Doctor information" />
+          <div className="grid gap-3 sm:grid-cols-3">
+            <DetailItem label="Doctor ID" value={consultation.doctor?.id ? `#${consultation.doctor.id}` : EMPTY_REPORT_VALUE} />
+            <DetailItem label="Name" value={formatReportName(consultation.doctor?.user)} />
+            <DetailItem label="Phone" value={formatReportValue(consultation.doctor?.user?.phoneNumber)} dir="ltr" />
+          </div>
+        </section>
+
+        <section className="border-t pt-4">
           <SectionTitle icon={FileText} title="Prescription" />
           <div className="grid gap-4 lg:grid-cols-3">
             <div>
