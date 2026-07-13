@@ -4,6 +4,7 @@ import * as i18next from '../../utils/i18n';
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from "react";
 import LabBottomNavBar from "./_components/bottomNavBar";
+import WalletSection from "./_components/wallet/WalletSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
 import { getOrganization } from "./_controllers/getOrganization";
@@ -62,7 +63,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription">(
+  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription" | "wallet">(
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
@@ -195,7 +196,7 @@ const OrgPatientsPage: React.FC = () => {
 
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
-    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration') {
+    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration' || viewParam === 'wallet') {
       setCurrentView(viewParam);
     }
 
@@ -547,7 +548,7 @@ const OrgPatientsPage: React.FC = () => {
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
         {/* User Info Section - Compact Design (hidden on subscription view) */}
-        {userData && currentView !== "subscription" && (
+        {userData && currentView !== "subscription" && currentView !== "wallet" && (
           <div className="mb-4">
             <div className="w-full">
               {/* Compact Header with Language Toggle */}
@@ -628,7 +629,7 @@ const OrgPatientsPage: React.FC = () => {
         )}
 
         {/* Bundle remaining consultations - shown under personal info */}
-        {subscription.length > 0 && currentView !== "subscription" && (
+        {subscription.length > 0 && currentView !== "subscription" && currentView !== "wallet" && (
           <div className="px-4 pb-2 flex flex-wrap gap-2 justify-end" dir="rtl">
             {subscription.map((sub: any) => (
               <div key={sub.id} className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
@@ -683,7 +684,9 @@ const OrgPatientsPage: React.FC = () => {
             </div>
           )}
 
-          {isLoadingOrg ? (
+          {currentView === "wallet" ? (
+            <WalletSection />
+          ) : isLoadingOrg ? (
             <div className="flex items-center justify-center min-h-[50vh]">
               <div className="spinner"></div>
             </div>

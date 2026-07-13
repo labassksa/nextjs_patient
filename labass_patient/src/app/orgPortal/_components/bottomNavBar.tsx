@@ -1,18 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Home as HomeIcon,
   Assignment as PatientsIcon,
   PersonAdd as RegistrationIcon,
   CardMembership as SubscriptionIcon,
+  AccountBalanceWalletOutlined as WalletIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 interface LabBottomNavBarProps {
   onToggleView: React.Dispatch<
-    React.SetStateAction<"patients" | "registration" | "subscription">
+    React.SetStateAction<"patients" | "registration" | "subscription" | "wallet">
   >;
-  currentView: "patients" | "registration" | "subscription";
+  currentView: "patients" | "registration" | "subscription" | "wallet";
   className?: string;
 }
 
@@ -49,6 +50,15 @@ const LabBottomNavBar: React.FC<LabBottomNavBarProps> = ({
       >
         <SubscriptionIcon fontSize="small" />
         <span>{t('subscription.tabLabel')}</span>
+      </button>
+      <button
+        className={`flex flex-col items-center ${
+          currentView === "wallet" ? "text-blue-500" : "text-gray-500"
+        }`}
+        onClick={() => onToggleView("wallet")}
+      >
+        <WalletIcon fontSize="small" />
+        <span>{t('wallet.tabLabel')}</span>
       </button>
     </nav>
   );
