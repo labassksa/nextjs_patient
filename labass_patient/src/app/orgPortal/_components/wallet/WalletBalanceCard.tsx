@@ -5,42 +5,38 @@ import { useTranslation } from "react-i18next";
 
 interface Props {
   balance: number;
-  totalEarned: number;
+  currency: string;
   commissionPercentage: number;
 }
 
 const WalletBalanceCard: React.FC<Props> = ({
   balance,
-  totalEarned,
+  currency,
   commissionPercentage,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith("ar") ? "ar-SA" : "en-SA";
+  const formattedBalance = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(balance);
 
   return (
-    <section className="relative overflow-hidden rounded-wallet-xl border-t-4 border-lime bg-forest p-6 text-paleGreen shadow-wallet-card">
+    <section className="overflow-hidden rounded-wallet-xl border-t-4 border-lime bg-forest p-6 text-paleGreen shadow-wallet-card">
       <p className="text-sm opacity-75">{t("wallet.currentBalance")}</p>
-      <div className="mt-1 flex items-end gap-2">
-        <span
-          className="text-4xl font-extrabold text-white"
-          style={{ fontVariantNumeric: "tabular-nums" }}
-        >
-          {balance.toLocaleString("en-US")}
-        </span>
-        <span className="mb-1 text-base opacity-90">{t("wallet.currency")}</span>
-      </div>
+      <p
+        className="mt-1 text-3xl font-extrabold text-white"
+        dir="ltr"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+      >
+        {formattedBalance}
+      </p>
 
-      <div className="mt-5 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs opacity-60">{t("wallet.totalEarned")}</p>
-          <p
-            className="text-sm font-bold text-white"
-            style={{ fontVariantNumeric: "tabular-nums" }}
-          >
-            {totalEarned.toLocaleString("en-US")} {t("wallet.currency")}
-          </p>
-        </div>
-        <span className="inline-flex shrink-0 items-center bg-paleGreen px-3 py-1 text-xs font-bold text-forestDeep rounded-full">
-          {commissionPercentage}٪ · {t("wallet.commissionRate")}
+      <div className="mt-5 flex justify-start">
+        <span className="inline-flex items-center rounded-full bg-paleGreen px-3 py-1 text-xs font-bold text-forestDeep">
+          {commissionPercentage}% · {t("wallet.commissionRate")}
         </span>
       </div>
 

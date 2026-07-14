@@ -51,4 +51,12 @@ export const queryKeys = {
     all: ["promoCodes"] as const,
     list: (filters?: Record<string, unknown>) => ["promoCodes", "list", filters] as const,
   },
+  wallets: {
+    myWallet: ["wallet", "me"] as const,
+    myTransactions: ["wallet", "me", "transactions"] as const,
+    adminList: ["wallet", "admin", "list"] as const,
+    adminDetail: (marketerId: number) => ["wallet", "admin", marketerId] as const,
+    adminTransactions: (marketerId: number, page: number, limit: number) =>
+      ["wallet", "admin", marketerId, "transactions", page, limit] as const,
+  },
 };

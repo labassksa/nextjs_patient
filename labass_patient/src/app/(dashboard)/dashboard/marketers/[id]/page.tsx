@@ -25,6 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from "lucide-react";
 import Link from "next/link";
+import { MarketerWalletCard } from "@/features/dashboard/components/marketers/marketer-wallet-card";
 
 export default function MarketerDetailPage() {
   const params = useParams();
@@ -337,6 +338,8 @@ export default function MarketerDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      <MarketerWalletCard marketerId={marketerId} />
 
       {/* Edit Marketer */}
       <Card className="max-w-2xl">
