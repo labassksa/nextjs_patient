@@ -58,7 +58,7 @@ export default function MarketerDetailPage() {
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
-
+//1
   const todayDate = new Date();
   const weekAgoDate = new Date(todayDate);
   weekAgoDate.setDate(todayDate.getDate() - 7);
