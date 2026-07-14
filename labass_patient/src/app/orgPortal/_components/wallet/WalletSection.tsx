@@ -52,6 +52,7 @@ const WalletSection: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [walletError, setWalletError] = useState<string | null>(null);
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [isReferralLoading, setIsReferralLoading] = useState(true);
   const [history, setHistory] = useState<WalletTransactionsPage | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
@@ -113,6 +114,9 @@ const WalletSection: React.FC = () => {
       })
       .catch(() => {
         if (active) setReferralCode(null);
+      })
+      .finally(() => {
+        if (active) setIsReferralLoading(false);
       });
     return () => {
       active = false;
@@ -130,9 +134,6 @@ const WalletSection: React.FC = () => {
     await Promise.all(requests);
   };
 
-  const marketingLink = referralCode
-    ? `https://labass.sa/r/${encodeURIComponent(referralCode)}`
-    : null;
   const displayedTransactions = isFullHistory
     ? history?.data ?? []
     : wallet?.recentTransactions ?? [];
@@ -216,12 +217,10 @@ const WalletSection: React.FC = () => {
             </div>
           )}
 
-          {referralCode && marketingLink && (
-            <WalletShareLinks
-              referralCode={referralCode}
-              marketingLink={marketingLink}
-            />
-          )}
+          <WalletShareLinks
+            referralCode={referralCode}
+            isFetchingCode={isReferralLoading}
+          />
         </>
       )}
     </main>

@@ -8,10 +8,12 @@ import { labelForBundleType } from "@/utils/bundleType";
 
 interface AvailableBundlesSectionProps {
   onSubscribe?: (bundleId: number) => void;
+  bundleTypes?: Array<"gpConsultations" | "specialistConsultations">;
 }
 
 const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   onSubscribe,
+  bundleTypes,
 }) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
@@ -83,6 +85,11 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
   };
 
   const getBundleTypeLabel = (type: string) => labelForBundleType(type);
+  const displayedBundles = bundleTypes
+    ? bundles.filter((bundle) => bundleTypes.includes(
+        bundle.type as "gpConsultations" | "specialistConsultations"
+      ))
+    : bundles;
 
   if (isLoading) {
     return (
@@ -111,7 +118,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
     );
   }
 
-  if (bundles.length === 0) {
+  if (displayedBundles.length === 0) {
     return (
       <div className="max-w-xl mx-auto bg-white rounded-lg p-6 mt-4" dir={isRTL ? "rtl" : "ltr"}>
         <h3 className="text-gray-800 text-lg font-semibold mb-2">
@@ -185,7 +192,7 @@ const AvailableBundlesSection: React.FC<AvailableBundlesSectionProps> = ({
 
       {/* Bundles Grid */}
       <div className="space-y-3">
-        {bundles.map((bundle) => (
+        {displayedBundles.map((bundle) => (
           <div
             key={bundle.id}
             className="border border-gray-200 rounded-lg p-4 hover:border-custom-green hover:shadow-md transition-all"

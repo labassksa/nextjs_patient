@@ -44,12 +44,20 @@ const getRelevantSubscription = (subs: any[], type: DoctorType) => {
   const specialist = isSpecialistDoctorType(type);
   return (
     subs.find((s) =>
-      specialist
+      Number(s.remainingConsultations) > 0 &&
+      (specialist
         ? s.bundle?.type === "specialistConsultations"
-        : s.bundle?.type !== "specialistConsultations"
+        : s.bundle?.type !== "specialistConsultations")
     ) || null
   );
 };
+
+type ConsultationBundleType = "gpConsultations" | "specialistConsultations";
+
+const getSubscriptionBundleType = (subscription: any): ConsultationBundleType =>
+  subscription.bundle?.type === "specialistConsultations"
+    ? "specialistConsultations"
+    : "gpConsultations";
 
 interface OrgPatient {
   id: number;
@@ -125,6 +133,18 @@ const OrgPatientsPage: React.FC = () => {
       : [80, 70, 50, 35, 25, 15];
 
   const relevantSubscription = getRelevantSubscription(subscription, doctorType);
+  const activeSubscriptions = subscription.filter(
+    (item) => Number(item.remainingConsultations) > 0
+  );
+  const subscribedBundleTypes = new Set<ConsultationBundleType>(
+    subscription.map(getSubscriptionBundleType)
+  );
+  const activeBundleTypes = new Set<ConsultationBundleType>(
+    activeSubscriptions.map(getSubscriptionBundleType)
+  );
+  const exhaustedBundleTypes = Array.from(subscribedBundleTypes).filter(
+    (type) => !activeBundleTypes.has(type)
+  );
   const showCashMethod = !relevantSubscription;
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -781,15 +801,21 @@ const OrgPatientsPage: React.FC = () => {
                 </div>
               ) : currentView === "subscription" ? (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
-                  {/* Show active subscription or available bundles */}
-                  {subscription.length > 0 ? (
+                  {/* Show usable subscriptions and renewal options for exhausted types. */}
+                  {activeSubscriptions.length > 0 && (
                     <BundleSection
-                      subscriptions={subscription}
+                      subscriptions={activeSubscriptions}
                       useBundle={false}
                       setUseBundle={() => {}}
                     />
-                  ) : (
+                  )}
+                  {(subscription.length === 0 || exhaustedBundleTypes.length > 0) && (
                     <AvailableBundlesSection
+                      bundleTypes={
+                        subscription.length === 0
+                          ? ["gpConsultations", "specialistConsultations"]
+                          : exhaustedBundleTypes
+                      }
                       onSubscribe={(bundleId) => {
                         // TODO: Connect to backend subscription flow
                         console.log("Subscribe to bundle:", bundleId);
