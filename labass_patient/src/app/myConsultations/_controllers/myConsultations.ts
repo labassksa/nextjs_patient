@@ -1,7 +1,7 @@
 // _controllers/myConsultations.ts
 import axios from "axios";
 
-export const fetchConsultations = async () => {
+export const fetchConsultations = async (forceRefresh = false) => {
   try {
     const token = localStorage.getItem("labass_token");
     if (!token) {
@@ -14,7 +14,11 @@ export const fetchConsultations = async () => {
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          ...(forceRefresh
+            ? { "Cache-Control": "no-cache", Pragma: "no-cache" }
+            : {}),
         },
+        params: forceRefresh ? { _refresh: Date.now() } : undefined,
       }
     );
 

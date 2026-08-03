@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AppDrawer from "../../components/common/AppDrawer";
 import Header from "../../components/common/header";
 import { usePathname, useRouter } from "next/navigation";
@@ -7,6 +7,11 @@ import { fetchSubscriptions } from "./_controllers/fetchSubscriptions";
 import Link from "next/link";
 import axios from "axios";
 import { labelForBundleType } from "@/utils/bundleType";
+import { fetchConsultations } from "@/app/myConsultations/_controllers/myConsultations";
+import {
+  findMatchingRecentConsultation,
+  isAmbiguousConsultationError,
+} from "@/utils/consultationReconciliation";
 
 type SubscriptionStatus =
   | "Draft"
@@ -118,13 +123,17 @@ const Ring: React.FC<{ remaining: number; total: number }> = ({
 const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
   const router = useRouter();
   const [starting, setStarting] = useState(false);
+  const submittingRef = useRef(false);
   const [cardError, setCardError] = useState("");
   const cfg = STATUS[sub.status] ?? STATUS.Draft;
   const isActive = sub.status === "Active";
 
   const handleStartConsultation = async () => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setCardError("");
     setStarting(true);
+    const startedAt = Date.now();
     try {
       const token = localStorage.getItem("labass_token");
       if (!token) { router.push("/login"); return; }
@@ -142,6 +151,25 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
       }
     } catch (err: any) {
+      if (isAmbiguousConsultationError(err)) {
+        try {
+          const recent = await fetchConsultations(true);
+          const match = findMatchingRecentConsultation(recent, {
+            startedAt,
+            patientScopedList: true,
+            consultationType: BUNDLE_CONSULTATION_TYPE[sub.bundle.type] ?? "quick",
+            subscriptionId: sub.id,
+            bundleType: sub.bundle.type,
+          });
+          if (match?.id) {
+            localStorage.setItem(`subscription_consultation_${match.id}`, "1");
+            router.push(`/completeInfo?consultationId=${match.id}`);
+            return;
+          }
+        } catch {
+          // Preserve the original network error when the read-only check also fails.
+        }
+      }
       const msg: string = err.response?.data?.message ?? "";
       if (err.response?.status === 403) {
         setCardError(
@@ -153,6 +181,7 @@ const SubCard: React.FC<{ sub: Subscription }> = ({ sub }) => {
         setCardError("تعذّر إنشاء الاستشارة، يرجى المحاولة مجدداً");
       }
     } finally {
+      submittingRef.current = false;
       setStarting(false);
     }
   };
