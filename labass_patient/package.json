@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:consultation-guard": "node --test tests/consultation-creation-guard.test.mjs",
+    "test:video-call": "node --test tests/video-call.test.mjs",
     "demo:wallet": "playwright test tests/wallet-demo.spec.ts",
     "demo:wallet:plain": "DEMO_VIDEO_STYLE=plain playwright test tests/wallet-demo.spec.ts"
   },
