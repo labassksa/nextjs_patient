@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import {
   Home as HomeIcon,
   Assignment as PatientsIcon,
@@ -10,9 +10,9 @@ import { useTranslation } from "react-i18next";
 
 interface LabBottomNavBarProps {
   onToggleView: React.Dispatch<
-    React.SetStateAction<"patients" | "registration" | "subscription">
+    React.SetStateAction<"patients" | "registration" | "subscription" | "wallet">
   >;
-  currentView: "patients" | "registration" | "subscription";
+  currentView: "patients" | "registration" | "subscription" | "wallet";
   className?: string;
 }
 

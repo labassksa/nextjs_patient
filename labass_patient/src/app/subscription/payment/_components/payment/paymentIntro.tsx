@@ -1,6 +1,7 @@
 import React from "react";
 import { Bundle } from "../../myClientComponent";
 import s from "../../payment.module.css";
+import { labelForBundleType } from "@/utils/bundleType";
 
 interface PaymentIntroProps {
   bundle: Bundle | null;
@@ -9,7 +10,7 @@ interface PaymentIntroProps {
 
 const PaymentIntro: React.FC<PaymentIntroProps> = ({ bundle, price }) => {
   const name = bundle?.description || "جاري التحميل...";
-  const type = bundle?.type || "";
+  const type = labelForBundleType(bundle?.type);
   const originalPrice = bundle?.originalPrice ? Number(bundle.originalPrice) : null;
   const hasDiscount = originalPrice && originalPrice > price;
 

@@ -14,7 +14,7 @@ export const queryKeys = {
     list: (filters?: Record<string, unknown>) => ["marketers", "list", filters] as const,
     detail: (id: number) => ["marketers", "detail", id] as const,
     promoCodes: (marketerId: number) => ["marketers", "promoCodes", marketerId] as const,
-    consultations: (userId: number, fromDate: string, toDate: string) => ["marketers", "consultations", userId, fromDate, toDate] as const,
+    consultations: (marketerId: number, fromDate: string, toDate: string) => ["marketers", "consultations", marketerId, fromDate, toDate] as const,
   },
   organizations: {
     all: ["organizations"] as const,
@@ -29,7 +29,13 @@ export const queryKeys = {
     all: ["consultations"] as const,
     list: (filters?: Record<string, unknown>) => ["consultations", "list", filters] as const,
     detail: (id: number) => ["consultations", "detail", id] as const,
-    report: (fromDate: string, toDate: string) => ["consultations", "report", fromDate, toDate] as const,
+    report: (filters?: unknown) => ["consultations", "report", filters] as const,
+    drugSearch: (filters?: unknown) => ["consultations", "drugSearch", filters] as const,
+  },
+  subscriptionConsultations: {
+    all: ["subscriptionConsultations"] as const,
+    list: (variant: string, params: Record<string, unknown>) =>
+      ["subscriptionConsultations", variant, params] as const,
   },
   bundles: {
     all: ["bundles"] as const,
@@ -44,5 +50,13 @@ export const queryKeys = {
   promoCodes: {
     all: ["promoCodes"] as const,
     list: (filters?: Record<string, unknown>) => ["promoCodes", "list", filters] as const,
+  },
+  wallets: {
+    myWallet: ["wallet", "me"] as const,
+    myTransactions: ["wallet", "me", "transactions"] as const,
+    adminList: ["wallet", "admin", "list"] as const,
+    adminDetail: (marketerId: number) => ["wallet", "admin", marketerId] as const,
+    adminTransactions: (marketerId: number, page: number, limit: number) =>
+      ["wallet", "admin", marketerId, "transactions", page, limit] as const,
   },
 };

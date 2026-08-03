@@ -50,10 +50,10 @@ export function useSendPromoCodesToMarketer() {
   });
 }
 
-export function useMarketerConsultations(userId: number, fromDate: string, toDate: string) {
+export function useMarketerConsultations(marketerId: number, fromDate: string, toDate: string, page: number = 1, limit: number = 10) {
   return useQuery({
-    queryKey: queryKeys.marketers.consultations(userId, fromDate, toDate),
-    queryFn: () => getMarketerConsultations(userId, fromDate, toDate),
-    enabled: !!userId && !!fromDate && !!toDate,
+    queryKey: [...queryKeys.marketers.consultations(marketerId, fromDate, toDate), page, limit],
+    queryFn: () => getMarketerConsultations(marketerId, fromDate, toDate, page, limit),
+    enabled: !!marketerId && !!fromDate && !!toDate,
   });
 }

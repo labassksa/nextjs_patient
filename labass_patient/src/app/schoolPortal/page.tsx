@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getOrganization } from "../orgPortal/_controllers/getOrganization";
 import { getUserData } from "../orgPortal/_controllers/getUserData";
@@ -11,6 +11,12 @@ import { getLabPatients } from "../orgPortal/_controllers/getLabPatients";
 import { Gender } from "../orgPortal/_types/genderType";
 import { DealType } from "../orgPortal/_types/dealType";
 import { convertArabicToEnglishNumbers } from "../../utils/arabicToenglish";
+import {
+  extractConsultations,
+  findMatchingRecentConsultation,
+  getRecentConsultationDateRange,
+  isAmbiguousConsultationError,
+} from "@/utils/consultationReconciliation";
 
 /* ─── Types ─── */
 interface Student {
@@ -164,6 +170,7 @@ export default function SchoolPortal() {
   const [magicLink, setMagicLink] = useState("");
   const [copied, setCopied] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const submittingRef = useRef(false);
 
   /* ── Init ── */
   useEffect(() => {
@@ -245,8 +252,11 @@ export default function SchoolPortal() {
     nationalId: string;
     dateOfBirth: string;
   }) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     setError("");
+    const startedAt = Date.now();
     try {
       if (dealType === DealType.SUBSCRIPTION) {
         const res = await createBundleConsultation({
@@ -271,8 +281,36 @@ export default function SchoolPortal() {
       setShowModal(true);
       await refreshData();
     } catch (e: any) {
+      if (isAmbiguousConsultationError(e)) {
+        try {
+          const { fromDate, toDate } = getRecentConsultationDateRange(startedAt);
+          const response = await getMarketerConsultaion(
+            fromDate,
+            toDate,
+            1,
+            50,
+            true
+          );
+          const recent = extractConsultations(response);
+          setConsultations(recent);
+          const match = findMatchingRecentConsultation(recent, {
+            startedAt,
+            ...patientInfo,
+            consultationType: "general",
+            organizationName: orgName,
+          });
+          if (match?.id) {
+            setMagicLink(match.magicLink || match.link || `/chat/${match.id}`);
+            setShowModal(true);
+            return;
+          }
+        } catch {
+          // Preserve the original network error when the read-only check also fails.
+        }
+      }
       setError(e?.response?.data?.message || e?.message || "حدث خطأ غير متوقع");
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };

@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 import type { Organization, CreateOrganizationPayload, UpdateOrganizationPayload, OrgReportResponse, SubscriptionConsultationsResponse } from "../types/organization.types";
+import { getConsultationReport } from "./consultations.api";
 
 export async function getOrganizations(): Promise<Organization[]> {
   const { data } = await apiClient.get("/organizations/with-marketers");
@@ -38,6 +39,5 @@ export async function getOrgConsultationsReport(
   page: number = 1,
   limit: number = 10
 ): Promise<OrgReportResponse> {
-  const { data } = await apiClient.post("/marketers/consultations/report", { orgId, fromDate, toDate, page, limit });
-  return data;
+  return getConsultationReport({ orgId, fromDate, toDate, page, limit });
 }

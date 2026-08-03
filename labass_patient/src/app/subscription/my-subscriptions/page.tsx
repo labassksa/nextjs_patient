@@ -1,16 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import s from "./my-subscriptions.module.css";
+import { labelForBundleType } from "@/utils/bundleType";
+import { fetchConsultations } from "@/app/myConsultations/_controllers/myConsultations";
+import {
+  findMatchingRecentConsultation,
+  isAmbiguousConsultationError,
+} from "@/utils/consultationReconciliation";
 
 const bundleConsultationTypeMap: Record<string, string> = {
-  "GP Consultations":         "quick",
-  "Specialist Consultations": "specialist",
-  "Vitamins":                 "vitamins",
-  "Obesity Program":          "obesity",
-  "Sexual Health":            "sexualHealth",
+  "gpConsultations":         "quick",
+  "specialistConsultations": "specialist",
+  "vitamins":                 "vitamins",
+  "obesityProgram":          "obesity",
+  "sexualHealth":            "sexualHealth",
 };
 
 interface MySubscription {
@@ -51,6 +57,7 @@ export default function MySubscriptionsPage() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [startingId, setStartingId] = useState<number | null>(null);
   const [consultationError, setConsultationError] = useState<Record<number, string>>({});
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     const token = localStorage.getItem("labass_token");
@@ -69,10 +76,18 @@ export default function MySubscriptionsPage() {
   }, []);
 
   const handleStartConsultation = async (sub: MySubscription) => {
-    const token = localStorage.getItem("labass_token");
-    if (!token) { router.push("/login"); return; }
-
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setStartingId(sub.id);
+    const startedAt = Date.now();
+    const token = localStorage.getItem("labass_token");
+    if (!token) {
+      submittingRef.current = false;
+      setStartingId(null);
+      router.push("/login");
+      return;
+    }
+
     setConsultationError((prev) => ({ ...prev, [sub.id]: "" }));
 
     try {
@@ -90,6 +105,25 @@ export default function MySubscriptionsPage() {
         router.push(`/completeInfo?consultationId=${cid}`);
       }
     } catch (err: any) {
+      if (isAmbiguousConsultationError(err)) {
+        try {
+          const recent = await fetchConsultations(true);
+          const match = findMatchingRecentConsultation(recent, {
+            startedAt,
+            patientScopedList: true,
+            consultationType: bundleConsultationTypeMap[sub.bundle.type],
+            subscriptionId: sub.id,
+            bundleType: sub.bundle.type,
+          });
+          if (match?.id) {
+            localStorage.setItem(`subscription_consultation_${match.id}`, "1");
+            router.push(`/completeInfo?consultationId=${match.id}`);
+            return;
+          }
+        } catch {
+          // Preserve the original network error when the read-only check also fails.
+        }
+      }
       const status = err?.response?.status ?? 500;
       const message = err?.response?.data?.message ?? "";
       setConsultationError((prev) => ({
@@ -97,6 +131,7 @@ export default function MySubscriptionsPage() {
         [sub.id]: consultationErrorMessage(status, message),
       }));
     } finally {
+      submittingRef.current = false;
       setStartingId(null);
     }
   };
@@ -141,7 +176,7 @@ export default function MySubscriptionsPage() {
           <div key={sub.id} className={s.card}>
             <div className={s.cardHeader}>
               <span className={s.badge}>نشط</span>
-              <span className={s.bundleType}>{sub.bundle.type}</span>
+              <span className={s.bundleType}>{labelForBundleType(sub.bundle.type)}</span>
             </div>
 
             <div className={s.cardRow}>
@@ -164,7 +199,7 @@ export default function MySubscriptionsPage() {
               <button
                 className={s.startBtn}
                 onClick={() => handleStartConsultation(sub)}
-                disabled={startingId === sub.id}
+                disabled={startingId !== null}
               >
                 {startingId === sub.id ? "جاري التحميل..." : "ابدأ استشارة"}
               </button>

@@ -175,10 +175,6 @@ const resources = {
           standard: "Standard Package",
           premium: "Premium Package"
         },
-        bundleTypes: {
-          gpConsultations: "GP Consultations",
-          specialistConsultations: "Specialist Consultations"
-        },
         recurringTypes: {
           monthly: "Monthly",
           weekly: "Weekly",
@@ -187,6 +183,57 @@ const resources = {
         },
         lowConsultationsWarning: "Warning: Remaining consultations are low",
         noConsultationsError: "No remaining consultations in subscription. Separate payment method will be used."
+      },
+      wallet: {
+        tabLabel: "Wallet",
+        title: "My Wallet",
+        currentBalance: "Current balance",
+        commissionRate: "Your rate",
+        commissionExplainer: "You earn {{percent}}% of every consultation or subscription through your link",
+        transactionsTitle: "Recent activity",
+        allTransactionsTitle: "Wallet history",
+        transactionCount: "{{count}} transactions",
+        transactionType: {
+          consultation_commission: "Consultation commission",
+          subscription_commission: "Subscription commission",
+          payout: "Payout",
+          adjustment: "Wallet adjustment",
+        },
+        baseAmount: "Base amount",
+        appliedRate: "Commission rate",
+        emptyTransactions: "No wallet transactions yet",
+        viewAll: "View all",
+        pageOf: "Page {{page}} of {{totalPages}}",
+        previousPage: "Previous page",
+        nextPage: "Next page",
+        refresh: "Refresh wallet",
+        loading: "Loading wallet activity",
+        retry: "Try again",
+        errors: {
+          unauthorized: "Your session has expired. Please sign in again.",
+          forbidden: "This account does not have access to a marketer wallet.",
+          noMarketer: "No marketer profile was found for this account.",
+          general: "The wallet could not be loaded. Please try again.",
+        },
+        shareTitle: "Share your link & earn",
+        marketing: {
+          subtitle: "Send your marketing link directly to a client's phone",
+          phoneLabel: "Client phone number",
+          codeLabel: "Marketing code",
+          generateCode: "Generate code",
+          generating: "Generating...",
+          send: "Send marketing message",
+          sending: "Sending...",
+          success: "The marketing message was sent successfully.",
+          errors: {
+            required: "Enter the phone number and marketing code.",
+            invalid: "The information is invalid or the code is inactive.",
+            forbidden: "This code does not belong to your account.",
+            notFound: "The marketing code was not found.",
+            server: "The message could not be sent. Please try again.",
+            general: "An unexpected error occurred. Please try again.",
+          },
+        },
       }
     }
   },
@@ -362,10 +409,6 @@ const resources = {
           standard: "الباقة المتوسطة",
           premium: "الباقة المميزة"
         },
-        bundleTypes: {
-          gpConsultations: "استشارات طبيب عام",
-          specialistConsultations: "استشارات أخصائي"
-        },
         recurringTypes: {
           monthly: "شهري",
           weekly: "أسبوعي",
@@ -374,6 +417,57 @@ const resources = {
         },
         lowConsultationsWarning: "تنبيه: عدد الاستشارات المتبقية منخفض",
         noConsultationsError: "لا توجد استشارات متبقية في الاشتراك. سيتم استخدام طريقة الدفع المنفصلة."
+      },
+      wallet: {
+        tabLabel: "المحفظة",
+        title: "محفظتي",
+        currentBalance: "الرصيد الحالي",
+        commissionRate: "نسبتك",
+        commissionExplainer: "تحصل على {{percent}}٪ من كل استشارة أو اشتراك يتم عبر رابطك",
+        transactionsTitle: "أحدث الحركات",
+        allTransactionsTitle: "سجل المحفظة",
+        transactionCount: "{{count}} حركة",
+        transactionType: {
+          consultation_commission: "عمولة استشارة",
+          subscription_commission: "عمولة اشتراك",
+          payout: "دفعة مالية",
+          adjustment: "تعديل المحفظة",
+        },
+        baseAmount: "المبلغ الأساسي",
+        appliedRate: "نسبة العمولة",
+        emptyTransactions: "لا توجد حركات في المحفظة بعد",
+        viewAll: "عرض الكل",
+        pageOf: "صفحة {{page}} من {{totalPages}}",
+        previousPage: "الصفحة السابقة",
+        nextPage: "الصفحة التالية",
+        refresh: "تحديث المحفظة",
+        loading: "جارٍ تحميل حركات المحفظة",
+        retry: "إعادة المحاولة",
+        errors: {
+          unauthorized: "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.",
+          forbidden: "هذا الحساب لا يملك صلاحية الوصول إلى محفظة مسوق.",
+          noMarketer: "لم يتم العثور على ملف مسوق مرتبط بهذا الحساب.",
+          general: "تعذر تحميل المحفظة. يرجى المحاولة مرة أخرى.",
+        },
+        shareTitle: "شارك رابطك واربح",
+        marketing: {
+          subtitle: "أرسل رابطك التسويقي مباشرة إلى جوال العميل",
+          phoneLabel: "رقم جوال المريض",
+          codeLabel: "الرمز التسويقي للصيدلي",
+          generateCode: "توليد الرمز",
+          generating: "جارٍ توليد الرمز...",
+          send: "إرسال رسالة تسويقية",
+          sending: "جارٍ الإرسال...",
+          success: "تم إرسال الرسالة التسويقية بنجاح.",
+          errors: {
+            required: "يرجى إدخال رقم الجوال والرمز التسويقي",
+            invalid: "بيانات غير صحيحة أو الرمز غير نشط",
+            forbidden: "هذا الرمز لا ينتمي لحسابك",
+            notFound: "الرمز التسويقي غير موجود",
+            server: "فشل إرسال الرسالة، يرجى المحاولة مجدداً",
+            general: "حدث خطأ غير متوقع، يرجى المحاولة مجدداً",
+          },
+        },
       }
     }
   }

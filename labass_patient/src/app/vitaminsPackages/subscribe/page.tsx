@@ -64,7 +64,7 @@ export default function SubscribePage() {
         console.log("All bundles from API:", data);
         const list: any[] = Array.isArray(data) ? data : (data.data ?? []);
         const vitamins = list
-          .filter((b) => b.type === "Vitamins")
+          .filter((b) => b.type === "vitamins")
           .sort((a, b) => Number(a.price) - Number(b.price)); // cheapest first
         setVitaminBundles(vitamins);
         if (vitamins.length > 0) {

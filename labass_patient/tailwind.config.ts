@@ -27,6 +27,17 @@ const config: Config = {
       colors: {
         "custom-background": "#F5FAF1",
         "custom-green": "#4DA514",
+        forest: "#173404",
+        forestDeep: "#0d2002",
+        lime: "#7ED957",
+        sage: "#97C459",
+        green600: "#639922",
+        green700: "#27500A",
+        paleGreen: "#EAF3DE",
+        paleGreen2: "#C0DD97",
+        surface: "#fdfcf7",
+        surfaceAlt: "#f7fbf0",
+        surfaceTint: "#f2faed",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -78,6 +89,14 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "wallet-md": "14px",
+        "wallet-lg": "16px",
+        "wallet-xl": "18px",
+      },
+      boxShadow: {
+        "wallet-card": "0 24px 64px rgba(23,52,4,0.08)",
+        "wallet-hover": "0 16px 36px rgba(23,52,4,0.10)",
+        "wallet-chip": "0 8px 22px rgba(23,52,4,0.15)",
       },
       keyframes: {
         "accordion-down": {

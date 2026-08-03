@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryKeys } from "../constants/query-keys";
-import { getConsultations, getConsultationsReport, sendFollowUp } from "../api/consultations.api";
-import type { SendFollowUpPayload } from "../types/consultation.types";
+import { getConsultationReport, getConsultations, searchConsultationsByDrug, sendFollowUp } from "../api/consultations.api";
+import type { ConsultationReportParams, SearchConsultationsByDrugParams, SendFollowUpPayload } from "../types/consultation.types";
 
 export function useConsultations() {
   return useQuery({
@@ -10,11 +10,22 @@ export function useConsultations() {
   });
 }
 
-export function useConsultationsReport(fromDate: string, toDate: string, page: number = 1, limit: number = 10) {
+export function useConsultationReport(params: ConsultationReportParams) {
   return useQuery({
-    queryKey: [...queryKeys.consultations.report(fromDate, toDate), page, limit],
-    queryFn: () => getConsultationsReport(fromDate, toDate, page, limit),
-    enabled: !!fromDate && !!toDate,
+    queryKey: queryKeys.consultations.report(params),
+    queryFn: () => getConsultationReport(params),
+  });
+}
+
+export function useConsultationsReport(fromDate?: string, toDate?: string, page: number = 1, limit: number = 10) {
+  return useConsultationReport({ fromDate, toDate, page, limit });
+}
+
+export function useDrugConsultationSearch(params: SearchConsultationsByDrugParams, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.consultations.drugSearch(params),
+    queryFn: () => searchConsultationsByDrug(params),
+    enabled,
   });
 }
 

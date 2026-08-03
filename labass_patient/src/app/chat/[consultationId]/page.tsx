@@ -172,7 +172,20 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     if (!socket || !userId || !consultationId) return;
 
-    socket.emit("joinRoom", { room: `${consultationId}` });
+    const joinConsultationRoom = () => {
+      socket.emit("joinRoom", { room: `${consultationId}` });
+    };
+
+    socket.on("connect", joinConsultationRoom);
+    if (socket.connected) joinConsultationRoom();
+
+    return () => {
+      socket.off("connect", joinConsultationRoom);
+    };
+  }, [socket, userId, consultationId]);
+
+  useEffect(() => {
+    if (!socket || !userId || !consultationId) return;
 
     socket.emit(
       "loadMessages",
@@ -394,21 +407,19 @@ const ChatPage: React.FC = () => {
               <h3 className="text-sm font-bold mb-0">{`${doctorInfo.user.firstName} ${doctorInfo.user.lastName} :د`}</h3>
               <p className="text-xs text-gray-600 mb-0">{` ${doctorInfo.specialty} :التخصص`}</p>
               <p className="text-xs text-gray-600">{` ${doctorInfo.medicalLicenseNumber} :رقم الترخيص الطبي`}</p>
-
-              {/* Video Call Button - only show when consultation is open */}
-              {status === ConsultationStatus.Open && (
-                <VideoCallButton
-                  consultationId={Number(consultationId)}
-                  userId={userId || ''}
-                  socket={socket}
-                  isConsultationOpen={status === ConsultationStatus.Open}
-                />
-              )}
             </div>
           ) : (
             <div className="p-0 text-gray-500 text-right text-sm mb-0">
               بانتظار انضمام الدكتور
             </div>
+          )}
+          {status === ConsultationStatus.Open && (
+            <VideoCallButton
+              consultationId={Number(consultationId)}
+              userId={userId || ''}
+              socket={socket}
+              isConsultationOpen={status === ConsultationStatus.Open}
+            />
           )}
         </div>
       </div>

@@ -1,41 +1,44 @@
 "use client";
 
 import { useState } from "react";
-import { useConsultationsReport } from "@/features/dashboard/hooks/use-consultations";
-import { useSendFollowUp } from "@/features/dashboard/hooks/use-consultations";
-import { getConsultationsReport } from "@/features/dashboard/api/consultations.api";
+import { useConsultationsReport, useSendFollowUp } from "@/features/dashboard/hooks/use-consultations";
+import { getConsultationReport } from "@/features/dashboard/api/consultations.api";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
-import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
+import { ConsultationReportTable } from "@/features/dashboard/components/shared/consultation-report-table";
+import { exportConsultationReportToExcel } from "@/features/dashboard/utils/consultation-report";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Send, Download, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Download, Send } from "lucide-react";
+
+function formatDateInput(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
 export default function ConsultationsPage() {
   const today = new Date();
-  const weekAgo = new Date(today);
-  weekAgo.setDate(today.getDate() - 7);
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  const [fromDate, setFromDate] = useState(weekAgo.toISOString().split("T")[0]);
-  const [toDate, setToDate] = useState(today.toISOString().split("T")[0]);
+  const [fromDate, setFromDate] = useState(formatDateInput(monthStart));
+  const [toDate, setToDate] = useState(formatDateInput(today));
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-
-  const { data: reportData, isLoading, error, refetch } = useConsultationsReport(fromDate, toDate, page, limit);
-  const sendFollowUp = useSendFollowUp();
-
+  const [isExporting, setIsExporting] = useState(false);
   const [followUpDialog, setFollowUpDialog] = useState<{ open: boolean; consultationId: string }>({
     open: false,
     consultationId: "",
   });
   const [paymentMethod, setPaymentMethod] = useState("Through Labass Platform");
-  const [isExporting, setIsExporting] = useState(false);
+
+  const { data: reportData, isLoading, error, refetch } = useConsultationsReport(fromDate || undefined, toDate || undefined, page, limit);
+  const sendFollowUp = useSendFollowUp();
 
   const handleSendFollowUp = async () => {
     await sendFollowUp.mutateAsync({
@@ -46,54 +49,22 @@ export default function ConsultationsPage() {
   };
 
   const handleExport = async () => {
-    const filename = `الاستشارات الطبية - ${fromDate} - ${toDate}`;
-    const titleText = `الاستشارات الطبية من الفترة ${fromDate} الي ${toDate}`;
+    const filename = `الاستشارات الطبية - ${fromDate || "default"} - ${toDate || "default"}`;
+    const titleText = `الاستشارات الطبية من الفترة ${fromDate || "بداية الشهر"} الي ${toDate || "الآن"}`;
+
     setIsExporting(true);
     try {
-      const ExcelJS = (await import("exceljs")).default;
-      const allData = await getConsultationsReport(fromDate, toDate, 1, reportData?.total || 10000);
-
-      const HEADERS = ["ID", "Status", "Patient", "Marketer", "Doctor", "Created", "Closed"];
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Consultations");
-
-      worksheet.mergeCells(1, 1, 1, HEADERS.length);
-      const titleCell = worksheet.getCell("A1");
-      titleCell.value = titleText;
-      titleCell.font = { bold: true, size: 14 };
-      titleCell.alignment = { horizontal: "center", vertical: "middle", readingOrder: "rtl" };
-      worksheet.getRow(1).height = 28;
-
-      worksheet.addRow([]);
-
-      const headerRow = worksheet.addRow(HEADERS);
-      headerRow.font = { bold: true };
-      headerRow.eachCell((cell) => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0E0E0" } };
+      const allData = await getConsultationReport({
+        fromDate: fromDate || undefined,
+        toDate: toDate || undefined,
+        page: 1,
+        limit: reportData?.total || limit,
       });
-
-      for (const c of allData.consultations ?? []) {
-        worksheet.addRow([
-          c.id,
-          c.status,
-          `${c.patient?.firstName ?? ""} ${c.patient?.lastName ?? ""}`.trim(),
-          `${c.marketer?.firstName ?? ""} ${c.marketer?.lastName ?? ""}`.trim(),
-          `${c.doctor?.firstName ?? ""} ${c.doctor?.lastName ?? ""}`.trim(),
-          new Date(c.createdAt).toLocaleDateString(),
-          c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "",
-        ]);
-      }
-
-      HEADERS.forEach((_, i) => { worksheet.getColumn(i + 1).width = 18; });
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${filename}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await exportConsultationReportToExcel({
+        filename,
+        titleText,
+        rows: allData.consultations ?? [],
+      });
     } finally {
       setIsExporting(false);
     }
@@ -102,8 +73,7 @@ export default function ConsultationsPage() {
   if (error) return <ErrorState onRetry={() => refetch()} />;
 
   const consultationsList = reportData?.consultations ?? [];
-  const total = reportData?.total ?? consultationsList.length;
-  const totalPages = Math.ceil(total / limit) || 1;
+  const total = reportData?.total ?? 0;
 
   return (
     <div>
@@ -115,15 +85,39 @@ export default function ConsultationsPage() {
             Consultations{" "}
             <Badge variant="secondary" className="ml-2 font-mono">{total}</Badge>
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">From</Label>
-              <Input type="date" lang="en" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setPage(1); }} className="h-8 w-auto text-sm" dir="ltr" max={toDate} />
+              <Input
+                type="date"
+                lang="en"
+                value={fromDate}
+                onChange={(event) => { setFromDate(event.target.value); setPage(1); }}
+                className="h-8 w-auto text-sm"
+                dir="ltr"
+                max={toDate || undefined}
+              />
             </div>
             <div className="flex items-center gap-1">
               <Label className="text-xs text-muted-foreground whitespace-nowrap">To</Label>
-              <Input type="date" lang="en" value={toDate} onChange={(e) => { setToDate(e.target.value); setPage(1); }} className="h-8 w-auto text-sm" dir="ltr" min={fromDate} max={today.toISOString().split("T")[0]} />
+              <Input
+                type="date"
+                lang="en"
+                value={toDate}
+                onChange={(event) => { setToDate(event.target.value); setPage(1); }}
+                className="h-8 w-auto text-sm"
+                dir="ltr"
+                min={fromDate || undefined}
+                max={formatDateInput(today)}
+              />
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => { setFromDate(""); setToDate(""); setPage(1); }}
+            >
+              Backend default dates
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -133,100 +127,26 @@ export default function ConsultationsPage() {
             </Button>
           </div>
 
-          {isLoading ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Loading consultations...</p>
-          ) : consultationsList.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Marketer</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Closed</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {consultationsList.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell className="font-mono text-xs">#{c.id}</TableCell>
-                      <TableCell><StatusBadge status={c.status} /></TableCell>
-                      <TableCell>{c.patient?.firstName} {c.patient?.lastName}</TableCell>
-                      <TableCell>{c.marketer?.firstName} {c.marketer?.lastName}</TableCell>
-                      <TableCell>{c.doctor?.firstName} {c.doctor?.lastName}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{c.closedAt ? new Date(c.closedAt).toLocaleDateString() : "—"}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-muted-foreground hover:text-foreground"
-                          onClick={() => setFollowUpDialog({ open: true, consultationId: String(c.id) })}
-                        >
-                          <Send className="h-4 w-4 mr-1" /> Follow Up
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-6">
-              No consultations found for this date range.
-            </p>
-          )}
-
-          {/* Pagination */}
-          {consultationsList.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1 py-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                <p className="text-sm text-muted-foreground">
-                  Showing{" "}
-                  <span className="font-medium text-foreground">{(page - 1) * limit + 1}</span>
-                  {" "}to{" "}
-                  <span className="font-medium text-foreground">{Math.min(page * limit, total)}</span>
-                  {" "}of{" "}
-                  <span className="font-medium text-foreground">{total}</span>
-                  {" "}results
-                </p>
-                <div className="hidden sm:flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Rows per page</span>
-                  <Select value={String(limit)} onValueChange={(val) => { setLimit(Number(val)); setPage(1); }}>
-                    <SelectTrigger className="h-8 w-[70px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[10, 20, 30, 50].map((size) => (
-                        <SelectItem key={size} value={String(size)}>{size}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-sm text-muted-foreground mr-2">
-                  Page {page} of {totalPages}
-                </span>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(1)} disabled={page === 1}>
-                  <ChevronsLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setPage(totalPages)} disabled={page >= totalPages}>
-                  <ChevronsRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
+          <ConsultationReportTable
+            data={reportData}
+            isLoading={isLoading}
+            page={page}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+            actionHeader="Actions"
+            renderActions={(consultation) => (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+                disabled={!consultation.id}
+                onClick={() => setFollowUpDialog({ open: true, consultationId: String(consultation.id) })}
+              >
+                <Send className="h-4 w-4 mr-1" /> Follow Up
+              </Button>
+            )}
+          />
         </CardContent>
       </Card>
 
@@ -242,10 +162,7 @@ export default function ConsultationsPage() {
             </div>
             <div className="space-y-2">
               <Label>Payment Method</Label>
-              <Input
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
+              <Input value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value)} />
             </div>
           </div>
           <DialogFooter>

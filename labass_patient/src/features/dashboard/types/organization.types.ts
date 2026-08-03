@@ -1,4 +1,5 @@
 import type { Marketer } from "./marketer.types";
+import type { ConsultationReportResponse, ConsultationReportRow } from "./consultation.types";
 
 export interface Organization {
   id: number;
@@ -24,25 +25,8 @@ export interface CreateOrganizationPayload {
   dealType: string;
 }
 
-export interface OrgReportConsultation {
-  id: number;
-  status: string;
-  createdAt: string;
-  doctorJoinedAT: string | null;
-  patientJoinedAT: string | null;
-  paidAT: string | null;
-  closedAt: string | null;
-  prescriptionPDFUrl?: string;
-  marketer: { phoneNumber?: string; firstName: string | null; lastName: string | null; orgName?: string };
-  patient: { id?: number; phoneNumber?: string; firstName?: string; lastName?: string };
-  doctor: { phoneNumber?: string; firstName?: string; lastName?: string };
-  subscription?: { id: number; bundleType: string; remainingConsultations: number };
-}
-
-export interface OrgReportResponse {
-  consultations: OrgReportConsultation[];
-  total: number;
-}
+export type OrgReportConsultation = ConsultationReportRow;
+export type OrgReportResponse = ConsultationReportResponse;
 
 export interface SubscriptionConsultation {
   id: number;

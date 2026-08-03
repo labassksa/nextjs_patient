@@ -6,9 +6,11 @@ import { useSubscriptions, useToggleSubscriptionStatus, useCancelSubscription } 
 import { useBundles, useCreateBundle, useToggleBundleActive, useDeleteBundle } from "@/features/dashboard/hooks/use-bundles";
 import type { Subscription } from "@/features/dashboard/types/subscription.types";
 import type { Bundle, CreateBundlePayload } from "@/features/dashboard/types/bundle.types";
+import { labelForBundleType } from "@/utils/bundleType";
 import { DataTable } from "@/features/dashboard/components/shared/data-table";
 import { PageHeader } from "@/features/dashboard/components/shared/page-header";
 import { StatusBadge } from "@/features/dashboard/components/shared/status-badge";
+import { SubscriptionConsultationsTable } from "@/features/dashboard/components/shared/subscription-consultations-table";
 import { SearchInput } from "@/features/dashboard/components/shared/search-input";
 import { ConfirmDialog } from "@/features/dashboard/components/shared/confirm-dialog";
 import { ErrorState } from "@/features/dashboard/components/shared/error-state";
@@ -23,11 +25,11 @@ import { Plus, Ban, Trash2, Eye } from "lucide-react";
 
 const CURRENCIES = ["SAR", "KWD", "AED", "BHD", "OMR", "QAR", "USD", "EUR"] as const;
 const RECURRING_TYPES = ["Daily", "Weekly", "Monthly", "Custom"] as const;
-const BUNDLE_TYPES = ["GP Consultations", "Specialist Consultations", "Vitamins", "Obesity Program", "Sexual Health"] as const;
+const BUNDLE_TYPES = ["gpConsultations", "specialistConsultations", "vitamins", "obesityProgram", "sexualHealth"] as const;
 const BUNDLE_NAMES = ["basic", "standard", "premium"] as const;
 
 const DEFAULT_BUNDLE: CreateBundlePayload = {
-  name: "basic", type: "GP Consultations", price: 0, consultationCount: 1,
+  name: "basic", type: "gpConsultations", price: 0, consultationCount: 1,
   currency: "SAR", recurringType: "Monthly", intervalDays: undefined, description: "",
   originalPrice: undefined, whoSubscribes: "individual", isUnlimited: false,
 };
@@ -180,7 +182,7 @@ export default function IndividualsSubscriptionsPage() {
     {
       accessorKey: "type",
       header: "Type",
-      cell: ({ row }) => <Badge variant="outline" className="font-normal capitalize">{row.original.type}</Badge>,
+      cell: ({ row }) => <Badge variant="outline" className="font-normal">{labelForBundleType(row.original.type, "en")}</Badge>,
     },
     {
       accessorKey: "price",
@@ -266,6 +268,15 @@ export default function IndividualsSubscriptionsPage() {
         <DataTable columns={subColumns} data={indSubs} isLoading={subsLoading} searchKey="bundle" searchValue={subSearch} exportFilename="individual-subscriptions" />
       </div>
 
+      {/* Subscription Consultations */}
+      <div>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Consultations</h2>
+          <p className="text-sm text-muted-foreground">Consultations patients booked from their own bundles</p>
+        </div>
+        <SubscriptionConsultationsTable variant="individuals" />
+      </div>
+
       {/* Bundles */}
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -311,7 +322,7 @@ export default function IndividualsSubscriptionsPage() {
                 <h3 className="font-semibold text-muted-foreground uppercase text-xs tracking-wide mb-2">Bundle</h3>
                 <div className="grid grid-cols-2 gap-2">
                   <div><span className="text-muted-foreground">Name</span><p className="font-medium capitalize">{viewSub.bundle?.name || "—"}</p></div>
-                  <div><span className="text-muted-foreground">Type</span><p>{viewSub.bundle?.type || "—"}</p></div>
+                  <div><span className="text-muted-foreground">Type</span><p>{viewSub.bundle?.type ? labelForBundleType(viewSub.bundle.type, "en") : "—"}</p></div>
                 </div>
               </div>
               {viewSub.patient && (
@@ -365,7 +376,7 @@ export default function IndividualsSubscriptionsPage() {
               <Label>Type</Label>
               <Select value={newBundle.type} onValueChange={(val) => setNewBundle({ ...newBundle, type: val })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                <SelectContent>{BUNDLE_TYPES.map((t) => <SelectItem key={t} value={t}>{labelForBundleType(t, "en")}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">

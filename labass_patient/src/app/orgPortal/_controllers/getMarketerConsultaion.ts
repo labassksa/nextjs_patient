@@ -1,6 +1,21 @@
 import axios from "axios";
 import i18next from "i18next";
-export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => {
+
+const formatLocalDate = (date?: Date) => {
+  if (!date) return undefined;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+export const getMarketerConsultaion = async (
+  fromDate?: Date,
+  toDate?: Date,
+  page = 1,
+  limit = 10,
+  forceRefresh = false
+) => {
   try {
     const token = localStorage.getItem("labass_token");
     const userId = localStorage.getItem("labass_userId");
@@ -15,10 +30,16 @@ export const getMarketerConsultaion = async (fromDate?: Date, toDate?: Date) => 
       {
       headers: {
         Authorization: `Bearer ${token}`,
+        ...(forceRefresh
+          ? { "Cache-Control": "no-cache", Pragma: "no-cache" }
+          : {}),
       },
       params: {
-        fromDate: fromDate ? fromDate.toISOString().split('T')[0] : undefined,
-        toDate: toDate ? toDate.toISOString().split('T')[0] : undefined,
+        fromDate: formatLocalDate(fromDate),
+        toDate: formatLocalDate(toDate),
+        page,
+        limit,
+        _refresh: forceRefresh ? Date.now() : undefined,
       }
       }
     );

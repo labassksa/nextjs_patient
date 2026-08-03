@@ -1,19 +1,31 @@
 "use client";
 import '@livekit/components-styles';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LiveKitRoom,
-  VideoConference,
   RoomAudioRenderer,
+  StartAudio,
+  VideoConference,
+  useConnectionState,
+  useRemoteParticipants,
 } from '@livekit/components-react';
+import { ConnectionState, DisconnectReason } from 'livekit-client';
 
 interface VideoRoomProps {
   token: string;
-  onDisconnect: () => void;
+  onDisconnect: (reason?: DisconnectReason) => void;
   onConnected?: () => void;
+  onError?: (message: string) => void;
 }
 
-const VideoRoom: React.FC<VideoRoomProps> = ({ token, onDisconnect, onConnected }) => {
+const VideoRoom: React.FC<VideoRoomProps> = ({ token, onDisconnect, onConnected, onError }) => {
+  const [roomError, setRoomError] = useState<string | null>(null);
+
+  const reportError = (message: string) => {
+    setRoomError(message);
+    onError?.(message);
+  };
+
   return (
     <div className="fixed inset-0 bg-white z-50">
       <style jsx global>{`
@@ -126,13 +138,50 @@ const VideoRoom: React.FC<VideoRoomProps> = ({ token, onDisconnect, onConnected 
         connect={true}
         audio={true}
         video={true}
-        onConnected={onConnected}
+        onConnected={() => {
+          setRoomError(null);
+          onConnected?.();
+        }}
         onDisconnected={onDisconnect}
+        onError={(error) => reportError(error.message || 'تعذر الاتصال بالمكالمة')}
+        onMediaDeviceFailure={(_, kind) =>
+          reportError(
+            kind === 'audioinput'
+              ? 'تعذر الوصول إلى الميكروفون. تحقق من إذن المتصفح.'
+              : 'تعذر الوصول إلى الكاميرا. تحقق من إذن المتصفح.',
+          )
+        }
         style={{ height: '100vh', width: '100vw' }}
       >
         <VideoConference />
         <RoomAudioRenderer />
+        <CallStatus />
+        <StartAudio label="اضغط لتشغيل صوت المكالمة" />
+        {roomError && (
+          <div className="fixed inset-x-4 top-16 z-[10000] mx-auto max-w-lg rounded-xl bg-red-600 px-4 py-3 text-center text-sm text-white shadow-lg" dir="rtl">
+            {roomError}
+          </div>
+        )}
       </LiveKitRoom>
+    </div>
+  );
+};
+
+const CallStatus = () => {
+  const connectionState = useConnectionState();
+  const remoteParticipants = useRemoteParticipants();
+
+  const message = connectionState === ConnectionState.Reconnecting
+    ? 'جاري استعادة الاتصال…'
+    : connectionState === ConnectionState.Connected && remoteParticipants.length === 0
+      ? 'بانتظار انضمام الطرف الآخر…'
+      : null;
+
+  if (!message) return null;
+
+  return (
+    <div className="fixed top-4 left-1/2 z-[10000] -translate-x-1/2 rounded-full bg-gray-900/85 px-4 py-2 text-sm text-white shadow-lg">
+      {message}
     </div>
   );
 };

@@ -24,7 +24,7 @@ interface BundleSectionProps {
 }
 
 const getBundleTypeLabel = (type: string) => {
-  if (type === "Specialist Consultations") return "استشارات تخصصية";
+  if (type === "specialistConsultations") return "استشارات تخصصية";
   return "استشارات عامة";
 };
 

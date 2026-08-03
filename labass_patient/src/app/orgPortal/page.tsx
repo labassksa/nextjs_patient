@@ -2,8 +2,9 @@
 import { I18nextProvider } from 'react-i18next';
 import * as i18next from '../../utils/i18n';
 import { useTranslation } from 'react-i18next';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LabBottomNavBar from "./_components/bottomNavBar";
+import WalletSection from "./_components/wallet/WalletSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
 import PaymentMethodSection from "./_components/PaymentMethodSection";
 import { getOrganization } from "./_controllers/getOrganization";
@@ -33,6 +34,12 @@ import { createBundleConsultation } from "./_controllers/createBundleConsultatio
 import { sendMarketingMessage } from "./_controllers/sendMarketingMessage";
 import { getReferralCode } from "./_controllers/getReferralCode";
 import { generateReferralCode } from "./_controllers/generateReferralCode";
+import {
+  extractConsultations,
+  findMatchingRecentConsultation,
+  getRecentConsultationDateRange,
+  isAmbiguousConsultationError,
+} from "@/utils/consultationReconciliation";
 
 
 const isSpecialistDoctorType = (type: DoctorType) =>
@@ -43,12 +50,20 @@ const getRelevantSubscription = (subs: any[], type: DoctorType) => {
   const specialist = isSpecialistDoctorType(type);
   return (
     subs.find((s) =>
-      specialist
-        ? s.bundle?.type === "Specialist Consultations"
-        : s.bundle?.type !== "Specialist Consultations"
+      Number(s.remainingConsultations) > 0 &&
+      (specialist
+        ? s.bundle?.type === "specialistConsultations"
+        : s.bundle?.type !== "specialistConsultations")
     ) || null
   );
 };
+
+type ConsultationBundleType = "gpConsultations" | "specialistConsultations";
+
+const getSubscriptionBundleType = (subscription: any): ConsultationBundleType =>
+  subscription.bundle?.type === "specialistConsultations"
+    ? "specialistConsultations"
+    : "gpConsultations";
 
 interface OrgPatient {
   id: number;
@@ -62,7 +77,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription">(
+  const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription" | "wallet">(
     "registration"
   );
   const [patients, setPatients] = useState<OrgPatient[]>([]);
@@ -83,11 +98,15 @@ const OrgPatientsPage: React.FC = () => {
   const [showNameUpdateSuccessModal, setShowNameUpdateSuccessModal] = useState(false);
   const [showNameUpdateErrorModal, setShowNameUpdateErrorModal] = useState(false);
   const [showBundlePaymentSuccessModal, setShowBundlePaymentSuccessModal] = useState(false);
+  const [consultationSuccessLink, setConsultationSuccessLink] = useState("");
+  const [consultationSuccessMessage, setConsultationSuccessMessage] = useState("");
+  const [consultationLinkCopied, setConsultationLinkCopied] = useState(false);
 
   // Confirmation modals for consultations
   const [showSendConsultationConfirm, setShowSendConsultationConfirm] = useState(false);
   const [showOpenConsultationConfirm, setShowOpenConsultationConfirm] = useState(false);
   const [isOpeningConsultation, setIsOpeningConsultation] = useState(false);
+  const consultationSubmittingRef = useRef(false);
 
   // Form fields
   const [name, setName] = useState("");
@@ -124,6 +143,18 @@ const OrgPatientsPage: React.FC = () => {
       : [80, 70, 50, 35, 25, 15];
 
   const relevantSubscription = getRelevantSubscription(subscription, doctorType);
+  const activeSubscriptions = subscription.filter(
+    (item) => Number(item.remainingConsultations) > 0
+  );
+  const subscribedBundleTypes = new Set<ConsultationBundleType>(
+    subscription.map(getSubscriptionBundleType)
+  );
+  const activeBundleTypes = new Set<ConsultationBundleType>(
+    activeSubscriptions.map(getSubscriptionBundleType)
+  );
+  const exhaustedBundleTypes = Array.from(subscribedBundleTypes).filter(
+    (type) => !activeBundleTypes.has(type)
+  );
   const showCashMethod = !relevantSubscription;
 
   const possiblePaymentMethods: PaymentMethodEnum[] =
@@ -195,7 +226,7 @@ const OrgPatientsPage: React.FC = () => {
 
     // Check for view parameter and set current view
     const viewParam = urlParams.get('view');
-    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration') {
+    if (viewParam === 'subscription' || viewParam === 'patients' || viewParam === 'registration' || viewParam === 'wallet') {
       setCurrentView(viewParam);
     }
 
@@ -314,6 +345,21 @@ const OrgPatientsPage: React.FC = () => {
     setShowNameUpdateErrorModal(false);
   };
 
+  const handleCopyConsultationLink = async () => {
+    try {
+      await navigator.clipboard.writeText(consultationSuccessLink);
+      setConsultationLinkCopied(true);
+    } catch {
+      setConsultationLinkCopied(false);
+    }
+  };
+
+  const handleConsultationSuccessClose = () => {
+    setConsultationSuccessLink("");
+    setConsultationSuccessMessage("");
+    setConsultationLinkCopied(false);
+  };
+
   // Show confirmation modal for send consultation
   const handleSendConsultationClick = () => {
     setShowSendConsultationConfirm(true);
@@ -339,14 +385,28 @@ const OrgPatientsPage: React.FC = () => {
     }
   };
 
+  const refreshAndFindConsultation = async (criteria: Record<string, unknown>) => {
+    const { fromDate, toDate } = getRecentConsultationDateRange(
+      Number(criteria.startedAt)
+    );
+    const response = await getMarketerConsultaion(fromDate, toDate, 1, 50, true);
+    const recent = extractConsultations(response);
+    setMarketerConsultaion(recent);
+    return findMatchingRecentConsultation(recent, criteria);
+  };
+
   // Actual send consultation logic (after confirmation)
   const handleSendConsultation = async () => {
+    if (consultationSubmittingRef.current) return;
+    consultationSubmittingRef.current = true;
     setShowSendConsultationConfirm(false);
     setIsSubmitting(true);
     setSubmitError("");
+    const startedAt = Date.now();
 
     if (!name || !phone || !dateOfBirth || !gender || !nationality) {
       alert(t('formValidation'));
+      consultationSubmittingRef.current = false;
       setIsSubmitting(false);
       return;
     }
@@ -364,6 +424,23 @@ const OrgPatientsPage: React.FC = () => {
       dateOfBirth: dateOfBirth.toISOString().split("T")[0],
       email: ""
     };
+    const consultationType = getConsultationType(doctorType);
+    const reconciliationCriteria = {
+      startedAt,
+      ...patientInfo,
+      consultationType,
+      labConsultationType: testType,
+      subscriptionId:
+        paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION
+          ? relevantSubscription?.id
+          : undefined,
+      organizationId: userData?.organizationId ?? userData?.organization?.id,
+      organizationName: orgName,
+      bundleType:
+        paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION
+          ? relevantSubscription?.bundle?.type
+          : undefined,
+    };
 
     try {
       if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
@@ -376,7 +453,7 @@ const OrgPatientsPage: React.FC = () => {
 
         const bundleData = {
           patientInfo,
-          consultationType: getConsultationType(doctorType),
+          consultationType,
           testType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
         };
@@ -392,7 +469,11 @@ const OrgPatientsPage: React.FC = () => {
                 : s
             )
           );
-          alert(`تم إرسال الاستشارة وتبقى لديك ${resultData.remainingConsultations} استشارة`);
+          setConsultationSuccessMessage(
+            `تم إرسال الاستشارة وتبقى لديك ${resultData.remainingConsultations} استشارة`
+          );
+          setConsultationSuccessLink(resultData.magicLink);
+          setConsultationLinkCopied(false);
         }
       } else {
         // Revenue share (magic link) flow
@@ -403,14 +484,27 @@ const OrgPatientsPage: React.FC = () => {
           dealType: DealType.REVENUE_SHARE,
           consultationPrice: selectedPrice || cashPrice,
           testType,
-          consultationType: getConsultationType(doctorType),
+          consultationType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
         });
-        alert(
+        setConsultationSuccessMessage(
           `${t('consultationSuccess')}\n${t('link')}: ${result.link}\n${t('promoCode')}: ${result.promoCode}`
         );
+        setConsultationSuccessLink(result.link);
+        setConsultationLinkCopied(false);
       }
     } catch (err: any) {
+      if (isAmbiguousConsultationError(err)) {
+        try {
+          const match = await refreshAndFindConsultation(reconciliationCriteria);
+          if (match?.id) {
+            alert(`تم إنشاء الاستشارة رقم ${match.id}`);
+            return;
+          }
+        } catch {
+          // Show the original network error if reconciliation cannot be completed.
+        }
+      }
       console.error("Error from backend:", err);
       const errorMessage =
         err.response?.data?.error ||
@@ -419,18 +513,23 @@ const OrgPatientsPage: React.FC = () => {
         t("unexpectedError");
       setSubmitError(errorMessage);
     } finally {
+      consultationSubmittingRef.current = false;
       setIsSubmitting(false);
     }
   };
 
   // Open consultation logic (creates magic link and opens it immediately)
   const handleOpenConsultation = async () => {
+    if (consultationSubmittingRef.current) return;
+    consultationSubmittingRef.current = true;
     setShowOpenConsultationConfirm(false);
     setIsOpeningConsultation(true);
     setSubmitError("");
+    const startedAt = Date.now();
 
     if (!name || !phone || !dateOfBirth || !gender || !nationality) {
       alert(t('formValidation'));
+      consultationSubmittingRef.current = false;
       setIsOpeningConsultation(false);
       return;
     }
@@ -448,6 +547,23 @@ const OrgPatientsPage: React.FC = () => {
       dateOfBirth: dateOfBirth.toISOString().split("T")[0],
       email: ""
     };
+    const consultationType = getConsultationType(doctorType);
+    const reconciliationCriteria = {
+      startedAt,
+      ...patientInfo,
+      consultationType,
+      labConsultationType: testType,
+      subscriptionId:
+        paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION
+          ? relevantSubscription?.id
+          : undefined,
+      organizationId: userData?.organizationId ?? userData?.organization?.id,
+      organizationName: orgName,
+      bundleType:
+        paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION
+          ? relevantSubscription?.bundle?.type
+          : undefined,
+    };
 
     try {
       if (paymentMethod === PaymentMethodEnum.USE_SUBSCRIPTION) {
@@ -460,7 +576,7 @@ const OrgPatientsPage: React.FC = () => {
 
         const bundleData = {
           patientInfo,
-          consultationType: getConsultationType(doctorType),
+          consultationType,
           testType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
           sendSMS: false,
@@ -488,13 +604,24 @@ const OrgPatientsPage: React.FC = () => {
           dealType: DealType.REVENUE_SHARE,
           consultationPrice: selectedPrice || cashPrice,
           testType,
-          consultationType: getConsultationType(doctorType),
+          consultationType,
           pdfFiles: testType === LabtestType.PostTest ? pdfFiles : undefined,
           sendSMS: false,
         });
         window.location.href = result.link;
       }
     } catch (err: any) {
+      if (isAmbiguousConsultationError(err)) {
+        try {
+          const match = await refreshAndFindConsultation(reconciliationCriteria);
+          if (match?.id) {
+            window.location.href = match.magicLink || match.link || `/chat/${match.id}`;
+            return;
+          }
+        } catch {
+          // Show the original network error if reconciliation cannot be completed.
+        }
+      }
       console.error("Error from backend:", err);
       const errorMessage =
         err.response?.data?.error ||
@@ -502,6 +629,8 @@ const OrgPatientsPage: React.FC = () => {
         err.message ||
         t("unexpectedError");
       setSubmitError(errorMessage);
+    } finally {
+      consultationSubmittingRef.current = false;
       setIsOpeningConsultation(false);
     }
   };
@@ -547,7 +676,7 @@ const OrgPatientsPage: React.FC = () => {
     <I18nextProvider i18n={i18next.default}>
       <div className="min-h-screen bg-white text-black">
         {/* User Info Section - Compact Design (hidden on subscription view) */}
-        {userData && currentView !== "subscription" && (
+        {userData && currentView !== "subscription" && currentView !== "wallet" && (
           <div className="mb-4">
             <div className="w-full">
               {/* Compact Header with Language Toggle */}
@@ -628,12 +757,12 @@ const OrgPatientsPage: React.FC = () => {
         )}
 
         {/* Bundle remaining consultations - shown under personal info */}
-        {subscription.length > 0 && currentView !== "subscription" && (
+        {subscription.length > 0 && currentView !== "subscription" && currentView !== "wallet" && (
           <div className="px-4 pb-2 flex flex-wrap gap-2 justify-end" dir="rtl">
             {subscription.map((sub: any) => (
               <div key={sub.id} className="flex items-center gap-3 bg-custom-green text-white rounded-xl px-4 py-2 shadow-sm">
                 <span className="text-xs font-medium opacity-90">
-                  {sub.bundle?.type === "Specialist Consultations" ? "تخصصية" : "عامة"}
+                  {sub.bundle?.type === "specialistConsultations" ? "تخصصية" : "عامة"}
                 </span>
                 <span className="text-xl font-bold">{sub.remainingConsultations}</span>
               </div>
@@ -683,7 +812,9 @@ const OrgPatientsPage: React.FC = () => {
             </div>
           )}
 
-          {isLoadingOrg ? (
+          {currentView === "wallet" ? (
+            <WalletSection />
+          ) : isLoadingOrg ? (
             <div className="flex items-center justify-center min-h-[50vh]">
               <div className="spinner"></div>
             </div>
@@ -778,15 +909,21 @@ const OrgPatientsPage: React.FC = () => {
                 </div>
               ) : currentView === "subscription" ? (
                 <div className="bg-white p-6 rounded-md shadow-sm w-full">
-                  {/* Show active subscription or available bundles */}
-                  {subscription.length > 0 ? (
+                  {/* Show usable subscriptions and renewal options for exhausted types. */}
+                  {activeSubscriptions.length > 0 && (
                     <BundleSection
-                      subscriptions={subscription}
+                      subscriptions={activeSubscriptions}
                       useBundle={false}
                       setUseBundle={() => {}}
                     />
-                  ) : (
+                  )}
+                  {(subscription.length === 0 || exhaustedBundleTypes.length > 0) && (
                     <AvailableBundlesSection
+                      bundleTypes={
+                        subscription.length === 0
+                          ? ["gpConsultations", "specialistConsultations"]
+                          : exhaustedBundleTypes
+                      }
                       onSubscribe={(bundleId) => {
                         // TODO: Connect to backend subscription flow
                         console.log("Subscribe to bundle:", bundleId);
@@ -944,6 +1081,42 @@ const OrgPatientsPage: React.FC = () => {
               >
                 {t('ok')}
               </button>
+            </div>
+          </div>
+        )}
+
+        {consultationSuccessLink && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 mx-4 max-w-md w-full" dir="rtl">
+              <div className="text-center">
+                <CheckCircleIcon className="text-green-500 w-20 h-20 mx-auto mb-4" />
+                <p className="text-lg font-semibold text-black mb-3 whitespace-pre-line">
+                  {consultationSuccessMessage}
+                </p>
+                <a
+                  href={consultationSuccessLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-blue-600 underline break-all mb-6"
+                  dir="ltr"
+                >
+                  {consultationSuccessLink}
+                </a>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleCopyConsultationLink}
+                    className="flex-1 p-3 text-sm font-bold bg-custom-green text-white rounded-lg hover:bg-green-600"
+                  >
+                    {consultationLinkCopied ? "تم نسخ الرابط ✓" : "نسخ الرابط"}
+                  </button>
+                  <button
+                    onClick={handleConsultationSuccessClose}
+                    className="flex-1 p-3 text-sm font-bold bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+                  >
+                    إغلاق
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
