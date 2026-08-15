@@ -8,6 +8,12 @@ const nextConfig = {
     domains: ['storage.googleapis.com'],
   },
   transpilePackages: ['@livekit/components-react', '@livekit/components-styles'],
+  async rewrites() {
+    return [
+      // Static landing page served at /ai (public/ai.html)
+      { source: '/ai', destination: '/ai.html' },
+    ];
+  },
 };
 
 export default withSentryConfig(nextConfig, {
