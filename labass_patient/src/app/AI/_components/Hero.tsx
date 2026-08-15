@@ -13,6 +13,7 @@ const t = {
     cta1: "Chat with us on WhatsApp",
     cta2: "See how it works",
     trust: ["Clinics", "Hospitals", "Pharmacies", "Labs", "School Health"],
+    disclaimer: "LaBas is an independent product — not affiliated with WhatsApp or Meta",
   },
   ar: {
     badge: "نخدم الآن فرق الرعاية الصحية في المنطقة",
@@ -23,6 +24,7 @@ const t = {
     cta1: "تحدّث معنا على واتساب",
     cta2: "اكتشف كيف يعمل",
     trust: ["العيادات", "المستشفيات", "الصيدليات", "المختبرات", "الصحة المدرسية"],
+    disclaimer: "لاباس منتج مستقل — وليس تابعاً لواتساب أو ميتا",
   },
 };
 
@@ -84,6 +86,11 @@ const Hero: React.FC = () => {
             {tx.cta2}
           </button>
         </div>
+
+        {/* Brand disclaimer — kept above the fold, next to the WhatsApp CTA */}
+        <p className={`text-gray-400 text-xs mt-5 ${isAr ? "font-cairo" : ""}`}>
+          {tx.disclaimer}
+        </p>
 
       </div>
     </section>
