@@ -15,7 +15,8 @@ const t = {
     privacy: "Privacy",
     terms: "Terms",
     disclaimer:
-      "LaBas is an independent software product and is not affiliated with, endorsed by, or sponsored by WhatsApp LLC or Meta Platforms, Inc. WhatsApp is a trademark of WhatsApp LLC.",
+      "LaBas is an independent company providing services built on the WhatsApp Business Platform. LaBas is not affiliated with, endorsed by, or sponsored by WhatsApp LLC or Meta Platforms, Inc. WhatsApp is a trademark of WhatsApp LLC.",
+    disclaimerLink: "Learn more about the WhatsApp Business Platform",
   },
   ar: {
     tagline: "وكلاء ذكاء اصطناعي لفرق الرعاية الصحية",
@@ -26,7 +27,8 @@ const t = {
     privacy: "الخصوصية",
     terms: "الشروط",
     disclaimer:
-      "لاباس منتج برمجي مستقل، وليس تابعاً لشركة واتساب أو ميتا ولا معتمداً أو مدعوماً منهما. واتساب علامة تجارية مملوكة لشركة WhatsApp LLC.",
+      "لاباس شركة مستقلة تقدّم خدماتها عبر منصة واتساب للأعمال، وليست تابعة لشركة واتساب أو ميتا ولا معتمدة أو مدعومة منهما. واتساب علامة تجارية مملوكة لشركة WhatsApp LLC.",
+    disclaimerLink: "معلومات أكثر عن منصة واتساب للأعمال",
   },
 };
 
@@ -78,7 +80,15 @@ const Footer: React.FC = () => {
 
         {/* Brand disclaimer */}
         <p className={`text-gray-600 text-xs leading-relaxed mb-6 ${isAr ? "font-cairo text-right" : ""}`}>
-          {tx.disclaimer}
+          {tx.disclaimer}{" "}
+          <a
+            href="https://business.whatsapp.com/products/business-platform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 underline hover:text-gray-300 transition-colors"
+          >
+            {tx.disclaimerLink}
+          </a>
         </p>
 
         {/* Bottom */}
