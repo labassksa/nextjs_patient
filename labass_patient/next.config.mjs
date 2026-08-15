@@ -12,6 +12,8 @@ const nextConfig = {
     return [
       // Static landing page served at /ai (public/ai.html)
       { source: '/ai', destination: '/ai.html' },
+      // TEMPORARY — Safe Browsing diagnostic. Remove once the flag is resolved.
+      { source: '/ai-test', destination: '/ai-test.html' },
     ];
   },
 };
