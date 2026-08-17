@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta charset="utf-8">
+<title>Labass.ai — WhatsApp Business Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&amp;family=Cairo:wght@400;500;600;700;800;900&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&amp;family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&amp;display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #FDFCF7; color: #0D2002; font-family: 'Tajawal', sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: #0D2002; text-decoration: none; }
+a:hover { color: #173404; }
+@keyframes float-y { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+@keyframes dash-flow { to { stroke-dashoffset: -18; } }
+@keyframes float-pill { 0%, 100% { transform: translate(-50%,-50%) translateY(0px); } 50% { transform: translate(-50%,-50%) translateY(-6px); } }
+</style>
+</helmet>
+
+<div style="background:#FDFCF7;color:#0D2002;font-family:'Tajawal',sans-serif;overflow-x:hidden">
+
+<sc-if value="{{ isEn }}" hint-placeholder-val="{{ true }}">
+<div dir="ltr">
+
+  <nav data-screen-label="Nav (EN)" style="position:sticky;top:0;z-index:50;background:rgba(253,252,247,0.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(13,32,2,0.08)">
+    <div style="max-width:1152px;margin:0 auto;padding:8px 24px;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <a href="#" dir="ltr" style="display:flex;align-items:center;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;letter-spacing:-0.01em;color:#1C2B16;white-space:nowrap;flex-shrink:0">Labass<span style="color:#8BE06A">.ai</span></a>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <a href="#features" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">Features</a>
+        <a href="#usecase" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">Use cases</a>
+        <a href="#how" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">How it works</a>
+        <a href="#pricing" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">Pricing</a>
+        <a href="#compliance" style="display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;background:rgba(126,217,87,0.2);border:1px solid rgba(126,217,87,0.5);padding:6px 16px;border-radius:999px;white-space:nowrap" style-hover="background:rgba(126,217,87,0.35);color:#0D2002">
+          <span style="width:6px;height:6px;border-radius:50%;background:#7ED957"></span>
+          Built on WhatsApp Business Platform
+        </a>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button type="button" onClick="{{ setAr }}" style="border:1px solid rgba(13,32,2,0.15);background:transparent;cursor:pointer;border-radius:999px;padding:8px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;color:rgba(13,32,2,0.7);white-space:nowrap">عربي</button>
+        <a href="#doctor" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.7)" style-hover="color:#0D2002">Sign in</a>
+        <a href="#pricing" style="display:inline-flex;align-items:center;gap:8px;background:#0D2002;color:#FDFCF7;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;padding:10px 20px;white-space:nowrap;line-height:1.2;transition:all .2s" style-hover="background:#173404;color:#FDFCF7;box-shadow:0 6px 20px rgba(13,32,2,0.18)">Start free →</a>
+      </div>
+    </div>
+  </nav>
+
+  <section data-screen-label="Hero (EN)" style="background:#FDFCF7;display:flex;flex-direction:column">
+    <div style="flex:1;max-width:1152px;margin:0 auto;width:100%;padding:64px 24px 96px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+
+      <div style="flex:1 1 420px;display:flex;flex-direction:column">
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.5);margin-bottom:24px;width:fit-content">
+          <span style="font-family:'Material Symbols Rounded';font-size:16px;color:#7ED957">bolt</span>
+          WhatsApp automation — built on the official WhatsApp Business Platform
+        </div>
+
+        <h1 style="font-family:'Cairo',sans-serif;font-weight:900;color:#0D2002;line-height:1.07;margin:0 0 24px;font-size:clamp(2.05rem, 5.5vw, 4.2rem);text-wrap:balance">A smart receptionist that runs your WhatsApp 24/7</h1>
+
+        <p style="color:rgba(13,32,2,0.55);font-size:18px;line-height:1.75;margin:0 0 40px;max-width:30rem;text-wrap:pretty">Replies instantly, books and confirms appointments, and sends reminders through approved templates — only to customers who opted in, designed to comply with Meta's WhatsApp Business policies.</p>
+
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <a href="#pricing" style="display:inline-flex;align-items:center;gap:8px;background:#0D2002;color:#FDFCF7;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;padding:14px 32px;white-space:nowrap;transition:all .2s" style-hover="background:#173404;color:#FDFCF7;box-shadow:0 6px 20px rgba(13,32,2,0.18)">Start your free trial →</a>
+          <a href="#usecase" style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6);padding:0 8px" style-hover="color:#0D2002">
+            <span style="font-family:'Material Symbols Rounded';font-size:18px;color:#7ED957">play_circle</span>
+            See the medical center demo
+          </a>
+        </div>
+      </div>
+
+      <div style="flex:1 1 520px;display:flex;align-items:center;justify-content:center">
+        <div style="position:relative;width:580px;height:470px;max-width:100%">
+          <svg viewBox="0 0 580 470" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0">
+            <circle cx="290" cy="235" r="120" fill="none" stroke="#7ED957" stroke-width="1.5" stroke-opacity="0">
+              <animate attributeName="r" values="100;170" dur="3.6s" repeatCount="indefinite"></animate>
+              <animate attributeName="stroke-opacity" values="0.35;0" dur="3.6s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle cx="290" cy="235" r="120" fill="none" stroke="#7ED957" stroke-width="1.5" stroke-opacity="0">
+              <animate attributeName="r" values="100;170" dur="3.6s" begin="-1.8s" repeatCount="indefinite"></animate>
+              <animate attributeName="stroke-opacity" values="0.35;0" dur="3.6s" begin="-1.8s" repeatCount="indefinite"></animate>
+            </circle>
+            <path d="M70 130 Q168 206 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite"></path>
+            <path d="M510 130 Q412 206 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.2s"></path>
+            <path d="M510 235 Q400 214 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.4s"></path>
+            <path d="M290 432 Q316 334 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.6s"></path>
+            <path d="M290 38 Q264 136 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.8s"></path>
+            <path d="M70 235 Q180 256 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1s"></path>
+            <path d="M70 340 Q192 312 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1.2s"></path>
+            <path d="M510 340 Q388 312 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1.4s"></path>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="0s" repeatCount="indefinite" path="M290 38 Q264 136 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="0s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite" path="M510 235 Q400 214 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="0.8s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" path="M70 340 Q192 312 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="1.6s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="2.4s" repeatCount="indefinite" path="M290 432 Q316 334 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="2.4s" repeatCount="indefinite"></animate>
+            </circle>
+          </svg>
+
+          <div style="position:absolute;left:70px;top:130px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#7ED957;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Instant replies 24/7</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:130px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:.35s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#9B89C4;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">FAQs answered</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:235px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 4.6s ease-in-out infinite;animation-delay:.7s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#68B984;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Automatic booking</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:290px;top:432px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite;animation-delay:1.05s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#D4A853;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Approved-template reminders</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:290px;top:38px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:1.4s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#E87979;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Smart human handoff</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:70px;top:235px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 4.6s ease-in-out infinite;animation-delay:1.75s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#F0A87E;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Dialects &amp; languages</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:70px;top:340px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite;animation-delay:2.1s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#7DB8D4;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Opt-in &amp; opt-out</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:340px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:2.45s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#A8C97E;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">Reports &amp; analytics</span>
+            </div>
+          </div>
+
+          <div style="position:absolute;left:175px;top:75px;width:232px;z-index:2">
+            <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:20px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(13,32,2,0.08)">
+                <span style="width:36px;height:36px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:900;color:#0D2002">AI</span>
+                <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900">AI Receptionist</span>
+              </div>
+              <p style="font-size:10px;font-weight:700;color:rgba(13,32,2,0.4);letter-spacing:0.05em;margin:0 0 10px;text-transform:uppercase">Your front desk on WhatsApp</p>
+              <ul style="list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:6px">
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>Answers every inquiry instantly</li>
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>Books &amp; confirms appointments</li>
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>Reminders via approved templates</li>
+              </ul>
+              <p style="font-size:10px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 8px">Works with:</p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-size:10px;font-weight:700;background:rgba(13,32,2,0.06);color:rgba(13,32,2,0.7);border-radius:999px;padding:2px 10px">Approved templates</span>
+                <span style="font-size:10px;font-weight:700;background:rgba(13,32,2,0.06);color:rgba(13,32,2,0.7);border-radius:999px;padding:2px 10px">Human handoff</span>
+              </div>
+              <a href="#usecase" style="display:block;width:100%;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:#FDFCF7;background:#0D2002;border-radius:999px;padding:10px 16px;text-align:center" style-hover="background:#173404;color:#FDFCF7">See it in action →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showProof }}" hint-placeholder-val="{{ true }}">
+      <div style="border-top:1px solid rgba(13,32,2,0.08);padding:28px 0;text-align:center">
+        <p style="font-family:'Cairo',sans-serif;font-size:14px;color:rgba(13,32,2,0.4);margin:0 0 20px">Serving businesses across Saudi Arabia</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px 24px;flex-wrap:wrap;padding:0 24px">
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Medical centers</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Dental clinics</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Salons &amp; spas</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Restaurants</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Online stores</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">Maintenance services</span>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <section id="features" data-screen-label="Features (EN)" style="padding:112px 0;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:64px">
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;line-height:1.15;margin:0 0 16px">Every message becomes a booking or a customer</h2>
+        <p style="color:rgba(13,32,2,0.5);font-size:18px;max-width:36rem;margin:0 auto;text-wrap:pretty">Let the assistant handle replies, bookings and reminders — while your team focuses on what can't be automated.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">bolt</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">24/7</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">No inquiry left unanswered</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">The assistant replies to every message instantly — after hours and at peak times — so you never lose a customer to a slow response.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(90deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">event_available</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">−40%</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">Fewer no-shows</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">Automatic confirmations and reminders — sent via approved templates, only to opted-in customers — cut missed appointments and fill your calendar.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(90deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">support_agent</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">×3</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">Your team, only where it matters</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">Repetitive questions get answered automatically; complex cases are handed to your staff with the full conversation context.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(90deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="usecase" data-screen-label="Use case (EN)" style="padding:112px 0;background:#fff">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:64px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:16px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;USE CASE
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;line-height:1.15;margin:0">A medical center receptionist — on WhatsApp</h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:64px;align-items:center">
+        <div>
+          <p style="color:rgba(13,32,2,0.55);font-size:18px;line-height:1.75;margin:0 0 40px">From the first "hello" to the pre-visit reminder: the assistant greets patients, books into the center's real schedule, and routes any medical question to qualified staff.</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">calendar_month</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">Connected to your real schedule</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">Shows genuinely available slots, then books, reschedules and cancels directly — no front-desk intervention.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">medical_services</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">Medical questions go to staff</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">The assistant gives no medical advice — any clinical or sensitive question is instantly handed to a human with the conversation context.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">translate</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">Speaks your patients' language</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">Arabic dialects — Najdi, Hijazi, Southern, Eastern — plus Modern Standard Arabic and English.</p>
+              </div>
+            </div>
+          </div>
+          <p style="margin:24px 0 0;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.4);line-height:1.8">The medical center is one use case — the same platform runs front desks for salons, restaurants, stores and maintenance services.</p>
+        </div>
+
+        <div>
+          <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;overflow:hidden;max-width:24rem;margin:0 auto;box-shadow:0 20px 40px rgba(13,32,2,0.06)">
+            <div style="background:#0D2002;padding:16px;display:flex;align-items:center;gap:12px">
+              <span style="width:36px;height:36px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:900;color:#0D2002">AI</span>
+              <div>
+                <p style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#fff;margin:0">Al-Noor Medical Center</p>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="width:5px;height:5px;border-radius:50%;background:#7ED957"></span>
+                  <span style="font-size:10px;color:rgba(255,255,255,0.5)">Replies in seconds</span>
+                </div>
+              </div>
+              <span style="margin-right:0;margin-left:auto;font-family:'Cairo',sans-serif;font-size:10px;font-weight:700;color:#7ED957;border:1px solid rgba(126,217,87,0.4);border-radius:999px;padding:4px 10px;white-space:nowrap">WhatsApp</span>
+            </div>
+            <div style="padding:20px;display:flex;flex-direction:column;gap:12px;background:#FDFCF7">
+              <div style="display:flex;flex-direction:row-reverse;gap:8px">
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#0D2002;color:#fff;border-radius:1rem 1rem 0.2rem 1rem;font-weight:600">Hi, I'd like a dental appointment tomorrow afternoon</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <span style="width:24px;height:24px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:auto;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#fff;color:#0D2002;border:1px solid rgba(13,32,2,0.08);border-radius:1rem 1rem 1rem 0.2rem">Hello! Tomorrow we have 4:30 PM or 6:00 PM with Dr. Sarah — which works for you?</div>
+              </div>
+              <div style="display:flex;flex-direction:row-reverse;gap:8px">
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#0D2002;color:#fff;border-radius:1rem 1rem 0.2rem 1rem;font-weight:600">4:30 works</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <span style="width:24px;height:24px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:auto;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#fff;color:#0D2002;border:1px solid rgba(13,32,2,0.08);border-radius:1rem 1rem 1rem 0.2rem">✓ Booked — tomorrow 4:30 PM with Dr. Sarah. We'll remind you 2 hours before. Reply STOP to opt out.</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="width:24px;height:24px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="display:flex;gap:4px;background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1rem;padding:12px 16px">
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite"></span>
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite;animation-delay:.2s"></span>
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite;animation-delay:.4s"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p style="text-align:center;font-family:'Cairo',sans-serif;font-size:11px;color:rgba(13,32,2,0.4);margin:16px auto 0;max-width:24rem">Reminders are sent via WhatsApp-approved templates and always include an opt-out.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compliance" data-screen-label="Compliance (EN)" style="padding:112px 0;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:56px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:20px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;META POLICY COMPLIANCE
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;margin:0;line-height:1.15">Official automation, no workarounds</h2>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 8px 24px rgba(13,32,2,0.04);padding:48px">
+        <div style="position:relative;overflow:hidden;margin-bottom:44px;display:flex;align-items:center;gap:16px;border-radius:1rem;background:#0D2002;padding:20px 28px;flex-wrap:wrap">
+          <div style="position:absolute;right:-32px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(126,217,87,0.1);filter:blur(40px);pointer-events:none"></div>
+          <span style="position:relative;width:48px;height:48px;border-radius:1rem;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:26px;color:#0D2002">verified</span>
+          <div style="position:relative;flex:1;min-width:240px">
+            <p style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:#fff;line-height:1.4;margin:0">Built on Meta's official <span style="color:#7ED957">WhatsApp Business Platform</span></p>
+            <p style="font-family:'Cairo',sans-serif;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;margin:0">No unofficial gateways that put your number at risk of bans — Cloud API access, approved message templates, and messaging quality you can build on. Business verification and display-name approval remain subject to Meta's review</p>
+          </div>
+          <span style="position:relative;font-family:'Cairo',sans-serif;font-size:11px;font-weight:900;color:#0D2002;background:#7ED957;border-radius:999px;padding:6px 14px;white-space:nowrap">WhatsApp Business Platform</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px">
+          <div style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">how_to_reg</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">Opt-in first</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">Messages go only to customers who agreed in advance to hear from you on WhatsApp — consent is recorded and auditable.</p>
+          </div>
+          <div style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">unsubscribe</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">One-word opt-out</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">Any customer who replies STOP is unsubscribed immediately and automatically — and the choice is honored everywhere.</p>
+          </div>
+          <div style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">fact_check</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">Approved templates</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">Every message sent outside an open conversation goes through WhatsApp's template approval — reminders, confirmations, notifications.</p>
+          </div>
+          <div style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">schedule</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">The 24-hour window</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">Free-form replies only inside the customer service window — full compliance with the WhatsApp Business Messaging Policy.</p>
+          </div>
+        </div>
+
+        <p style="margin:32px 0 0;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.45);line-height:1.9;text-align:center">Labass.ai operates as an independent technology provider on the WhatsApp Business Platform and is designed to comply with the <a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="color:#0D2002;font-weight:900;text-decoration:underline">WhatsApp Business Messaging Policy</a>, the WhatsApp Commerce Policy and the WhatsApp Business Terms. "WhatsApp" is a trademark of Meta Platforms, Inc. — Labass.ai is not affiliated with, sponsored, or endorsed by Meta.
+          <br>See our <a href="/ai/privacypolicy" style="color:#0D2002;font-weight:900;text-decoration:underline">Privacy Policy</a> and <a href="/ai/termsofuse" style="color:#0D2002;font-weight:900;text-decoration:underline">Terms of Use</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <section id="pricing" data-screen-label="Pricing (EN)" style="padding:32px 0 112px;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+
+      <div style="display:flex;justify-content:center;margin-bottom:56px">
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:6px;border-radius:999px;background:rgba(13,32,2,0.04);border:1px solid rgba(13,32,2,0.1)">
+          <button type="button" onClick="{{ setMonthly }}" style="border:0;cursor:pointer;padding:10px 24px;border-radius:999px;background:{{ monthlyBg }};font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:{{ monthlyColor }}">Monthly</button>
+          <button type="button" onClick="{{ setAnnual }}" style="border:0;cursor:pointer;padding:10px 24px;border-radius:999px;background:{{ annualBg }};font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:{{ annualColor }};display:inline-flex;align-items:center;gap:8px">Annual<span style="font-size:10px;font-weight:900;padding:2px 8px;border-radius:999px;background:#0D2002;color:#7ED957;white-space:nowrap">Save 20%</span></button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:stretch">
+        <div style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)">
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 4px">Basic</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.45);margin:0 0 24px;line-height:1.7">For a small business getting started</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block">{{ priceBasicEn }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.45);white-space:nowrap">SAR / month</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 28px">{{ billingNoteEn }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Auto-replies to inquiries</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Appointment booking &amp; confirmation</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">500 conversations / month</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">2 approved reminder templates</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Basic reports</span></li>
+          </ul>
+          <a href="#" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;border:2px solid rgba(13,32,2,0.15);transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">Start now</a>
+        </div>
+
+        <div style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#0D2002;box-shadow:0 20px 40px rgba(13,32,2,0.2)">
+          <span style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:'Cairo',sans-serif;font-size:11px;font-weight:900;color:#0D2002;background:#7ED957;border-radius:999px;padding:6px 16px;white-space:nowrap;box-shadow:0 4px 12px rgba(13,32,2,0.15)">Most popular</span>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;color:#7ED957;margin:0 0 4px">Growth</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin:0 0 24px;line-height:1.7">A full front desk — without an extra hire</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block;color:#fff">{{ priceGrowthEn }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap">SAR / month</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);margin:0 0 28px">{{ billingNoteEn }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">Everything in Basic</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">Automatic reminders &amp; follow-ups</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">Human handoff with full context</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">2,000 conversations / month</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">Unlimited approved templates</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">Advanced analytics &amp; priority support</span></li>
+          </ul>
+          <a href="#" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;background:#7ED957;color:#0D2002;transition:all .2s" style-hover="background:#6bc947;color:#0D2002;box-shadow:0 6px 20px rgba(126,217,87,0.35)">Subscribe now</a>
+        </div>
+
+        <div style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)">
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 4px">Business</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.45);margin:0 0 24px;line-height:1.7">For multi-branch businesses and teams</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block">{{ priceBizEn }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.45);white-space:nowrap">SAR / month</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 28px">{{ billingNoteEn }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Everything in Growth</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Multiple numbers &amp; branches</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">API integration with your systems</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Unlimited conversations</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Dedicated success manager</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">Guided onboarding, step by step</span></li>
+          </ul>
+          <a href="mailto:khalid@labass.sa" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;border:2px solid rgba(13,32,2,0.15);transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">Contact us</a>
+        </div>
+      </div>
+
+      <div style="margin-top:48px;text-align:center">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <p style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.55);margin:0">Questions before subscribing? Our team is happy to help.</p>
+          <a href="mailto:khalid@labass.sa" style="display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:2px solid rgba(13,32,2,0.15);padding:12px 28px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">
+            <span style="font-family:'Material Symbols Rounded';font-size:18px;color:#7ED957">chat_bubble</span>
+            Talk to us
+          </a>
+        </div>
+        <p style="margin-top:32px;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.4)">Prices in Saudi Riyal, updates included — Meta's per-conversation fees are billed separately at Meta's published rates.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer (EN)" style="background:#0D2002;padding:64px 0 32px">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;margin-bottom:56px">
+        <div>
+          <div dir="ltr" style="display:flex;align-items:center;margin-bottom:16px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;color:#FDFCF7">Labass<span style="color:#8BE06A">.ai</span></div>
+          <p style="font-size:14px;color:rgba(255,255,255,0.35);line-height:1.7;margin:0 0 24px">WhatsApp business automation on the official API — for medical centers, salons, restaurants and stores.</p>
+          <div style="display:flex;gap:8px">
+            <a href="#" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">chat</a>
+            <a href="#" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">work</a>
+            <a href="mailto:khalid@labass.sa" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">alternate_email</a>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">Platform</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="#features" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Features</a></li>
+            <li><a href="#usecase" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Medical center use case</a></li>
+            <li><a href="#compliance" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Meta policy compliance</a></li>
+            <li><a href="#pricing" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">Company</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="#" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">About</a></li>
+            <li><a href="#" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Careers</a></li>
+            <li><a href="mailto:khalid@labass.sa" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">Legal</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="/ai/privacypolicy" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Privacy Policy</a></li>
+            <li><a href="/ai/termsofuse" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">Terms of Use</a></li>
+            <li><a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">WhatsApp Business policies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <p style="font-size:12px;color:rgba(255,255,255,0.2);margin:0">© 2026 labass.ai — All rights reserved</p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin:0">"WhatsApp" is a trademark of Meta Platforms, Inc. Labass.ai is an independent product, not affiliated with Meta.</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAr }}" hint-placeholder-val="{{ false }}">
+<div dir="rtl">
+
+  <nav data-screen-label="Nav (AR)" style="position:sticky;top:0;z-index:50;background:rgba(253,252,247,0.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(13,32,2,0.08)">
+    <div style="max-width:1152px;margin:0 auto;padding:8px 24px;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <button type="button" onClick="{{ setEn }}" style="border:1px solid rgba(13,32,2,0.15);background:transparent;cursor:pointer;border-radius:999px;padding:8px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;color:rgba(13,32,2,0.7);white-space:nowrap">English</button>
+        <a href="#doctor" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.7)" style-hover="color:#0D2002">دخول</a>
+        <a href="#pricing" style="display:inline-flex;align-items:center;gap:8px;background:#0D2002;color:#FDFCF7;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:800;font-size:14px;padding:10px 20px;white-space:nowrap;line-height:1.2;transition:all .2s" style-hover="background:#173404;color:#FDFCF7;box-shadow:0 6px 20px rgba(13,32,2,0.18)">ابدأ مجاناً ←</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <a href="#features" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">المزايا</a>
+        <a href="#usecase" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">حالات الاستخدام</a>
+        <a href="#how" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">كيف يعمل</a>
+        <a href="#pricing" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">الأسعار</a>
+        <a href="#compliance" style="display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;background:rgba(126,217,87,0.2);border:1px solid rgba(126,217,87,0.5);padding:6px 16px;border-radius:999px;white-space:nowrap" style-hover="background:rgba(126,217,87,0.35);color:#0D2002">
+          <span style="width:6px;height:6px;border-radius:50%;background:#7ED957"></span>
+          مبني على منصة واتساب للأعمال
+        </a>
+      </div>
+      <a href="#" dir="ltr" style="display:flex;align-items:center;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;letter-spacing:-0.01em;color:#1C2B16;white-space:nowrap;flex-shrink:0">لابَّاس<span style="color:#8BE06A">.ai</span></a>
+    </div>
+  </nav>
+
+  <section data-screen-label="Hero (AR)" style="background:#FDFCF7;display:flex;flex-direction:column">
+    <div style="flex:1;max-width:1152px;margin:0 auto;width:100%;padding:64px 24px 96px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+
+      <div style="flex:1 1 420px;display:flex;flex-direction:column">
+        <div style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.5);margin-bottom:24px;width:fit-content">
+          <span style="font-family:'Material Symbols Rounded';font-size:16px;color:#7ED957">bolt</span>
+          أتمتة واتساب للأعمال — عبر WhatsApp Business Platform الرسمية
+        </div>
+
+        <h1 style="font-family:'Cairo',sans-serif;font-weight:900;color:#0D2002;line-height:1.07;margin:0 0 24px;font-size:clamp(2.05rem, 5.5vw, 4.4rem);text-wrap:balance">موظف استقبال ذكي يدير واتساب منشأتك ٢٤/٧</h1>
+
+        <p style="color:rgba(13,32,2,0.55);font-size:18px;line-height:1.75;margin:0 0 40px;max-width:30rem;text-wrap:pretty">يرد على كل استفسار فوراً، يحجز المواعيد ويؤكدها، ويرسل تذكيرات بقوالب معتمدة — لعملاء وافقوا على التواصل، وبتصميمٍ يراعي سياسات واتساب للأعمال من Meta.</p>
+
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <a href="#pricing" style="display:inline-flex;align-items:center;gap:8px;background:#0D2002;color:#FDFCF7;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;padding:14px 32px;white-space:nowrap;transition:all .2s" style-hover="background:#173404;color:#FDFCF7;box-shadow:0 6px 20px rgba(13,32,2,0.18)">ابدأ تجربتك المجانية ←</a>
+          <a href="#usecase" style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6);padding:0 8px" style-hover="color:#0D2002">
+            <span style="font-family:'Material Symbols Rounded';font-size:18px;color:#7ED957">play_circle</span>
+            شاهد حالة المركز الطبي
+          </a>
+        </div>
+      </div>
+
+      <div style="flex:1 1 520px;display:flex;align-items:center;justify-content:center">
+        <div style="position:relative;width:580px;height:470px;max-width:100%">
+          <svg viewBox="0 0 580 470" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0">
+            <circle cx="290" cy="235" r="120" fill="none" stroke="#7ED957" stroke-width="1.5" stroke-opacity="0">
+              <animate attributeName="r" values="100;170" dur="3.6s" repeatCount="indefinite"></animate>
+              <animate attributeName="stroke-opacity" values="0.35;0" dur="3.6s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle cx="290" cy="235" r="120" fill="none" stroke="#7ED957" stroke-width="1.5" stroke-opacity="0">
+              <animate attributeName="r" values="100;170" dur="3.6s" begin="-1.8s" repeatCount="indefinite"></animate>
+              <animate attributeName="stroke-opacity" values="0.35;0" dur="3.6s" begin="-1.8s" repeatCount="indefinite"></animate>
+            </circle>
+            <path d="M70 130 Q168 206 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite"></path>
+            <path d="M510 130 Q412 206 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.2s"></path>
+            <path d="M510 235 Q400 214 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.4s"></path>
+            <path d="M290 432 Q316 334 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.6s"></path>
+            <path d="M290 38 Q264 136 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-.8s"></path>
+            <path d="M70 235 Q180 256 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1s"></path>
+            <path d="M70 340 Q192 312 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1.2s"></path>
+            <path d="M510 340 Q388 312 290 235" fill="none" stroke="#0D2002" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="5 4" style="animation:dash-flow 1.6s linear infinite;animation-delay:-1.4s"></path>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="0s" repeatCount="indefinite" path="M290 38 Q264 136 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="0s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="0.8s" repeatCount="indefinite" path="M510 235 Q400 214 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="0.8s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="1.6s" repeatCount="indefinite" path="M70 340 Q192 312 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="1.6s" repeatCount="indefinite"></animate>
+            </circle>
+            <circle r="3.5" fill="#7ED957" opacity="0">
+              <animateMotion dur="3.2s" begin="2.4s" repeatCount="indefinite" path="M290 432 Q316 334 290 235"></animateMotion>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.8;1" dur="3.2s" begin="2.4s" repeatCount="indefinite"></animate>
+            </circle>
+          </svg>
+
+          <div style="position:absolute;left:70px;top:130px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#7ED957;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">رد فوري ٢٤/٧</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:130px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:.35s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#9B89C4;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">الأسئلة الشائعة</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:235px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 4.6s ease-in-out infinite;animation-delay:.7s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#68B984;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">حجز المواعيد تلقائياً</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:290px;top:432px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite;animation-delay:1.05s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#D4A853;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">تذكيرات بقوالب معتمدة</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:290px;top:38px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:1.4s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#E87979;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">تحويل ذكي للموظف</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:70px;top:235px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 4.6s ease-in-out infinite;animation-delay:1.75s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#F0A87E;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">متعدد اللهجات واللغات</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:70px;top:340px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3s ease-in-out infinite;animation-delay:2.1s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#7DB8D4;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">موافقة وإلغاء اشتراك</span>
+            </div>
+          </div>
+          <div style="position:absolute;left:510px;top:340px;transform:translate(-50%,-50%);z-index:1;animation:float-pill 3.8s ease-in-out infinite;animation-delay:2.45s">
+            <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(13,32,2,0.1);border-radius:999px;padding:6px 12px;box-shadow:0 1px 2px rgba(0,0,0,0.05);white-space:nowrap">
+              <span style="width:20px;height:20px;border-radius:50%;background:#A8C97E;flex-shrink:0"></span>
+              <span style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700">تقارير وتحليلات</span>
+            </div>
+          </div>
+
+          <div dir="rtl" style="position:absolute;left:175px;top:75px;width:232px;z-index:2">
+            <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:20px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(13,32,2,0.08)">
+                <span style="width:36px;height:36px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:900;color:#0D2002">AI</span>
+                <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900">مساعد الاستقبال</span>
+              </div>
+              <p style="font-size:10px;font-weight:700;color:rgba(13,32,2,0.4);letter-spacing:0.05em;margin:0 0 10px">استقبال منشأتك على واتساب</p>
+              <ul style="list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:6px">
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>يرد على كل استفسار فوراً</li>
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>يحجز المواعيد ويؤكدها</li>
+                <li style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(13,32,2,0.65)"><span style="width:14px;height:14px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:900;color:#0D2002">✓</span>تذكيرات بقوالب معتمدة من واتساب</li>
+              </ul>
+              <p style="font-size:10px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 8px">يعمل مع:</p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
+                <span style="font-size:10px;font-weight:700;background:rgba(13,32,2,0.06);color:rgba(13,32,2,0.7);border-radius:999px;padding:2px 10px">قوالب معتمدة</span>
+                <span style="font-size:10px;font-weight:700;background:rgba(13,32,2,0.06);color:rgba(13,32,2,0.7);border-radius:999px;padding:2px 10px">تحويل بشري</span>
+              </div>
+              <a href="#usecase" style="display:block;width:100%;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:#FDFCF7;background:#0D2002;border-radius:999px;padding:10px 16px;text-align:center" style-hover="background:#173404;color:#FDFCF7">شاهده في العمل ←</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ showProof }}" hint-placeholder-val="{{ false }}">
+      <div style="border-top:1px solid rgba(13,32,2,0.08);padding:28px 0;text-align:center">
+        <p style="font-family:'Cairo',sans-serif;font-size:14px;color:rgba(13,32,2,0.4);margin:0 0 20px">يخدم منشآت في قطاعات متعددة بالمملكة العربية السعودية</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px 24px;flex-wrap:wrap;padding:0 24px">
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">المراكز الطبية</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">عيادات الأسنان</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">الصالونات والسبا</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">المطاعم والحجوزات</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">المتاجر الإلكترونية</span>
+          <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:rgba(13,32,2,0.25)">خدمات الصيانة</span>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <section id="features-ar" data-screen-label="Features (AR)" style="padding:112px 0;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:64px">
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;line-height:1.15;margin:0 0 16px">كل رسالة تتحول إلى موعد أو عميل</h2>
+        <p style="color:rgba(13,32,2,0.5);font-size:18px;max-width:36rem;margin:0 auto;text-wrap:pretty">دع المساعد يتولى الرد والحجز والتذكير — بينما يتفرغ فريقك لما لا يمكن أتمتته.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">bolt</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">٢٤/٧</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">لا استفسار بلا رد</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">يرد المساعد فوراً على كل رسالة — خارج الدوام وفي أوقات الذروة — فلا تخسر عميلاً بسبب الانتظار.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(270deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">event_available</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">−٤٠٪</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">غياب أقل عن المواعيد</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">تأكيدات وتذكيرات تلقائية بقوالب معتمدة — تُرسل فقط لمن وافق — تقلّل المواعيد الفائتة وتملأ جدولك.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(270deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);padding:32px;display:flex;flex-direction:column">
+          <span style="width:44px;height:44px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-family:'Material Symbols Rounded';font-size:22px">support_agent</span>
+          <div style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;color:#7ED957;line-height:1;margin-bottom:8px">×٣</div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;margin:0 0 12px">فريقك لما يهم فقط</h3>
+          <p style="color:rgba(13,32,2,0.55);font-size:14px;line-height:1.7;margin:0">الأسئلة المتكررة تُجاب آلياً، والحالات المعقدة تُحوَّل لموظفك مع كامل سياق المحادثة.</p>
+          <div style="margin-top:24px;height:1px;border-radius:999px;background:linear-gradient(270deg, rgba(126,217,87,0.6), rgba(126,217,87,0.2), transparent)"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="usecase-ar" data-screen-label="Use case (AR)" style="padding:112px 0;background:#fff">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:64px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:16px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;حالة استخدام
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;line-height:1.15;margin:0">موظف استقبال المركز الطبي — على واتساب</h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:64px;align-items:center">
+        <div dir="rtl">
+          <p style="color:rgba(13,32,2,0.55);font-size:18px;line-height:1.75;margin:0 0 40px">من أول «السلام عليكم» إلى تذكير ما قبل الموعد: المساعد يستقبل مرضى المركز، يحجز في الجدول الفعلي، ويحوّل أي سؤال طبي إلى الطاقم المختص.</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">calendar_month</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">متصل بجدول مواعيدك الفعلي</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">يعرض الأوقات المتاحة فعلياً، يحجز ويعدّل ويلغي مباشرة — بلا تدخل من موظف الاستقبال.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">medical_services</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">الأسئلة الطبية للطاقم المختص</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">المساعد لا يقدم استشارات طبية — أي سؤال علاجي أو حالة حساسة تُحوَّل فوراً لموظف بشري مع سياق المحادثة.</p>
+              </div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:16px;padding:20px;border-radius:1rem;background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);transition:border-color .2s" style-hover="border-color:rgba(126,217,87,0.6)">
+              <span style="width:40px;height:40px;border-radius:0.75rem;background:rgba(126,217,87,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:20px">translate</span>
+              <div>
+                <h4 style="font-family:'Cairo',sans-serif;font-weight:900;font-size:14px;margin:0 0 4px">يفهم لهجات مراجعيك</h4>
+                <p style="color:rgba(13,32,2,0.5);font-size:12px;line-height:1.7;margin:0">من النجدية إلى الحجازية والجنوبية والشرقية، وبالفصحى والإنجليزية — يرد بلغة المراجع الطبيعية.</p>
+              </div>
+            </div>
+          </div>
+          <p style="margin:24px 0 0;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.4);line-height:1.8">المركز الطبي حالة واحدة — المنصة نفسها تدير استقبال الصالونات والمطاعم والمتاجر وخدمات الصيانة.</p>
+        </div>
+
+        <div>
+          <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;overflow:hidden;max-width:24rem;margin:0 auto;box-shadow:0 20px 40px rgba(13,32,2,0.06)">
+            <div style="background:#0D2002;padding:16px;display:flex;align-items:center;gap:12px">
+              <span style="width:36px;height:36px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:900;color:#0D2002">AI</span>
+              <div>
+                <p style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#fff;margin:0">استقبال مركز النور الطبي</p>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="width:5px;height:5px;border-radius:50%;background:#7ED957"></span>
+                  <span style="font-size:10px;color:rgba(255,255,255,0.5)">يرد خلال ثوانٍ</span>
+                </div>
+              </div>
+              <span style="margin-left:auto;font-family:'Cairo',sans-serif;font-size:10px;font-weight:700;color:#7ED957;border:1px solid rgba(126,217,87,0.4);border-radius:999px;padding:4px 10px;white-space:nowrap">WhatsApp</span>
+            </div>
+            <div dir="rtl" style="padding:20px;display:flex;flex-direction:column;gap:12px;background:#FDFCF7">
+              <div style="display:flex;flex-direction:row-reverse;gap:8px">
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#0D2002;color:#fff;border-radius:1rem 1rem 0.2rem 1rem;font-weight:600">السلام عليكم، أبغى موعد أسنان بكرة العصر</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <span style="width:24px;height:24px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:auto;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#fff;color:#0D2002;border:1px solid rgba(13,32,2,0.08);border-radius:1rem 1rem 1rem 0.2rem">وعليكم السلام! متاح بكرة ٤:٣٠ م أو ٦:٠٠ م مع د. سارة — أيهم يناسبك؟</div>
+              </div>
+              <div style="display:flex;flex-direction:row-reverse;gap:8px">
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#0D2002;color:#fff;border-radius:1rem 1rem 0.2rem 1rem;font-weight:600">٤:٣٠ تمام</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <span style="width:24px;height:24px;border-radius:50%;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:auto;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="max-width:80%;padding:10px 16px;font-size:12px;line-height:1.7;background:#fff;color:#0D2002;border:1px solid rgba(13,32,2,0.08);border-radius:1rem 1rem 1rem 0.2rem">✓ تم الحجز — بكرة ٤:٣٠ م مع د. سارة. بنرسل لك تذكيراً قبل الموعد بساعتين. لإيقاف الرسائل أرسل «إيقاف».</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="width:24px;height:24px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#0D2002">AI</span>
+                <div style="display:flex;gap:4px;background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1rem;padding:12px 16px">
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite"></span>
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite;animation-delay:.2s"></span>
+                  <span style="width:6px;height:6px;border-radius:50%;background:rgba(13,32,2,0.3);animation:float-y 1.2s ease-in-out infinite;animation-delay:.4s"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p style="text-align:center;font-family:'Cairo',sans-serif;font-size:11px;color:rgba(13,32,2,0.4);margin:16px auto 0;max-width:24rem">التذكير يُرسل بقالب معتمد من واتساب، ويشمل دائماً خيار إلغاء الاشتراك.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="compliance-ar" data-screen-label="Compliance (AR)" style="padding:112px 0;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:56px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:20px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;التوافق مع سياسات Meta
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;margin:0;line-height:1.15">أتمتة رسمية، لا حلول ملتوية</h2>
+      </div>
+
+      <div style="background:#fff;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;box-shadow:0 8px 24px rgba(13,32,2,0.04);padding:48px">
+        <div dir="rtl" style="position:relative;overflow:hidden;margin-bottom:44px;display:flex;align-items:center;gap:16px;border-radius:1rem;background:#0D2002;padding:20px 28px;flex-wrap:wrap">
+          <div style="position:absolute;left:-32px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(126,217,87,0.1);filter:blur(40px);pointer-events:none"></div>
+          <span style="position:relative;width:48px;height:48px;border-radius:1rem;background:#7ED957;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Material Symbols Rounded';font-size:26px;color:#0D2002">verified</span>
+          <div style="position:relative;flex:1;min-width:240px">
+            <p style="font-family:'Cairo',sans-serif;font-size:18px;font-weight:900;color:#fff;line-height:1.4;margin:0">مبني على <span style="color:#7ED957">WhatsApp Business Platform</span> الرسمية من Meta</p>
+            <p style="font-family:'Cairo',sans-serif;font-size:13px;color:rgba(255,255,255,0.55);line-height:1.7;margin:0">لا واجهات غير رسمية تعرّض رقمك لخطر الحظر — وصول عبر Cloud API وقوالب معتمدة وجودة إرسال عالية. ويبقى توثيق الحساب واعتماد الاسم التجاري خاضعين لمراجعة Meta</p>
+          </div>
+          <span style="position:relative;font-family:'Cairo',sans-serif;font-size:11px;font-weight:900;color:#0D2002;background:#7ED957;border-radius:999px;padding:6px 14px;white-space:nowrap">منصة واتساب للأعمال</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px">
+          <div dir="rtl" style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">how_to_reg</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">الموافقة أولاً</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">لا رسائل إلا لعملاء وافقوا مسبقاً على التواصل عبر واتساب — والموافقة موثّقة وقابلة للتدقيق.</p>
+          </div>
+          <div dir="rtl" style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">unsubscribe</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">إلغاء الاشتراك بكلمة</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">أي عميل يرسل «إيقاف» يتوقف التواصل معه فوراً وتلقائياً — ويُحترم قراره في كل الحملات.</p>
+          </div>
+          <div dir="rtl" style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">fact_check</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">قوالب معتمدة</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">كل رسالة تُرسل خارج نافذة المحادثة تمر باعتماد واتساب المسبق — تذكيرات وتأكيدات وإشعارات.</p>
+          </div>
+          <div dir="rtl" style="background:#FDFCF7;border:1px solid rgba(13,32,2,0.08);border-radius:1.5rem;padding:28px">
+            <span style="width:40px;height:40px;border-radius:1rem;background:rgba(126,217,87,0.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-family:'Material Symbols Rounded';font-size:20px">schedule</span>
+            <h3 style="font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;margin:0 0 8px">نافذة الـ٢٤ ساعة</h3>
+            <p style="font-size:13px;color:rgba(13,32,2,0.55);line-height:1.7;margin:0">الردود الحرة داخل نافذة خدمة العملاء فقط — التزام كامل بسياسة المراسلة التجارية لواتساب.</p>
+          </div>
+        </div>
+
+        <p style="margin:32px 0 0;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.45);line-height:1.9;text-align:center">تعمل لابَّاس.ai مزوداً تقنياً مستقلاً على منصة واتساب للأعمال وصُممت خدماتها بما يتوافق مع <a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="color:#0D2002;font-weight:900;text-decoration:underline">سياسة المراسلة التجارية لواتساب</a> وسياسة التجارة وشروط WhatsApp Business. «واتساب» و«WhatsApp» علامتان تجاريتان لشركة Meta Platforms, Inc.‏ — ولا تربط لابَّاس.ai أي شراكة أو رعاية أو تبعية بشركة Meta.
+          <br>راجع <a href="/ai/privacypolicy" style="color:#0D2002;font-weight:900;text-decoration:underline">سياسة الخصوصية</a> و<a href="/ai/termsofuse" style="color:#0D2002;font-weight:900;text-decoration:underline">شروط الاستخدام</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-ar" data-screen-label="How it works (AR)" style="padding:112px 0;background:#fff">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:64px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:20px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;كيف يعمل
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;margin:0;line-height:1.15">جاهز خلال أيام<br><span style="color:rgba(13,32,2,0.25);font-weight:300;font-size:clamp(24px,3vw,36px)">لا أشهر</span></h2>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;position:relative">
+        <div style="position:absolute;top:56px;right:22%;left:22%;height:1px;background:linear-gradient(90deg, transparent, rgba(13,32,2,0.12), transparent)"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative">
+          <div style="width:112px;height:112px;margin-bottom:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            <span style="font-family:'Material Symbols Rounded';font-size:26px">power</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:10px;font-weight:900;color:rgba(13,32,2,0.3)">٠١</span>
+          </div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;margin:0 0 16px">الربط</h3>
+          <p style="color:rgba(13,32,2,0.5);font-size:14px;line-height:1.7;max-width:20rem;margin:0">نربط رقم منشأتك بواجهة واتساب للأعمال الرسمية ونوثّق ملفك التجاري لدى Meta.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative">
+          <div style="width:112px;height:112px;margin-bottom:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            <span style="font-family:'Material Symbols Rounded';font-size:26px">tune</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:10px;font-weight:900;color:rgba(13,32,2,0.3)">٠٢</span>
+          </div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;margin:0 0 16px">التدريب</h3>
+          <p style="color:rgba(13,32,2,0.5);font-size:14px;line-height:1.7;max-width:20rem;margin:0">نغذّي المساعد بخدماتك وأسعارك وجداولك وأسلوب ردّك، ونعتمد قوالب رسائلك لدى واتساب.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative">
+          <div style="width:112px;height:112px;margin-bottom:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+            <span style="font-family:'Material Symbols Rounded';font-size:26px">rocket_launch</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:10px;font-weight:900;color:rgba(13,32,2,0.3)">٠٣</span>
+          </div>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:24px;font-weight:900;margin:0 0 16px">الانطلاق</h3>
+          <p style="color:rgba(13,32,2,0.5);font-size:14px;line-height:1.7;max-width:20rem;margin:0">يبدأ الرد والحجز والتذكير ٢٤/٧ — مع لوحة متابعة حية وتحويل بشري في أي لحظة.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:64px;display:flex;flex-direction:column;align-items:center;gap:12px">
+        <a href="#pricing" style="display:inline-flex;align-items:center;gap:8px;background:#0D2002;color:#FDFCF7;border-radius:999px;font-family:'Cairo',sans-serif;font-weight:800;font-size:16px;padding:16px 40px;white-space:nowrap" style-hover="background:#173404;color:#FDFCF7">ابدأ تجربتك المجانية ←</a>
+        <p style="font-family:'Cairo',sans-serif;color:rgba(13,32,2,0.35);font-size:14px;margin:0">تجربة ١٤ يوماً · بلا رسوم إعداد · ألغِ في أي وقت</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing-ar" data-screen-label="Pricing (AR)" style="padding:112px 0;background:#FDFCF7">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="text-align:center;margin-bottom:40px">
+        <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:20px">
+          <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;الأسعار
+        </span>
+        <h2 style="font-family:'Cairo',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:900;margin:0;line-height:1.15">باقة لكل حجم منشأة</h2>
+        <p style="color:rgba(13,32,2,0.5);font-size:18px;max-width:42rem;margin:16px auto 0;line-height:1.75">باقات مرنة، ألغِ في أي وقت. اختر السنوي ووفّر ٢٠٪.</p>
+      </div>
+
+      <div dir="rtl" style="display:flex;justify-content:center;margin-bottom:56px">
+        <div style="display:inline-flex;align-items:center;gap:4px;padding:6px;border-radius:999px;background:rgba(13,32,2,0.04);border:1px solid rgba(13,32,2,0.1)">
+          <button type="button" onClick="{{ setMonthly }}" style="border:0;cursor:pointer;padding:10px 24px;border-radius:999px;background:{{ monthlyBg }};font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:{{ monthlyColor }}">شهري</button>
+          <button type="button" onClick="{{ setAnnual }}" style="border:0;cursor:pointer;padding:10px 24px;border-radius:999px;background:{{ annualBg }};font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:{{ annualColor }};display:inline-flex;align-items:center;gap:8px">سنوي<span style="font-size:10px;font-weight:900;padding:2px 8px;border-radius:999px;background:#0D2002;color:#7ED957;white-space:nowrap">وفّر ٢٠٪</span></button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;align-items:stretch">
+        <div dir="rtl" style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)">
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 4px">أساسي</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.45);margin:0 0 24px;line-height:1.7">لمنشأة صغيرة تبدأ بالأتمتة</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block">{{ priceBasic }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.45);white-space:nowrap">ر.س / شهرياً</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 28px">{{ billingNote }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">مساعد رد آلي على الاستفسارات</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">حجز المواعيد وتأكيدها</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">٥٠٠ محادثة شهرياً</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">قالبا تذكير معتمدان</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">تقارير أساسية</span></li>
+          </ul>
+          <a href="#" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;border:2px solid rgba(13,32,2,0.15);transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">ابدأ الآن</a>
+        </div>
+
+        <div dir="rtl" style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#0D2002;box-shadow:0 20px 40px rgba(13,32,2,0.2)">
+          <span style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:'Cairo',sans-serif;font-size:11px;font-weight:900;color:#0D2002;background:#7ED957;border-radius:999px;padding:6px 16px;white-space:nowrap;box-shadow:0 4px 12px rgba(13,32,2,0.15)">الأكثر اختياراً</span>
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;color:#7ED957;margin:0 0 4px">نمو</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin:0 0 24px;line-height:1.7">للمنشأة النشطة — استقبال كامل بلا موظف إضافي</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block;color:#fff">{{ priceGrowth }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);white-space:nowrap">ر.س / شهرياً</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);margin:0 0 28px">{{ billingNote }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">كل مزايا باقة أساسي</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">تذكيرات ومتابعات تلقائية</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">تحويل بشري بسياق كامل</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">٢٬٠٠٠ محادثة شهرياً</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">قوالب معتمدة بلا حد</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1.5">تحليلات متقدمة ودعم أولوية</span></li>
+          </ul>
+          <a href="#" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;background:#7ED957;color:#0D2002;transition:all .2s" style-hover="background:#6bc947;color:#0D2002;box-shadow:0 6px 20px rgba(126,217,87,0.35)">اشترك الآن</a>
+        </div>
+
+        <div dir="rtl" style="position:relative;display:flex;flex-direction:column;padding:32px;border-radius:1.5rem;background:#fff;border:1px solid rgba(13,32,2,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)">
+          <h3 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 4px">أعمال</h3>
+          <p style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(13,32,2,0.45);margin:0 0 24px;line-height:1.7">للمنشآت متعددة الفروع والفرق</p>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Cairo',sans-serif;font-size:48px;font-weight:900;line-height:1;display:inline-block">{{ priceBiz }}</span>
+            <span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.45);white-space:nowrap">ر.س / شهرياً</span>
+          </div>
+          <p style="font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 28px">{{ billingNote }}</p>
+          <ul style="list-style:none;margin:0 0 32px;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">كل مزايا باقة نمو</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">أرقام وفروع متعددة</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">تكامل مع أنظمتك عبر API</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">محادثات بلا حد</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">مدير نجاح مخصص</span></li>
+            <li style="display:flex;align-items:flex-start;gap:10px"><span style="width:20px;height:20px;border-radius:50%;background:rgba(126,217,87,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'Material Symbols Rounded';font-size:13px;color:#7ED957">check</span><span style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.65);line-height:1.5">تهيئة كاملة خطوة بخطوة</span></li>
+          </ul>
+          <a href="mailto:khalid@labass.sa" style="margin-top:auto;width:100%;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;border:2px solid rgba(13,32,2,0.15);transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">تواصل معنا</a>
+        </div>
+      </div>
+
+      <div style="margin-top:48px;text-align:center">
+        <div dir="rtl" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+          <p style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.55);margin:0">لديك أسئلة قبل الاشتراك؟ فريقنا جاهز لمساعدتك.</p>
+          <a href="mailto:khalid@labass.sa" style="display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:2px solid rgba(13,32,2,0.15);padding:12px 28px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;color:#0D2002;transition:all .2s" style-hover="border-color:#0D2002;background:#0D2002;color:#FDFCF7">
+            <span style="font-family:'Material Symbols Rounded';font-size:18px;color:#7ED957">chat_bubble</span>
+            تواصل معنا للأسئلة
+          </a>
+        </div>
+        <p style="margin-top:32px;font-family:'Cairo',sans-serif;font-size:12px;color:rgba(13,32,2,0.4)">الأسعار بالريال السعودي وتشمل التحديثات المستمرة — ولا تشمل رسوم المحادثات التي تفرضها Meta وفق أسعارها المعلنة.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer data-screen-label="Footer (AR)" style="background:#0D2002;padding:64px 0 32px">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;margin-bottom:56px">
+        <div>
+          <div dir="ltr" style="display:flex;align-items:center;margin-bottom:16px;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;color:#FDFCF7">لابَّاس<span style="color:#8BE06A">.ai</span></div>
+          <p style="font-size:14px;color:rgba(255,255,255,0.35);line-height:1.7;margin:0 0 24px">أتمتة واتساب للأعمال عبر الواجهة الرسمية — للمراكز الطبية والصالونات والمطاعم والمتاجر.</p>
+          <div style="display:flex;gap:8px">
+            <a href="#" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">chat</a>
+            <a href="#" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">work</a>
+            <a href="mailto:khalid@labass.sa" style="width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Material Symbols Rounded';font-size:16px" style-hover="color:#7ED957;border-color:rgba(126,217,87,0.4)">alternate_email</a>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">المنصة</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="#features-ar" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">المزايا</a></li>
+            <li><a href="#usecase-ar" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">حالة المركز الطبي</a></li>
+            <li><a href="#compliance-ar" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">التوافق مع سياسات Meta</a></li>
+            <li><a href="#pricing-ar" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">الأسعار</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">الشركة</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="#" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">من نحن</a></li>
+            <li><a href="#" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">وظائف</a></li>
+            <li><a href="mailto:khalid@labass.sa" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">تواصل معنا</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:'Cairo',sans-serif;font-weight:900;color:#fff;font-size:14px;margin:0 0 20px">القانوني</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px">
+            <li><a href="/ai/privacypolicy" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">سياسة الخصوصية</a></li>
+            <li><a href="/ai/termsofuse" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">شروط الاستخدام</a></li>
+            <li><a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="font-size:14px;color:rgba(255,255,255,0.3)" style-hover="color:rgba(255,255,255,0.7)">سياسات واتساب للأعمال</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <p style="font-size:12px;color:rgba(255,255,255,0.2);margin:0">© 2026 labass.ai — جميع الحقوق محفوظة</p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin:0">«واتساب» علامة تجارية لشركة Meta Platforms, Inc.‏ — لابَّاس.ai منتج مستقل غير تابع لها</p>
+      </div>
+    </div>
+  </footer>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;ar&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;'en' | 'ar'&quot;,&quot;section&quot;:&quot;Language&quot;},&quot;defaultBilling&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;monthly&quot;,&quot;annual&quot;],&quot;default&quot;:&quot;monthly&quot;,&quot;tsType&quot;:&quot;'monthly' | 'annual'&quot;,&quot;section&quot;:&quot;Pricing&quot;},&quot;showProof&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      annual: (props.defaultBilling ?? "monthly") === "annual",
+      lang: props.defaultLang ?? "en",
+    };
+  }
+  renderVals() {
+    const annual = this.state.annual;
+    const en = this.state.lang === "en";
+    return {
+      isEn: en,
+      isAr: !en,
+      setEn: () => this.setState({ lang: "en" }),
+      setAr: () => this.setState({ lang: "ar" }),
+      showProof: this.props.showProof ?? true,
+      setMonthly: () => this.setState({ annual: false }),
+      setAnnual: () => this.setState({ annual: true }),
+      monthlyBg: annual ? "transparent" : "#7ED957",
+      annualBg: annual ? "#7ED957" : "transparent",
+      monthlyColor: annual ? "rgba(13,32,2,0.5)" : "#0D2002",
+      annualColor: annual ? "#0D2002" : "rgba(13,32,2,0.5)",
+      priceBasic: annual ? "١٥٩" : "١٩٩",
+      priceGrowth: annual ? "٣٩٩" : "٤٩٩",
+      priceBiz: annual ? "٧٩٩" : "٩٩٩",
+      billingNote: annual ? "يُفوتر سنوياً — وفّرت ٢٠٪" : "يُفوتر شهرياً",
+      priceBasicEn: annual ? "159" : "199",
+      priceGrowthEn: annual ? "399" : "499",
+      priceBizEn: annual ? "799" : "999",
+      billingNoteEn: annual ? "Billed annually — you save 20%" : "Billed monthly",
+    };
+  }
+}
+</script>
+</body>
+</html>

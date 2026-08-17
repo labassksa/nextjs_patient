@@ -10,8 +10,14 @@ const nextConfig = {
   transpilePackages: ['@livekit/components-react', '@livekit/components-styles'],
   async rewrites() {
     return [
-      // Static landing page served at /ai (public/ai.html)
-      { source: '/ai', destination: '/ai.html' },
+      // Labass.ai marketing site — static export served from public/ai/.
+      { source: '/ai', destination: '/ai/index.html' },
+      { source: '/ai/privacypolicy', destination: '/ai/privacypolicy.html' },
+      { source: '/ai/termsofuse', destination: '/ai/termsofuse.html' },
+      // The pages load the design runtime as a relative "./support.js", which
+      // resolves to /support.js from /ai but /ai/support.js from the nested
+      // pages. Point the root path at the single real copy.
+      { source: '/support.js', destination: '/ai/support.js' },
       // TEMPORARY — Safe Browsing diagnostic. Remove once the flag is resolved.
       { source: '/ai-test', destination: '/ai-test.html' },
     ];
