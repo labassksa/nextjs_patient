@@ -188,7 +188,7 @@ export default function LandingPage() {
           {!loggedIn && (
             <Link href="/login" className={s.topBarBtnLogin}>تسجيل الدخول</Link>
           )}
-          <Link href="/login?redirect=/orgPortal" className={s.topBarBtnGreen}>دخول المنشآت</Link>
+          <Link href="/orgPortal" className={s.topBarBtnGreen}>دخول المنشآت</Link>
           <Link href="/schoolLogin" className={s.topBarBtnBlue}>دخول المدارس</Link>
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function LandingPage() {
 
           {/* Portal access */}
           <p className={s.drawerSection}>بوابات المنشآت</p>
-          <Link href="/login?redirect=/orgPortal"  className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
+          <Link href="/orgPortal"  className={s.drawerLinkGreen} onClick={closeDrawer}>دخول المنشآت</Link>
           <Link href="/schoolLogin" className={s.drawerLinkBlue} onClick={closeDrawer}>دخول المدارس</Link>
         </nav>
 
