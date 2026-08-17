@@ -51,11 +51,6 @@ export const queryKeys = {
     all: ["promoCodes"] as const,
     list: (filters?: Record<string, unknown>) => ["promoCodes", "list", filters] as const,
   },
-  whatsapp: {
-    all: ["whatsapp"] as const,
-    status: ["whatsapp", "status"] as const,
-    qr: ["whatsapp", "qr"] as const,
-  },
   wallets: {
     myWallet: ["wallet", "me"] as const,
     myTransactions: ["wallet", "me", "transactions"] as const,

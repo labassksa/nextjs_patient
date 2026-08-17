@@ -9,7 +9,6 @@ import {
   ClipboardList,
   Pill,
   UserCheck,
-  MessageCircle,
 } from "lucide-react";
 
 export const sidebarNavigation = [
@@ -23,5 +22,4 @@ export const sidebarNavigation = [
   { label: "Organizations Subscriptions", href: "/dashboard/subscriptions/organizations", icon: CreditCard },
   { label: "Individuals Subscriptions", href: "/dashboard/subscriptions/individuals", icon: UserCheck },
   { label: "Promo Codes", href: "/dashboard/promo-codes", icon: Ticket },
-  { label: "WhatsApp", href: "/dashboard/whatsapp", icon: MessageCircle },
 ];
