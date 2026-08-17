@@ -51,24 +51,6 @@ const SimpleLoginForm = () => {
 
     setIsLoading(false);
 
-    // TEMPORARY MARKETER OTP BYPASS — REMOVE AFTER 2026-08-27
-    // The backend recognised this phone number as an already-registered marketer
-    // and returned a session directly, so skip the OTP step entirely.
-    if (
-      result.success &&
-      result.alreadyRegisteredMarketer &&
-      result.authResponse?.token
-    ) {
-      localStorage.setItem("labass_token", result.authResponse.token);
-      localStorage.setItem(
-        "labass_userId",
-        String(result.authResponse.userId)
-      );
-      router.push("/registeredMarketer");
-      return;
-    }
-    // END TEMPORARY MARKETER OTP BYPASS
-
     if (result.success) {
       router.push(
         `/otp?phoneNumber=${encodeURIComponent(

@@ -23,27 +23,10 @@ export default function SchoolLoginPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/send-otp`,
-        {
-          phoneNumber: `+966${local}`,
-          role: "patient",
-        }
-      );
-
-      // TEMPORARY MARKETER OTP BYPASS — REMOVE AFTER 2026-08-27
-      // When the backend recognises this number as an already-registered marketer
-      // it returns a session and does NOT send an OTP, so continuing to /schoolOtp
-      // would leave the user waiting for a code that never arrives.
-      const body = res?.data ?? {};
-      if (body.alreadyRegisteredMarketer === true && body.authResponse?.token) {
-        localStorage.setItem("labass_token", body.authResponse.token);
-        localStorage.setItem("labass_userId", String(body.authResponse.userId));
-        router.push("/registeredMarketer");
-        return;
-      }
-      // END TEMPORARY MARKETER OTP BYPASS
-
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/send-otp`, {
+        phoneNumber: `+966${local}`,
+        role: "patient",
+      });
       router.push(`/schoolOtp?phoneNumber=${encodeURIComponent(`+966${local}`)}`);
     } catch (err: any) {
       setError(err?.response?.data?.error || "حدث خطأ، حاول مرة أخرى");
