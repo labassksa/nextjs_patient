@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta charset="utf-8">
+<title>Terms of Use — Labass.ai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Cairo:wght@400;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: #FDFCF7; color: #0D2002; font-family: 'Tajawal', sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: #0D2002; text-decoration: none; }
+a:hover { color: #173404; }
+</style>
+</helmet>
+
+<div style="background:#FDFCF7;color:#0D2002;font-family:'Tajawal',sans-serif;min-height:100vh;display:flex;flex-direction:column">
+
+<sc-if value="{{ isEn }}" hint-placeholder-val="{{ true }}">
+<div dir="ltr" style="display:flex;flex-direction:column;min-height:100vh">
+
+  <nav style="position:sticky;top:0;z-index:50;background:rgba(253,252,247,0.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(13,32,2,0.08)">
+    <div style="max-width:1152px;margin:0 auto;padding:8px 24px;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <a href="/ai" dir="ltr" style="display:flex;align-items:center;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;letter-spacing:-0.01em;color:#1C2B16;white-space:nowrap">Labass<span style="color:#8BE06A">.ai</span></a>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <a href="/ai" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">← Back to home</a>
+        <a href="/ai/privacypolicy" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">Privacy Policy</a>
+        <button type="button" onClick="{{ setAr }}" style="border:1px solid rgba(13,32,2,0.15);background:transparent;cursor:pointer;border-radius:999px;padding:8px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;color:rgba(13,32,2,0.7);white-space:nowrap">عربي</button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="flex:1;max-width:820px;margin:0 auto;width:100%;padding:64px 24px 96px">
+    <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:16px">
+      <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;LEGAL
+    </span>
+    <h1 style="font-family:'Cairo',sans-serif;font-size:clamp(32px,5vw,48px);font-weight:900;line-height:1.15;margin:0 0 12px">Terms of Use</h1>
+    <p style="font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 48px">Last updated: August 17, 2026</p>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">1. Acceptance of terms</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">By subscribing to or using the Labass.ai platform ("the Platform"), you — as a business ("Client") — agree to these terms and to the <a href="/ai/privacypolicy" style="font-weight:900;text-decoration:underline">Privacy Policy</a>. If you do not agree, do not use the Platform.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">2. Service description</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">The Platform provides an automated receptionist that runs on the Client's WhatsApp number through Meta's official WhatsApp Business Platform: answering inquiries, managing bookings, sending confirmations and reminders via approved templates, and handing off to a human employee. The Platform is an operational tool and is not a party to the relationship between the Client and its end customers. The Client's WhatsApp Business Account (WABA) is created and operated under Meta's WhatsApp Business Terms, and the Client authorizes the Platform — acting as an independent technology provider — to manage messaging on its behalf through Meta's official interfaces.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">3. Your account and obligations</h2>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:10px">
+        <li>Provide accurate, up-to-date information about your business and hold the legal authority to operate the connected number.</li>
+        <li>Keep your credentials confidential and take responsibility for activity under your account.</li>
+        <li>Use the Platform in compliance with the laws of the Kingdom of Saudi Arabia and any other applicable law.</li>
+        <li>Ensure the accuracy and legality of the content you feed your assistant (services, prices, schedules, replies).</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">4. Compliance with WhatsApp and Meta policies</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0 0 12px">Use of the Platform is conditional on the Client's compliance with applicable Meta policies, including the <a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="font-weight:900;text-decoration:underline">WhatsApp Business Messaging Policy</a>, the WhatsApp Commerce Policy and the WhatsApp Business Terms, as updated by Meta from time to time — in particular:</p>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:10px">
+        <li><strong style="font-family:'Cairo',sans-serif">Prior opt-in:</strong> business-initiated messages go only to customers who expressly agreed to receive them on WhatsApp; the Client is responsible for obtaining and documenting consent.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">Right to opt out:</strong> any user's request to stop messages is honored immediately; the Platform provides an automatic STOP mechanism that must not be disabled or circumvented.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">Approved templates:</strong> messages outside the 24-hour customer service window are sent only via WhatsApp-approved templates.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">Messaging quality:</strong> the Client must avoid spammy or misleading messaging and acknowledges that Meta may restrict the number or its quality rating upon violations.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">End-user notices:</strong> the Client provides its own customers with any legally required privacy notices and obtains any consents required for messaging and data processing.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">5. Prohibited uses</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0 0 12px">The Platform must not be used for:</p>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:10px">
+        <li>Unsolicited bulk messaging (spam) or messaging recipients who have not opted in.</li>
+        <li>Goods and services prohibited by the WhatsApp Commerce Policy, including prescription drugs and narcotics, tobacco products, weapons and ammunition, unlicensed gambling, and content that violates law or public morals.</li>
+        <li>Impersonation or misleading recipients about the sender's identity or capacity.</li>
+        <li>Collecting or using users' data beyond the purpose they consented to.</li>
+        <li>Any attempt to bypass template approval, consent controls, or the limits of the official API.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">6. Medical disclaimer</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">When the Platform is used by a healthcare facility, the assistant's role is limited to reception, scheduling and reminders. The assistant provides no diagnosis, consultation or medical recommendation; medical questions are routed to the facility's qualified staff. The facility remains responsible for its obligations before the competent health authorities. In emergencies, call 997 or go to the nearest emergency room.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">7. Fees and billing</h2>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:10px">
+        <li>Subscription fees are paid in advance (monthly or annually) in Saudi Riyals; subscriptions renew automatically unless cancelled before the end of the cycle.</li>
+        <li>Meta's per-conversation fees on the WhatsApp Business Platform are not included and are charged at Meta's published rates.</li>
+        <li>You may cancel at any time; cancellation takes effect at the end of the paid cycle, and fees for the elapsed period are non-refundable except as required by law.</li>
+        <li>Prices may change with at least 30 days' notice before the next billing cycle.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">8. Availability and changes</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">We aim for high availability without guaranteeing uninterrupted operation; the service may be affected by maintenance or by changes or outages at Meta or infrastructure providers. We may update the Platform and its features, and may suspend or restrict any account that violates these terms or Meta's policies to protect messaging quality and number reputation.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">9. Intellectual property and trademarks</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">The Platform, its software, design and the Labass.ai mark belong to us or our licensors. The Client retains ownership of its data and content and grants us a limited license to process them solely to operate the service. "WhatsApp" and "Meta" are trademarks of Meta Platforms, Inc. Labass.ai is an independent product; use of these names does not imply any partnership, sponsorship or endorsement by Meta.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">10. Limitation of liability</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">The service is provided "as is". To the maximum extent permitted by law, we are not liable for indirect or consequential damages or lost profits arising from use of or inability to use the Platform, nor for damages arising from the Client's violation of Meta's policies or Meta's decisions regarding its number or templates. Our total liability shall in all cases not exceed the subscription fees paid by the Client in the twelve months preceding the claim.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">11. Termination</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">The Client may end its subscription at any time from the dashboard or by contacting us. We may terminate or suspend the service immediately upon a material breach of these terms or of Meta's policies, or otherwise with 30 days' notice. Upon termination, data is handled per the retention section of the Privacy Policy.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">12. Governing law</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">These terms are governed by the laws of the Kingdom of Saudi Arabia, and its courts have jurisdiction over any dispute arising from them after amicable resolution fails within 30 days.</p>
+    </section>
+
+    <section style="margin-bottom:0">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">13. Contact us</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">For any question about these terms: khalid@labass.sa — Labass.ai, Kingdom of Saudi Arabia.</p>
+    </section>
+  </main>
+
+  <footer style="background:#0D2002;padding:24px 0">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:0">© 2026 labass.ai — All rights reserved</p>
+      <div style="display:flex;gap:20px">
+        <a href="/ai" style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(126,217,87,0.6)" style-hover="color:#7ED957">Home</a>
+        <a href="/ai/privacypolicy" style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(126,217,87,0.6)" style-hover="color:#7ED957">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAr }}" hint-placeholder-val="{{ false }}">
+<div dir="rtl" style="display:flex;flex-direction:column;min-height:100vh">
+
+  <nav style="position:sticky;top:0;z-index:50;background:rgba(253,252,247,0.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(13,32,2,0.08)">
+    <div style="max-width:1152px;margin:0 auto;padding:8px 24px;min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <a href="/ai" style="display:inline-flex;align-items:center;gap:6px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">→ العودة للرئيسية</a>
+        <a href="/ai/privacypolicy" style="font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:rgba(13,32,2,0.6)" style-hover="color:#0D2002">سياسة الخصوصية</a>
+        <button type="button" onClick="{{ setEn }}" style="border:1px solid rgba(13,32,2,0.15);background:transparent;cursor:pointer;border-radius:999px;padding:8px 14px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;color:rgba(13,32,2,0.7);white-space:nowrap">English</button>
+      </div>
+      <a href="/ai" dir="ltr" style="display:flex;align-items:center;font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:24px;line-height:1;letter-spacing:-0.01em;color:#1C2B16;white-space:nowrap">لابَّاس<span style="color:#8BE06A">.ai</span></a>
+    </div>
+  </nav>
+
+  <main style="flex:1;max-width:820px;margin:0 auto;width:100%;padding:64px 24px 96px">
+    <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:900;color:rgba(13,32,2,0.4);margin-bottom:16px">
+      <span style="width:7px;height:7px;border-radius:50%;background:#7ED957"></span>&nbsp;القانوني
+    </span>
+    <h1 style="font-family:'Cairo',sans-serif;font-size:clamp(32px,5vw,48px);font-weight:900;line-height:1.15;margin:0 0 12px">شروط الاستخدام</h1>
+    <p style="font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;color:rgba(13,32,2,0.4);margin:0 0 48px">آخر تحديث: ١٧ أغسطس ٢٠٢٦</p>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">١. قبول الشروط</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">باشتراكك في منصة لابَّاس.ai («المنصة») أو استخدامك لها، فإنك — بصفتك منشأة («العميل») — توافق على هذه الشروط وعلى <a href="/ai/privacypolicy" style="font-weight:900;text-decoration:underline">سياسة الخصوصية</a>. إن لم توافق عليها فلا تستخدم المنصة.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٢. وصف الخدمة</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">توفر المنصة مساعد استقبال آلياً يعمل على رقم واتساب الخاص بالعميل عبر واجهة WhatsApp Business Platform الرسمية من Meta: الرد على الاستفسارات، إدارة الحجوزات، إرسال التأكيدات والتذكيرات بقوالب معتمدة، والتحويل لموظف بشري. المنصة أداة تشغيلية، وليست طرفاً في العلاقة بين العميل وعملائه النهائيين. يُنشأ حساب واتساب للأعمال (WABA) الخاص بالعميل ويُشغَّل وفق شروط WhatsApp Business من Meta، ويفوّض العميل المنصة — بصفتها مزوداً تقنياً مستقلاً — بإدارة المراسلة نيابة عنه عبر الواجهات الرسمية من Meta.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٣. حسابك والتزاماتك</h2>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 20px 0 0;display:flex;flex-direction:column;gap:10px">
+        <li>تقديم بيانات صحيحة ومحدّثة عن منشأتك ونشاطها، وامتلاك صفة نظامية لتشغيل الرقم المربوط.</li>
+        <li>الحفاظ على سرية بيانات الدخول، وتحمّل مسؤولية ما يتم عبر حسابك.</li>
+        <li>استخدام المنصة وفق الأنظمة السارية في المملكة العربية السعودية وأي نظام آخر منطبق.</li>
+        <li>صحة ومشروعية المحتوى الذي تغذّي به مساعدك (الخدمات، الأسعار، الجداول، الردود).</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٤. الالتزام بسياسات واتساب وMeta</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0 0 12px">استخدام المنصة مشروط بالتزام العميل بسياسات Meta المنطبقة، ومنها <a href="https://business.whatsapp.com/policy" target="_blank" rel="noopener noreferrer" style="font-weight:900;text-decoration:underline">سياسة المراسلة التجارية لواتساب</a> وسياسة التجارة لواتساب وشروط WhatsApp Business، بصيغتها المحدَّثة من Meta من وقت لآخر، وعلى الأخص:</p>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 20px 0 0;display:flex;flex-direction:column;gap:10px">
+        <li><strong style="font-family:'Cairo',sans-serif">الموافقة المسبقة:</strong> لا تُرسل رسائل تبدأها المنشأة إلا لعملاء وافقوا صراحةً على استقبالها عبر واتساب، ويتحمل العميل مسؤولية الحصول على الموافقة وتوثيقها.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">حق الإيقاف:</strong> يُحترم طلب أي مستخدم إيقاف الرسائل فوراً، وتوفر المنصة آلية «إيقاف» تلقائية لا يجوز تعطيلها أو الالتفاف عليها.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">القوالب المعتمدة:</strong> الرسائل خارج نافذة خدمة العملاء (٢٤ ساعة) تُرسل بقوالب معتمدة من واتساب فقط.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">جودة المراسلة:</strong> يلتزم العميل بتجنب الإرسال المزعج أو المضلل، ويقرّ بأن Meta قد تقيّد الرقم أو جودته عند المخالفة.</li>
+        <li><strong style="font-family:'Cairo',sans-serif">إشعارات المستخدم النهائي:</strong> يوفّر العميل لعملائه ما تقتضيه الأنظمة من إشعارات خصوصية، ويحصل على الموافقات اللازمة للمراسلة ومعالجة البيانات.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٥. الاستخدامات المحظورة</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0 0 12px">يُحظر استخدام المنصة في:</p>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 20px 0 0;display:flex;flex-direction:column;gap:10px">
+        <li>الرسائل الجماعية غير المرغوبة (سبام) أو الرسائل لجهات لم توافق على التواصل.</li>
+        <li>السلع والخدمات المحظورة بموجب سياسة التجارة لواتساب، ومنها: الأدوية الموصوفة والمواد المخدرة، التبغ ومنتجاته، الأسلحة والذخائر، المقامرة غير المرخصة، والمحتوى المخالف للآداب أو الأنظمة.</li>
+        <li>انتحال الشخصية أو التضليل بشأن هوية المرسل أو صفته.</li>
+        <li>جمع بيانات المستخدمين أو استخدامها خارج الغرض الذي وافقوا عليه.</li>
+        <li>أي محاولة لتجاوز ضوابط الاعتماد أو الموافقة أو حدود الواجهة الرسمية.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٦. إخلاء المسؤولية الطبية</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">عند استخدام المنصة من منشأة صحية، يقتصر دور المساعد على الاستقبال والجدولة والتذكير. المساعد لا يقدم تشخيصاً أو استشارة أو توصية طبية، وتُحوَّل الأسئلة الطبية إلى الطاقم المختص لدى المنشأة. المنشأة مسؤولة عن التزاماتها أمام الجهات الصحية المختصة، وفي الحالات الطارئة يجب الاتصال بالرقم 997 أو التوجه لأقرب طوارئ.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٧. الرسوم والفوترة</h2>
+      <ul style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0;padding:0 20px 0 0;display:flex;flex-direction:column;gap:10px">
+        <li>تُدفع رسوم الاشتراك مقدماً (شهرياً أو سنوياً) بالريال السعودي، ويتجدد الاشتراك تلقائياً ما لم يُلغَ قبل نهاية الدورة.</li>
+        <li>رسوم المحادثات التي تفرضها Meta على WhatsApp Business Platform غير مشمولة، وتُحمَّل وفق أسعار Meta المعلنة.</li>
+        <li>يمكن الإلغاء في أي وقت؛ يسري الإلغاء نهاية الدورة المدفوعة، ولا تُسترد الرسوم عن المدة المنقضية إلا بما يوجبه النظام.</li>
+        <li>قد تتغير الأسعار مع إشعار مسبق لا يقل عن ٣٠ يوماً قبل دورة الفوترة التالية.</li>
+      </ul>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٨. توافر الخدمة والتعديلات</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">نسعى لتوافر عالٍ للخدمة دون ضمان تشغيل غير منقطع؛ فقد تتأثر الخدمة بأعمال صيانة أو بتغييرات أو أعطال في منصات Meta أو مزودي البنية التحتية. لنا تحديث المنصة وتطوير مزاياها، وتعليق أو تقييد أي حساب يخالف هذه الشروط أو سياسات Meta حمايةً لجودة الإرسال وسمعة الأرقام.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">٩. الملكية الفكرية والعلامات التجارية</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">المنصة وبرمجياتها وتصميمها وعلامة لابَّاس.ai ملك لنا أو لمرخّصينا. يحتفظ العميل بملكية بياناته ومحتواه ويمنحنا ترخيصاً محدوداً لمعالجتها بغرض تشغيل الخدمة فقط. «واتساب» و«WhatsApp» و«Meta» علامات تجارية لشركة Meta Platforms, Inc.‏ — لابَّاس.ai منتج مستقل، ولا يعني استخدام هذه الأسماء وجود شراكة أو رعاية أو اعتماد من Meta.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">١٠. حدود المسؤولية</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">تُقدَّم الخدمة «كما هي» وبأقصى ما يجيزه النظام، لا نتحمل الأضرار غير المباشرة أو التبعية أو فوات الربح الناتجة عن استخدام المنصة أو تعذّره، ولا الأضرار الناشئة عن مخالفة العميل لسياسات Meta أو عن قرارات Meta بشأن رقمه أو قوالبه. لا يتجاوز إجمالي مسؤوليتنا في جميع الأحوال ما دفعه العميل من رسوم اشتراك خلال الاثني عشر شهراً السابقة للمطالبة.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">١١. الإنهاء</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">للعميل إنهاء اشتراكه في أي وقت من لوحة التحكم أو بالتواصل معنا. لنا إنهاء أو تعليق الخدمة فوراً عند مخالفة جوهرية لهذه الشروط أو لسياسات Meta، أو بإشعار مدته ٣٠ يوماً لغير ذلك. عند الإنهاء تُعالج البيانات وفق بند الاحتفاظ في سياسة الخصوصية.</p>
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">١٢. القانون الواجب التطبيق</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">تخضع هذه الشروط لأنظمة المملكة العربية السعودية، وتختص محاكمها بأي نزاع ينشأ عنها بعد تعذّر الحل الودي خلال ٣٠ يوماً.</p>
+    </section>
+
+    <section style="margin-bottom:0">
+      <h2 style="font-family:'Cairo',sans-serif;font-size:20px;font-weight:900;margin:0 0 12px">١٣. التواصل معنا</h2>
+      <p style="font-size:15px;line-height:1.9;color:rgba(13,32,2,0.7);margin:0">لأي استفسار عن هذه الشروط: khalid@labass.sa — لابَّاس.ai، المملكة العربية السعودية.</p>
+    </section>
+  </main>
+
+  <footer style="background:#0D2002;padding:24px 0">
+    <div style="max-width:1152px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);margin:0">© 2026 labass.ai — جميع الحقوق محفوظة</p>
+      <div style="display:flex;gap:20px">
+        <a href="/ai" style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(126,217,87,0.6)" style-hover="color:#7ED957">الرئيسية</a>
+        <a href="/ai/privacypolicy" style="font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:rgba(126,217,87,0.6)" style-hover="color:#7ED957">سياسة الخصوصية</a>
+      </div>
+    </div>
+  </footer>
+</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultLang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;ar&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;'en' | 'ar'&quot;,&quot;section&quot;:&quot;Language&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: props.defaultLang ?? "en" };
+  }
+  renderVals() {
+    const en = this.state.lang === "en";
+    return {
+      isEn: en,
+      isAr: !en,
+      setEn: () => this.setState({ lang: "en" }),
+      setAr: () => this.setState({ lang: "ar" }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
