@@ -12,7 +12,7 @@ const HealthFacilitiesButton: React.FC = () => {
     if (isAuthenticated()) {
       router.push("/orgPortal");
     } else {
-      router.push("/login");
+      router.push("/login?redirect=/orgPortal");
     }
   };
 
