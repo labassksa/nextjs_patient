@@ -23,6 +23,7 @@ export const getMarketerConsultaion = async (
       return {
         success: false,
         message: i18next.t('errors.noToken'),
+        requiresLogin: true,
       };
     }
     const response = await axios.get(
@@ -50,12 +51,17 @@ export const getMarketerConsultaion = async (
       return { success: false, message: "Unexpected response status code" };
     }
   } catch (error) {
+    const requiresLogin =
+      axios.isAxiosError(error) && error.response?.status === 401;
+
     return {
       success: false,
-      message:
-        axios.isAxiosError(error) && error.response?.data?.error
+      message: requiresLogin
+        ? i18next.t('errors.noToken')
+        : axios.isAxiosError(error) && error.response?.data?.error
           ? error.response.data.error
           : i18next.t('unexpectedError'),
+      requiresLogin,
     };
   }
 };

@@ -6,8 +6,9 @@ export const getOrganization = async () => {
     const token = localStorage.getItem("labass_token");
     if (!token) {
       return {
-      success: false,
-      message: i18next.t('errors.noToken')
+        success: false,
+        message: i18next.t('errors.noToken'),
+        requiresLogin: true,
       };
     }
 
@@ -39,6 +40,11 @@ export const getOrganization = async () => {
     // Extract Backend Message
     let backendMessage =
       error.response?.data?.message || i18next.t('errors.genericError');
+    let requiresLogin = error.response?.status === 401;
+
+    if (requiresLogin) {
+      backendMessage = i18next.t('errors.noToken');
+    }
 
     // Translate Specific Backend Messages
     if (
@@ -47,6 +53,7 @@ export const getOrganization = async () => {
       )
     ) {
       backendMessage = i18next.t('errors.marketerNotFound');
+      requiresLogin = true;
     } else if (
       backendMessage.includes(
         "Organization not found for the given marketer profile."
@@ -58,6 +65,7 @@ export const getOrganization = async () => {
     return {
       success: false,
       message: backendMessage,
+      requiresLogin,
     };
   }
 };
