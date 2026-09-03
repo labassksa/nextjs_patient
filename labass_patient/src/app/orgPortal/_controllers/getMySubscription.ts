@@ -7,7 +7,8 @@ export const getMySubscription = async () => {
     if (!token) {
       return {
         success: false,
-        message: i18next.t('errors.noToken')
+        message: i18next.t('errors.noToken'),
+        requiresLogin: true,
       };
     }
 
@@ -46,12 +47,15 @@ export const getMySubscription = async () => {
     }
 
     // Extract Backend Message
-    let backendMessage =
-      error.response?.data?.message || i18next.t('errors.genericError');
+    const requiresLogin = error.response?.status === 401;
+    const backendMessage = requiresLogin
+      ? i18next.t('errors.noToken')
+      : error.response?.data?.message || i18next.t('errors.genericError');
 
     return {
       success: false,
       message: backendMessage,
+      requiresLogin,
     };
   }
 };

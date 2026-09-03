@@ -3,6 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 import * as i18next from '../../utils/i18n';
 import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import LabBottomNavBar from "./_components/bottomNavBar";
 import WalletSection from "./_components/wallet/WalletSection";
 import ConsultationPriceSection from "./_components/ConsultationPriceSection";
@@ -77,6 +78,7 @@ interface OrgPatient {
 
 const OrgPatientsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [currentView, setCurrentView] = useState<"patients" | "registration" | "subscription" | "wallet">(
     "registration"
   );
@@ -86,6 +88,7 @@ const OrgPatientsPage: React.FC = () => {
   const [isLoadingOrg, setIsLoadingOrg] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orgError, setOrgError] = useState("");
+  const [orgErrorRequiresLogin, setOrgErrorRequiresLogin] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [dealType, setDealType] = useState<DealType[]>([]);
   const [orgType, setOrgType] = useState<OrganizationTypes | "">("");
@@ -167,6 +170,7 @@ const OrgPatientsPage: React.FC = () => {
   const fetchOrg = async () => {
     setIsLoadingOrg(true);
     setOrgError("");
+    setOrgErrorRequiresLogin(false);
     try {
       const orgResponse = await getOrganization();
       console.log("Organization Response:", orgResponse);
@@ -176,6 +180,9 @@ const OrgPatientsPage: React.FC = () => {
         setOrgType(orgResponse.data.type);
         setOrgName(orgResponse.data.name || "");
       } else {
+        setOrgErrorRequiresLogin(
+          "requiresLogin" in orgResponse && orgResponse.requiresLogin === true
+        );
         throw new Error(orgResponse.message || "Unknown error occurred.");
       }
 
@@ -187,6 +194,13 @@ const OrgPatientsPage: React.FC = () => {
         setUserData(userResponse.data); // Use data directly, not as array
       } else {
         console.log("User fetch failed:", userResponse.message);
+        if (
+          "requiresLogin" in userResponse &&
+          userResponse.requiresLogin === true
+        ) {
+          setOrgErrorRequiresLogin(true);
+          throw new Error(userResponse.message);
+        }
       }
 
     } catch (err: any) {
@@ -209,6 +223,12 @@ const OrgPatientsPage: React.FC = () => {
       } else if (subscriptionResponse.noSubscription) {
         console.log("No active subscription found");
         setSubscription([]);
+      } else if (
+        "requiresLogin" in subscriptionResponse &&
+        subscriptionResponse.requiresLogin === true
+      ) {
+        setOrgError(subscriptionResponse.message);
+        setOrgErrorRequiresLogin(true);
       }
     } catch (err: any) {
       console.error("Error fetching subscription:", err);
@@ -254,6 +274,10 @@ const OrgPatientsPage: React.FC = () => {
         setMarketers(uniqueMarketers);
       } else {
         setOrgError(marketerConsultaion.message || t('unexpectedError'));
+        setOrgErrorRequiresLogin(
+          "requiresLogin" in marketerConsultaion &&
+          marketerConsultaion.requiresLogin === true
+        );
       }
       })()
   }, [fromDate, toDate]);
@@ -800,13 +824,21 @@ const OrgPatientsPage: React.FC = () => {
               <div className="bg-white rounded-lg shadow-lg p-6 text-center mx-4">
                 <p className="text-red-500 text-lg mb-4">{orgError}</p>
                 <button
-                  onClick={fetchOrg}
+                  onClick={
+                    orgErrorRequiresLogin
+                      ? () => router.push("/login")
+                      : fetchOrg
+                  }
                   className="bg-custom-green text-white py-2 px-4 rounded-md"
                   disabled={isLoadingOrg}
                 >
                   {isLoadingOrg ? (
                     <div className="spinner"></div>
-                  ) : (t('retryButton'))}
+                  ) : orgErrorRequiresLogin ? (
+                    t('loginButton')
+                  ) : (
+                    t('retryButton')
+                  )}
                 </button>
               </div>
             </div>
