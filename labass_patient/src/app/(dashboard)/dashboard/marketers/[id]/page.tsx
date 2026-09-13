@@ -26,6 +26,81 @@ import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Send, RefreshCw, Plus, Building2, User, Phone, Mail, Calendar, CreditCard, Globe, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Download } from "lucide-react";
 import Link from "next/link";
 import { MarketerWalletCard } from "@/features/dashboard/components/marketers/marketer-wallet-card";
+import type { Marketer, UpdateMarketerPayload } from "@/features/dashboard/types/marketer.types";
+
+type MarketerFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  gender: string;
+  nationalId: string;
+  dateOfBirth: string;
+  iban: string;
+  nationality: string;
+};
+
+function getMarketerFormData(marketer: Marketer): MarketerFormData {
+  return {
+    firstName: marketer.user?.firstName ?? "",
+    lastName: marketer.user?.lastName ?? "",
+    email: marketer.user?.email ?? "",
+    phoneNumber: marketer.user?.phoneNumber ?? "",
+    gender: marketer.user?.gender ?? "",
+    nationalId: marketer.user?.nationalId ?? "",
+    dateOfBirth: marketer.user?.dateOfBirth?.slice(0, 10) ?? "",
+    iban: marketer.iban ?? "",
+    nationality: marketer.nationality ?? "",
+  };
+}
+
+function changedValue(current: string, original: string): string | null | undefined {
+  const trimmedCurrent = current.trim();
+  if (trimmedCurrent === original.trim()) return undefined;
+  return trimmedCurrent || null;
+}
+
+function getApiErrorMessage(error: unknown): string {
+  const responseData = (error as {
+    response?: { data?: { message?: string; error?: string } };
+  })?.response?.data;
+
+  return responseData?.message ?? responseData?.error ?? "Failed to update marketer";
+}
+
+function isRealDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function responseMatchesPayload(
+  marketer: Marketer,
+  payload: UpdateMarketerPayload,
+): boolean {
+  const canonicalData = getMarketerFormData(marketer);
+  const marketerFields = ["iban", "nationality"] as const;
+  const userFields = [
+    "firstName",
+    "lastName",
+    "email",
+    "phoneNumber",
+    "gender",
+    "nationalId",
+    "dateOfBirth",
+  ] as const;
+
+  return (
+    marketerFields.every((field) =>
+      payload.marketerData[field] === undefined
+        || canonicalData[field] === (payload.marketerData[field] ?? ""),
+    )
+    && userFields.every((field) =>
+      payload.userData[field] === undefined
+        || canonicalData[field] === (payload.userData[field] ?? ""),
+    )
+  );
+}
 
 export default function MarketerDetailPage() {
   const params = useParams();
@@ -40,7 +115,7 @@ export default function MarketerDetailPage() {
 
   const marketer = Array.isArray(marketers) ? marketers.find((m) => m.id === marketerId) : undefined;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<MarketerFormData>({
     firstName: "",
     lastName: "",
     email: "",
@@ -57,6 +132,7 @@ export default function MarketerDetailPage() {
   const [promoConfig, setPromoConfig] = useState({ discountPercentage: 10, marketerPercentage: 10, numberOfCodes: 5 });
   const [editErrors, setEditErrors] = useState<Record<string, string>>({});
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [promoErrors, setPromoErrors] = useState<Record<string, string>>({});
 //1
   const todayDate = new Date();
@@ -69,23 +145,16 @@ export default function MarketerDetailPage() {
 
   useEffect(() => {
     if (marketer) {
-      setFormData({
-        firstName: marketer.user?.firstName ?? marketer.firstName ?? "",
-        lastName: marketer.user?.lastName ?? marketer.lastName ?? "",
-        email: marketer.user?.email ?? marketer.email ?? "",
-        phoneNumber: marketer.user?.phoneNumber ?? marketer.phoneNumber ?? "",
-        gender: marketer.gender ?? "",
-        nationalId: marketer.nationalId ?? "",
-        dateOfBirth: marketer.dateOfBirth ? marketer.dateOfBirth.split("T")[0] : "",
-        iban: marketer.iban ?? "",
-        nationality: marketer.nationality ?? "",
-      });
+      setFormData(getMarketerFormData(marketer));
     }
   }, [marketer]);
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setEditErrors({});
+    setSaveSuccess(false);
+    setSaveError("");
+    updateMarketer.reset();
   };
 
   const { data: consultData, isLoading: consultLoading } = useMarketerConsultations(marketerId, consultFromDate, consultToDate, consultPage, consultLimit);
@@ -178,29 +247,53 @@ export default function MarketerDetailPage() {
   const handleUpdateMarketer = async () => {
     const errors: Record<string, string> = {};
     if (!formData.firstName.trim()) errors.firstName = "First name is required";
-    if (formData.iban && !/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/.test(formData.iban)) errors.iban = "Invalid IBAN format";
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = "Invalid email format";
+    if (formData.phoneNumber.trim() && !/^\+\d{8,18}$/.test(formData.phoneNumber.trim())) errors.phoneNumber = "Invalid phone (e.g. +966501234567)";
+    if (formData.iban.trim() && !/^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/.test(formData.iban.trim())) errors.iban = "Invalid IBAN format";
+    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) errors.email = "Invalid email format";
+    if (formData.dateOfBirth && !isRealDate(formData.dateOfBirth)) errors.dateOfBirth = "Invalid date";
     if (Object.keys(errors).length > 0) { setEditErrors(errors); setSaveSuccess(false); return; }
     setEditErrors({});
     setSaveSuccess(false);
-    await updateMarketer.mutateAsync({
-      marketerId,
-      marketerData: {
-        iban: formData.iban,
-        nationality: formData.nationality,
-      },
-      userData: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        gender: formData.gender,
-        nationalId: formData.nationalId,
-        dateOfBirth: formData.dateOfBirth,
-      },
-    });
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    setSaveError("");
+
+    const originalData = getMarketerFormData(marketer);
+    const marketerData: UpdateMarketerPayload["marketerData"] = {};
+    const userData: UpdateMarketerPayload["userData"] = {};
+
+    const iban = changedValue(formData.iban, originalData.iban);
+    const nationality = changedValue(formData.nationality, originalData.nationality);
+    const firstName = changedValue(formData.firstName, originalData.firstName);
+    const lastName = changedValue(formData.lastName, originalData.lastName);
+    const email = changedValue(formData.email, originalData.email);
+    const phoneNumber = changedValue(formData.phoneNumber, originalData.phoneNumber);
+    const gender = changedValue(formData.gender, originalData.gender);
+    const nationalId = changedValue(formData.nationalId, originalData.nationalId);
+    const dateOfBirth = changedValue(formData.dateOfBirth, originalData.dateOfBirth);
+
+    if (iban !== undefined) marketerData.iban = iban;
+    if (nationality !== undefined) marketerData.nationality = nationality;
+    if (firstName !== undefined) userData.firstName = firstName;
+    if (lastName !== undefined) userData.lastName = lastName;
+    if (email !== undefined) userData.email = email;
+    if (phoneNumber !== undefined) userData.phoneNumber = phoneNumber;
+    if (gender !== undefined) userData.gender = gender;
+    if (nationalId !== undefined) userData.nationalId = nationalId;
+    if (dateOfBirth !== undefined) userData.dateOfBirth = dateOfBirth;
+
+    if (Object.keys(marketerData).length === 0 && Object.keys(userData).length === 0) return;
+
+    try {
+      const payload = { marketerId, marketerData, userData };
+      const updatedMarketer = await updateMarketer.mutateAsync(payload);
+      if (!responseMatchesPayload(updatedMarketer, payload)) {
+        setSaveError("The server did not save all submitted changes. Please try again.");
+        return;
+      }
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      setSaveError(getApiErrorMessage(error));
+    }
   };
 
   const handleSendMessage = async () => {
@@ -283,30 +376,30 @@ export default function MarketerDetailPage() {
                 )}
               </div>
             </div>
-            {marketer.gender && (
+            {marketer.user?.gender && (
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-custom-green" />
                 <div>
                   <p className="text-sm text-muted-foreground">Gender</p>
-                  <p className="font-medium">{marketer.gender}</p>
+                  <p className="font-medium">{marketer.user.gender}</p>
                 </div>
               </div>
             )}
-            {marketer.dateOfBirth && (
+            {marketer.user?.dateOfBirth && (
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-custom-green" />
                 <div>
                   <p className="text-sm text-muted-foreground">Date of Birth</p>
-                  <p className="font-medium">{new Date(marketer.dateOfBirth).toLocaleDateString()}</p>
+                  <p className="font-medium">{new Date(marketer.user.dateOfBirth).toLocaleDateString()}</p>
                 </div>
               </div>
             )}
-            {marketer.nationalId && (
+            {marketer.user?.nationalId && (
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4 text-custom-green" />
                 <div>
                   <p className="text-sm text-muted-foreground">National ID</p>
-                  <p className="font-medium" dir="ltr">{marketer.nationalId}</p>
+                  <p className="font-medium" dir="ltr">{marketer.user.nationalId}</p>
                 </div>
               </div>
             )}
@@ -393,6 +486,7 @@ export default function MarketerDetailPage() {
             <div className="space-y-2">
               <Label>Date of Birth</Label>
               <Input type="date" value={formData.dateOfBirth} onChange={(e) => updateField("dateOfBirth", e.target.value)} dir="ltr" />
+              {editErrors.dateOfBirth && <p className="text-sm text-destructive">{editErrors.dateOfBirth}</p>}
             </div>
           </div>
 
@@ -413,7 +507,7 @@ export default function MarketerDetailPage() {
               {updateMarketer.isPending ? "Saving..." : "Save Changes"}
             </Button>
             {saveSuccess && <p className="text-sm text-green-600 font-medium">Changes saved successfully.</p>}
-            {updateMarketer.isError && <p className="text-sm text-destructive font-medium">Failed to save changes. Please try again.</p>}
+            {saveError && <p className="text-sm text-destructive font-medium">{saveError}</p>}
           </div>
         </CardContent>
       </Card>

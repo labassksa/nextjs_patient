@@ -8,7 +8,7 @@ import {
   sendPromoCodesToMarketer,
   getMarketerConsultations,
 } from "../api/marketers.api";
-import type { CreateMarketerPayload, UpdateMarketerPayload } from "../types/marketer.types";
+import type { CreateMarketerPayload, Marketer, UpdateMarketerPayload } from "../types/marketer.types";
 
 export function useMarketers() {
   return useQuery({
@@ -31,8 +31,25 @@ export function useUpdateMarketer() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: UpdateMarketerPayload) => updateMarketer(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.marketers.all });
+    onSuccess: (updatedMarketer, payload) => {
+      queryClient.setQueryData<Marketer[]>(queryKeys.marketers.all, (marketers) =>
+        marketers?.map((marketer) =>
+          marketer.id === payload.marketerId
+            ? {
+                ...marketer,
+                ...updatedMarketer,
+                user: updatedMarketer.user
+                  ? { ...marketer.user, ...updatedMarketer.user }
+                  : marketer.user,
+              }
+            : marketer,
+        ),
+      );
+      queryClient.setQueryData(queryKeys.marketers.detail(payload.marketerId), updatedMarketer);
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.marketers.all,
+        refetchType: "none",
+      });
     },
   });
 }

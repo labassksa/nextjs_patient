@@ -12,7 +12,7 @@ export async function createMarketer(payload: CreateMarketerPayload) {
   return data;
 }
 
-export async function updateMarketer(payload: UpdateMarketerPayload) {
+export async function updateMarketer(payload: UpdateMarketerPayload): Promise<Marketer> {
   const { data } = await apiClient.put("/marketers", payload);
   return data;
 }
