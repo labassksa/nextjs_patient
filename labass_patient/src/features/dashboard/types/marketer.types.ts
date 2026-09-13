@@ -6,6 +6,9 @@ export interface MarketerUser {
   lastName: string;
   phoneNumber: string;
   email: string;
+  gender: string;
+  nationalId: string;
+  dateOfBirth: string;
 }
 
 export interface MarketerOrganization {
@@ -63,17 +66,17 @@ export interface CreateMarketerPayload {
 export interface UpdateMarketerPayload {
   marketerId: number;
   marketerData: {
-    iban?: string;
-    nationality?: string;
+    iban?: string | null;
+    nationality?: string | null;
   };
   userData: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    gender?: string;
-    nationalId?: string;
-    dateOfBirth?: string;
-    phoneNumber?: string;
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string | null;
+    gender?: string | null;
+    nationalId?: string | null;
+    dateOfBirth?: string | null;
+    phoneNumber?: string | null;
   };
 }
 
