@@ -1,0 +1,21 @@
+/* OTP-specific pieces; shell, hero and card come from login.module.css */
+
+.phone { font-weight: 800; color: #0d2002; white-space: nowrap; letter-spacing: 0.3px; }
+.editLink { display: inline-block; margin-inline-start: 6px; font-size: 12.5px; font-weight: 700; color: #173404; text-decoration: underline; text-underline-offset: 3px; }
+
+.boxes { display: flex; justify-content: center; gap: 12px; }
+.box { flex: 1; max-width: 64px; aspect-ratio: 1; min-width: 0; border: 1.5px solid rgba(23,52,4,0.14); border-radius: 16px; background: #f7fbf0; text-align: center; font-family: inherit; font-size: 26px; font-weight: 700; color: #0d2002; outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; caret-color: #4DA514; }
+.box:focus { border-color: #4DA514; background: #ffffff; box-shadow: 0 0 0 4px rgba(126,217,87,0.22); }
+.boxFilled { border-color: rgba(23,52,4,0.35); background: #ffffff; }
+.boxError, .boxError:focus { border-color: #d64545; box-shadow: 0 0 0 4px rgba(214,69,69,0.12); }
+
+.verifying { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 13px; font-weight: 500; color: #27500A; }
+.miniSpinner { width: 16px; height: 16px; border: 2px solid rgba(23,52,4,0.15); border-top-color: #173404; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+.resend { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 20px; font-size: 13px; color: rgba(23,52,4,0.6); }
+.resendBtn { background: none; border: none; padding: 0; font-family: inherit; font-size: 13px; font-weight: 700; color: #27500A; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.resendBtn:disabled { color: rgba(23,52,4,0.4); text-decoration: none; cursor: default; }
+.timer { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; background: #EAF3DE; color: #27500A; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .miniSpinner { animation-duration: 2s; } }

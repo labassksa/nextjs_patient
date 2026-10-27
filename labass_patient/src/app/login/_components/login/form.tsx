@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginPatient } from "../../_controllers/sendOTP.Controller";
 import { convertArabicToEnglishNumbers } from "../../../../utils/arabicToenglish";
-import { ArrowBack } from "@mui/icons-material";
+import s from "../../login.module.css";
 
 const countryCodes = [
   { code: "+966", label: "🇸🇦 +966" },
@@ -62,22 +62,21 @@ const SimpleLoginForm = () => {
     }
   };
 
-  const handleBackClick = () => {
-    router.back();
-  };
-
   return (
-    <div className="flex flex-col h-screen justify-between">
-      <form onSubmit={handleSubmit} className="text-right m-2" id="loginForm">
-        <label htmlFor="phoneNumber" className="block mb-2">
-          أدخل رقم الجوال
-        </label>
-        <div className="flex">
+    <form onSubmit={handleSubmit} className={s.card} id="loginForm" noValidate>
+      <label htmlFor="phoneNumber" className={s.label}>
+        رقم الجوال
+      </label>
+
+      {/* Phone numbers read left-to-right: [code ▾ | number] */}
+      <div dir="ltr" className={`${s.field} ${errorMessage ? s.fieldError : ""}`}>
+        <div className={s.codeWrap}>
           <select
             id="countryCode"
+            aria-label="رمز الدولة"
             value={countryCode}
             onChange={handleCountryCodeChange}
-            className="p-3 text-right text-lg border border-gray-200 rounded-l-md focus:outline-none focus:border-custom-green direction-rtl"
+            className={s.code}
           >
             {countryCodes.map((cc) => (
               <option key={cc.code} value={cc.code}>
@@ -85,39 +84,56 @@ const SimpleLoginForm = () => {
               </option>
             ))}
           </select>
-          <input
-            id="phoneNumber"
-            type="tel"
-            value={phoneNumber}
-            onChange={handlePhoneNumberChange}
-            placeholder="5xxxxxxx"
-            required
-            className="w-full p-3 text-right text-lg border border-gray-200 rounded-r-md focus:outline-none focus:border-custom-green direction-rtl"
-          />
+          <svg className={s.codeChevron} width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
-
-        {errorMessage && (
-          <div className="text-red-400 text-sm mt-2">{errorMessage}</div>
-        )}
-      </form>
-
-      <div className="p-6 mb-60">
-        <div className="text-xs text-right">
-          مع الاستمرار بتسجيل الدخول، أنت توافق على{" "}
-          <a href="/termsandConditions" className="underline text-custom-green">
-            الشروط والأحكام
-          </a>
-        </div>
-        <button
-          type="submit"
-          form="loginForm"
-          className="mt-2 px-6 py-4 w-full bg-custom-green text-white font-bold text-sm rounded-md focus:outline-none flex justify-center items-center"
-          disabled={isLoading}
-        >
-          {isLoading ? <div className="spinner"></div> : "تسجيل الدخول"}
-        </button>
+        <input
+          id="phoneNumber"
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel-national"
+          value={phoneNumber}
+          onChange={handlePhoneNumberChange}
+          placeholder="5X XXX XXXX"
+          required
+          autoFocus
+          aria-invalid={!!errorMessage}
+          aria-describedby={errorMessage ? "phoneError" : undefined}
+          className={s.input}
+        />
       </div>
-    </div>
+
+      {errorMessage ? (
+        <div id="phoneError" role="alert" className={s.error}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+            <path d="M12 7v6M12 16.5v.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          {errorMessage}
+        </div>
+      ) : (
+        <p className={s.hint}>سنرسل لك رمز تحقق عبر رسالة نصية</p>
+      )}
+
+      <button type="submit" className={s.submit} disabled={isLoading}>
+        {isLoading ? (
+          <div className="spinner"></div>
+        ) : (
+          <>
+            إرسال رمز التحقق
+            <span className={s.submitArr}>←</span>
+          </>
+        )}
+      </button>
+
+      <p className={s.terms}>
+        مع الاستمرار بتسجيل الدخول، أنت توافق على{" "}
+        <a href="/termsandConditions" className={s.termsLink}>
+          الشروط والأحكام
+        </a>
+      </p>
+    </form>
   );
 };
 

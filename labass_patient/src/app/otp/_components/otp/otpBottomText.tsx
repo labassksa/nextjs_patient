@@ -1,5 +1,6 @@
 // components/otp/OTPBottomText.tsx
 import React, { useState, useEffect } from "react";
+import o from "../../otp.module.css";
 
 interface OTPBottomTextProps {
   onResend: () => void;
@@ -24,18 +25,21 @@ const OTPBottomText: React.FC<OTPBottomTextProps> = ({ onResend }) => {
   };
 
   return (
-    <div className="text-center mt-4">
-      <p className="text-gray-600">
-        لم استلم الكود{" "}
-        <span
-          className={`text-blue-600 cursor-pointer ${
-            timeLeft > 0 ? "pointer-events-none text-gray-400" : ""
-          }`}
-          onClick={handleResendClick}
-        >
-          اضغط هنا لاعادة ارساله {timeLeft > 0 && `(${timeLeft} ثانية)`}
+    <div className={o.resend}>
+      <span>لم يصلك الرمز؟</span>
+      <button
+        type="button"
+        className={o.resendBtn}
+        onClick={handleResendClick}
+        disabled={timeLeft > 0}
+      >
+        إعادة الإرسال
+      </button>
+      {timeLeft > 0 && (
+        <span dir="ltr" className={o.timer}>
+          00:{String(timeLeft).padStart(2, "0")}
         </span>
-      </p>
+      )}
     </div>
   );
 };
