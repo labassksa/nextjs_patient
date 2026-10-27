@@ -1,12 +1,14 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import OTPInput from "./_components/otp/otpInput";
-import Header from "../../components/common/header";
 import OTPTopText from "./_components/otp/otpTopText";
 import OTPBottomText from "./_components/otp/otpBottomText";
 import { useRouter } from "next/navigation";
 import { verifyOTPandLogin } from "./_controllers/verifyOTPandLogin";
 import { loginPatient } from "../login/_controllers/sendOTP.Controller";
+import s from "../login/login.module.css";
+import o from "./otp.module.css";
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -22,6 +24,7 @@ const OTPPage = () => {
   const [localPhoneNumber, setLocalPhoneNumber] = useState<string | null>(null);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -53,11 +56,26 @@ const OTPPage = () => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    setErrorMessage(null);
     if (value && index < 3) {
       inputRefs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
+  };
+
+  // Spread a pasted / autofilled code across the boxes.
+  // A full-length code always starts from the first box.
+  const fillOTP = (digits: string, index: number) => {
+    const start = digits.length >= otp.length ? 0 : index;
+    const newOtp = [...otp];
+    digits
+      .slice(0, otp.length - start)
+      .split("")
+      .forEach((d, i) => (newOtp[start + i] = d));
+    setOtp(newOtp);
+    setErrorMessage(null);
+    inputRefs.current[Math.min(start + digits.length, otp.length - 1)]?.focus();
   };
 
   const handleVerifyOTP = async () => {
@@ -66,7 +84,10 @@ const OTPPage = () => {
       return;
     }
 
+    if (isVerifying) return;
+
     const otpCode = otp.join("");
+    setIsVerifying(true);
     try {
       const fullNumber = `${countryCode}${localPhoneNumber}`;
       const result = await verifyOTPandLogin("patient", fullNumber, otpCode);
@@ -81,6 +102,8 @@ const OTPPage = () => {
     } catch (error) {
       setErrorMessage("حدث خطأ ، حاول مرة أخرى");
       console.error("Failed to verify OTP:", error);
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -110,30 +133,80 @@ const OTPPage = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="flex flex-col justify-between">
-        <Header title="التحقق" showBackButton />
-        {countryCode && localPhoneNumber ? (
-          <OTPTopText phoneNumber={`${countryCode}${localPhoneNumber}`} />
-        ) : null}
-        <div className="flex mt-10 justify-center" dir="ltr">
-          {otp.map((value, index) => (
-            <OTPInput
-              key={index}
-              value={value}
-              index={index}
-              onChange={updateOTP}
-              autoFocus={index === 0}
-              ref={(el: any) => (inputRefs.current[index] = el)}
-            />
-          ))}
-        </div>
-        {errorMessage && (
-          <div className="text-red-500 text-sm m-2 text-center">
-            {errorMessage}
+    <div dir="rtl" className={s.page}>
+      <div className={s.shell}>
+        {/* ─── TOP BAR ─── */}
+        <header className={s.topBar}>
+          <Link href="/landing" className={s.brand}>
+            <div className={s.mark} />
+            <span className={s.bname}>لاباس</span>
+          </Link>
+          {/* Right-pointing arrow = "back" in RTL */}
+          <button onClick={() => router.back()} className={s.backBtn} aria-label="رجوع">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </header>
+
+        {/* ─── HERO ─── */}
+        <section className={s.hero}>
+          <OTPTopText
+            phoneNumber={
+              countryCode && localPhoneNumber
+                ? `${countryCode} ${localPhoneNumber}`
+                : null
+            }
+          />
+          <div className={s.pillVisual} aria-hidden="true">
+            <div className={s.ring} />
+            <div className={s.pillWrap}>
+              <div className={s.pill}>
+                <span className={s.pillText}>labass</span>
+              </div>
+            </div>
           </div>
-        )}
-        <OTPBottomText onResend={handleResendOTP} />
+        </section>
+
+        {/* ─── CODE ─── */}
+        <div className={s.card}>
+          <label className={s.label} htmlFor="otp-0">رمز التحقق</label>
+          <div className={o.boxes} dir="ltr">
+            {otp.map((value, index) => (
+              <OTPInput
+                key={index}
+                value={value}
+                index={index}
+                onChange={updateOTP}
+                onFill={fillOTP}
+                autoFocus={index === 0}
+                hasError={!!errorMessage}
+                ref={(el: any) => (inputRefs.current[index] = el)}
+              />
+            ))}
+          </div>
+
+          {isVerifying && (
+            <div className={o.verifying} role="status">
+              <span className={o.miniSpinner} />
+              جارٍ التحقق…
+            </div>
+          )}
+
+          {errorMessage && (
+            <div role="alert" className={s.error}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                <path d="M12 7v6M12 16.5v.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              {errorMessage}
+            </div>
+          )}
+
+          <OTPBottomText onResend={handleResendOTP} />
+        </div>
+
+        <footer className={s.foot}>شركة معالم التطوير · مرخّصة من وزارة الصحة</footer>
       </div>
     </div>
   );

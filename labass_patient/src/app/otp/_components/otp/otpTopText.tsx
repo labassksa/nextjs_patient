@@ -1,16 +1,28 @@
 // components/otp/OTPTopText.tsx
 import React from "react";
+import Link from "next/link";
+import s from "../../../login/login.module.css";
+import o from "../../otp.module.css";
 
 const OTPTopText = ({ phoneNumber }: { phoneNumber: string | null }) => {
   return (
-    <div className="text-center mt-20 mx-4">
-      <h2 className="text-xl font-bold">
-        الرجاء إدخال الرمز المكون من 4 ارقام
-      </h2>
-      <p className="text-gray-600 m-4">
-        تم إرسال الرمز الى الرقم{" "}
-        <span className="font-bold">{phoneNumber}</span> الرجاء ادخال الرمز
-        المكون من ٤ أرقام
+    <div className={s.heroText}>
+      <div className={s.eyebrow}>
+        <span className={s.eyebrowDot} />
+        رمز التحقق
+      </div>
+      <h1 className={s.title}>أدخل الرمز</h1>
+      <p className={s.sub}>
+        أرسلنا رمزاً من ٤ أرقام إلى{" "}
+        {/* <bdi dir="ltr"> keeps "+966 5…" in order inside Arabic text */}
+        {phoneNumber && (
+          <bdi dir="ltr" className={o.phone}>
+            {phoneNumber}
+          </bdi>
+        )}
+        <Link href="/login" className={o.editLink}>
+          تعديل
+        </Link>
       </p>
     </div>
   );
