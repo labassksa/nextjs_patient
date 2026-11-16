@@ -20,7 +20,7 @@ import LabPatientCard from "./_components/patientsCard";
 import { LabtestType } from "./_types/labTestTypes";
 import { Gender } from "./_types/genderType";
 import TestTypeSection from "./_components/testType";
-import { getMarketerConsultaion } from "./_controllers/getMarketerConsultaion";
+import { getMarketerConsultaion, getAllMarketerConsultaions } from "./_controllers/getMarketerConsultaion";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ProductsList from "./_components/productsList";
@@ -265,8 +265,11 @@ const OrgPatientsPage: React.FC = () => {
   }, []);
 
   useEffect(() =>{
+    let cancelled = false;
     (async () => {
-      const marketerConsultaion = await getMarketerConsultaion(fromDate, toDate);
+      const marketerConsultaion = await getAllMarketerConsultaions(fromDate, toDate);
+      // Ignore a stale response if the date range changed while pages were loading.
+      if (cancelled) return;
       if (marketerConsultaion.success && marketerConsultaion.data.consultations) {
         setMarketerConsultaion(marketerConsultaion.data.consultations);
         const uniqueMarketers: any[] = [...new Set(marketerConsultaion.data.consultations
@@ -280,6 +283,9 @@ const OrgPatientsPage: React.FC = () => {
         );
       }
       })()
+    return () => {
+      cancelled = true;
+    };
   }, [fromDate, toDate]);
 
   useEffect(() => {

@@ -65,3 +65,22 @@ export const getMarketerConsultaion = async (
     };
   }
 };
+
+// The endpoint is paginated (backend default limit is 10), so walk every page
+// to get the full list for the selected date range.
+export const getAllMarketerConsultaions = async (
+  fromDate?: Date,
+  toDate?: Date,
+  pageSize = 100
+) => {
+  const consultations: any[] = [];
+  let page = 1;
+  while (true) {
+    const response = await getMarketerConsultaion(fromDate, toDate, page, pageSize);
+    if (!response.success) return response;
+    consultations.push(...(response.data.consultations ?? []));
+    if (!response.data.hasNextPage) break;
+    page++;
+  }
+  return { success: true, data: { consultations } };
+};

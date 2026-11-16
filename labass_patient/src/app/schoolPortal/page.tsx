@@ -6,7 +6,7 @@ import { getOrganization } from "../orgPortal/_controllers/getOrganization";
 import { getUserData } from "../orgPortal/_controllers/getUserData";
 import { createBundleConsultation } from "../orgPortal/_controllers/createBundleConsultation";
 import { createMagicLink } from "../orgPortal/_controllers/createMagicLink";
-import { getMarketerConsultaion } from "../orgPortal/_controllers/getMarketerConsultaion";
+import { getMarketerConsultaion, getAllMarketerConsultaions } from "../orgPortal/_controllers/getMarketerConsultaion";
 import { getLabPatients } from "../orgPortal/_controllers/getLabPatients";
 import { Gender } from "../orgPortal/_types/genderType";
 import { DealType } from "../orgPortal/_types/dealType";
@@ -177,7 +177,7 @@ export default function SchoolPortal() {
     const token = localStorage.getItem("labass_token");
     if (!token) { setInitLoading(false); router.push("/schoolLogin"); return; }
 
-    Promise.all([getOrganization(), getUserData(), getMarketerConsultaion(), getLabPatients()])
+    Promise.all([getOrganization(), getUserData(), getAllMarketerConsultaions(), getLabPatients()])
       .then(([orgRes, userRes, consultRes, patientsRes]) => {
         if (!orgRes.success) { router.push("/schoolLogin"); return; }
         if (orgRes.data?.type !== "school") { router.push("/orgPortal"); return; }
@@ -224,7 +224,7 @@ export default function SchoolPortal() {
 
   /* ── Refresh data ── */
   const refreshData = async () => {
-    const [cr, pr] = await Promise.all([getMarketerConsultaion(), getLabPatients()]);
+    const [cr, pr] = await Promise.all([getAllMarketerConsultaions(), getLabPatients()]);
     const consultList = cr.success ? (cr.data?.consultations ?? cr.data ?? []) : [];
     setConsultations(consultList);
 
